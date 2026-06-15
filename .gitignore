@@ -377,5 +377,4 @@ FodyWeavers.xsd
 /ide/vs/LightEngine.sln
 
 
-ide
-*exe
+ide 
