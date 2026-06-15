@@ -5,6 +5,7 @@
 
 int main(int argc, char** argv)
 {
+    //Temporaire
     GameManager gm = GameManager(640,480);
 
     gm.LaunchGame();
