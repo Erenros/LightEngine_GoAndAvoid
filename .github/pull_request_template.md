@@ -2,26 +2,18 @@
 <!-- Explique ce que fait cette PR -->
 
 ## 🧠 Type de changement
-- [ ] Feature
 - [ ] Fix
-- [ ] Refactor
-- [ ] Chore
+- [ ] Add
+- [ ] Del
+- [ ] Refacto
+- [ ] Merge
 
 ## 📁 Fichiers modifiés
 <!-- Liste les fichiers importants -->
 - 
 
-## 🧪 Tests à effectuer
-<!-- Très important -->
+## 🧪 Tests à effectuer 
+<!-- a remplir -->
 - [ ] Test scénario 1
 - [ ] Test scénario 2
 - [ ] Edge case
-
-## 🔍 Checklist avant review
-- [ ] Code lint OK
-- [ ] Tests passent en local
-- [ ] Merge avec Acceptance effectué
-- [ ] Pas de conflits
-
-## ⚠️ Risques / impact
-<!-- Si applicable -->
