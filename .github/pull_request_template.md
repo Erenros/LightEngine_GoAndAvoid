@@ -8,10 +8,6 @@
 - [ ] Refacto
 - [ ] Merge
 
-## 📁 Fichiers modifiés
-<!-- Liste les fichiers importants -->
-- 
-
 ## 🧪 Tests à effectuer 
 <!-- a remplir -->
 - [ ] Test scénario 1
