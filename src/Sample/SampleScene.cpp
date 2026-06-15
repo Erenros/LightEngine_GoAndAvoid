@@ -15,6 +15,8 @@ void SampleScene::OnInitialize()
 	pEntity2->SetRigidBody(true);
 
 	pEntitySelected = nullptr;
+
+	int foo = 2;
 }
 
 void SampleScene::OnEvent(const sf::Event& event)
