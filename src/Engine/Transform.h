@@ -1,141 +1,63 @@
+#pragma once
+
 #include <vector>
+#include <math.h>
 
-#include"Entity.h"
+#include "Math.hpp"
+#include "include.h"
+#include "Entity.h"
 
-namespace Transform {
+struct Transform2D
+{
+private: 
+    Vector2f m_Position;
+    Vector2f m_Direction;
+    Math::Degrees m_DegAngle;
+    Math::Radians m_RadAngle;
 
-    using Radiant = float;
-
-    struct Transform2D
-    {
-        //vector2D position
-        //vector2D direction
-        Radiant angle;
-
-        bool m_IsDirty;
+    bool m_IsDirty;
         
-        Transform2D* mp_Parent;
-        std::vector<Transform2D*> mp_Childs;
+    float m_DistanceFromParent;
+    Math::Radians m_AngleDifferenceToParent;
+    Math::Radians m_OffsetAngle;
 
+    Math::Radians m_ParentAncientAngle;
 
-        //functions
-        void SetParent(Transform2D* pParent);
-        void AddChild(Transform2D* pChild);
+    Transform2D* mp_Parent;
+    std::vector<Transform2D*> mp_Childs;
 
-        Transform2D* GetParent();
-        Transform2D* GetChild(uint32_t index);
+public: 
 
-        const Transform2D* GetParent() const;
-        const Transform2D* GetChild(uint32_t index) const;
+    void UpdateAngleWithDirection();
+    void UpdateDirectionWithAngle();
 
-        void RemoveParent();
-        void RemoveChild(uint32_t index);
+    void SetParent(Transform2D* pParent);
+    void AddChild(Transform2D* pChild);
 
-        uint32_t GetChildCount() const;
+    Transform2D* GetParent();
+    Transform2D* GetChild(uint32 index);
 
-        void SetDirty();
+    const Transform2D* GetParent() const;
+    const Transform2D* GetChild(uint32 index) const;
 
-        void UpdatePositionWithParentPosition();
-    };
+    void RemoveParent();
+    void RemoveChild(uint32 index);
 
+    uint32 GetChildCount() const;
 
-    Transform2D::~Transform2D() {
+    void SetDirty();
 
-        if (mp_Parent != nullptr) {
-            for (auto it = mp_Parent->mp_Childs.begin(); it != mp_Parent->mp_Childs.end(); ++it) {
-                if (*it == this) {
-                    mp_Parent->mp_Childs.erase(it);
-                    break;
-                }
-            }
-        }
+    void UpdatePositionWithParentPosition();
 
-        for (auto pChild : mp_Childs) {
-            pChild->SetParent(nullptr);
-        }
-    }
+    void SetPosition(Vector2f);
+    Vector2f GetPosition();
 
-#pragma region Parent/Childs
+    void SetDirection(Vector2f);
+    Vector2f GetDirection();
 
-    Transform2D* Transform2D::GetParent() {
-        return mp_Parent;
-    }
+    void SetDegAngle(Math::Degrees angle);
+    Math::Degrees GetDegAngle();
 
-    Transform2D* Transform2D::GetChild(uint32_t index) {
-        return mp_Childs[index];
-    }
-
-    const Transform2D* Transform2D::GetParent() const {
-        return mp_Parent;
-    }
-
-    const Transform2D* Transform2D::GetChild(uint32_t index) const {
-        return mp_Childs[index];
-    }
-
-    uint32_t Transform2D::GetChildCount() const {
-        return mp_Childs.size();
-    }
-
-    void Transform2D::SetParent(Transform2D* pParent) {
-        if (pParent == this) {
-            //GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
-            return;
-        }
-        if (mp_Parent != nullptr) {
-            RemoveParent();
-        }
-        mp_Parent = pParent;
-        if (mp_Parent != nullptr) {
-            mp_Parent->mp_Childs.push_back(this);
-        }
-    }
-
-    void Transform2D::AddChild(Transform2D* pChild) {
-        if (pChild == this) {
-            //GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
-            return;
-        }
-        for (auto& child : mp_Childs) {
-            if (child == pChild) return;
-        }
-
-        if (pChild->mp_Parent != nullptr) {
-            pChild->RemoveParent();
-        }
-        mp_Childs.push_back(pChild);
-        pChild->mp_Parent = this;
-    }
-
-    void Transform2D::RemoveParent() {
-        if (mp_Parent != nullptr) {
-            for (auto it = mp_Parent->mp_Childs.begin(); it != mp_Parent->mp_Childs.end(); ++it) {
-                if (*it == this) {
-                    mp_Parent->mp_Childs.erase(it);
-                    break;
-                }
-            }
-        }
-        mp_Parent = nullptr;
-    }
-
-    void Transform2D::RemoveChild(uint32_t index) {
-        if (index >= GetChildCount()) return;
-        auto it = mp_Childs.begin();
-        std::advance(it, index);
-        //mp_Childs[index]->UpdateLocalWithWorldParentRemoval();
-        mp_Childs[index]->mp_Parent = nullptr;
-        mp_Childs.erase(it);
-    }
-
-#pragma endregion
-
-
-    void Transform2D::SetDirty() {
-        if (m_IsDirty) return;
-        m_IsDirty = true;
-        for (auto pChild : mp_Childs) {
-            pChild->SetDirty();
-        }
-    }
-} // GPC
+    void SetRadAngle(Math::Radians angle);
+    Math::Radians GetRadAngle();
+};
