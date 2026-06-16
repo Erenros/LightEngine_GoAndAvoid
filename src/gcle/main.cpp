@@ -5,14 +5,12 @@
 
 int main(int argc, char** argv)
 {
-    /* Initialisation simple */
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     { 
         return -1;
     }
 
     {
-        /* Création de la fenêtre */
         SDL_Window* pWindow = NULL;
         pWindow = SDL_CreateWindow("Ma première application SDL2", SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
@@ -21,14 +19,12 @@ int main(int argc, char** argv)
             SDL_WINDOW_SHOWN);
 
         if (pWindow)
-        {
-            DEBUG_INFO << "Info" << ENDL;
-            DEBUG_WARN << "Warn" << ENDL;
-            DEBUG_ERROR << "Error" << ENDL;
+        { 
+            PROFILER_START("sleep", "Sleep Duration");
+            SDL_Delay(3000);
+            PROFILER_END("sleep");
 
-            PROFILER_START("Delay", "");
-            SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fenêtre */
-            PROFILER_END("Delay");
+
 
             SDL_DestroyWindow(pWindow);
         }

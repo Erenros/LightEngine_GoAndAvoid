@@ -7,9 +7,15 @@
 
 #include "Utils.h"
 
+#ifdef _DEBUG
 #define PROFILER_START(name, message) gcle::Profiler::NewTask(name, message)
 #define PROFILER_END(name) gcle::Profiler::EndTask(name)
 #define PROFILER_CLEAR(name) gcle::Profiler::Clear()
+#else
+#define PROFILER_START(name, message) {}
+#define PROFILER_END(name) {}
+#define PROFILER_CLEAR(name) {}
+#endif // _DEBUG
 
 namespace gcle
 {
