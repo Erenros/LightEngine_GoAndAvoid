@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Entity.h"
 
 
 //TODO : mettre l'update des entitiés

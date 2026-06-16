@@ -21,7 +21,6 @@ void GameManager::Loop()
 	SDL_RenderClear(mp_window->GetRenderer());
 
 	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
-
 	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
 
 	SDL_RenderPresent(mp_window->GetRenderer());
