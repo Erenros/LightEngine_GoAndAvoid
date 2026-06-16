@@ -20,27 +20,13 @@ void GameManager::Loop()
 	Triangle* triangle = new Triangle(10, 10, 100, 10, 100, 400, { 230, 0, 0, 250 });
 	triangle->Draw(mp_window);
 
+	Circle* circle = new Circle(500, 500, 100, 30, { 0, 0, 230, 255 });
+	circle->Draw(mp_window);
+
 	SDL_RenderPresent(mp_window->GetRenderer());
+
 
 	while (isRunning == true)
-	SDL_Rect rect(50, 50, 50, 50);
-
-	InputManager& IM = InputManager::GetInstance();
-
-	RessourceManager& RM = RessourceManager::GetInstance();
-	RM.Init(mp_window->GetRenderer());
-
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
-	SDL_RenderClear(mp_window->GetRenderer());
-
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
-	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
-
-	SDL_RenderPresent(mp_window->GetRenderer());
-
-	SDL_Delay(5000);
-
-	while (IM.HandleInput() && isRunning == true)
 	{
 		//TODO Loop
 

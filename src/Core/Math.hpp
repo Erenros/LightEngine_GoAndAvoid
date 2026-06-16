@@ -36,7 +36,6 @@ namespace Math
 	}
 
 	Radians VecToAngle(Vector2f vec) {
-
 		Radians rad = std::atan2f(vec.y, vec.x);
 		return rad;
 	}

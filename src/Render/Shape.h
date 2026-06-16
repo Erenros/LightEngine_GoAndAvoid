@@ -3,13 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Engine/Window.h"
-
-//TODO enlever ca
-class Coord {
-public:
-	int x;
-	int y;
-};
+#include "Core/Math.hpp"
 
 enum class Shapes {
 	Triangle,
@@ -17,36 +11,24 @@ enum class Shapes {
 	Circle
 };
 
-
-
 class Shape {
 
 	SDL_Texture* m_texture = nullptr;
-	
-
-
 
 protected:
 
-	
 
 	//circle
 	int m_radius;
-	Coord m_center;
-
+	Vector2<int> m_center;
+	int smoothness;
 
 	//rectangle
 	int m_height;
 	int m_width;
-	Coord m_coordinates;
-
-
-
-
-
+	Vector2<int> m_coordinates;
 
 	Shapes m_shapes;
-
 
 	int m_vertexNbr;
 	int m_indicesNbr;
@@ -62,28 +44,28 @@ protected:
 public:
 	//Getters 
 
-	virtual float GetRadius() { return 0.f; };
-	virtual float GetHeight() { return 0.f; };
-	virtual float GetWidth() { return 0.f; };
-	virtual Coord GetCenter() { return { 0, 0 }; };
-	virtual Coord GetCoordinates() { return { 0, 0 }; };
+	virtual int GetRadius() { return 0.f; };
+	virtual int GetHeight() { return 0.f; };
+	virtual int GetWidth() { return 0.f; };
+	virtual int GetSmoothness() { return 0.f; };
+	virtual Vector2<int> GetCenter() { return { 0, 0 }; };
+	virtual Vector2<int> GetCoordinates() { return { 0, 0 }; };
 
 	SDL_Texture* GetTexture() { return m_texture; };
 
 	//Setters 
 
 	virtual void SetRadius(int radius) {};
-	virtual void SetHeight(float height) {};
-	virtual void SetWidth(float width) {};
-	virtual void SetCenter(Coord center) {};
-	virtual void SetCoordinates(Coord coordinates) {};
+	virtual void SetHeight(int height) {};
+	virtual void SetWidth(int width) {};
+	virtual void SetCenter(Vector2<int> center) {};
+	virtual void SetCoordinates(Vector2<int> coordinates) {};
 	
 	void SetTexture(SDL_Texture* tex) {
 		m_texture = tex;
 	}
 
 };
-
 
 
 class Rectangle : public Shape {
@@ -122,26 +104,26 @@ public:
 
 	//Getters
 
-	float GetHeight() override {
+	int GetHeight() override {
 		return m_height;
 	}
-	float GetWidth() override {
+	int GetWidth() override {
 		return m_width;
 	}
-	Coord GetCoordinates() override {
+	Vector2<int> GetCoordinates() override {
 		return m_coordinates;
 	}
 
 
 	//Setters
 
-	void SetHeight(float height) override {
+	void SetHeight(int height) override {
 		m_height = height;
 	}
-	void SetWidth(float width) override {
+	void SetWidth(int width) override {
 		m_width = width;
 	}
-	void SetCoordinates(Coord coordinates) override {
+	void SetCoordinates(Vector2<int> coordinates) override {
 		m_coordinates = coordinates;
 	}
 
@@ -174,6 +156,40 @@ public:
 		m_vertices[1] = vertex2;
 		m_vertices[2] = vertex3;
 	}
+
+	void Draw(Window* pWindow) override;
+};
+
+class Circle: public Shape {
+	SDL_Vertex* m_vertices;
+
+public:
+
+	//Contructors
+
+	Circle(int x, int y, int radius, int smoothness, SDL_Color color) {
+		m_shapes = Shapes::Circle;
+
+		m_vertices = static_cast<SDL_Vertex*>(malloc(sizeof(SDL_Vertex) * smoothness));
+
+		m_indicesNbr = 0;
+		m_vertexNbr = smoothness;
+
+		Math::Degrees degreesBetweenPoints = 360 / smoothness;
+
+		for (int i = 0; i < smoothness; i++) {
+			Math::Radians radian = Math::DegToRad(degreesBetweenPoints * i);
+			
+			x = sin(radian);
+			y = cos(radian);
+
+			SDL_Vertex vertex{ {x, y}, color, {1, 1} };
+			m_vertices[i] = vertex;
+		}
+
+	}
+
+	~Circle() { delete m_vertices; }
 
 	void Draw(Window* pWindow) override;
 };
