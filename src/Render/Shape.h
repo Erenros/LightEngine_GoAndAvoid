@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Engine/Window.h"
-#include "Core/Math.hpp"
+#include "Core/Math.h"
 
 enum class Shapes {
 	Triangle,
@@ -175,10 +175,10 @@ public:
 		m_indicesNbr = 0;
 		m_vertexNbr = smoothness;
 
-		Math::Degrees degreesBetweenPoints = 360 / smoothness;
+		Degrees degreesBetweenPoints = 360 / smoothness;
 
 		for (int i = 0; i < smoothness; i++) {
-			Math::Radians radian = Math::DegToRad(degreesBetweenPoints * i);
+			Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 			
 			x = sin(radian);
 			y = cos(radian);
