@@ -6,11 +6,21 @@
 
 #include "Entity.h"
 
+#include "Shape.h"
+
 void GameManager::Loop()
 {
 	isRunning = true;
 
-	
+	SDL_RenderClear(mp_window->GetRenderer());
+
+	Rectangle* rectangle = new Rectangle(100, 100, 20, 500, { 0, 230, 0, 250 });
+	rectangle->Draw(mp_window);
+
+	Triangle* triangle = new Triangle(10, 10, 100, 10, 100, 400, { 230, 0, 0, 250 });
+	triangle->Draw(mp_window);
+
+	SDL_RenderPresent(mp_window->GetRenderer());
 
 	while (isRunning == true)
 	{
