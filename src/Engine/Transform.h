@@ -11,17 +11,31 @@ namespace Transform {
         //vector2D position
         //vector2D direction
         Radiant angle;
+
+        bool m_IsDirty;
+        
         Transform2D* mp_Parent;
         std::vector<Transform2D*> mp_Childs;
 
+
+        //functions
         void SetParent(Transform2D* pParent);
-        void UpdateLocalWithWorldParentAddition();
+        void AddChild(Transform2D* pChild);
 
         Transform2D* GetParent();
         Transform2D* GetChild(uint32_t index);
+
         const Transform2D* GetParent() const;
         const Transform2D* GetChild(uint32_t index) const;
+
+        void RemoveParent();
+        void RemoveChild(uint32_t index);
+
         uint32_t GetChildCount() const;
+
+        void SetDirty();
+
+        void UpdatePositionWithParentPosition();
     };
 
 
@@ -75,12 +89,11 @@ namespace Transform {
         if (mp_Parent != nullptr) {
             mp_Parent->mp_Childs.push_back(this);
         }
-        UpdateLocalWithWorldParentAddition();
     }
 
     void Transform2D::AddChild(Transform2D* pChild) {
         if (pChild == this) {
-            GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
+            //GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
             return;
         }
         for (auto& child : mp_Childs) {
@@ -92,7 +105,6 @@ namespace Transform {
         }
         mp_Childs.push_back(pChild);
         pChild->mp_Parent = this;
-        pChild->UpdateLocalWithWorldParentAddition();
     }
 
     void Transform2D::RemoveParent() {
@@ -107,11 +119,11 @@ namespace Transform {
         mp_Parent = nullptr;
     }
 
-    void Transform3D::RemoveChild(uint32_t index) {
+    void Transform2D::RemoveChild(uint32_t index) {
         if (index >= GetChildCount()) return;
         auto it = mp_Childs.begin();
         std::advance(it, index);
-        mp_Childs[index]->UpdateLocalWithWorldParentRemoval();
+        //mp_Childs[index]->UpdateLocalWithWorldParentRemoval();
         mp_Childs[index]->mp_Parent = nullptr;
         mp_Childs.erase(it);
     }
