@@ -24,21 +24,31 @@ void GameManager::Loop()
 
 	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
 
-	SDL_RenderPresent(mp_window->GetRenderer());
 
-	SDL_Delay(5000);
+	SDL_Rect srect = SDL_Rect(0, 0, 32, 32);
+	SDL_Rect rect2 = SDL_Rect(0, 0, 256, 256);
+
+	//SDL_RenderCopy(mp_window->GetRenderer(), RM.GetTexture("test"), &srect, &rect2);
+
+	SpriteSheet* spritesheet = new SpriteSheet(RM.GetTexture("test"), 1, 4, srect);
+	spritesheet->PlayAnimation(0);
+
+
+	//SDL_Delay(5000);
 
 	while (IM.HandleInput() && isRunning == true)
 	{
 		//TODO Loop
+		spritesheet->UpdateAnimation();
+		SDL_Delay(spritesheet->duration * 500);
+		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->texture, &spritesheet->srect, &rect2);
+		SDL_RenderPresent(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
 			//TODO faire update et draw pour les entiti�s
 			/*entity.Update();
 			entity.Draw();*/
 		}
-		SDL_Delay(3000);
-		isRunning = false;
 	}
 }
 

@@ -8,6 +8,47 @@
 #include <string>
 
 //Faudra biennnn optimiser ca plus tard
+//je fais rien depuis 1H aled
+
+//struct Sprite
+//{
+//	bool spritesheet;
+//	SDL_Texture* texture;
+//	int row, column;
+//	SDL_Rect srect;
+//
+//	Sprite(bool s, SDL_Texture* t, int r, int c, SDL_Rect sr) :
+//		spritesheet(s),
+//		texture(t),
+//		row(r),
+//		column(c),
+//		srect(sr) { }
+//};
+
+
+//Temporaire
+struct SpriteSheet
+{
+	SDL_Texture* texture;
+	int row, column;
+	SDL_Rect srect;
+	float duration;
+
+	int currentRow = 0;
+	int currentColumn = 0;
+
+	SpriteSheet(SDL_Texture* t, int r, int c, SDL_Rect sr, float d = 0.5f) :
+		texture(t),
+		row(r),
+		column(c),
+		srect(sr),
+		duration(d)
+	{ }
+
+	void PlayAnimation(int nbr);
+	void UpdateAnimation(float deltaTime = 0.f);
+};
+
 
 class RessourceManager
 {

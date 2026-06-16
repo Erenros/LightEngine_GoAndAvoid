@@ -275,3 +275,20 @@ void RessourceManager::DeleteAllTexture()
 
     m_textureMap.clear();
 }
+
+void SpriteSheet::PlayAnimation(int nbr)
+{
+    if (nbr >= row) nbr = row;
+    if (nbr < row) nbr = 0;
+
+    currentRow = nbr;
+    srect.y = currentRow * srect.h;
+}
+
+void SpriteSheet::UpdateAnimation(float deltaTime = 0.f)
+{
+    currentColumn += 1;
+    if (currentColumn >= column) currentColumn = 0;
+
+    srect.x = currentColumn * srect.w;
+}
