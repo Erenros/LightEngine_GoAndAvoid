@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "RessourceManager.h"
 #include <iostream>
 #include "SceneManager.h"
 #include "SDL.h"
@@ -11,7 +12,8 @@ void GameManager::Loop()
 
 	SDL_Rect rect(50, 50, 50, 50);
 
-
+	RessourceManager& RM = RessourceManager::GetInstance();
+	RM.Init(mp_window->GetRenderer());
 
 	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
 	SDL_RenderClear(mp_window->GetRenderer());
@@ -24,13 +26,12 @@ void GameManager::Loop()
 
 	SDL_Delay(5000);
 
-
 	while (isRunning == true)
 	{
 		//TODO Loop
 
 		for (Entity* entity : m_entities) {
-			//TODO faire update et draw pour les entitiés
+			//TODO faire update et draw pour les entitiï¿½s
 			/*entity.Update();
 			entity.Draw();*/
 		}
