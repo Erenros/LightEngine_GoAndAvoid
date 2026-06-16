@@ -1,4 +1,5 @@
 #include "SDL.h"
+#include "include.h"
 
 #undef main
 
@@ -21,7 +22,13 @@ int main(int argc, char** argv)
 
         if (pWindow)
         {
+            DEBUG_INFO << "Info" << ENDL;
+            DEBUG_WARN << "Warn" << ENDL;
+            DEBUG_ERROR << "Error" << ENDL;
+
+            PROFILER_START("Delay", "");
             SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fenêtre */
+            PROFILER_END("Delay");
 
             SDL_DestroyWindow(pWindow);
         }
