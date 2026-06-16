@@ -29,6 +29,8 @@ void GameManager::Loop()
 
 	while (IM.HandleInput() && isRunning == true)
 	{
+		timer->ResetChrono();
+
 		//TODO Loop
 
 		for (Entity* entity : m_entities) {
@@ -75,6 +77,8 @@ bool GameManager::Init()
 		Close();
 		return false;
 	}
+
+	timer = new Timer();
 
 	return true;
 }

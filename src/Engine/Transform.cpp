@@ -16,11 +16,13 @@ Transform2D::~Transform2D() {
     }
 }
 
-void Transform2D::Initialize(Vector2f position, Vector2f direction)
+void Transform2D::Initialize(Vector2f position, Math::Degrees angle)
 {
     m_Position = position;
-    m_Direction = direction;
-    UpdateAngleWithDirection();
+    m_DegAngle = angle;
+    m_RadAngle = Math::DegToRad(m_DegAngle);
+
+    isSet = true;
 }
 
 #pragma region Gets
@@ -157,7 +159,7 @@ void Transform2D::RemoveChild(uint32 index) {
 
 #pragma region Updates
 
-void Transform2D::UpdateAngleWithDirection()
+void Transform2D::RotateToDirection()
 {
     Math::Radians rad = Math::VecToAngle(m_Direction);
 
@@ -165,7 +167,7 @@ void Transform2D::UpdateAngleWithDirection()
     SetDegAngle(Math::RadToDeg(rad));
 }
 
-void Transform2D::UpdateDirectionWithAngle()
+void Transform2D::Forward()
 {
     m_Direction = Math::AngleToVec(m_RadAngle);
 }
@@ -184,6 +186,7 @@ void Transform2D::UpdatePositionWithParentPosition()
 
     m_RadAngle = mp_Parent->GetRadAngle() + m_AngleDifferenceToParent;
     m_DegAngle = Math::RadToDeg(m_RadAngle);
-    UpdateDirectionWithAngle();
 }
+
+
 #pragma endregion
