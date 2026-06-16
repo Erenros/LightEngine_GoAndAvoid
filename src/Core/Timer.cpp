@@ -9,18 +9,18 @@ second Timer::GetChronoTime()
 {
 	m_ending_time = system_clock::now();
 
-	float f = (m_ending_time - m_beginning_time).count() / 10000000.f;
+	double d = (m_ending_time - m_beginning_time).count() / 10000000.f;
 
-	return f;
+	return d;
 }
 
 second Timer::GetChronoTimeScale()
 {
 	m_ending_time = system_clock::now();
 
-	float f = ((m_ending_time - m_beginning_time).count() / 10000000.f) * scale;
+	double d = ((m_ending_time - m_beginning_time).count() / 10000000.f) * scale;
 
-	return f;
+	return d;
 }
 
 void Timer::SetScale(float f)
