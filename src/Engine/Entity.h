@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include.h"
+#include "Transform.h"
 
 class Entity
 {
@@ -38,7 +39,7 @@ protected:
 
 private:
 	void Update();
-	void Initialize();
+	void Initialize(Vector2f position, Vector2f direction);
 	void Repulse(Entity* other);
 
 
@@ -47,7 +48,7 @@ protected:
 	bool m_ToDestroy = false;
 	int m_Tag = -1;
 	bool m_RigidBody = false;
-	Vector2f m_Direction;
-	Vector2f m_Position;
+
+	Transform2D* mp_Transform = nullptr;
 
 };

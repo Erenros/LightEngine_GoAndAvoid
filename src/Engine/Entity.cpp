@@ -1,7 +1,9 @@
 #include "Entity.h"
 
-void Entity::Initialize()
+void Entity::Initialize(Vector2f position, Vector2f direction)
 {
+    mp_Transform = new Transform2D();
+    mp_Transform->Initialize(position, direction);
 }
 
 void Entity::Repulse(Entity* other)

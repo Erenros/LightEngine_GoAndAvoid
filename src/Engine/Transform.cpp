@@ -16,6 +16,13 @@ Transform2D::~Transform2D() {
     }
 }
 
+void Transform2D::Initialize(Vector2f position, Vector2f direction)
+{
+    m_Position = position;
+    m_Direction = direction;
+    UpdateAngleWithDirection();
+}
+
 #pragma region Gets
 
 Transform2D* Transform2D::GetParent() {

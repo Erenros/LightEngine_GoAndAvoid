@@ -5,34 +5,36 @@
 
 #include "Math.hpp"
 #include "include.h"
-#include "Entity.h"
 
 struct Transform2D
 {
-private: 
-    Vector2f m_Position;
-    Vector2f m_Direction;
-    Math::Degrees m_DegAngle;
-    Math::Radians m_RadAngle;
-
-    bool m_IsDirty;
-        
-    float m_DistanceFromParent;
-    Math::Radians m_AngleDifferenceToParent;
-    Math::Radians m_OffsetAngle;
-
-    Math::Radians m_ParentAncientAngle;
-
-    Transform2D* mp_Parent;
-    std::vector<Transform2D*> mp_Childs;
-
 public: 
+    Transform2D() = default;
+    ~Transform2D();
+
 
     void UpdateAngleWithDirection();
     void UpdateDirectionWithAngle();
 
+    void UpdatePositionWithParentPosition();
+
+public:
+    void SetPosition(Vector2f);
+    void SetDirection(Vector2f);
+    
+    void SetDegAngle(Math::Degrees angle);
+    void SetRadAngle(Math::Radians angle);
+
     void SetParent(Transform2D* pParent);
-    void AddChild(Transform2D* pChild);
+    
+    void SetDirty();
+
+public:
+    Vector2f GetPosition();
+    Vector2f GetDirection();
+
+    Math::Radians GetRadAngle();
+    Math::Degrees GetDegAngle();
 
     Transform2D* GetParent();
     Transform2D* GetChild(uint32 index);
@@ -40,24 +42,29 @@ public:
     const Transform2D* GetParent() const;
     const Transform2D* GetChild(uint32 index) const;
 
-    void RemoveParent();
-    void RemoveChild(uint32 index);
-
     uint32 GetChildCount() const;
 
-    void SetDirty();
+public:
+    void AddChild(Transform2D* pChild);
+    void RemoveParent();
+    void RemoveChild(uint32 index);
+    void Initialize(Vector2f m_Position, Vector2f m_Direction);
 
-    void UpdatePositionWithParentPosition();
+private:
+    Vector2f m_Position = {0,0};
+    Vector2f m_Direction = { 0,0 };
 
-    void SetPosition(Vector2f);
-    Vector2f GetPosition();
+    Math::Degrees m_DegAngle = 0;
+    Math::Radians m_RadAngle = 0;
 
-    void SetDirection(Vector2f);
-    Vector2f GetDirection();
+    Transform2D* mp_Parent = nullptr;
+    std::vector<Transform2D*> mp_Childs;
 
-    void SetDegAngle(Math::Degrees angle);
-    Math::Degrees GetDegAngle();
+    float m_DistanceFromParent = 0;
+    Math::Radians m_AngleDifferenceToParent = 0;
+    Math::Radians m_OffsetAngle = 0;
 
-    void SetRadAngle(Math::Radians angle);
-    Math::Radians GetRadAngle();
+    Math::Radians m_ParentAncientAngle = 0;
+    
+    bool m_IsDirty = false;
 };

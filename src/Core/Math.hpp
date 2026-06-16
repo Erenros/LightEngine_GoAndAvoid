@@ -14,15 +14,15 @@ namespace Math
 
 	template <typename T>
 	T Lerp(T minValue, T maxValue, float t) {
-		return (t - 1) * minValue + t * maxValue
+		return (t - 1) * minValue + t * maxValue;
 	}
 
 	float RadToDeg(Radians rad) {
-		rad* RAD_TO_DEG;
+		return rad* RAD_TO_DEG;
 	}
 
 	float DegToRad(Degrees deg) {
-		deg* DEG_TO_RAD;
+		return deg* DEG_TO_RAD;
 	}
 
 	Vector2f AngleToVec(Radians rad) {
@@ -38,6 +38,6 @@ namespace Math
 	Radians VecToAngle(Vector2f vec) {
 
 		Radians rad = std::atan2f(vec.y, vec.x);
-
+		return rad;
 	}
 }
