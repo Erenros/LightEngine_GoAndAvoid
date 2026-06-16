@@ -13,8 +13,8 @@ public:
     ~Transform2D();
 
 
-    void UpdateAngleWithDirection();
-    void UpdateDirectionWithAngle();
+    void RotateToDirection();
+    void Forward();
 
     void UpdatePositionWithParentPosition();
 
@@ -48,7 +48,7 @@ public:
     void AddChild(Transform2D* pChild);
     void RemoveParent();
     void RemoveChild(uint32 index);
-    void Initialize(Vector2f m_Position, Vector2f m_Direction);
+    void Initialize(Vector2f m_Position, Math::Degrees angle);
 
 private:
     Vector2f m_Position = {0,0};
@@ -67,4 +67,7 @@ private:
     Math::Radians m_ParentAncientAngle = 0;
     
     bool m_IsDirty = false;
+
+public:
+    bool isSet = false;
 };
