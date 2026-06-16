@@ -1,5 +1,6 @@
 #include "SDL.h"
 #include "GameManager.h"
+#include "include.h"
 
 #undef main
 
@@ -17,9 +18,9 @@ int main(int argc, char** argv)
     //}
 
     //{
-    //    /* Cr�ation de la fen�tre */
+    //    /* Crï¿½ation de la fenï¿½tre */
     //    SDL_Window* pWindow = NULL;
-    //    pWindow = SDL_CreateWindow("Ma premi�re application SDL2", SDL_WINDOWPOS_UNDEFINED,
+    //    pWindow = SDL_CreateWindow("Ma premiï¿½re application SDL2", SDL_WINDOWPOS_UNDEFINED,
     //        SDL_WINDOWPOS_UNDEFINED,s
     //        640,
     //        480,
@@ -27,7 +28,7 @@ int main(int argc, char** argv)
 
     //    if (pWindow)
     //    {
-    //        SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fen�tre */
+    //        SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fenï¿½tre */
 
     //        SDL_DestroyWindow(pWindow);
     //    }
