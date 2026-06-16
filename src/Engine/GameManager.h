@@ -12,14 +12,9 @@ private:
 
 	Window* mp_window = nullptr;
 
-	//SDL_Renderer* mp_Renderer = nullptr;
-	//SDL_Window* mp_Window = nullptr;
-
 	bool isRunning = false;
 
-
 	int m_WindW, m_WindH;
-
 
 	bool Init();
 	void Loop();
@@ -33,4 +28,5 @@ public:
 
 	void LaunchGame();
 
+	Window* GetWindow() { return mp_window; };
 };
