@@ -1,15 +1,19 @@
 #include "GameManager.h"
+#include "RessourceManager.h"
 #include <iostream>
 
 void GameManager::Loop()
 {
 	isRunning = true;
 
+	RessourceManager& RM = RessourceManager::GetInstance();
+	RM.Init(mp_window->GetRenderer());
+
 	while (isRunning == true)
 	{
 		//TODO Loop
 
-		SDL_Delay(3000);
+		SDL_Delay(50000);
 		isRunning = false;
 	}
 }
