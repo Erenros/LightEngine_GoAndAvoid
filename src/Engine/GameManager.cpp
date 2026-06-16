@@ -30,7 +30,7 @@ void GameManager::Loop()
 
 	//SDL_RenderCopy(mp_window->GetRenderer(), RM.GetTexture("test"), &srect, &rect2);
 
-	SpriteSheet* spritesheet = new SpriteSheet(RM.GetTexture("test"), 1, 4, srect);
+	Sprite* spritesheet = new Sprite("test", srect,true, 1, 4);
 	spritesheet->PlayAnimation(0);
 
 
@@ -40,8 +40,8 @@ void GameManager::Loop()
 	{
 		//TODO Loop
 		spritesheet->UpdateAnimation();
-		SDL_Delay(spritesheet->duration * 500);
-		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->texture, &spritesheet->srect, &rect2);
+		SDL_Delay(spritesheet->Duration * 500);
+		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->pTexture, &spritesheet->SourceRect, &rect2);
 		SDL_RenderPresent(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {

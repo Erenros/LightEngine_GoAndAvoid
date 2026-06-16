@@ -276,19 +276,42 @@ void RessourceManager::DeleteAllTexture()
     m_textureMap.clear();
 }
 
-void SpriteSheet::PlayAnimation(int nbr)
+Sprite::Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet, int row, int column, float duration) :
+    SpriteSheet(is_spritesheet),
+    Row(row),
+    Column(column),
+    SourceRect(sourceRect),
+    Duration(duration),
+    Timer(duration)
 {
-    if (nbr >= row) nbr = row;
-    if (nbr < row) nbr = 0;
-
-    currentRow = nbr;
-    srect.y = currentRow * srect.h;
+    pTexture = RessourceManager::GetInstance().GetTexture(id);
 }
 
-void SpriteSheet::UpdateAnimation(float deltaTime = 0.f)
+void Sprite::PlayAnimation(int nbr)
 {
-    currentColumn += 1;
-    if (currentColumn >= column) currentColumn = 0;
+    if (!SpriteSheet) return;
 
-    srect.x = currentColumn * srect.w;
+    if (nbr >= Row) nbr = Row;
+    if (nbr < Row) nbr = 0;
+
+    CurrentRow = nbr;
+    SourceRect.y = CurrentRow * SourceRect.h;
+}
+
+void Sprite::UpdateAnimation(float deltaTime)
+{
+    if (!SpriteSheet) return;
+
+    Timer -= deltaTime;
+
+    //-Waiting for class Deltatime-
+    //if (Timer > 0)
+    //    return;
+
+    //Timer = Duration;
+
+    CurrentColumn += 1;
+    if (CurrentColumn >= Column) CurrentColumn = 0;
+
+    SourceRect.x = CurrentColumn * SourceRect.w;
 }

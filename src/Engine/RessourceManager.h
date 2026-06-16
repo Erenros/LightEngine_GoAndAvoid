@@ -1,3 +1,4 @@
+#pragma once
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -10,44 +11,38 @@
 //Faudra biennnn optimiser ca plus tard
 //je fais rien depuis 1H aled
 
-//struct Sprite
-//{
-//	bool spritesheet;
-//	SDL_Texture* texture;
-//	int row, column;
-//	SDL_Rect srect;
-//
-//	Sprite(bool s, SDL_Texture* t, int r, int c, SDL_Rect sr) :
-//		spritesheet(s),
-//		texture(t),
-//		row(r),
-//		column(c),
-//		srect(sr) { }
-//};
-
 
 //Temporaire
-struct SpriteSheet
+struct Sprite
 {
-	SDL_Texture* texture;
-	int row, column;
-	SDL_Rect srect;
-	float duration;
+	bool SpriteSheet = true;
 
-	int currentRow = 0;
-	int currentColumn = 0;
+	SDL_Texture* pTexture = nullptr;
+	SDL_Rect SourceRect;
+	
+	float Duration;
+	float Timer;
 
-	SpriteSheet(SDL_Texture* t, int r, int c, SDL_Rect sr, float d = 0.5f) :
-		texture(t),
-		row(r),
-		column(c),
-		srect(sr),
-		duration(d)
-	{ }
+	int Row, Column;
+	int CurrentRow = 0;
+	int CurrentColumn = 0;
+
+	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
 
 	void PlayAnimation(int nbr);
 	void UpdateAnimation(float deltaTime = 0.f);
 };
+
+
+
+/*
+Dans l'idée ça donnera un truc du style 
+	Entity* e = CreateEntity.... ect
+		
+	e->AddSprite(new Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
+*/
+
+
 
 
 class RessourceManager
