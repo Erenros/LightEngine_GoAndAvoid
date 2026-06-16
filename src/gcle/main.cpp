@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     //    /* Cr�ation de la fen�tre */
     //    SDL_Window* pWindow = NULL;
     //    pWindow = SDL_CreateWindow("Ma premi�re application SDL2", SDL_WINDOWPOS_UNDEFINED,
-    //        SDL_WINDOWPOS_UNDEFINED,
+    //        SDL_WINDOWPOS_UNDEFINED,s
     //        640,
     //        480,
     //        SDL_WINDOW_SHOWN);

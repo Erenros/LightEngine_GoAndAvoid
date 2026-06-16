@@ -1,16 +1,43 @@
 #include "GameManager.h"
 #include <iostream>
+#include "SceneManager.h"
+#include "SDL.h"
+
+#include "Entity.h"
 
 void GameManager::Loop()
 {
 	isRunning = true;
 
+	SDL_Rect rect(50, 50, 50, 50);
+
+
+
+	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
+	SDL_RenderClear(mp_window->GetRenderer());
+
+	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
+
+	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
+
+	SDL_RenderPresent(mp_window->GetRenderer());
+
+	SDL_Delay(5000);
+
+
 	while (isRunning == true)
 	{
 		//TODO Loop
 
+		for (Entity* entity : m_entities) {
+			//TODO faire update et draw pour les entitiés
+			/*entity.Update();
+			entity.Draw();*/
+		}
 		SDL_Delay(3000);
 		isRunning = false;
+
+
 	}
 }
 
