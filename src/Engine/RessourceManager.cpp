@@ -41,6 +41,14 @@ SDL_Texture* RessourceManager::LoadTexture(SDL_Renderer* renderer, const char* p
     return texture;
 }
 
+void RessourceManager::SetFontSize(const char* id, int size)
+{
+    if (!m_fontMap.contains(id))
+        return;
+
+    TTF_SetFontSize(m_fontMap[id], size);
+}
+
 bool RessourceManager::LoadMusic(const char* path, const char* id)
 {
     Mix_Music* music = Mix_LoadMUS(path);
@@ -61,9 +69,22 @@ bool RessourceManager::LoadSound(const char* path, const char* id)
     return true;
 }
 
+bool RessourceManager::LoadFont(const char* path, const char* id, int size)
+{
+    TTF_Font* font = TTF_OpenFont(path, size);
+    if (!font)
+        return false;
+
+    m_fontMap[id] = font;
+    return false;
+}
+
 void RessourceManager::Init(SDL_Renderer* renderer)
 {
     InitTextureFolder(renderer);
+    InitMusicFolder();
+    InitSoundFolder();
+    InitFont();
 }
 
 void RessourceManager::InitTextureFolder(SDL_Renderer* renderer)
@@ -84,7 +105,6 @@ void RessourceManager::InitTextureFolder(SDL_Renderer* renderer)
             continue;
         }
 
-
         if (entry.path().extension() != ".png")
         {
             std::cout << "Extension is not correct, expected : .png, receive" + entry.path().extension().string();
@@ -95,6 +115,115 @@ void RessourceManager::InitTextureFolder(SDL_Renderer* renderer)
     }
 }
 
+void RessourceManager::InitMusicFolder()
+{
+    std::filesystem::path filename = "../../assets/musics";
+
+    if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
+    {
+        std::cout << "Directory " + filename.string() + "does not exits" << std::endl;
+        return;
+    }
+
+    for (auto& entry : std::filesystem::directory_iterator(filename))
+    {
+        if (!entry.is_regular_file())
+        {
+            std::cout << "File is not valid : " + entry.path().filename().string();
+            continue;
+        }
+
+        if (entry.path().extension() != ".mp3")
+        {
+            std::cout << "Extension is not correct, expected : .mp3, receive" + entry.path().extension().string();
+            continue;
+        }
+
+        LoadMusic(entry.path().string().c_str(), entry.path().stem().string().c_str());
+    }
+}
+
+void RessourceManager::InitSoundFolder()
+{
+    std::filesystem::path filename = "../../assets/sounds";
+
+    if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
+    {
+        std::cout << "Directory " + filename.string() + "does not exits" << std::endl;
+        return;
+    }
+
+    for (auto& entry : std::filesystem::directory_iterator(filename))
+    {
+        if (!entry.is_regular_file())
+        {
+            std::cout << "File is not valid : " + entry.path().filename().string();
+            continue;
+        }
+
+        if (entry.path().extension() != ".wav")
+        {
+            std::cout << "Extension is not correct, expected : .wav, receive" + entry.path().extension().string();
+            continue;
+        }
+
+        LoadSound(entry.path().string().c_str(), entry.path().stem().string().c_str());
+    }
+}
+
+void RessourceManager::InitFont()
+{
+    std::filesystem::path filename = "../../assets/sounds";
+
+    if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
+    {
+        std::cout << "Directory " + filename.string() + "does not exits" << std::endl;
+        return;
+    }
+
+    for (auto& entry : std::filesystem::directory_iterator(filename))
+    {
+        if (!entry.is_regular_file())
+        {
+            std::cout << "File is not valid : " + entry.path().filename().string();
+            continue;
+        }
+
+        if (entry.path().extension() != ".ttf")
+        {
+            std::cout << "Extension is not correct, expected : .wav, receive" + entry.path().extension().string();
+            continue;
+        }
+
+        LoadFont(entry.path().string().c_str(), entry.path().stem().string().c_str(), 25);
+    }
+}
+
+
+void RessourceManager::DeleteAll()
+{
+    DeleteAllFont();
+    DeleteAllMusic();
+    DeleteAllSound();
+    DeleteAllTexture();
+}
+
+void RessourceManager::DeleteFont(const char* id)
+{
+    if (!m_fontMap.contains(id))
+        return;
+
+    TTF_CloseFont(m_fontMap[id]);
+    m_fontMap.erase(id);
+}
+
+void RessourceManager::DeleteAllFont()
+{
+    for (auto& pair : m_fontMap)
+        TTF_CloseFont(pair.second);
+
+    m_fontMap.clear();
+}
 
 void RessourceManager::DeleteMusic(const char* id)
 {
@@ -108,9 +237,7 @@ void RessourceManager::DeleteMusic(const char* id)
 void RessourceManager::DeleteAllMusic()
 {
     for (auto& pair : m_musicMap)
-    {
         Mix_FreeMusic(pair.second);
-    }
 
     m_musicMap.clear();
 }
@@ -127,9 +254,7 @@ void RessourceManager::DeleteSound(const char* id)
 void RessourceManager::DeleteAllSound()
 {
     for (auto& pair : m_soundMap)
-    {
         Mix_FreeChunk(pair.second);
-    }
 
     m_soundMap.clear();
 }
@@ -146,8 +271,7 @@ void RessourceManager::DeleteTexture(const char* id)
 void RessourceManager::DeleteAllTexture()
 {
     for (auto& pair : m_textureMap)
-    {
         SDL_DestroyTexture(pair.second);
-    }
+
     m_textureMap.clear();
 }

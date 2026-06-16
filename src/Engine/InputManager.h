@@ -5,17 +5,24 @@
 
 class InputManager
 {
-	public:
+public:
 
-		struct Keystate
-		{
-			bool isPressed;
-			bool isHeld;
-			bool isReleased;
-		};
+	struct Keystate
+	{
+		bool isPressed;
+		bool isHeld;
+		bool isReleased;
+	};
 
-		std::unordered_map<SDL_Keycode, Keystate> keyMap;
+	std::unordered_map<SDL_Keycode, Keystate> keyMap;
 
-		void HandleInput();
+	bool HandleInput();
+
+	static InputManager& GetInstance() {
+		static InputManager instance;
+		return instance;
+	}
+
+	~InputManager();
 };
 

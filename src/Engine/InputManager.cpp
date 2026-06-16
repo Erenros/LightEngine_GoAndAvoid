@@ -1,6 +1,6 @@
 #include "InputManager.h"
 
-void InputManager::HandleInput()
+bool InputManager::HandleInput()
 {
     SDL_Event event;
 
@@ -10,7 +10,7 @@ void InputManager::HandleInput()
         {
             case SDL_QUIT:
             {
-                exit(0);
+                return false;
             }
 
             case SDL_KEYDOWN:
@@ -35,4 +35,11 @@ void InputManager::HandleInput()
             }
         }
     }
+
+    return true;
+}
+
+InputManager::~InputManager()
+{
+    keyMap.clear();
 }
