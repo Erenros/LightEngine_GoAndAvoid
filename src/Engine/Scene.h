@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 class Entity;
 class Window;
@@ -29,14 +30,14 @@ public:
 	void AddEntity(Entity* entity);
 	Entity* GetEntityWithID(const int& id);
 
-	/*template <typename T, typename... Args>
+	template <typename T, typename... Args>
 	Entity* CreateEntity(Args&&... args) {
 		static_assert(std::is_base_of<Entity, T>::value, "T must inherit from Entity");
-		std::cerr << "T must inherit from Entity" << std::end;
+		std::cerr << "T must inherit from Entity\n";
 		T* entity = new T(std::forward<Args>(args)...);
 
 		m_Entities.push_back(entity);
 		return entity;
-	}*/
+	}
 };
 
