@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Engine/Window.h"
-#include "Core/Math.h"
+#include "Core/MathGC.h"
 
 enum class Shapes {
 	Triangle,
@@ -162,34 +162,48 @@ public:
 
 class Circle: public Shape {
 	SDL_Vertex* m_vertices;
-
+	int* m_indices;
 public:
 
 	//Contructors
 
 	Circle(int x, int y, int radius, int smoothness, SDL_Color color) {
+		if (smoothness == 0) {
+			return;
+		}
+
 		m_shapes = Shapes::Circle;
 
-		m_vertices = static_cast<SDL_Vertex*>(malloc(sizeof(SDL_Vertex) * smoothness));
+		m_vertices = static_cast<SDL_Vertex*>(malloc(sizeof(SDL_Vertex) * m_vertexNbr));
+		m_indices = static_cast<int*>(malloc(sizeof(int) * m_indicesNbr));
 
-		m_indicesNbr = 0;
-		m_vertexNbr = smoothness;
+		m_indicesNbr = smoothness * 3 ;
+		m_vertexNbr = smoothness + 1;
 
 		Degrees degreesBetweenPoints = 360 / smoothness;
+
+		m_vertices[0] = SDL_Vertex{ {(float)x, (float)y} , color, {1, 1} };
 
 		for (int i = 0; i < smoothness; i++) {
 			Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 			
-			x = sin(radian);
-			y = cos(radian);
+			float cx = x + sin(radian) * radius;
+			float cy = y + cos(radian) * radius;
 
-			SDL_Vertex vertex{ {x, y}, color, {1, 1} };
-			m_vertices[i] = vertex;
+			SDL_Vertex vertex{ {cx, cy}, color, {1, 1} };
+			m_vertices[i + 1] = vertex;
+
+			m_indices[i * 3] = 0;
+			m_indices[i * 3 + 1] = i+1;
+			m_indices[i * 3 + 2] = (i + 1) % smoothness + 1;
 		}
 
 	}
 
-	~Circle() { delete m_vertices; }
+	~Circle() { 
+		delete m_vertices;
+		delete m_indices;
+	}
 
 	void Draw(Window* pWindow) override;
 };

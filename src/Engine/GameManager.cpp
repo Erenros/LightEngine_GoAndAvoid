@@ -20,7 +20,7 @@ void GameManager::Loop()
 	Triangle* triangle = new Triangle(10, 10, 100, 10, 100, 400, { 230, 0, 0, 250 });
 	triangle->Draw(mp_window);
 
-	Circle* circle = new Circle(500, 500, 100, 30, { 0, 0, 230, 255 });
+	Circle* circle = new Circle(350, 350, 100, 30, { 0, 0, 230, 255 });
 	circle->Draw(mp_window);
 
 	SDL_RenderPresent(mp_window->GetRenderer());

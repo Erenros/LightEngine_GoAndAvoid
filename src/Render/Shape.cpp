@@ -11,6 +11,6 @@ void Triangle::Draw(Window* pWindow) {
 
 
 void Circle::Draw(Window* pWindow) {
-	SDL_RenderGeometry(pWindow->GetRenderer(), GetTexture(), m_vertices, m_vertexNbr, nullptr, m_indicesNbr);
+	SDL_RenderGeometry(pWindow->GetRenderer(), GetTexture(), m_vertices, m_vertexNbr, m_indices, m_indicesNbr);
 }
 
