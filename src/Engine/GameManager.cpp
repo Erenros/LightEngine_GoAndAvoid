@@ -1,8 +1,8 @@
 #include "GameManager.h"
-#include "RessourceManager.h"
 #include <iostream>
+#include "RessourceManager.h"
 #include "SceneManager.h"
-#include "SDL.h"
+#include "InputManager.h"
 
 #include "Entity.h"
 
@@ -23,6 +23,24 @@ void GameManager::Loop()
 	SDL_RenderPresent(mp_window->GetRenderer());
 
 	while (isRunning == true)
+	SDL_Rect rect(50, 50, 50, 50);
+
+	InputManager& IM = InputManager::GetInstance();
+
+	RessourceManager& RM = RessourceManager::GetInstance();
+	RM.Init(mp_window->GetRenderer());
+
+	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
+	SDL_RenderClear(mp_window->GetRenderer());
+
+	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
+	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
+
+	SDL_RenderPresent(mp_window->GetRenderer());
+
+	SDL_Delay(5000);
+
+	while (IM.HandleInput() && isRunning == true)
 	{
 		//TODO Loop
 
@@ -33,8 +51,6 @@ void GameManager::Loop()
 		}
 		SDL_Delay(3000);
 		isRunning = false;
-
-
 	}
 }
 
@@ -81,6 +97,8 @@ void GameManager::Close()
 	mp_window->End();
 
 	delete mp_window;
+
+	RessourceManager::GetInstance().DeleteAll();
 
 	Mix_CloseAudio();
 	TTF_Quit();

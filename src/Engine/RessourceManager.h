@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
@@ -16,6 +17,8 @@ private:
 
 	std::unordered_map<const char*, SDL_Texture*> m_textureMap;
 
+	std::unordered_map<const char*, TTF_Font*> m_fontMap;
+
 public:
 
 	static RessourceManager& GetInstance() {
@@ -26,6 +29,9 @@ public:
 	SDL_Texture* GetTexture(const char* id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
 	SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* path, const char* id);
 
+	TTF_Font* GetFont(const char* id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
+
+	void SetFontSize(const char* id, int size);
 
 	void SetMusicVolume(int volume) { Mix_VolumeMusic(volume); };
 
@@ -54,19 +60,27 @@ public:
 	bool LoadMusic(const char* path, const char* id);
 	bool LoadSound(const char* path, const char* id);
 
+	bool LoadFont(const char* path, const char* id, int size);
 
 	void Init(SDL_Renderer* renderer);
 
+
+	//I'm just gonna make only one function for this four later
 	void InitTextureFolder(SDL_Renderer* renderer);
 	void InitMusicFolder();
 	void InitSoundFolder();
+	void InitFont();
 
 
-
+	void DeleteAll();
+	void DeleteFont(const char* id);
+	void DeleteAllFont();
 	void DeleteMusic(const char* id);
 	void DeleteAllMusic();
 	void DeleteSound(const char* id);
 	void DeleteAllSound();
 	void DeleteTexture(const char* id);
 	void DeleteAllTexture();
+
+	~RessourceManager() { DeleteAll(); };
 };
