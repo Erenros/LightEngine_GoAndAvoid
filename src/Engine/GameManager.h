@@ -4,7 +4,12 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
+#include <vector>
 #include "Window.h"
+
+
+class Entity;
+
 
 class GameManager
 {
@@ -15,6 +20,8 @@ private:
 	bool isRunning = false;
 
 	int m_WindW, m_WindH;
+
+	std::vector <Entity*> m_entities;
 
 	bool Init();
 	void Loop();
