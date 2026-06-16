@@ -27,24 +27,7 @@ bool GameManager::Init()
 		return false;
 	}
 
-
-	// Temporaire En attente de la class Window
-	SDL_CreateWindowAndRenderer(m_WindW, m_WindH, SDL_WINDOW_RESIZABLE, &mp_Window, &mp_Renderer);
-
-	if (!mp_Window)
-	{
-		std::cout << "[Initialisation] : SDL_CreateWindow Error : " << SDL_GetError() << std::endl;
-		Close();
-		return false;
-	}
-
-	if (!mp_Renderer)
-	{
-		std::cout << "[Initialisation] : Renderer Error : " << SDL_GetError() << std::endl;
-		Close();
-		return false;
-	}
-	///////////////////////////////////////////
+	mp_window = new Window("gcle", m_WindW, m_WindH, SDL_WINDOW_SHOWN, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
 
 
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
@@ -66,10 +49,9 @@ bool GameManager::Init()
 
 void GameManager::Close()
 {
-	// Temporaire En attente de la class Window
-	SDL_DestroyRenderer(mp_Renderer);
-	SDL_DestroyWindow(mp_Window);
-	///////////////////////////////////////////
+	mp_window->End();
+
+	delete mp_window;
 
 	Mix_CloseAudio();
 	TTF_Quit();

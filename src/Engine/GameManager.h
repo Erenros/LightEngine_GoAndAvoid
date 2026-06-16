@@ -4,12 +4,16 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
+#include "Window.h"
+
 class GameManager
 {
 private:
 
-	SDL_Renderer* mp_Renderer = nullptr;
-	SDL_Window* mp_Window = nullptr;
+	Window* mp_window = nullptr;
+
+	//SDL_Renderer* mp_Renderer = nullptr;
+	//SDL_Window* mp_Window = nullptr;
 
 	bool isRunning = false;
 
