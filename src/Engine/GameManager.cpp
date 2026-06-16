@@ -28,6 +28,8 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
+		timer->ResetChrono();
+
 		//TODO Loop
 
 		for (Entity* entity : m_entities) {
@@ -74,6 +76,8 @@ bool GameManager::Init()
 		Close();
 		return false;
 	}
+
+	timer = new Timer();
 
 	return true;
 }

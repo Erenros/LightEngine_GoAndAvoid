@@ -3,17 +3,24 @@
 #include "include.h"
 #include "Transform.h"
 
+
+struct Target
+{
+	Vector2f position;
+	float distance;
+	bool isSet;
+};
+
+
 class Entity
 {
 public:
 	void Destroy();
-	bool IsInside(float x, float y) const; 
-	bool IsColliding(Entity* other) const;
 	bool GoToPosition(int x, int y, float speed = -1.f);
 	bool GoToDirection(int x, int y, float speed = -1.f);
 
 public:
-	Vector2f GetPosition(float ratioX = 0.5f, float ratioY = 0.5f) const;
+	Transform2D& GetTransform();
 	//Shape* GetShape() { return &mShape; }
 
 public:
@@ -38,17 +45,16 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update();
-	void Initialize(Vector2f position, Vector2f direction);
-	void Repulse(Entity* other);
+	void Update(Timer* timer);
+	void Initialize(Vector2f position, Degrees angle);
 
 
 protected:
 	float m_Speed = 0.f;
 	bool m_ToDestroy = false;
 	int m_Tag = -1;
+	Target mTarget;
 	bool m_RigidBody = false;
 
-	Transform2D* mp_Transform = nullptr;
-
+	Transform2D m_Transform;
 };
