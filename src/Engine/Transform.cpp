@@ -88,7 +88,8 @@ void Transform2D::SetParent(Transform2D* pParent) {
 
         m_AngleDifferenceToParent = m_RadAngle - mp_Parent->GetRadAngle();
 
-        m_OffsetAngle = Math::VecToAngle(m_Position - mp_Parent->GetPosition()) - mp_Parent->GetRadAngle();
+        Vector2f offset = m_Position - mp_Parent->GetPosition();
+        m_OffsetAngle = MathGC::VecToAngle(offset) - mp_Parent->GetRadAngle();
     }
 }
 
@@ -169,7 +170,7 @@ void Transform2D::RotateToDirection()
 
 void Transform2D::Forward()
 {
-    m_Direction = Math::AngleToVec(m_RadAngle);
+    m_Direction = MathGC::AngleToVec(m_RadAngle);
 }
 
 void Transform2D::UpdatePositionWithParentPosition()
@@ -185,7 +186,7 @@ void Transform2D::UpdatePositionWithParentPosition()
     m_Position.y = mp_Parent->GetPosition().y + m_DistanceFromParent * std::sin(currentParentAngle + m_OffsetAngle);
 
     m_RadAngle = mp_Parent->GetRadAngle() + m_AngleDifferenceToParent;
-    m_DegAngle = Math::RadToDeg(m_RadAngle);
+    m_DegAngle = MathGC::RadToDeg(m_RadAngle);
 }
 
 
