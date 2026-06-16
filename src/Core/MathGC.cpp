@@ -1,4 +1,4 @@
-#include "Math.h" 
+#include "MathGC.h" 
 
 float32 MathGC::RadToDeg(Radians rad)
 {
