@@ -15,6 +15,7 @@ class GameManager
 {
 private:
 
+
 	Window* mp_window = nullptr;
 
 	bool isRunning = false;

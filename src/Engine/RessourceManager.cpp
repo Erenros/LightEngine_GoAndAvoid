@@ -1,13 +1,13 @@
 #include "RessourceManager.h"
 #include <iostream>
 
-void RessourceManager::PlayMusic(const char* id, int mode)
+void RessourceManager::PlayMusic(const std::string& id, int mode)
 {
     if (m_musicMap.count(id))
         Mix_PlayMusic(m_musicMap[id], mode);
 }
 
-void RessourceManager::PlaySound(const char* id, int mode, int volume)
+void RessourceManager::PlaySound(const std::string& id, int mode, int volume)
 {
     if (!m_soundMap.count(id))
         return;
@@ -17,12 +17,12 @@ void RessourceManager::PlaySound(const char* id, int mode, int volume)
     Mix_PlayChannel(-1, sound, mode);
 }
 
-SDL_Texture* RessourceManager::LoadTexture(SDL_Renderer* renderer, const char* path, const char* id)
+SDL_Texture* RessourceManager::LoadTexture(SDL_Renderer* renderer, const std::string& path, const std::string& id)
 {
 	if (m_textureMap.count(id))
 		return m_textureMap[id];
 
-    SDL_Surface* surface = IMG_Load(path);
+    SDL_Surface* surface = IMG_Load(path.c_str());
     if (surface == NULL)
     {
         return nullptr;
@@ -41,7 +41,7 @@ SDL_Texture* RessourceManager::LoadTexture(SDL_Renderer* renderer, const char* p
     return texture;
 }
 
-void RessourceManager::SetFontSize(const char* id, int size)
+void RessourceManager::SetFontSize(const std::string& id, int size)
 {
     if (!m_fontMap.contains(id))
         return;
@@ -49,9 +49,9 @@ void RessourceManager::SetFontSize(const char* id, int size)
     TTF_SetFontSize(m_fontMap[id], size);
 }
 
-bool RessourceManager::LoadMusic(const char* path, const char* id)
+bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 {
-    Mix_Music* music = Mix_LoadMUS(path);
+    Mix_Music* music = Mix_LoadMUS(path.c_str());
     if (!music)
         return false;
 
@@ -59,9 +59,9 @@ bool RessourceManager::LoadMusic(const char* path, const char* id)
     return true;
 }
 
-bool RessourceManager::LoadSound(const char* path, const char* id)
+bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 {
-    Mix_Chunk* sound = Mix_LoadWAV(path);
+    Mix_Chunk* sound = Mix_LoadWAV(path.c_str());
     if (!sound)
         return false;
 
@@ -69,9 +69,9 @@ bool RessourceManager::LoadSound(const char* path, const char* id)
     return true;
 }
 
-bool RessourceManager::LoadFont(const char* path, const char* id, int size)
+bool RessourceManager::LoadFont(const std::string& path, const std::string& id, int size)
 {
-    TTF_Font* font = TTF_OpenFont(path, size);
+    TTF_Font* font = TTF_OpenFont(path.c_str(), size);
     if (!font)
         return false;
 
@@ -111,7 +111,7 @@ void RessourceManager::InitTextureFolder(SDL_Renderer* renderer)
             continue;
         }
 
-        LoadTexture(renderer,entry.path().string().c_str(), entry.path().stem().string().c_str());  // .string().c_str() ? i don't like that
+        LoadTexture(renderer,entry.path().string(), entry.path().stem().string());
     }
 }
 
@@ -139,7 +139,7 @@ void RessourceManager::InitMusicFolder()
             continue;
         }
 
-        LoadMusic(entry.path().string().c_str(), entry.path().stem().string().c_str());
+        LoadMusic(entry.path().string(), entry.path().stem().string());
     }
 }
 
@@ -167,7 +167,7 @@ void RessourceManager::InitSoundFolder()
             continue;
         }
 
-        LoadSound(entry.path().string().c_str(), entry.path().stem().string().c_str());
+        LoadSound(entry.path().string(), entry.path().stem().string());
     }
 }
 
@@ -195,7 +195,7 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        LoadFont(entry.path().string().c_str(), entry.path().stem().string().c_str(), 25);
+        LoadFont(entry.path().string(), entry.path().stem().string(), 25);
     }
 }
 
@@ -208,7 +208,7 @@ void RessourceManager::DeleteAll()
     DeleteAllTexture();
 }
 
-void RessourceManager::DeleteFont(const char* id)
+void RessourceManager::DeleteFont(const std::string& id)
 {
     if (!m_fontMap.contains(id))
         return;
@@ -225,7 +225,7 @@ void RessourceManager::DeleteAllFont()
     m_fontMap.clear();
 }
 
-void RessourceManager::DeleteMusic(const char* id)
+void RessourceManager::DeleteMusic(const std::string& id)
 {
     if (!m_musicMap.contains(id))
         return;
@@ -242,7 +242,7 @@ void RessourceManager::DeleteAllMusic()
     m_musicMap.clear();
 }
 
-void RessourceManager::DeleteSound(const char* id)
+void RessourceManager::DeleteSound(const std::string& id)
 {
     if (!m_soundMap.contains(id))
         return;
@@ -259,7 +259,7 @@ void RessourceManager::DeleteAllSound()
     m_soundMap.clear();
 }
 
-void RessourceManager::DeleteTexture(const char* id)
+void RessourceManager::DeleteTexture(const std::string& id)
 {
     if (!m_textureMap.count(id))
         return;
@@ -274,4 +274,44 @@ void RessourceManager::DeleteAllTexture()
         SDL_DestroyTexture(pair.second);
 
     m_textureMap.clear();
+}
+
+Sprite::Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet, int row, int column, float duration) :
+    SpriteSheet(is_spritesheet),
+    Row(row),
+    Column(column),
+    SourceRect(sourceRect),
+    Duration(duration),
+    Timer(duration)
+{
+    pTexture = RessourceManager::GetInstance().GetTexture(id);
+}
+
+void Sprite::PlayAnimation(int nbr)
+{
+    if (!SpriteSheet) return;
+
+    if (nbr >= Row) nbr = Row;
+    if (nbr < Row) nbr = 0;
+
+    CurrentRow = nbr;
+    SourceRect.y = CurrentRow * SourceRect.h;
+}
+
+void Sprite::UpdateAnimation(float deltaTime)
+{
+    if (!SpriteSheet) return;
+
+    Timer -= deltaTime;
+
+    //-Waiting for class Deltatime-
+    //if (Timer > 0)
+    //    return;
+
+    //Timer = Duration;
+
+    CurrentColumn += 1;
+    if (CurrentColumn >= Column) CurrentColumn = 0;
+
+    SourceRect.x = CurrentColumn * SourceRect.w;
 }
