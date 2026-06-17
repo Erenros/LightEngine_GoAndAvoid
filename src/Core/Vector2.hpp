@@ -70,6 +70,14 @@ public:
 		return *this / norm;
 	}
 
+	float32 GetDistance(Vector2 otherPos)
+	{
+		float32 _x = otherPos.x - x;
+		float32 _y = otherPos.y - y;
+
+		return std::sqrt(_x * _x + _y * _y);
+	}
+
 	Vector2& operator=(const Vector2& other)
 	{ 
 		x = other.x;

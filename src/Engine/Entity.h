@@ -17,11 +17,10 @@ class Entity
 {
 public:
 	void Destroy();
-	bool GoToPosition(int32 x, int32 y, float32 speed = -1.f);
-	bool GoToDirection(int32 x, int32 y, float32 speed = -1.f);
+	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
+	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
-public:
-	Transform2D& GetTransform();
+public: 
 	Shape* GetShape() { return mp_Shape; }
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
@@ -48,18 +47,17 @@ protected:
 
 private:
 	void Update(Timer& timer);
-	void Initialize(Shape& shape, Transform2D& transform);
+	void Initialize(Shape& shape);
 
 
 protected:
-	float32 m_Speed = 0.f;
-	bool m_ToDestroy = false;
-	int32 m_Tag = -1;
-	Target mTarget;
-	bool m_RigidBody = false;
-	Shape* mp_Shape = nullptr;
-
-	Transform2D m_Transform;
+	Vector2f	m_Direction = { 0.0f, 0.0f };
+	float32		m_Speed = 0.f;
+	bool		m_ToDestroy = false;
+	int32		m_Tag = -1;
+	Target		m_Target;
+	bool		m_RigidBody = false;
+	Shape*		mp_Shape = nullptr;
 
 private:
 	friend class GameManager;

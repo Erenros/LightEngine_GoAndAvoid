@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream> 
 #include "MathGC.h"
+#include "Engine/Transform.h"
 
 enum class Shapes {
 	Triangle,
@@ -15,7 +16,7 @@ class Shape {
 	SDL_Texture* m_texture = nullptr;
 
 protected:
-
+	Transform2D m_Transform;
 
 	//circle
 	float32 m_radius = 0.0f;
@@ -39,6 +40,7 @@ protected:
 
 public:
 	//Getters 
+	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	Shapes GetShape() { return m_shape; };
 	Vector2f GetOrigin() { return m_origin; }
 	SDL_Texture* GetTexture() { return m_texture; };
@@ -67,13 +69,18 @@ public:
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	void SetTexture(SDL_Texture* tex) { m_texture = tex; }
 	void SetOrigin(Vector2f origin) { m_origin = origin; }
+
+public:
+	void Move(Vector2f translation);
 };
 
 
 class Rectangle : public Shape { 
 
 public:
-	Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color) {
+	Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color) 
+	{
+
 		m_shape = Shapes::Rectangle;
 
 		m_verticies.resize(4);
@@ -93,6 +100,7 @@ public:
 		};
 
 		m_origin = { x, y };
+		m_Transform.Initialize({ x, y }, 0);
 	}
 
 
@@ -136,6 +144,8 @@ public:
 		m_indicies = { 0, 1, 2 };
 
 		m_origin = { x1, y1 };
+
+		m_Transform.Initialize({ x1, y1 }, 0);
 	} 
 };
 
@@ -161,6 +171,7 @@ public:
 
 		m_origin = { x, y };
 
+		m_Transform.Initialize({ x, y }, 0);
 
 		Degrees degreesBetweenPoints = 360.0f / smoothness;
 

@@ -34,9 +34,7 @@ void GameManager::Loop()
 	Timer time;
 
 	m_entities.push_back(new Entity());
-	Transform2D transform;
-	transform.Initialize({ 0.f, 0.f }, 0.f);
-	m_entities[0]->Initialize(*rectangle, transform);
+	m_entities[0]->Initialize(*rectangle);
 
 	while (isRunning == true)
 	{ 
