@@ -12,6 +12,9 @@ void GameManager::Loop()
 	isRunning = true;
 
 	
+	float32 a = 0;
+
+
 
 	Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
 
@@ -23,6 +26,7 @@ void GameManager::Loop()
 
 	Triangle* triangle = new Triangle(300, 300, 500, 300, 500, 500, { 255, 0, 255, 255 });
 	triangle->SetTexture(tex);
+	mp_window->Draw(triangle);
 
 
 	/*
@@ -36,10 +40,12 @@ void GameManager::Loop()
 	m_entities.push_back(new Entity());
 	Transform2D transform;
 	transform.Initialize({ 0, 0 }, 0);
-	m_entities[0]->Initialize(*rectangle, transform);
+	m_entities[0]->Initialize(*triangle, transform);
 
 	while (isRunning == true)
 	{ 
+		a+=1;
+		triangle->SetPosition(a, a);
 		time.ResetChrono();
 
 		SDL_RenderClear(mp_window->GetRenderer());

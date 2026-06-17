@@ -67,6 +67,8 @@ public:
 		m_texture = tex;
 	}
 
+	void SetPosition(float32 x, float32 y);
+
 };
 
 
