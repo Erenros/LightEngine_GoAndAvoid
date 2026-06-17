@@ -2,15 +2,15 @@
 #include "SDL.h"
 #include "Entity.h"
 #include "Window.h"
+#include "Vector2.hpp"
 
 
 class Camera
 {
 	public:
-		double x;
-		double y;
+		Vector2f v = { 0.f, 0.f };
 
-		Entity* followingEntity;
+		Entity* followingEntity = nullptr;
 
 		SDL_Renderer* renderer;
 

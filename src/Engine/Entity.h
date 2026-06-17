@@ -45,13 +45,8 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Timer* timer);
-<<<<<<< Updated upstream
-	void Initialize(Vector2f position, Degrees angle);
-=======
-	void Initialize(Vector2f position, gcle::Math::Degrees angle);
-	void Repulse(Entity* other);
->>>>>>> Stashed changes
+	void Update(Timer* timer); 
+	void Initialize(Vector2f position, Degrees angle); 
 
 
 protected:

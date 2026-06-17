@@ -10,33 +10,33 @@ void GameManager::Loop()
 {
 	isRunning = true;
 
-	SDL_Rect rect(50, 50, 50, 50);
-
 	InputManager& IM = InputManager::GetInstance();
 
 	RessourceManager& RM = RessourceManager::GetInstance();
 	RM.Init(mp_window->GetRenderer());
 
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
-	SDL_RenderClear(mp_window->GetRenderer());
+	SDL_Renderer* p_renderer = mp_window->GetRenderer();
 
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
-	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
+	SDL_SetRenderDrawColor(p_renderer, 255, 255, 255, 255);
+	SDL_RenderClear(p_renderer);
 
-	SDL_RenderPresent(mp_window->GetRenderer());
 
-	Camera c;
-	c.InitRenderer(mp_window->GetRenderer());
+	SDL_Rect rect(50, 50, 50, 50);
 
-	SDL_Delay(1000);
+	SDL_SetRenderDrawColor(p_renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(p_renderer, &rect);
+	SDL_RenderPresent(p_renderer);
 
-	c.SetZoom(0.5);
+	Camera cam;
+	cam.InitRenderer(p_renderer);
 
-	SDL_Delay(1000);
+	while (true)
+	{
+		SDL_Delay(100);
+		cam.Update();
+		SDL_RenderPresent(p_renderer);
+	}
 
-	c.SetZoom(2);
-
-	SDL_Delay(100000);
 
 	while (IM.HandleInput() && isRunning == true)
 	{
