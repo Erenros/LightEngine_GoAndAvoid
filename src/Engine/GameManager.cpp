@@ -1,42 +1,16 @@
 #include "GameManager.h"
 #include <iostream>
-#include "RessourceManager.h"
-#include "SceneManager.h"
 #include "InputManager.h"
 #include "Entity.h"
+#include "Scene.h" 
 
 #include "Shape.h"
 
 void GameManager::Loop()
 {
 	isRunning = true;
-
-	
-
-
-
-	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
-
-
-	rectangle->SetTexture(tex);*/
-
-	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
-
-	Triangle* triangle = new Triangle(300.f, 300.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
-	triangle->SetTexture(tex);
-
-
-	
-	Circle* circle = new Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
-
-	
 	 
 	Timer time;
-
-	m_entities.push_back(new Entity());
-	Transform2D transform;
-	transform.Initialize({ 0.f, 0.f }, 0.f);
-	m_entities[0]->Initialize(*circle, transform);
 
 	while (isRunning == true)
 	{ 

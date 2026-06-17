@@ -2,12 +2,19 @@
 #include <Windows.h>
 
 
-void Entity::Initialize(Shape& shape, Transform2D& transform)
-{
-    m_Transform = transform;
+void Entity::Initialize(Shape& shape)
+{ 
+	m_Direction = { 0.0f, 0.0f };
+	m_Speed = 0.f;
+	m_ToDestroy = false;
+	m_Tag = -1;
+	m_Target;
+	m_RigidBody = false;
+	mp_Shape = nullptr;
+
 	mp_Shape = &shape;
 
-	mTarget.isSet = false;
+	m_Target.isSet = false;
 
 	OnInitialize();
 }
@@ -16,31 +23,26 @@ void Entity::Update(Timer& timer)
 {
 	double dt = timer.GetChronoTime();
 	float distance = dt * m_Speed;
-	Vector2f translation = m_Transform.GetDirection() * distance;
-	mp_Shape->SetPosition(m_Transform.GetPosition().x, m_Transform.GetPosition().y);
-	if ((GetAsyncKeyState('A') & 0x8001) != 0) {
-		Vector2f pos = m_Transform.GetPosition();
-		m_Transform.SetPosition({pos.x + 1, pos.y + 1});
-	}
+	Vector2f translation = m_Direction * distance;
 
-	if (m_Transform.isSet)
+	mp_Shape->Move(translation);
+
+	if (m_Target.isSet)
 	{
-		float x1 = m_Transform.GetPosition().x;
-		float y1 = m_Transform.GetPosition().y;
+		float32 x1 = GetPosition(0.5f, 0.5f).x;
+		float32 y1 = GetPosition(0.5f, 0.5f).y;
 
-		float x2 = x1 + m_Transform.GetDirection().x* mTarget.distance;
-		float y2 = y1 + m_Transform.GetDirection().y * mTarget.distance;
+		float32 x2 = x1 + m_Direction.x * m_Target.distance;
+		float32 y2 = y1 + m_Direction.y * m_Target.distance;
 
-		mTarget.distance -= distance;
+		m_Target.distance -= distance;
 
-		if (mTarget.distance <= 0.f)
+		if (m_Target.distance <= 0)
 		{
-			SetPosition(mTarget.position.x, mTarget.position.y, 0.5f, 0.5f);
-			m_Transform.SetDirection(Vector2f({ 0,0 }));
-			mTarget.isSet = false;
+			SetPosition(m_Target.position.x, m_Target.position.y, 0.5f, 0.5f);
+			m_Direction = Vector2f({ 0.f, 0.f });
+			m_Target.isSet = false;
 		}
-
-		m_Transform.SetDirty();
 	}
 
 	OnUpdate();
@@ -48,27 +50,53 @@ void Entity::Update(Timer& timer)
 
 void Entity::Destroy()
 {
+	m_ToDestroy = true;
+	OnDestroy();
 }
 
-bool Entity::GoToPosition(int x, int y, float speed)
+bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
 {
-    return false;
+	if (GoToDirection(x, y, speed) == false)
+		return false;
+
+	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+
+	m_Target.position = { x, y }; 
+	m_Target.distance = position.GetDistance({ x, y }); 
+	m_Target.isSet = true;
+
+	return true;
 }
 
-bool Entity::GoToDirection(int x, int y, float speed)
+bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 {
-    return false;
+	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+	Vector2f direction = Vector2f({ x - position.x, y - position.y });
+
+	direction = direction.Normalized();
+
+	SetDirection(direction.x, direction.y, speed);
+
+	return true;
+} 
+ 
+Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
+{
+	return mp_Shape->GetPosition(ratioX, ratioY);
 }
 
-Transform2D& Entity::GetTransform()
+void Entity::SetDirection(float32 x, float32 y, float32 speed)
 {
-	return m_Transform;
+	if (speed > 0)
+	{
+		m_Speed = speed;
+	}
+
+	m_Direction = { x, y };
 }
 
-void Entity::SetDirection(float x, float y, float speed)
+void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
+	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void Entity::SetPosition(float x, float y, float ratioX, float ratioY)
-{
-}
