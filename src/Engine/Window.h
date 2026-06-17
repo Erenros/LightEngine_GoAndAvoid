@@ -26,7 +26,14 @@ public:
 
 	//Create a Window
 
-	void Create(const char* pName, int width, int height, Uint32 windowFlags = SDL_WINDOW_SHOWN, Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, int x = SDL_WINDOWPOS_UNDEFINED, int y = SDL_WINDOWPOS_UNDEFINED);
+	void Create(const char* pName, 
+		int width, 
+		int height, 
+		Uint32 windowFlags = SDL_WINDOW_SHOWN, 
+		Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, 
+		int x = SDL_WINDOWPOS_UNDEFINED, 
+		int y = SDL_WINDOWPOS_UNDEFINED
+	);
 	
 	
 	//Destroy a window
