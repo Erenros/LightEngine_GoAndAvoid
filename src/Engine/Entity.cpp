@@ -27,11 +27,6 @@ void Entity::Update(Timer& timer)
 
 	mp_Shape->Move(translation);
 
-	if ((GetAsyncKeyState('A') & 0x8001) != 0) 
-	{
-		GoToPosition(500, 500, 500000);
-	}
-
 	if (m_Target.isSet)
 	{
 		float32 x1 = GetPosition(0.5f, 0.5f).x;

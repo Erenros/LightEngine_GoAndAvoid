@@ -24,7 +24,7 @@ protected:
 public:
 
 	template<typename T>
-	T* CreateEntity(Shape& shape, Transform2D& transform);
+	T* CreateEntity(Shape& shape);
 
 
 	friend class GameManager;

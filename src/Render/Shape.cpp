@@ -68,5 +68,5 @@ void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 
 void Shape::Move(Vector2f translation)
 {
-	SetPosition(m_Transform.GetPosition().x + translation.x, m_Transform.GetPosition().y + translation.y, 0, 0);
+	SetPosition(m_Transform.GetPosition().x + translation.x, m_Transform.GetPosition().y + translation.y, 0.0f, 0.0f);
 }

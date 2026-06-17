@@ -8,7 +8,7 @@
 #include "Window.h"
 #include "include.h"
 
-
+#include "RessourceManager.h"
 
 class Entity;
 class Scene;
@@ -43,6 +43,7 @@ public:
 	void AddEntity(Entity* entity) { m_entities.push_back(entity); };
 	
 	Window* GetWindow() { return mp_window; };
+	RessourceManager& GetResourceManager() { return RessourceManager::GetInstance(); };
 
 	template<typename T>
 	T* LaunchScene();
