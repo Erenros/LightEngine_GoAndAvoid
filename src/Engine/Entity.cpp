@@ -1,6 +1,5 @@
 #include "Entity.h"
-#include <Windows.h>
-
+#include "Core/InputManager.h"
 
 void Entity::Initialize(Shape& shape)
 { 

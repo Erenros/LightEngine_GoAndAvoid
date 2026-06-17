@@ -1,6 +1,6 @@
 #include "GameManager.h"
 #include <iostream>
-#include "InputManager.h"
+#include "Core/InputManager.h" 
 #include "Entity.h"
 #include "Scene.h" 
 
@@ -14,6 +14,8 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{ 
+
+		InputManager::GetInstance().Update();
 		time.ResetChrono();
 
 		SDL_RenderClear(mp_window->GetRenderer());
@@ -22,7 +24,7 @@ void GameManager::Loop()
 			entity->Update(time);
 			mp_window->Draw(entity->GetShape());
 		} 
-
+    
 		SDL_RenderPresent(mp_window->GetRenderer());
 	}
 

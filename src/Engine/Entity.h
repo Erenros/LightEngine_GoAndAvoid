@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "Render/Shape.h"
 
+using namespace gcle;
 
 struct Target
 {
