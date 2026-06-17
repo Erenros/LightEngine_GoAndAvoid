@@ -22,7 +22,7 @@ private:
 
 	bool isRunning = false;
 
-	int m_WindW, m_WindH;
+	int32 m_WindW, m_WindH;
 
 	std::vector <Entity*> m_entities;
 
@@ -32,7 +32,7 @@ private:
 
 public:
 
-	GameManager() = default;
+	GameManager(int32 _width, int32 _height);
 
 	bool Init();
 	void Loop();

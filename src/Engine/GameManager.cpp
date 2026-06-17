@@ -7,11 +7,19 @@
 
 #include "Shape.h"
 
+GameManager::GameManager(int32 _width, int32 _height) : m_WindW(_width), m_WindH(_height)
+{
+}
+
 void GameManager::Loop()
 {
 	isRunning = true;
 	 
 	Timer time;
+
+	Camera cam;
+	cam.Init(mp_window->GetRenderer());
+	cam.SetFollowing(m_entities[0]);
 
 	while (isRunning == true)
 	{ 
@@ -25,6 +33,28 @@ void GameManager::Loop()
 		SDL_RenderClear(mp_window->GetRenderer());
 		
 		cam.Update();
+
+		for (int i = 0; i < m_entities.size(); i++)
+		{
+			m_entities[i]->Update(time);
+
+			Vector2f realPos = m_entities[i]->GetPosition();
+			Vector2f screenMiddle = { m_WindW / 2.f, m_WindH / 2.f };
+
+			if (cam.GetFollowing() != m_entities[i])
+			{
+				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition());
+
+			}
+
+			else if (cam.GetFollowing() == m_entities[i])
+			{
+				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition() + screenMiddle);
+
+			}
+
+			mp_window->Draw(m_entities[i]->GetShape());
+		}
  
 		for (Entity* entity : m_entities) {
 			entity->Update(time);

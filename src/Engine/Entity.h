@@ -16,10 +16,6 @@ struct Target
 
 class Entity
 {
-private:
-	void Initialize(Shape& shape, Transform2D& transform);
-	void Update(Timer& timer);
-
 public:
 	void Destroy();
 	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
@@ -37,7 +33,7 @@ public:
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	
-	void SetRenderPosition(float x, float y);
+	void SetRenderPosition(float32 x, float32 y);
 	void SetRenderPosition(Vector2f v);
 
 	Vector2f GetRenderPosition();

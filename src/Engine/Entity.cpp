@@ -99,3 +99,18 @@ void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
+void Entity::SetRenderPosition(float32 x, float32 y)
+{
+	m_RenderPosition = { x, y };
+}
+
+void Entity::SetRenderPosition(Vector2f v)
+{
+	m_RenderPosition = v;
+}
+
+Vector2f Entity::GetRenderPosition()
+{
+	return m_RenderPosition;
+}
+

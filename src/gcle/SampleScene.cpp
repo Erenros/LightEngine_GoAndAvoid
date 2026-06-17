@@ -22,9 +22,24 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate()
 {
-	if (InputManager::GetInstance().IsDown('A'))
+	Vector2f pos = pEntity->GetPosition(0.5f, 0.5f);
+	if ((InputManager::GetInstance().IsHeld('D')))
 	{
-		DEBUG_INFO << "A" << ENDL;
-		pEntity->GoToPosition(500, 500, 200000);
+		pEntity->SetPosition(pos.x + 1, pos.y);
+	}
+
+	if (InputManager::GetInstance().IsHeld('Q'))
+	{
+		pEntity->SetPosition(pos.x - 1, pos.y);
+	}
+
+	if (InputManager::GetInstance().IsHeld('S'))
+	{
+		pEntity->SetPosition(pos.x, pos.y + 1);
+	}
+
+	if (InputManager::GetInstance().IsHeld('Z'))
+	{
+		pEntity->SetPosition(pos.x, pos.y - 1);
 	}
 }
