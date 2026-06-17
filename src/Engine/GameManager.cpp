@@ -16,6 +16,9 @@ void GameManager::Loop()
 	{ 
 
 		InputManager::GetInstance().Update();
+
+		mp_currentScene->OnUpdate();
+
 		time.ResetChrono();
 
 		SDL_RenderClear(mp_window->GetRenderer());
@@ -84,12 +87,4 @@ void GameManager::Close()
 	IMG_Quit();
 	SDL_Quit();
 	SDL_Quit();
-}
-
-void GameManager::LaunchGame()
-{
-	if (!Init()) return;
-	
-	Loop();
-	Close();
 }

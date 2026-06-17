@@ -10,9 +10,11 @@ int main(int argc, char** argv)
 {
     //Temporaire
     GameManager gm = GameManager(640,480);
-    gm.LaunchScene<SampleScene>();
 
-    gm.LaunchGame();
+    gm.Init();
+    gm.LaunchScene<SampleScene>();
+    gm.Loop();
+    gm.Close();
 
     ///* Initialisation simple */
     //if (SDL_Init(SDL_INIT_VIDEO) != 0)

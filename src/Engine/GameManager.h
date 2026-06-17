@@ -28,9 +28,7 @@ private:
 
 	Scene* mp_currentScene = nullptr;
 
-	bool Init();
-	void Loop();
-	void Close();
+	
 
 public:
 
@@ -38,12 +36,13 @@ public:
 		m_WindW(windowWidth),
 		m_WindH(windowHeight) { }
 
-	void LaunchGame();
+	bool Init();
+	void Loop();
+	void Close();
 
 	void AddEntity(Entity* entity) { m_entities.push_back(entity); };
 	
-	Window* GetWindow() { return mp_window; };
-	RessourceManager& GetResourceManager() { return RessourceManager::GetInstance(); };
+	Window* GetWindow() { return mp_window; }; 
 
 	template<typename T>
 	T* LaunchScene();

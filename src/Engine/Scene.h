@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "Entity.h"
+#include "Core/InputManager.h" 
 
 //class Entity;
 class GameManager;
