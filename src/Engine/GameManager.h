@@ -14,7 +14,7 @@ class Entity;
 
 class GameManager
 {
-private:
+private: 
 
 	Window* mp_window = nullptr;
 
@@ -32,11 +32,12 @@ private:
 
 public:
 
-	GameManager(int windowWidth,int windowHeight) :
-		m_WindW(windowWidth),
-		m_WindH(windowHeight) { }
+	GameManager() = default;
 
-	void LaunchGame();
+
+	void LaunchGame(int windowWidth, int windowHeight);
+
+	static GameManager* Get();
 
 	Window* GetWindow() { return mp_window; };
 };

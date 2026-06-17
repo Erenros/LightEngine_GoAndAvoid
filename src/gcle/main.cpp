@@ -7,9 +7,9 @@
 int main(int argc, char** argv)
 {
     //Temporaire
-    GameManager gm = GameManager(640,480);
+    GameManager* gm = GameManager::Get();
 
-    gm.LaunchGame();
+    gm->LaunchGame(640, 480);
 
     ///* Initialisation simple */
     //if (SDL_Init(SDL_INIT_VIDEO) != 0)

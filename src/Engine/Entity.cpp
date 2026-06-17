@@ -1,6 +1,10 @@
 #include "Entity.h"
 
+<<<<<<< Updated upstream
 void Entity::Initialize(Vector2f position, Degrees angle)
+=======
+void Entity::Initialize(Vector2f position, gcle::Math::Degrees angle)
+>>>>>>> Stashed changes
 {
     m_Transform = Transform2D();
     m_Transform.Initialize(position, angle);

@@ -27,7 +27,7 @@ public:
 	void SetTag(int tag) { m_Tag = tag; }
 	void SetSpeed(float speed) { m_Speed = speed; }
 	void SetDirection(float x, float y, float speed = -1.f);
-	void SetRigidBody(bool isRigitBody) { m_RigidBody = isRigitBody; }
+	void SetRigidBody(bool isRigidBody) { m_RigidBody = isRigidBody; }
 	void SetPosition(float x, float y, float ratioX = 0.5f, float ratioY = 0.5f);
 
 public:
@@ -46,7 +46,12 @@ protected:
 
 private:
 	void Update(Timer* timer);
+<<<<<<< Updated upstream
 	void Initialize(Vector2f position, Degrees angle);
+=======
+	void Initialize(Vector2f position, gcle::Math::Degrees angle);
+	void Repulse(Entity* other);
+>>>>>>> Stashed changes
 
 
 protected:

@@ -3,7 +3,7 @@
 #include "RessourceManager.h"
 #include "SceneManager.h"
 #include "InputManager.h"
-
+#include "Camera.h"
 #include "Entity.h"
 
 void GameManager::Loop()
@@ -25,7 +25,18 @@ void GameManager::Loop()
 
 	SDL_RenderPresent(mp_window->GetRenderer());
 
-	SDL_Delay(5000);
+	Camera c;
+	c.InitRenderer(mp_window->GetRenderer());
+
+	SDL_Delay(1000);
+
+	c.SetZoom(0.5);
+
+	SDL_Delay(1000);
+
+	c.SetZoom(2);
+
+	SDL_Delay(100000);
 
 	while (IM.HandleInput() && isRunning == true)
 	{
@@ -98,10 +109,20 @@ void GameManager::Close()
 	SDL_Quit();
 }
 
-void GameManager::LaunchGame()
+void GameManager::LaunchGame(int windowWidth, int windowHeight)
 {
+	m_WindW = windowWidth;
+	m_WindH = windowHeight;
+
 	if (!Init()) return;
 	
 	Loop();
 	Close();
 }
+
+GameManager* GameManager::Get()
+{
+	static GameManager* mp_instance = new GameManager; 
+	return  mp_instance;
+}
+
