@@ -28,7 +28,7 @@ protected:
 	int m_width;
 	Vector2<int> m_coordinates;
 
-	Shapes m_shapes;
+	Shapes m_shape;
 
 	int m_vertexNbr;
 	int m_indicesNbr;
@@ -52,6 +52,8 @@ public:
 	virtual Vector2<int> GetCoordinates() { return { 0, 0 }; };
 
 	SDL_Texture* GetTexture() { return m_texture; };
+
+	Shapes GetShape() { return m_shape; };
 
 	//Setters 
 
@@ -81,7 +83,7 @@ class Rectangle : public Shape {
 
 public:
 	Rectangle(int x, int y, float height, float width, SDL_Color color) {
-		m_shapes = Shapes::Rectangle;
+		m_shape = Shapes::Rectangle;
 
 		m_height = height;
 		m_width = width;
@@ -142,7 +144,7 @@ public:
 	//Contructors
 
 	Triangle(int x1, int y1, int x2, int y2, int x3, int y3, SDL_Color color) {
-		m_shapes = Shapes::Triangle;
+		m_shape = Shapes::Triangle;
 
 
 		m_indicesNbr = 0;
@@ -172,13 +174,15 @@ public:
 			return;
 		}
 
-		m_shapes = Shapes::Circle;
+		m_shape = Shapes::Circle;
+
+
+		m_indicesNbr = smoothness * 3;
+		m_vertexNbr = smoothness + 1;
 
 		m_vertices = static_cast<SDL_Vertex*>(malloc(sizeof(SDL_Vertex) * m_vertexNbr));
 		m_indices = static_cast<int*>(malloc(sizeof(int) * m_indicesNbr));
 
-		m_indicesNbr = smoothness * 3 ;
-		m_vertexNbr = smoothness + 1;
 
 		Degrees degreesBetweenPoints = 360 / smoothness;
 
@@ -194,7 +198,7 @@ public:
 			m_vertices[i + 1] = vertex;
 
 			m_indices[i * 3] = 0;
-			m_indices[i * 3 + 1] = i+1;
+			m_indices[i * 3 + 1] = i + 1;
 			m_indices[i * 3 + 2] = (i + 1) % smoothness + 1;
 		}
 
