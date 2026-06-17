@@ -1,8 +1,10 @@
 #include "Camera.h"
 
 
-void Camera::InitRenderer(SDL_Renderer* pRenderer)
+void Camera::Init(SDL_Renderer* pRenderer)
 {
+	t.SetPosition({ 0.f, 0.f });
+
 	renderer = pRenderer;
 }
 
@@ -16,22 +18,33 @@ Entity* Camera::GetFollowing()
 	return followingEntity;
 }
 
+
+
+void Camera::SetPosition(Vector2f v)
+{
+	t.SetPosition(v);
+}
+
+Vector2f Camera::GetPosition()
+{
+	return t.GetPosition();
+}
+
+
+
 void Camera::Update()
 {
-	DEBUG_INFO << "Camera update" << ENDL;
+	//DEBUG_INFO << "Camera update" << ENDL;
 
 	if (followingEntity == nullptr)
 	{
-		DEBUG_INFO << "Zoom is : " << zoom << ENDL;
-		SDL_Rect box(v.x+117, v.y+323, 100 * zoom, 100 * zoom);
+		//DEBUG_INFO << "Zoom is : " << zoom << ENDL;
 	}
 
 	else
 	{
-		v.x = followingEntity->GetTransform().GetPosition().x;
-		v.y = followingEntity->GetTransform().GetPosition().y;
-
-		SDL_Rect box(v.x, v.y, 50 * zoom, 50 * zoom);
+		t.SetPosition(followingEntity->GetPosition());
+		DEBUG_INFO << t.GetPosition().x << " and " << t.GetPosition().y << ENDL;
 	}
 }
 

@@ -15,6 +15,10 @@ struct Target
 
 class Entity
 {
+private:
+	void Initialize(Shape& shape, Transform2D& transform);
+	void Update(Timer& timer);
+
 public:
 	void Destroy();
 	bool GoToPosition(int x, int y, float speed = -1.f);
@@ -30,6 +34,12 @@ public:
 	void SetDirection(float x, float y, float speed = -1.f);
 	void SetRigidBody(bool isRigidBody) { m_RigidBody = isRigidBody; }
 	void SetPosition(float x, float y, float ratioX = 0.5f, float ratioY = 0.5f);
+	void SetPosition(Vector2f v);
+	void SetRenderPosition(float x, float y);
+	void SetRenderPosition(Vector2f v);
+
+	Vector2f GetPosition();
+	Vector2f GetRenderPosition();
 
 public:
 	bool IsRigidBody() const { return m_RigidBody; }
@@ -45,10 +55,6 @@ protected:
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 
-private:
-	void Update(Timer& timer);
-	void Initialize(Shape& shape, Transform2D& transform);
-
 
 protected:
 	float m_Speed = 0.f;
@@ -59,6 +65,8 @@ protected:
 	Shape* mp_Shape = nullptr;
 
 	Transform2D m_Transform;
+
+	Vector2f m_RenderPosition = { 0.f, 0.f };
 
 private:
 	friend class GameManager;

@@ -27,8 +27,8 @@ void GameManager::Loop()
 	// SDL_RenderDrawRect(p_renderer, &rect);
 	// SDL_RenderPresent(p_renderer);
 
-	// Camera cam;
-	// cam.InitRenderer(p_renderer);
+	Camera cam;
+	cam.Init(p_renderer);
 
 	// while (true)
 	// {
@@ -50,26 +50,63 @@ void GameManager::Loop()
 
 	
 	Circle* circle = new Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
-
+	Circle* circle2 = new Circle(200, 200, 100, 4, { 255, 0, 0, 255 });
+	Circle* circle3 = new Circle(300, -10, 80, 9, { 255, 255, 0, 255 });
 	
 	 
 	Timer time;
 
 	m_entities.push_back(new Entity());
+	m_entities.push_back(new Entity());
+	m_entities.push_back(new Entity());
+
 	Transform2D transform;
+	Transform2D transform2;
+	Transform2D transform3;
+
 	transform.Initialize({ 0.f, 0.f }, 0.f);
+	transform2.Initialize({ 200.f, 200.f }, 0.f);
+	transform3.Initialize({ 300.f, -10.f }, 0.f);
+
 	m_entities[0]->Initialize(*circle, transform);
+	m_entities[1]->Initialize(*circle2, transform2);
+	m_entities[2]->Initialize(*circle3, transform3);
+
+
+	m_entities[0]->SetTag(0);
+
+	cam.SetFollowing(m_entities[0]);
+
 
 	while (isRunning == true)
 	{ 
 		time.ResetChrono();
 
 		SDL_RenderClear(mp_window->GetRenderer());
+		
+		cam.Update();
 
-		for (Entity* entity : m_entities) {
-			entity->Update(time);
-			mp_window->Draw(entity->GetShape());
-		} 
+		for (int i = 0; i < m_entities.size(); i++)
+		{
+			m_entities[i]->Update(time);
+
+			Vector2f realPos = m_entities[i]->GetPosition();
+			Vector2f screenMiddle = { m_WindW / 2.f, m_WindH / 2.f };
+
+			if (cam.GetFollowing() != m_entities[i])
+			{
+				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition());
+
+			}
+
+			else if (cam.GetFollowing() == m_entities[i])
+			{
+				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition() + screenMiddle);
+
+			}
+
+			mp_window->Draw(m_entities[i]->GetShape());
+		}
 
 		SDL_RenderPresent(mp_window->GetRenderer());
 	}

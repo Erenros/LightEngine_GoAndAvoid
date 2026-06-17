@@ -18,9 +18,32 @@ void Entity::Update(Timer& timer)
 	float distance = dt * m_Speed;
 	Vector2f translation = m_Transform.GetDirection() * distance;
 	mp_Shape->SetPosition(m_Transform.GetPosition().x, m_Transform.GetPosition().y);
-	if ((GetAsyncKeyState('A') & 0x8001) != 0) {
-		Vector2f pos = m_Transform.GetPosition();
-		m_Transform.SetPosition({pos.x + 1, pos.y + 1});
+
+	if (m_Tag == 0)
+	{
+		if ((GetAsyncKeyState('D') & 0x8001) != 0)
+		{
+			Vector2f pos = m_Transform.GetPosition();
+			m_Transform.SetPosition({ pos.x + 1, pos.y });
+		}
+
+		if ((GetAsyncKeyState('Q') & 0x8001) != 0)
+		{
+			Vector2f pos = m_Transform.GetPosition();
+			m_Transform.SetPosition({ pos.x - 1, pos.y });
+		}
+
+		if ((GetAsyncKeyState('S') & 0x8001) != 0)
+		{
+			Vector2f pos = m_Transform.GetPosition();
+			m_Transform.SetPosition({ pos.x, pos.y + 1 });
+		}
+
+		if ((GetAsyncKeyState('Z') & 0x8001) != 0)
+		{
+			Vector2f pos = m_Transform.GetPosition();
+			m_Transform.SetPosition({ pos.x, pos.y - 1 });
+		}
 	}
 
 	if (m_Transform.isSet)
@@ -71,4 +94,33 @@ void Entity::SetDirection(float x, float y, float speed)
 
 void Entity::SetPosition(float x, float y, float ratioX, float ratioY)
 {
+	m_Transform.SetPosition({ x, y });
 }
+
+void Entity::SetPosition(Vector2f v)
+{
+	//m_Transform.SetPosition(v);
+}
+
+
+void Entity::SetRenderPosition(float x, float y)
+{
+	m_RenderPosition = { x, y };
+}
+
+void Entity::SetRenderPosition(Vector2f v)
+{
+	m_RenderPosition = v;
+}
+
+Vector2f Entity::GetPosition()
+{
+	return m_Transform.GetPosition();
+}
+
+Vector2f Entity::GetRenderPosition()
+{
+	return m_RenderPosition;
+}
+
+

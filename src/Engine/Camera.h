@@ -3,12 +3,13 @@
 #include "Entity.h"
 #include "Window.h"
 #include "Vector2.hpp"
+#include "Transform.h"
 
 
 class Camera
 {
 	public:
-		Vector2f v = { 0.f, 0.f };
+		Transform2D t;
 
 		Entity* followingEntity = nullptr;
 
@@ -16,11 +17,14 @@ class Camera
 
 		double zoom = 1;
 
-
-		void InitRenderer(SDL_Renderer* pRenderer);
+		// Cette fonction doit être lancée sinon la caméra ne marchera pas
+		void Init(SDL_Renderer* pRenderer);
 
 		void SetFollowing(Entity* newEntity);
 		Entity* GetFollowing();
+
+		void SetPosition(Vector2f v);
+		Vector2f GetPosition();
 
 		void Update();
 
