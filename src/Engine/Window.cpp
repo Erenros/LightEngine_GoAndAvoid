@@ -24,3 +24,9 @@ void Window::End(){
 void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){
 	SDL_RenderCopy(mp_Renderer, pTexture, srcrect, dstrect);
 }
+
+void Window::Draw(Shape* pShape)
+{
+	SDL_RenderGeometry(mp_Renderer, pShape->GetTexture(), pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+}
+

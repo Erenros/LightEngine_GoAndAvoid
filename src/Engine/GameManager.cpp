@@ -11,7 +11,7 @@ void GameManager::Loop()
 {
 	isRunning = true;
 
-	SDL_RenderClear(mp_window->GetRenderer());
+	
 
 	Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
 
@@ -30,21 +30,30 @@ void GameManager::Loop()
 	Circle* circle = new Circle(350, 350, 100, 50, { 0, 0, 230, 255 });
 	circle->Draw(mp_window);*/
 
-	SDL_RenderPresent(mp_window->GetRenderer());
+	
+	 
+	Timer time;
 
+	m_entities.push_back(new Entity());
+	Transform2D transform;
+	transform.Initialize({ 0, 0 }, 0);
+	m_entities[0]->Initialize(*circle, transform);
 
 	while (isRunning == true)
-	{
-		timer->ResetChrono();
+	{ 
+		time.ResetChrono();
 
-		//TODO Loop
+		SDL_RenderClear(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
-			//TODO faire update et draw pour les entiti�s
-			/*entity.Update();
-			entity.Draw();*/
-		}
+			entity->Update(time);
+			mp_window->Draw(entity->GetShape());
+		} 
+
+		SDL_RenderPresent(mp_window->GetRenderer());
 	}
+
+	isRunning = false;
 }
 
 bool GameManager::Init()
@@ -80,9 +89,7 @@ bool GameManager::Init()
 		std::cout << "[Initialisation] : Font Error" << std::endl;
 		Close();
 		return false;
-	}
-
-	timer = new Timer();
+	} 
 
 	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
 

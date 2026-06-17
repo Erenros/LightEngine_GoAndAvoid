@@ -2,6 +2,7 @@
 
 #include "include.h"
 #include "Transform.h"
+#include "Shape.h"
 
 
 struct Target
@@ -21,7 +22,7 @@ public:
 
 public:
 	Transform2D& GetTransform();
-	//Shape* GetShape() { return &mShape; }
+	Shape* GetShape() { return mp_Shape; }
 
 public:
 	void SetTag(int tag) { m_Tag = tag; }
@@ -45,8 +46,8 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Timer* timer);
-	void Initialize(Vector2f position, Degrees angle);
+	void Update(Timer& timer);
+	void Initialize(Shape& shape, Transform2D& transform);
 
 
 protected:
@@ -55,6 +56,10 @@ protected:
 	int m_Tag = -1;
 	Target mTarget;
 	bool m_RigidBody = false;
+	Shape* mp_Shape = nullptr;
 
 	Transform2D m_Transform;
+
+private:
+	friend class GameManager;
 };
