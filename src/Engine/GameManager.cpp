@@ -1,18 +1,17 @@
 #include "GameManager.h"
 #include <iostream>
 #include "RessourceManager.h"
-#include "SceneManager.h"
 #include "InputManager.h"
 #include "Entity.h"
+#include "Scene.h"
 
 #include "Shape.h"
 
 void GameManager::Loop()
 {
-	isRunning = true;
+	isRunning = true;	
 
-	
-
+	LaunchScene<Scene>();
 
 	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
@@ -33,8 +32,12 @@ void GameManager::Loop()
 	 
 	Timer time;
 
-	m_entities.push_back(new Entity());
-	m_entities[0]->Initialize(*rectangle);
+	//m_entities.push_back(new Entity());
+	Transform2D transform;
+	transform.Initialize({ 0.f, 0.f }, 0.f);
+	//m_entities[0]->Initialize(*circle, transform);
+
+	mp_currentScene->CreateEntity<Entity>(*circle);
 
 	while (isRunning == true)
 	{ 
