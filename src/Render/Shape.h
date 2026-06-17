@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream> 
 #include "MathGC.h"
+#include "Engine/Transform.h"
 
 enum class Shapes {
 	Triangle,
@@ -15,7 +16,7 @@ class Shape {
 	SDL_Texture* m_texture = nullptr;
 
 protected:
-
+	Transform2D m_Transform;
 
 	//circle
 	float32 m_radius = 0.0f;
@@ -25,7 +26,7 @@ protected:
 	//rectangle
 	float32 m_height = 0.0f;
 	float32 m_width = 0.0f;
-	Vector2f m_coordinates = { 0.0f, 0.0f };
+	Vector2f m_origin = { 0.0f, 0.0f };
 
 	Shapes m_shape = Shapes::Triangle;
 
@@ -39,7 +40,9 @@ protected:
 
 public:
 	//Getters 
+	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	Shapes GetShape() { return m_shape; };
+	Vector2f GetOrigin() { return m_origin; }
 	SDL_Texture* GetTexture() { return m_texture; };
 	std::vector<int32>& GetIndicies() { return m_indicies; };
 	std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
@@ -50,8 +53,7 @@ public:
 	virtual float32 GetHeight() { return 0.f; };
 	virtual float32 GetWidth() { return 0.f; };
 	virtual int32 GetSmoothness() { return 0; };
-	virtual Vector2f GetCenter() { return { 0, 0 }; };
-	virtual Vector2f GetCoordinates() { return { 0, 0 }; };
+	virtual Vector2f GetCenter() { return { 0, 0 }; }; 
 
 
 public:
@@ -60,22 +62,25 @@ public:
 	virtual void SetRadius(float32 radius) {};
 	virtual void SetHeight(float32 height) {};
 	virtual void SetWidth(float32 width) {};
-	virtual void SetCenter(Vector2f center) {};
-	virtual void SetCoordinates(Vector2f coordinates) {};
+	virtual void SetCenter(Vector2f center) {}; 
 	
-	void SetTexture(SDL_Texture* tex) {
-		m_texture = tex;
-	}
+public:
 
-	void SetPosition(float32 x, float32 y);
+	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+	void SetTexture(SDL_Texture* tex) { m_texture = tex; }
+	void SetOrigin(Vector2f origin) { m_origin = origin; }
 
+public:
+	void Move(Vector2f translation);
 };
 
 
 class Rectangle : public Shape { 
 
 public:
-	Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color) {
+	Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color) 
+	{
+
 		m_shape = Shapes::Rectangle;
 
 		m_verticies.resize(4);
@@ -93,6 +98,9 @@ public:
 			0, 1, 2,
 			2, 3, 1
 		};
+
+		m_origin = { x, y };
+		m_Transform.Initialize({ x, y }, 0);
 	}
 
 
@@ -104,9 +112,7 @@ public:
 	float32 GetWidth() override {
 		return m_width;
 	}
-	Vector2f GetCoordinates() override {
-		return m_coordinates;
-	}
+	
 
 
 	//Setters
@@ -117,9 +123,7 @@ public:
 	void SetWidth(float32 width) override {
 		m_width = width;
 	}
-	void SetCoordinates(Vector2f coordinates) override {
-		m_coordinates = coordinates;
-	} 
+	
 };
 
 class Triangle : public Shape { 
@@ -138,6 +142,10 @@ public:
 		m_verticies[2] = SDL_Vertex{ {x3, y3}, color, {1.f, 1.f} }; 
 
 		m_indicies = { 0, 1, 2 };
+
+		m_origin = { x1, y1 };
+
+		m_Transform.Initialize({ x1, y1 }, 0);
 	} 
 };
 
@@ -146,7 +154,7 @@ public:
 
 	//Contructors
 
-	Circle(int x, int y, int radius, int smoothness, SDL_Color color) {
+	Circle(float32 x, float32 y, float32 radius, int smoothness, SDL_Color color) {
 		if (smoothness == 0) {
 			return;
 		}
@@ -161,16 +169,19 @@ public:
 		m_verticies.resize(smoothness + 1);
 		m_indicies.resize(smoothness * 3);  
 
+		m_origin = { x, y };
+
+		m_Transform.Initialize({ x, y }, 0);
 
 		Degrees degreesBetweenPoints = 360.0f / smoothness;
 
-		m_verticies[0] = SDL_Vertex{ {(float)x, (float)y} , color, {1, 1} };
+		m_verticies[0] = SDL_Vertex{ {x + radius, y + radius} , color, {1, 1} };
 
 		for (int i = 0; i < smoothness; i++) {
 			Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 			
-			float cx = x + sin(radian) * radius;
-			float cy = y + cos(radian) * radius;
+			float cx = x + sin(radian) * radius + radius;
+			float cy = y + cos(radian) * radius + radius;
 
 			SDL_Vertex vertex{ {cx, cy}, color, {1, 1} };
 			m_verticies[i + 1] = vertex;

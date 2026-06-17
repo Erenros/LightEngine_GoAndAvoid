@@ -5,14 +5,14 @@
 
 
 template<typename T>
-T* Scene::CreateEntity(Shape& shape, Transform2D& transform)
+T* Scene::CreateEntity(Shape& shape)
 {
 	static_assert(std::is_base_of<Entity, T>::value, "T must be derived from Entity");
 
 	T* new_entity = new T();
 	Entity* entity = new_entity;
 
-	entity->Initialize(shape, transform);
+	entity->Initialize(shape);
 
 	mp_GameManager->AddEntity(new_entity);
 

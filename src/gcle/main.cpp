@@ -2,12 +2,15 @@
 #include "GameManager.h"
 #include "include.h"
 
+#include "SampleScene.h"
+
 #undef main
 
 int main(int argc, char** argv)
 {
     //Temporaire
     GameManager gm = GameManager(640,480);
+    gm.LaunchScene<SampleScene>();
 
     gm.LaunchGame();
 
