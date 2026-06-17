@@ -2,7 +2,7 @@
 
 #include "include.h"
 #include "Transform.h"
-#include "Shape.h"
+#include "Render/Shape.h"
 
 using namespace gcle;
 
@@ -18,23 +18,23 @@ class Entity
 {
 public:
 	void Destroy();
-	bool GoToPosition(int x, int y, float speed = -1.f);
-	bool GoToDirection(int x, int y, float speed = -1.f);
+	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
+	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
-public:
-	Transform2D& GetTransform();
+public: 
 	Shape* GetShape() { return mp_Shape; }
+	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 public:
-	void SetTag(int tag) { m_Tag = tag; }
-	void SetSpeed(float speed) { m_Speed = speed; }
-	void SetDirection(float x, float y, float speed = -1.f);
+	void SetTag(int32 tag) { m_Tag = tag; }
+	void SetSpeed(float32 speed) { m_Speed = speed; }
+	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
 	void SetRigidBody(bool isRigitBody) { m_RigidBody = isRigitBody; }
-	void SetPosition(float x, float y, float ratioX = 0.5f, float ratioY = 0.5f);
+	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 public:
 	bool IsRigidBody() const { return m_RigidBody; }
-	bool IsTag(int tag) const { return m_Tag == tag; }
+	bool IsTag(int32 tag) const { return m_Tag == tag; }
 	bool ToDestroy() const { return m_ToDestroy; }
 
 protected:
@@ -48,19 +48,20 @@ protected:
 
 private:
 	void Update(Timer& timer);
-	void Initialize(Shape& shape, Transform2D& transform);
+	void Initialize(Shape& shape);
 
 
 protected:
-	float m_Speed = 0.f;
-	bool m_ToDestroy = false;
-	int m_Tag = -1;
-	Target mTarget;
-	bool m_RigidBody = false;
-	Shape* mp_Shape = nullptr;
-
-	Transform2D m_Transform;
+	Vector2f	m_Direction = { 0.0f, 0.0f };
+	float32		m_Speed = 0.f;
+	bool		m_ToDestroy = false;
+	int32		m_Tag = -1;
+	Target		m_Target;
+	bool		m_RigidBody = false;
+	Shape*		mp_Shape = nullptr;
 
 private:
+
+	friend class Scene;
 	friend class GameManager;
 };

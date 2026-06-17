@@ -1,29 +1,16 @@
 #include "GameManager.h"
 #include <iostream>
-#include "RessourceManager.h"
-#include "SceneManager.h"
-#include "Core/InputManager.h"
+#include "Core/InputManager.h" 
 #include "Entity.h"
+#include "Scene.h" 
 
 #include "Shape.h"
 
 void GameManager::Loop()
 {
 	isRunning = true;
-
-	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
-
-	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
-
-	rectangle->SetTexture(tex);
-
 	 
 	Timer time;
-
-	m_entities.push_back(new Entity());
-	Transform2D transform;
-	transform.Initialize({ 0.f, 0.f }, 0.f);
-	m_entities[0]->Initialize(*rectangle, transform);
 
 	while (isRunning == true)
 	{ 
@@ -37,22 +24,7 @@ void GameManager::Loop()
 			entity->Update(time);
 			mp_window->Draw(entity->GetShape());
 		} 
-
-		
-		/*if (InputManager::GetInstance().IsUp('Z')) {
-			DEBUG_INFO << "z is up" << ENDL;
-		}*/
-
-		if (InputManager::GetInstance().IsDown(RightButton)) {
-			DEBUG_INFO << "right button is down" << ENDL;
-			Vector2<long> pos = InputManager::GetInstance().GetMousePosition();
-			DEBUG_INFO <<  pos.x << "  " << pos.y << ENDL;
-		}
-		if (InputManager::GetInstance().IsHeld(LeftButton)) {
-			DEBUG_INFO << "left click is Held" << ENDL;
-		}
-		
-
+    
 		SDL_RenderPresent(mp_window->GetRenderer());
 	}
 
