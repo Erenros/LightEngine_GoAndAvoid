@@ -26,7 +26,7 @@ public:
 	Vector2(std::initializer_list<T> list)
 	{
 		x = *list.begin();
-		y = *list.end();
+		y = *(list.end() - 1);
 	};
 
 	Vector2(const Vector2& other)

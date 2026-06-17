@@ -6,52 +6,75 @@
 #include "Camera.h"
 #include "Entity.h"
 
+#include "Shape.h"
+
 void GameManager::Loop()
 {
 	isRunning = true;
 
 	InputManager& IM = InputManager::GetInstance();
 
-	RessourceManager& RM = RessourceManager::GetInstance();
-	RM.Init(mp_window->GetRenderer());
 
 	SDL_Renderer* p_renderer = mp_window->GetRenderer();
 
-	SDL_SetRenderDrawColor(p_renderer, 255, 255, 255, 255);
-	SDL_RenderClear(p_renderer);
+	// SDL_SetRenderDrawColor(p_renderer, 255, 255, 255, 255);
+	// SDL_RenderClear(p_renderer);
 
 
-	SDL_Rect rect(50, 50, 50, 50);
+	// SDL_Rect rect(50, 50, 50, 50);
 
-	SDL_SetRenderDrawColor(p_renderer, 0, 0, 0, 255);
-	SDL_RenderDrawRect(p_renderer, &rect);
-	SDL_RenderPresent(p_renderer);
+	// SDL_SetRenderDrawColor(p_renderer, 0, 0, 0, 255);
+	// SDL_RenderDrawRect(p_renderer, &rect);
+	// SDL_RenderPresent(p_renderer);
 
-	Camera cam;
-	cam.InitRenderer(p_renderer);
+	// Camera cam;
+	// cam.InitRenderer(p_renderer);
 
-	while (true)
-	{
-		SDL_Delay(100);
-		cam.Update();
-		SDL_RenderPresent(p_renderer);
-	}
+	// while (true)
+	// {
+	// 	SDL_Delay(100);
+	// 	cam.Update();
+	// 	SDL_RenderPresent(p_renderer);
+	// }
+
+	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
 
 
-	while (IM.HandleInput() && isRunning == true)
-	{
-		timer->ResetChrono();
+	rectangle->SetTexture(tex);*/
 
-		//TODO Loop
+	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
+
+	Triangle* triangle = new Triangle(300.f, 300.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
+	triangle->SetTexture(tex);
+
+
+	
+	Circle* circle = new Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
+
+	
+	 
+	Timer time;
+
+	m_entities.push_back(new Entity());
+	Transform2D transform;
+	transform.Initialize({ 0.f, 0.f }, 0.f);
+	m_entities[0]->Initialize(*circle, transform);
+
+	while (isRunning == true)
+	{ 
+		time.ResetChrono();
+
+		SDL_RenderClear(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
-			//TODO faire update et draw pour les entiti�s
-			/*entity.Update();
-			entity.Draw();*/
-		}
-		SDL_Delay(3000);
-		isRunning = false;
+			entity->Update(time);
+			mp_window->Draw(entity->GetShape());
+		} 
+
+		SDL_RenderPresent(mp_window->GetRenderer());
 	}
+
+	isRunning = false;
 }
 
 bool GameManager::Init()
@@ -87,9 +110,9 @@ bool GameManager::Init()
 		std::cout << "[Initialisation] : Font Error" << std::endl;
 		Close();
 		return false;
-	}
+	} 
 
-	timer = new Timer();
+	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
 
 	return true;
 }

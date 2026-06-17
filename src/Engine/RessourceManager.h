@@ -1,3 +1,4 @@
+#pragma once
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -5,19 +6,55 @@
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
+#include <string>
 
 //Faudra biennnn optimiser ca plus tard
+//je fais rien depuis 1H aled
+
+
+//Temporaire
+struct Sprite
+{
+	bool SpriteSheet = true;
+
+	SDL_Texture* pTexture = nullptr;
+	SDL_Rect SourceRect;
+	
+	float Duration;
+	float Timer;
+
+	int Row, Column;
+	int CurrentRow = 0;
+	int CurrentColumn = 0;
+
+	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
+
+	void PlayAnimation(int nbr);
+	void UpdateAnimation(float deltaTime = 0.f);
+};
+
+
+
+/*
+Dans l'idée ça donnera un truc du style 
+	Entity* e = CreateEntity.... ect
+		
+	e->AddSprite(new Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
+*/
+
+
+
 
 class RessourceManager
 {
 private:
 
-	std::unordered_map<const char*, Mix_Chunk*> m_soundMap;
-	std::unordered_map<const char*, Mix_Music*> m_musicMap;
+	std::unordered_map<std::string, Mix_Chunk*> m_soundMap;
+	std::unordered_map<std::string, Mix_Music*> m_musicMap;
 
-	std::unordered_map<const char*, SDL_Texture*> m_textureMap;
+	std::unordered_map<std::string, SDL_Texture*> m_textureMap;
 
-	std::unordered_map<const char*, TTF_Font*> m_fontMap;
+	std::unordered_map<std::string, TTF_Font*> m_fontMap;
 
 public:
 
@@ -26,12 +63,12 @@ public:
 		return instance;
 	}
 
-	SDL_Texture* GetTexture(const char* id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
-	SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* path, const char* id);
+	SDL_Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
+	SDL_Texture* LoadTexture(SDL_Renderer* renderer, const std::string& path, const std::string& id);
 
-	TTF_Font* GetFont(const char* id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
+	TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 
-	void SetFontSize(const char* id, int size);
+	void SetFontSize(const std::string& id, int size);
 
 	void SetMusicVolume(int volume) { Mix_VolumeMusic(volume); };
 
@@ -49,18 +86,18 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	/// <param name="mode"></param>
-	void PlayMusic(const char* id, int mode);
+	void PlayMusic(const std::string& id, int mode);
 	/// <summary>
 	/// Mode : 1 = 1 fois,  0 = 1 boucle, -1 = infinite loop
 	/// </summary>
 	/// <param name="id"></param>
 	/// <param name="mode"></param>
-	void PlaySound(const char* id, int mode, int volume);
+	void PlaySound(const std::string& id, int mode, int volume);
 
-	bool LoadMusic(const char* path, const char* id);
-	bool LoadSound(const char* path, const char* id);
+	bool LoadMusic(const std::string& path, const std::string& id);
+	bool LoadSound(const std::string& path, const std::string& id);
 
-	bool LoadFont(const char* path, const char* id, int size);
+	bool LoadFont(const std::string& path, const std::string& id, int size);
 
 	void Init(SDL_Renderer* renderer);
 
@@ -71,15 +108,14 @@ public:
 	void InitSoundFolder();
 	void InitFont();
 
-
 	void DeleteAll();
-	void DeleteFont(const char* id);
+	void DeleteFont(const std::string& id);
 	void DeleteAllFont();
-	void DeleteMusic(const char* id);
+	void DeleteMusic(const std::string& id);
 	void DeleteAllMusic();
-	void DeleteSound(const char* id);
+	void DeleteSound(const std::string& id);
 	void DeleteAllSound();
-	void DeleteTexture(const char* id);
+	void DeleteTexture(const std::string& id);
 	void DeleteAllTexture();
 
 	~RessourceManager() { DeleteAll(); };

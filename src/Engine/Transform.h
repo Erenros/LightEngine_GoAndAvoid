@@ -29,11 +29,11 @@ public:
     void SetDirty();
 
 public:
-    Vector2f GetPosition();
-    Vector2f GetDirection();
+    Vector2f& GetPosition();
+    Vector2f& GetDirection();
 
-    Radians GetRadAngle();
-    Degrees GetDegAngle();
+    Radians& GetRadAngle();
+    Degrees& GetDegAngle();
 
     Transform2D* GetParent();
     Transform2D* GetChild(uint32 index);
@@ -50,11 +50,11 @@ public:
     void Initialize(Vector2f m_Position, Degrees angle);
 
 private:
-    Vector2f m_Position = {0,0};
-    Vector2f m_Direction = { 0,0 };
+    Vector2f m_Position = {0.f,0.f};
+    Vector2f m_Direction = { 0.f,0.f };
 
-    Degrees m_DegAngle = 0;
-    Radians m_RadAngle = 0;
+    Degrees m_DegAngle = 0.f;
+    Radians m_RadAngle = 0.f;
 
     Transform2D* mp_Parent = nullptr;
     std::vector<Transform2D*> mp_Childs;

@@ -47,22 +47,22 @@ uint32 Transform2D::GetChildCount() const {
     return mp_Childs.size();
 }
 
-Vector2f Transform2D::GetPosition()
+Vector2f& Transform2D::GetPosition()
 {
     return m_Position;
 }
 
-Vector2f Transform2D::GetDirection()
+Vector2f& Transform2D::GetDirection()
 {
     return m_Direction;
 }
- 
-Degrees Transform2D::GetDegAngle() 
+
+Degrees& Transform2D::GetDegAngle()
 {
     return m_DegAngle;
 }
- 
-Radians Transform2D::GetRadAngle() 
+
+Radians& Transform2D::GetRadAngle()
 {
     return m_RadAngle;
 }

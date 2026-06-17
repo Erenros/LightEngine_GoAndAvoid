@@ -1,21 +1,27 @@
 #include "Entity.h"
- 
-void Entity::Initialize(Vector2f position, Degrees angle) 
+#include <Windows.h>
+
+
+void Entity::Initialize(Shape& shape, Transform2D& transform)
 {
-    m_Transform = Transform2D();
-    m_Transform.Initialize(position, angle);
+    m_Transform = transform;
+	mp_Shape = &shape;
 
 	mTarget.isSet = false;
 
 	OnInitialize();
 }
 
-void Entity::Update(Timer* timer)
+void Entity::Update(Timer& timer)
 {
-	double dt = timer->GetChronoTime();
+	double dt = timer.GetChronoTime();
 	float distance = dt * m_Speed;
 	Vector2f translation = m_Transform.GetDirection() * distance;
-	//mShape.move(translation);
+	mp_Shape->SetPosition(m_Transform.GetPosition().x, m_Transform.GetPosition().y);
+	if ((GetAsyncKeyState('A') & 0x8001) != 0) {
+		Vector2f pos = m_Transform.GetPosition();
+		m_Transform.SetPosition({pos.x + 1, pos.y + 1});
+	}
 
 	if (m_Transform.isSet)
 	{

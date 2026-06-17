@@ -16,9 +16,7 @@ class GameManager
 {
 private: 
 
-	Window* mp_window = nullptr;
-
-	Timer* timer = nullptr;
+	Window* mp_window = nullptr; 
 
 	bool isRunning = false;
 
