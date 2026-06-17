@@ -88,10 +88,10 @@ public:
 		m_height = height;
 		m_width = width;
 
-		SDL_Vertex vertex1 = { {x, y}, color, {1, 1} };
-		SDL_Vertex vertex2 = { {x + m_width, y}, color, {1, 1} };
-		SDL_Vertex vertex3 = { {x, y + m_height}, color, {1, 1} };
-		SDL_Vertex vertex4 = { {x + m_width, y + m_height}, color, {1, 1} };
+		SDL_Vertex vertex1 = { {x, y}, color, {0.f, 0.f} };
+		SDL_Vertex vertex2 = { {x + m_width, y}, color, {1.f, 0.f} };
+		SDL_Vertex vertex3 = { {x, y + m_height}, color, {0.f, 1.f} };
+		SDL_Vertex vertex4 = { {x + m_width, y + m_height}, color, {1.f, 1.f} };
 
 		m_vertices[0] = vertex1;
 		m_vertices[1] = vertex2;
@@ -150,9 +150,9 @@ public:
 		m_indicesNbr = 0;
 		m_vertexNbr = 3;
 
-		SDL_Vertex vertex1 = { {x1, y1}, color, {1, 1} };
-		SDL_Vertex vertex2 = { {x2, y2}, color, {1, 1} };
-		SDL_Vertex vertex3 = { {x3, y3}, color, {1, 1} };
+		SDL_Vertex vertex1 = { {x1, y1}, color, {0.f, 0.f} };
+		SDL_Vertex vertex2 = { {x2, y2}, color, {1.f, 0.f} };
+		SDL_Vertex vertex3 = { {x3, y3}, color, {1.f, 1.f} };
 
 		m_vertices[0] = vertex1;
 		m_vertices[1] = vertex2;
@@ -194,7 +194,7 @@ public:
 			float cx = x + sin(radian) * radius;
 			float cy = y + cos(radian) * radius;
 
-			SDL_Vertex vertex{ {cx, cy}, color, {1, 1} };
+			SDL_Vertex vertex{ {cx, cy}, color, {1.f, 1.f} };
 			m_vertices[i + 1] = vertex;
 
 			m_indices[i * 3] = 0;

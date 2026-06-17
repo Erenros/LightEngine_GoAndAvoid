@@ -13,18 +13,24 @@ void GameManager::Loop()
 
 	SDL_RenderClear(mp_window->GetRenderer());
 
-	Rectangle* rectangle = new Rectangle(100, 100, 20, 500, { 0, 230, 0, 250 });
+	Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
+
+	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("test");
+
+	rectangle->SetTexture(tex);
 	rectangle->Draw(mp_window);
 
-	Triangle* triangle = new Triangle(10, 10, 100, 10, 100, 400, { 230, 0, 0, 250 });
+
+	Triangle* triangle = new Triangle(300, 300, 500, 300, 500, 500, { 255, 0, 255, 255 });
+	triangle->SetTexture(tex);
+
 	triangle->Draw(mp_window);
 
+	/*
 	Circle* circle = new Circle(350, 350, 100, 50, { 0, 0, 230, 255 });
+	circle->Draw(mp_window);*/
 
-	circle->SetTexture(RessourceManager::GetInstance().GetTexture("temp"));
-
-	circle->Draw(mp_window);
-
+	SDL_RenderPresent(mp_window->GetRenderer());
 
 
 	while (isRunning == true)
@@ -32,10 +38,6 @@ void GameManager::Loop()
 		timer->ResetChrono();
 
 		//TODO Loop
-		spritesheet->UpdateAnimation();
-		SDL_Delay(spritesheet->Duration * 500);
-		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->pTexture, &spritesheet->SourceRect, &rect2);
-		SDL_RenderPresent(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
 			//TODO faire update et draw pour les entiti�s
@@ -81,6 +83,8 @@ bool GameManager::Init()
 	}
 
 	timer = new Timer();
+
+	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
 
 	return true;
 }
