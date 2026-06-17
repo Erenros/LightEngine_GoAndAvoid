@@ -2,14 +2,19 @@
 #include "GameManager.h"
 #include "include.h"
 
+#include "SampleScene.h"
+
 #undef main
 
 int main(int argc, char** argv)
 {
     //Temporaire
-    GameManager* gm = GameManager::Get();
+    GameManager gm = GameManager(800, 600);
 
-    gm->LaunchGame(500, 500);
+    gm.Init();
+    gm.LaunchScene<SampleScene>();
+    gm.Loop();
+    gm.Close();
 
     ///* Initialisation simple */
     //if (SDL_Init(SDL_INIT_VIDEO) != 0)

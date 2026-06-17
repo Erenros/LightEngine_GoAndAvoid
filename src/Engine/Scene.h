@@ -1,43 +1,34 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include "Entity.h"
+#include "Core/InputManager.h" 
 
-class Entity;
-class Window;
+//class Entity;
+class GameManager;
 
+class Scene
+{
+private:
 
-class Scene{
-	std::vector<Entity*> m_Entities;
+	GameManager* mp_GameManager = nullptr;
 
+	void SetGameManager(GameManager* gameManager) { mp_GameManager = gameManager; };
 
-	void Update();
-	void Draw(Window* pWindow);
-
-
-	//Constructors 
+protected:
 
 	Scene() = default;
 
-	//Destructors
-
-	~Scene() = default;
-
-
-	friend class SceneManager;
-
+	virtual void OnInitialize() {};
+	virtual void OnUpdate() {};
 
 public:
-	void AddEntity(Entity* entity);
-	Entity* GetEntityWithID(const int& id);
 
-	template <typename T, typename... Args>
-	Entity* CreateEntity(Args&&... args) {
-		static_assert(std::is_base_of<Entity, T>::value, "T must inherit from Entity");
-		std::cerr << "T must inherit from Entity\n";
-		T* entity = new T(std::forward<Args>(args)...);
+	template<typename T>
+	T* CreateEntity(Shape& shape);
 
-		m_Entities.push_back(entity);
-		return entity;
-	}
+
+	friend class GameManager;
 };
 
+#include "Scene.inl"

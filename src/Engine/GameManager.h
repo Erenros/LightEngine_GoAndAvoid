@@ -8,8 +8,10 @@
 #include "Window.h"
 #include "include.h"
 
+#include "RessourceManager.h"
 
 class Entity;
+class Scene;
 
 
 class GameManager
@@ -24,18 +26,24 @@ private:
 
 	std::vector <Entity*> m_entities;
 
-	bool Init();
-	void Loop();
-	void Close();
+	Scene* mp_currentScene = nullptr;
+
+	
 
 public:
 
 	GameManager() = default;
 
+	bool Init();
+	void Loop();
+	void Close();
 
-	void LaunchGame(int windowWidth, int windowHeight);
+	void AddEntity(Entity* entity) { m_entities.push_back(entity); };
+	
+	Window* GetWindow() { return mp_window; }; 
 
-	static GameManager* Get();
-
-	Window* GetWindow() { return mp_window; };
+	template<typename T>
+	T* LaunchScene();
 };
+
+#include "GameManager.inl"

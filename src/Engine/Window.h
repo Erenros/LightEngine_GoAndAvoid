@@ -38,5 +38,5 @@ public:
 	 
 	//TODO changer SDL_Rect pour le vect2 custom
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
-	void Draw(Shape* pShape);
+	void Draw(gcle::Shape* pShape);
 };
