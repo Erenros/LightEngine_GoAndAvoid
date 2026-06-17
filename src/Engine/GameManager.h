@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "Window.h"
+#include "include.h"
 
 
 class Entity;
@@ -15,8 +16,7 @@ class GameManager
 {
 private:
 
-
-	Window* mp_window = nullptr;
+	Window* mp_window = nullptr; 
 
 	bool isRunning = false;
 

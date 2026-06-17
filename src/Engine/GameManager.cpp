@@ -3,52 +3,56 @@
 #include "RessourceManager.h"
 #include "SceneManager.h"
 #include "InputManager.h"
-
 #include "Entity.h"
+
+#include "Shape.h"
 
 void GameManager::Loop()
 {
 	isRunning = true;
 
-	SDL_Rect rect(50, 50, 50, 50);
-
-	InputManager& IM = InputManager::GetInstance();
-
-	RessourceManager& RM = RessourceManager::GetInstance();
-	RM.Init(mp_window->GetRenderer());
-
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 255, 255, 255, 255);
-	SDL_RenderClear(mp_window->GetRenderer());
-
-	SDL_SetRenderDrawColor(mp_window->GetRenderer(), 0, 0, 0, 255);
-	SDL_RenderDrawRect(mp_window->GetRenderer(), &rect);
+	
 
 
-	SDL_Rect srect = SDL_Rect(0, 0, 32, 32);
-	SDL_Rect rect2 = SDL_Rect(0, 0, 256, 256);
 
-	//SDL_RenderCopy(mp_window->GetRenderer(), RM.GetTexture("test"), &srect, &rect2);
-
-	Sprite* spritesheet = new Sprite("test", srect,true, 1, 4);
-	spritesheet->PlayAnimation(0);
+	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
 
 
-	//SDL_Delay(5000);
+	rectangle->SetTexture(tex);*/
 
-	while (IM.HandleInput() && isRunning == true)
-	{
-		//TODO Loop
-		spritesheet->UpdateAnimation();
-		SDL_Delay(spritesheet->Duration * 500);
-		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->pTexture, &spritesheet->SourceRect, &rect2);
-		SDL_RenderPresent(mp_window->GetRenderer());
+	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
+
+	Triangle* triangle = new Triangle(300.f, 300.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
+	triangle->SetTexture(tex);
+
+
+	
+	Circle* circle = new Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
+
+	
+	 
+	Timer time;
+
+	m_entities.push_back(new Entity());
+	Transform2D transform;
+	transform.Initialize({ 0.f, 0.f }, 0.f);
+	m_entities[0]->Initialize(*circle, transform);
+
+	while (isRunning == true)
+	{ 
+		time.ResetChrono();
+
+		SDL_RenderClear(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
-			//TODO faire update et draw pour les entiti�s
-			/*entity.Update();
-			entity.Draw();*/
-		}
+			entity->Update(time);
+			mp_window->Draw(entity->GetShape());
+		} 
+
+		SDL_RenderPresent(mp_window->GetRenderer());
 	}
+
+	isRunning = false;
 }
 
 bool GameManager::Init()
@@ -84,7 +88,9 @@ bool GameManager::Init()
 		std::cout << "[Initialisation] : Font Error" << std::endl;
 		Close();
 		return false;
-	}
+	} 
+
+	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
 
 	return true;
 }
