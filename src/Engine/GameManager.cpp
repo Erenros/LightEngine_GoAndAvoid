@@ -14,15 +14,15 @@ void GameManager::Loop()
 	
 
 
-
-	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
-
-
-	rectangle->SetTexture(tex);*/
-
 	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
-	Triangle* triangle = new Triangle(300.f, 300.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
+	Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
+
+
+	rectangle->SetTexture(tex);
+
+
+	Triangle* triangle = new Triangle(0.f, 0.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
 	triangle->SetTexture(tex);
 
 
@@ -36,7 +36,7 @@ void GameManager::Loop()
 	m_entities.push_back(new Entity());
 	Transform2D transform;
 	transform.Initialize({ 0.f, 0.f }, 0.f);
-	m_entities[0]->Initialize(*circle, transform);
+	m_entities[0]->Initialize(*rectangle, transform);
 
 	while (isRunning == true)
 	{ 

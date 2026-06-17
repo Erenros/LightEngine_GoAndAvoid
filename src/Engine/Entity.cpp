@@ -18,7 +18,9 @@ void Entity::Update(Timer& timer)
 	float distance = dt * m_Speed;
 	Vector2f translation = m_Transform.GetDirection() * distance;
 	mp_Shape->SetPosition(m_Transform.GetPosition().x, m_Transform.GetPosition().y);
-	if ((GetAsyncKeyState('A') & 0x8001) != 0) {
+
+	if ((GetAsyncKeyState('A') & 0x8001) != 0) 
+	{
 		Vector2f pos = m_Transform.GetPosition();
 		m_Transform.SetPosition({pos.x + 1, pos.y + 1});
 	}
@@ -50,25 +52,30 @@ void Entity::Destroy()
 {
 }
 
-bool Entity::GoToPosition(int x, int y, float speed)
+bool Entity::GoToPosition(int32 x, int32 y, float32 speed)
 {
-    return false;
+	return false;
 }
 
-bool Entity::GoToDirection(int x, int y, float speed)
+bool Entity::GoToDirection(int32 x, int32 y, float32 speed)
 {
-    return false;
-}
+	return false;
+} 
 
 Transform2D& Entity::GetTransform()
 {
 	return m_Transform;
 }
+Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
+{
+	return Vector2f();
+}
 
-void Entity::SetDirection(float x, float y, float speed)
+void Entity::SetDirection(float32 x, float32 y, float32 speed)
 {
 }
 
-void Entity::SetPosition(float x, float y, float ratioX, float ratioY)
+void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 }
+
