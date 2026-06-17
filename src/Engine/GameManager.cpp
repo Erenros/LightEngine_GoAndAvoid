@@ -25,7 +25,6 @@ void GameManager::Loop()
 
 	circle->Draw(mp_window);
 
-	SDL_RenderPresent(mp_window->GetRenderer());
 
 
 	while (isRunning == true)
@@ -33,14 +32,16 @@ void GameManager::Loop()
 		timer->ResetChrono();
 
 		//TODO Loop
+		spritesheet->UpdateAnimation();
+		SDL_Delay(spritesheet->Duration * 500);
+		SDL_RenderCopy(mp_window->GetRenderer(), spritesheet->pTexture, &spritesheet->SourceRect, &rect2);
+		SDL_RenderPresent(mp_window->GetRenderer());
 
 		for (Entity* entity : m_entities) {
 			//TODO faire update et draw pour les entiti�s
 			/*entity.Update();
 			entity.Draw();*/
 		}
-		SDL_Delay(3000);
-		isRunning = false;
 	}
 }
 

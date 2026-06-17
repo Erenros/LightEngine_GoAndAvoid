@@ -16,6 +16,7 @@ class GameManager
 {
 private:
 
+
 	Window* mp_window = nullptr;
 
 	Timer* timer = nullptr;
