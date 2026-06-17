@@ -1,6 +1,5 @@
 #include "Entity.h"
-#include <Windows.h>
-
+#include "Core/InputManager.h"
 
 void Entity::Initialize(Shape& shape, Transform2D& transform)
 {
@@ -18,10 +17,10 @@ void Entity::Update(Timer& timer)
 	float distance = dt * m_Speed;
 	Vector2f translation = m_Transform.GetDirection() * distance;
 	mp_Shape->SetPosition(m_Transform.GetPosition().x, m_Transform.GetPosition().y);
-	if ((GetAsyncKeyState('A') & 0x8001) != 0) {
+	/*if (InputManager::GetInstance().IsHeld('A')) {
 		Vector2f pos = m_Transform.GetPosition();
-		m_Transform.SetPosition({pos.x + 1, pos.y + 1});
-	}
+		m_Transform.SetPosition({pos.x + 10, pos.y + 10});
+	}*/
 
 	if (m_Transform.isSet)
 	{
