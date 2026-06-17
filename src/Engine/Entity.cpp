@@ -1,18 +1,18 @@
 #include "Entity.h"
 
-void Entity::Initialize(Vector2f position, Degrees angle)
+void Entity::Initialize(Shape& shape, Transform2D& transform)
 {
-    m_Transform = Transform2D();
-    m_Transform.Initialize(position, angle);
+    m_Transform = transform;
+	mp_Shape = &shape;
 
 	mTarget.isSet = false;
 
 	OnInitialize();
 }
 
-void Entity::Update(Timer* timer)
+void Entity::Update(Timer& timer)
 {
-	double dt = timer->GetChronoTime();
+	double dt = timer.GetChronoTime();
 	float distance = dt * m_Speed;
 	Vector2f translation = m_Transform.GetDirection() * distance;
 	//mShape.move(translation);
