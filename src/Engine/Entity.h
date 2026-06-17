@@ -16,8 +16,6 @@ class Entity
 {
 public:
 	void Destroy();
-	bool IsInside(float x, float y) const; 
-	bool IsColliding(Entity* other) const;
 	bool GoToPosition(int x, int y, float speed = -1.f);
 	bool GoToDirection(int x, int y, float speed = -1.f);
 
@@ -48,8 +46,7 @@ protected:
 
 private:
 	void Update(Timer* timer);
-	void Initialize(Vector2f position, Math::Degrees angle);
-	void Repulse(Entity* other);
+	void Initialize(Vector2f position, Degrees angle);
 
 
 protected:

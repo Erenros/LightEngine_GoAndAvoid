@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-void Entity::Initialize(Vector2f position, Math::Degrees angle)
+void Entity::Initialize(Vector2f position, Degrees angle)
 {
     m_Transform = Transform2D();
     m_Transform.Initialize(position, angle);
@@ -8,10 +8,6 @@ void Entity::Initialize(Vector2f position, Math::Degrees angle)
 	mTarget.isSet = false;
 
 	OnInitialize();
-}
-
-void Entity::Repulse(Entity* other)
-{
 }
 
 void Entity::Update(Timer* timer)
@@ -46,16 +42,6 @@ void Entity::Update(Timer* timer)
 
 void Entity::Destroy()
 {
-}
-
-bool Entity::IsInside(float x, float y) const
-{
-    return false;
-}
-
-bool Entity::IsColliding(Entity* other) const
-{
-    return false;
 }
 
 bool Entity::GoToPosition(int x, int y, float speed)
