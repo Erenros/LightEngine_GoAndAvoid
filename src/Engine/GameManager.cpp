@@ -12,26 +12,22 @@ void GameManager::Loop()
 	isRunning = true;
 
 	
-	float32 a = 0;
 
 
 
-	Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
+	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
+
+
+	rectangle->SetTexture(tex);*/
 
 	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
-	rectangle->SetTexture(tex);
-
-	mp_window->Draw(rectangle);
-
-	Triangle* triangle = new Triangle(300, 300, 500, 300, 500, 500, { 255, 0, 255, 255 });
+	Triangle* triangle = new Triangle(300.f, 300.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
 	triangle->SetTexture(tex);
-	mp_window->Draw(triangle);
 
 
-	/*
-	Circle* circle = new Circle(350, 350, 100, 50, { 0, 0, 230, 255 });
-	circle->Draw(mp_window);*/
+	
+	Circle* circle = new Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
 
 	
 	 
@@ -39,13 +35,11 @@ void GameManager::Loop()
 
 	m_entities.push_back(new Entity());
 	Transform2D transform;
-	transform.Initialize({ 0, 0 }, 0);
-	m_entities[0]->Initialize(*triangle, transform);
+	transform.Initialize({ 0.f, 0.f }, 0.f);
+	m_entities[0]->Initialize(*circle, transform);
 
 	while (isRunning == true)
 	{ 
-		a+=1;
-		triangle->SetPosition(a, a);
 		time.ResetChrono();
 
 		SDL_RenderClear(mp_window->GetRenderer());

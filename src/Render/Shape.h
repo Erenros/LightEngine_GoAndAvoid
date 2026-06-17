@@ -151,6 +151,11 @@ public:
 			return;
 		}
 
+		m_center.x = x;
+		m_center.y = y;
+
+		m_radius = radius;
+
 		m_shape = Shapes::Circle;
 
 		m_verticies.resize(smoothness + 1);
