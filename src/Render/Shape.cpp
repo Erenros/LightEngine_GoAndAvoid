@@ -1,6 +1,6 @@
 #include "Shape.h" 
 
-void Shape::SetPosition(float32 x, float32 y) {
+void gcle::Shape::SetPosition(float32 x, float32 y) {
 	
 	float32 dx = 0.f;
 	float32 dy = 0.f;
