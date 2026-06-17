@@ -2,7 +2,7 @@
 
 #include "include.h"
 #include "Transform.h"
-#include "Shape.h"
+#include "Render/Shape.h"
 
 
 struct Target
@@ -61,5 +61,7 @@ protected:
 	Transform2D m_Transform;
 
 private:
+
+	friend class Scene;
 	friend class GameManager;
 };

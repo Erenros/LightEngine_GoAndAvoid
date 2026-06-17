@@ -1,19 +1,17 @@
 #include "GameManager.h"
 #include <iostream>
 #include "RessourceManager.h"
-#include "SceneManager.h"
 #include "InputManager.h"
 #include "Entity.h"
+#include "Scene.h"
 
 #include "Shape.h"
 
 void GameManager::Loop()
 {
-	isRunning = true;
+	isRunning = true;	
 
-	
-
-
+	LaunchScene<Scene>();
 
 	/*Rectangle* rectangle = new Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
 
@@ -33,10 +31,12 @@ void GameManager::Loop()
 	 
 	Timer time;
 
-	m_entities.push_back(new Entity());
+	//m_entities.push_back(new Entity());
 	Transform2D transform;
 	transform.Initialize({ 0.f, 0.f }, 0.f);
-	m_entities[0]->Initialize(*circle, transform);
+	//m_entities[0]->Initialize(*circle, transform);
+
+	mp_currentScene->CreateEntity<Entity>(*circle, transform);
 
 	while (isRunning == true)
 	{ 
