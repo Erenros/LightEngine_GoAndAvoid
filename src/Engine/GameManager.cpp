@@ -3,7 +3,6 @@
 #include "RessourceManager.h"
 #include "SceneManager.h"
 #include "InputManager.h"
-
 #include "Entity.h"
 
 #include "Shape.h"
@@ -21,6 +20,9 @@ void GameManager::Loop()
 	triangle->Draw(mp_window);
 
 	Circle* circle = new Circle(350, 350, 100, 50, { 0, 0, 230, 255 });
+
+	circle->SetTexture(RessourceManager::GetInstance().GetTexture("temp"));
+
 	circle->Draw(mp_window);
 
 	SDL_RenderPresent(mp_window->GetRenderer());
