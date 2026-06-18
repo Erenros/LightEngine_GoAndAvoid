@@ -40,9 +40,45 @@ void GameManager::Loop()
 		{
 			m_entities[i]->Update(time);
 
-			Vector2f realPos = m_entities[i]->GetPosition();
+			Shape* realShape = m_entities[i]->GetShape();
 
-			m_entities[i]->SetRenderPosition(realPos - cam.GetPosition() + screenMiddle);
+			m_entities[i]->SetRenderPosition((realShape->GetPosition() - cam.GetPosition()) * cam.GetZoom() + screenMiddle);
+
+			int mode = 0;
+
+			std::vector<float32> points;
+
+			if (realShape->GetShape() == gcle::Shapes::Rectangle)
+			{
+				gcle::Rectangle* rect = static_cast<gcle::Rectangle*>(realShape);
+				points[0] = rect->GetWidth();
+				points[1] = rect->GetHeight();
+
+				mode = 0;
+			}
+
+			else if (realShape->GetShape() == gcle::Shapes::Circle)
+			{
+				gcle::Circle* circ = static_cast<gcle::Circle*>(realShape);
+				points[0] = circ->GetRadius();
+
+				mode = 1;
+			}
+
+			else if (realShape->GetShape() == gcle::Shapes::Triangle)
+			{
+				gcle::Triangle* tri = static_cast<gcle::Triangle*>(realShape);
+				points[0] = tri->GetTrianglePoints()[0].x;
+				points[1] = tri->GetTrianglePoints()[0].y;
+				points[2] = tri->GetTrianglePoints()[1].x;
+				points[3] = tri->GetTrianglePoints()[1].y;
+				points[4] = tri->GetTrianglePoints()[2].x;
+				points[5] = tri->GetTrianglePoints()[2].y;
+
+				mode = 2;
+			}
+
+			m_entities[i]->SetRenderSize(mode, points);
 
 			mp_window->Draw(m_entities[i]->GetRenderShape());
 		}

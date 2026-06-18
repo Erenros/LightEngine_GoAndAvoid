@@ -109,6 +109,30 @@ void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
 	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
+void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
+{
+	if (shapeType == 0)
+	{
+		mp_RenderShape->SetWidth(points[0]);
+		mp_RenderShape->SetHeight(points[1]);
+	}
+
+	else if (shapeType == 1)
+	{
+		mp_RenderShape->SetRadius(points[0]);
+	}
+
+	else if (shapeType == 2)
+	{
+		std::vector<Vector2f> newTrianglePoints;
+		newTrianglePoints[0] = { points[0], points[1] };
+		newTrianglePoints[1] = { points[2], points[3] };
+		newTrianglePoints[2] = { points[4], points[5] };
+
+		mp_RenderShape->SetTrianglePoints(newTrianglePoints);
+	}
+}
+
 Vector2f Entity::GetRenderPosition()
 {
 	return mp_RenderShape->GetPosition();

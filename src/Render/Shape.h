@@ -30,6 +30,9 @@ namespace gcle
 		float32 m_width = 0.0f;
 		Vector2f m_origin = { 0.0f, 0.0f };
 
+		//triangle
+		std::vector<Vector2f> m_points;
+
 		Shapes m_shape = Shapes::Triangle;
 
 		std::vector<SDL_Vertex> m_verticies;
@@ -65,6 +68,7 @@ namespace gcle
 		virtual void SetHeight(float32 height) {};
 		virtual void SetWidth(float32 width) {};
 		virtual void SetCenter(Vector2f center) {};
+		virtual void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) {};
 
 	public:
 
@@ -133,15 +137,21 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color) {
-			m_shape = Shapes::Triangle;
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color)
+		{
+			m_points[0] = { x1, y1 };
+			m_points[1] = { x2, y2 };
+			m_points[2] = { x3, y3 };
+
+
+			m_shape = Shapes::Triangle; 
 
 			m_verticies.resize(3);
 			m_indicies.resize(3);
 
-			m_verticies[0] = SDL_Vertex{ {x1, y1}, color, {0.f, 0.f} };
-			m_verticies[1] = SDL_Vertex{ {x2, y2}, color, {1, 0.f} };
-			m_verticies[2] = SDL_Vertex{ {x3, y3}, color, {1.f, 1.f} };
+			m_verticies[0] = SDL_Vertex{ {m_points[0].x, m_points[0].y}, color, {0.f, 0.f} };
+			m_verticies[1] = SDL_Vertex{ {m_points[1].x, m_points[1].y}, color, {1, 0.f} };
+			m_verticies[2] = SDL_Vertex{ {m_points[2].x, m_points[2].y}, color, {1.f, 1.f} };
 
 			m_indicies = { 0, 1, 2 };
 

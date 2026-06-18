@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 #include "include.h"
 #include "Transform.h"
 #include "Render/Shape.h"
@@ -35,6 +35,8 @@ public:
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
+
+	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
 
