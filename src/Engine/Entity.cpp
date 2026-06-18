@@ -54,29 +54,6 @@ void Entity::Update(Timer& timer)
 	OnUpdate();
 }
 
-void Entity::Repulse(Entity* other)
-{
-	Vector2f distance = GetPosition(0.5f, 0.5f) - other->GetPosition(0.5f, 0.5f);
-
-	float sqrLength = (distance.x * distance.x) + (distance.y * distance.y);
-	float length = std::sqrt(sqrLength);
-
-	float radius1 = mp_Shape->GetRadius();
-	float radius2 = other->mp_Shape->GetRadius();
-
-	float overlap = (length - (radius1 + radius2)) * 0.5f;
-
-	Vector2f normal = distance / length;
-
-	Vector2f translation = normal * overlap;
-
-	Vector2f position1 = GetPosition(0.5f, 0.5f) - translation;
-	Vector2f position2 = other->GetPosition(0.5f, 0.5f) + translation;
-
-	SetPosition(position1.x, position1.y, 0.5f, 0.5f);
-	other->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
-}
-
 void Entity::Destroy()
 {
 	m_ToDestroy = true;

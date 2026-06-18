@@ -50,8 +50,7 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Timer& timer);
-	void Repulse(Entity* other);
+	void Update(Timer& timer); 
 	void Initialize(Shape& shape);
 
 

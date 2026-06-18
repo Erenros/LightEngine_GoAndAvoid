@@ -21,6 +21,7 @@ public:
 	void Update(float64 deltaTime);
 	bool IsColliding(Entity* pEntity1, Entity* pEntity2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
+	void Repulse(Entity* pEntity1, Entity* pEntity2);
 
 private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
@@ -34,11 +35,19 @@ private:
 	bool CheckCircleRect(gcle::Shape* a, gcle::Shape* b);
 
 private:
+	void RepulseRectRect(gcle::Shape* a, gcle::Shape* b);
+	void RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b);
+	void RepulseRectCircle(gcle::Shape* a, gcle::Shape* b);
+	void RepulseCircleRect(gcle::Shape* a, gcle::Shape* b);
+
+private:
 	std::vector<EntityInfo> m_EntitiesToUpdate;
 
 private: 
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-
 	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+
+	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
+	static RepulseFn repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
 };
 
