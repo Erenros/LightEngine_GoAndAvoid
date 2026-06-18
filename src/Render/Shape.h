@@ -10,7 +10,8 @@ namespace gcle
 	enum class Shapes {
 		Triangle,
 		Rectangle,
-		Circle
+		Circle,
+		Count
 	};
 
 	class Shape {

@@ -1,0 +1,36 @@
+#pragma once 
+#include "include.h"
+#include "Entity.h"
+#include "Shape.h"
+
+#include <vector>
+
+class PhysicsManager
+{
+public:
+	static PhysicsManager& GetInstance();
+
+	void Update(float64 deltaTime);
+	bool IsColliding(Entity* pEntity1, Entity* pEntity2);
+	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
+
+private:
+	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
+	bool CheckAABBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle);
+	bool CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Circle* pCircle2);
+
+private:
+	bool CheckRectRect(gcle::Shape* a, gcle::Shape* b);
+	bool CheckCircleCircle(gcle::Shape* a, gcle::Shape* b);
+	bool CheckRectCircle(gcle::Shape* a, gcle::Shape* b);
+	bool CheckCircleRect(gcle::Shape* a, gcle::Shape* b);
+
+private:
+	std::vector<Entity*> m_EntitiesToUpdate;
+
+private: 
+	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
+
+	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+};
+
