@@ -36,16 +36,8 @@ void Camera::Update()
 {
 	//DEBUG_INFO << "Camera update" << ENDL;
 
-	if (followingEntity == nullptr)
-	{
-		//DEBUG_INFO << "Zoom is : " << zoom << ENDL;
-	}
-
-	else
-	{
-		t.SetPosition(followingEntity->GetPosition());
-		DEBUG_INFO << t.GetPosition().x << " and " << t.GetPosition().y << ENDL;
-	}
+	t.SetPosition(followingEntity->GetPosition());
+	DEBUG_INFO << t.GetPosition().x << " and " << t.GetPosition().y << ENDL;
 }
 
 void Camera::SetZoom(double d)

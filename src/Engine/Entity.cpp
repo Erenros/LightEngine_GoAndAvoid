@@ -9,9 +9,9 @@ void Entity::Initialize(Shape& shape)
 	m_Tag = -1;
 	m_Target;
 	m_RigidBody = false;
-	mp_Shape = nullptr;
 
 	mp_Shape = &shape;
+	mp_RenderShape = &shape;
 
 	m_Target.isSet = false;
 
@@ -99,18 +99,18 @@ void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void Entity::SetRenderPosition(float32 x, float32 y)
+void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
 {
-	m_RenderPosition = { x, y };
+	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void Entity::SetRenderPosition(Vector2f v)
+void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
 {
-	m_RenderPosition = v;
+	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
 Vector2f Entity::GetRenderPosition()
 {
-	return m_RenderPosition;
+	return mp_RenderShape->GetPosition();
 }
 

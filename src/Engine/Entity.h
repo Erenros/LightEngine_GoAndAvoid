@@ -23,6 +23,7 @@ public:
 
 public: 
 	Shape* GetShape() { return mp_Shape; }
+	Shape* GetRenderShape() { return mp_RenderShape; };
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 public:
@@ -32,9 +33,8 @@ public:
 	void SetRigidBody(bool isRigitBody) { m_RigidBody = isRigitBody; }
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
-	
-	void SetRenderPosition(float32 x, float32 y);
-	void SetRenderPosition(Vector2f v);
+	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
+	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
 
 	Vector2f GetRenderPosition();
 
@@ -66,7 +66,7 @@ protected:
 	bool		m_RigidBody = false;
 	Shape*		mp_Shape = nullptr;
 
-	Vector2f m_RenderPosition = { 0.f, 0.f };
+	Shape*		mp_RenderShape = nullptr;
 
 private:
 

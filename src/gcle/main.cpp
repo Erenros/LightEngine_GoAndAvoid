@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv)
 { 
-    GameManager gm = GameManager(800, 600);
+    GameManager gm = GameManager(1000, 800);
 
     gm.Init();
     gm.LaunchScene<SampleScene>();

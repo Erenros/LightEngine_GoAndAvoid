@@ -10,14 +10,24 @@ void SampleScene::OnInitialize()
 	rectangle->SetTexture(tex);
 
 
-	gcle::Triangle* triangle = new gcle::Triangle(0.f, 0.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
+	gcle::Triangle* triangle = new gcle::Triangle(100.f, 100.f, 600.f, 400.f, 600.f, 600.f, { 255, 0, 0, 255 });
 	triangle->SetTexture(tex);
 
 
 
 	gcle::Circle* circle = new gcle::Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
 
+
+	Circle* circle2 = new Circle(300, 300, 80, 50, { 255, 255, 0, 255 });
+
 	pEntity = CreateEntity<Entity>(*rectangle);
+	pEntity = CreateEntity<Entity>(*triangle);
+	pEntity = CreateEntity<Entity>(*circle);
+	pEntity = CreateEntity<Entity>(*circle2);
+
+
+
+	
 }
 
 void SampleScene::OnUpdate()

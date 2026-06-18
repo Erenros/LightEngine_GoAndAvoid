@@ -19,7 +19,9 @@ void GameManager::Loop()
 
 	Camera cam;
 	cam.Init(mp_window->GetRenderer());
-	cam.SetFollowing(m_entities[0]);
+	cam.SetFollowing(m_entities[3]);
+
+	Vector2f screenMiddle = { m_WindW / 2.f, m_WindH / 2.f };
 
 	while (isRunning == true)
 	{ 
@@ -39,27 +41,12 @@ void GameManager::Loop()
 			m_entities[i]->Update(time);
 
 			Vector2f realPos = m_entities[i]->GetPosition();
-			Vector2f screenMiddle = { m_WindW / 2.f, m_WindH / 2.f };
 
-			if (cam.GetFollowing() != m_entities[i])
-			{
-				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition());
+			m_entities[i]->SetRenderPosition(realPos - cam.GetPosition() + screenMiddle);
 
-			}
-
-			else if (cam.GetFollowing() == m_entities[i])
-			{
-				m_entities[i]->SetRenderPosition(realPos - cam.GetPosition() + screenMiddle);
-
-			}
-
-			mp_window->Draw(m_entities[i]->GetShape());
+			mp_window->Draw(m_entities[i]->GetRenderShape());
 		}
- 
-		for (Entity* entity : m_entities) {
-			entity->Update(time);
-			mp_window->Draw(entity->GetShape());
-		}
+
 		SDL_RenderPresent(mp_window->GetRenderer());
 	}
 
