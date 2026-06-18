@@ -18,7 +18,9 @@ class GameManager
 {
 private:
 
-	Window* mp_window = nullptr; 
+	GameManager* mp_Instance = nullptr;
+
+	Window* mp_window = nullptr;
 
 	bool isRunning = false;
 
@@ -26,17 +28,20 @@ private:
 
 	std::vector <Entity*> m_entities;
 
-	Scene* mp_currentScene = nullptr;
-
-	
+	friend class Scene;
 
 public:
 
-	GameManager(int windowWidth,int windowHeight) :
-		m_WindW(windowWidth),
-		m_WindH(windowHeight) { }
+	static GameManager& GetInstance() {
+		static GameManager instance;
+		return instance;
+	}
 
-	bool Init();
+
+	GameManager() = default;
+
+
+	bool Init(int windowWidth, int windowHeight);
 	void Loop();
 	void Close();
 
@@ -44,8 +49,8 @@ public:
 	
 	Window* GetWindow() { return mp_window; }; 
 
-	template<typename T>
-	T* LaunchScene();
+	/*template<typename T>
+	T* LaunchScene();*/
 };
 
 #include "GameManager.inl"

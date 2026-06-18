@@ -3,7 +3,7 @@
 #include "Core/InputManager.h" 
 #include "Entity.h"
 #include "Scene.h" 
-
+#include "SceneManager.h"
 #include "Shape.h"
 
 void GameManager::Loop()
@@ -11,31 +11,39 @@ void GameManager::Loop()
 	isRunning = true;
 	 
 	Timer time;
-
 	while (isRunning == true)
 	{ 
-
-		InputManager::GetInstance().Update();
-
-		mp_currentScene->OnUpdate();
+		PROFILER_START("main loop", "main loop");
+		if (InputManager::GetInstance().IsDown(Space)) {
+			SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
+		}
 
 		time.ResetChrono();
 
+		InputManager::GetInstance().Update();
+
+		SceneManager::GetInstance().UpdateCurrentScene(time);
+
+
 		SDL_RenderClear(mp_window->GetRenderer());
 
-		for (Entity* entity : m_entities) {
-			entity->Update(time);
-			mp_window->Draw(entity->GetShape());
-		} 
+		SceneManager::GetInstance().DrawCurrentScene(mp_window);
     
 		SDL_RenderPresent(mp_window->GetRenderer());
+
+		PROFILER_END("main loop");
+
 	}
 
 	isRunning = false;
 }
 
-bool GameManager::Init()
+bool GameManager::Init(int windowWidth, int windowHeight)
 {
+
+	m_WindW = windowWidth;
+	m_WindH = windowHeight;
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 	{
 		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;

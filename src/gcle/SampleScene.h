@@ -5,7 +5,7 @@ class SampleScene : public Scene
 {
 public:
 	void OnInitialize() override;
-	void OnUpdate() override;
+	void OnUpdate(Timer& time) override;
 
 private:
 	Entity* pEntity = nullptr;

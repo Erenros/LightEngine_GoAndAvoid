@@ -64,4 +64,14 @@ private:
 
 	friend class Scene;
 	friend class GameManager;
+
+
+private:
+	std::vector<std::string> m_activeScenes;
+
+public:
+	void AddActiveScene(const std::string& sceneTag);
+	void RemoveActiveScene(const std::string& sceneTag);
+
+	bool IsActiveIn(const std::string& sceneTag);
 };
