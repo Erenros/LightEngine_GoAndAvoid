@@ -2,16 +2,17 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-namespace AudioTest
+class Audio
 {
-	void SetMusicVolumeA(int volume) { Mix_VolumeMusic(volume); };
+public:
+	static void SetMusicVolumeA(int volume) { Mix_VolumeMusic(volume); };
 
-	void StopMusicA() { Mix_HaltMusic(); };
-	void PauseMusicA() { Mix_PauseMusic(); };
-	void ResumeMusicA() { Mix_ResumeMusic(); };
+	static void StopMusicA() { Mix_HaltMusic(); };
+    static void PauseMusicA() { Mix_PauseMusic(); };
+	static void ResumeMusicA() { Mix_ResumeMusic(); };
 
-	void StopAllSoundA() { Mix_HaltChannel(-1); };
+	static void StopAllSoundA() { Mix_HaltChannel(-1); };
 
-	bool IsMusicPlayingA() { return (Mix_PlayingMusic() ? true : false); };
-	bool IsMusicPausedA() { return (Mix_PausedMusic() ? true : false); }
+	static bool IsMusicPlayingA() { return (Mix_PlayingMusic() ? true : false); };
+	static bool IsMusicPausedA() { return (Mix_PausedMusic() ? true : false); }
 };
