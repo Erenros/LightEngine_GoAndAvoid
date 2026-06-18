@@ -49,8 +49,6 @@ public:
 	
 	Window* GetWindow() { return mp_window; }; 
 
-	/*template<typename T>
-	T* LaunchScene();*/
 };
 
 #include "GameManager.inl"

@@ -40,6 +40,7 @@ void GameManager::Loop()
 
 bool GameManager::Init(int windowWidth, int windowHeight)
 {
+	srand(time(NULL));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
