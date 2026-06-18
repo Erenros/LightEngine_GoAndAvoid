@@ -5,11 +5,19 @@
 
 #include <vector>
 
+struct EntityInfo
+{
+	Entity* pEntity = nullptr;
+	bool toRemove = false;
+};
+
 class PhysicsManager
 {
 public:
 	static PhysicsManager& GetInstance();
 
+	void AddEntity(Entity* pEntity);
+	void RemoveEntity(Entity* pEntity);
 	void Update(float64 deltaTime);
 	bool IsColliding(Entity* pEntity1, Entity* pEntity2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
@@ -26,7 +34,7 @@ private:
 	bool CheckCircleRect(gcle::Shape* a, gcle::Shape* b);
 
 private:
-	std::vector<Entity*> m_EntitiesToUpdate;
+	std::vector<EntityInfo> m_EntitiesToUpdate;
 
 private: 
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);

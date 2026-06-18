@@ -4,10 +4,12 @@ void SampleScene::OnInitialize()
 {
 	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
-	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
+	gcle::Rectangle* rectangle = new gcle::Rectangle(500, 400, 100, 100, { 250,250, 250, 250 });
+	gcle::Rectangle* rectangle2 = new gcle::Rectangle(200, 200, 100, 100, { 250,250, 250, 250 });
 
 
 	rectangle->SetTexture(tex);
+	rectangle2->SetTexture(tex);
 
 
 	gcle::Triangle* triangle = new gcle::Triangle(0.f, 0.f, 500.f, 300.f, 500.f, 500.f, { 255, 255, 255, 255 });
@@ -15,16 +17,42 @@ void SampleScene::OnInitialize()
 
 
 
-	gcle::Circle* circle = new gcle::Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle2 = new gcle::Circle(500, 400, 100, 50, { 0, 0, 230, 255 });
 
-	pEntity = CreateEntity<Entity>(*rectangle);
+	pEntity = CreateEntity<Entity>(*circle2);
+	pEntity->SetRigidBody(true);
+	Entity* entity1 = CreateEntity<Entity>(*rectangle2);
+	entity1->SetRigidBody(true);
+	Entity* entity2 = CreateEntity<Entity>(*circle);
+	entity2->SetRigidBody(true);
 }
 
 void SampleScene::OnUpdate()
 {
-	if (InputManager::GetInstance().IsDown('A'))
+	Vector2f pos = pEntity->GetPosition();
+
+	if (InputManager::GetInstance().IsHeld('Z'))
+	{ 
+		pEntity->SetPosition(pos.x, pos.y - 1);
+		pos = pEntity->GetPosition();
+	}
+
+	if (InputManager::GetInstance().IsHeld('Q'))
+	{ 
+		pEntity->SetPosition(pos.x - 1, pos.y);
+		pos = pEntity->GetPosition();
+	}
+
+	if (InputManager::GetInstance().IsHeld('S'))
 	{
-		DEBUG_INFO << "A" << ENDL;
-		pEntity->GoToPosition(500, 500, 200000);
+		pEntity->SetPosition(pos.x, pos.y + 1);
+		pos = pEntity->GetPosition();
+	}
+
+	if (InputManager::GetInstance().IsHeld('D'))
+	{
+		pEntity->SetPosition(pos.x + 1, pos.y);
+		pos = pEntity->GetPosition();
 	}
 }

@@ -3,7 +3,7 @@
 #include "Core/InputManager.h" 
 #include "Entity.h"
 #include "Scene.h" 
-
+#include "PhysicsManager.h"
 #include "Shape.h"
 
 void GameManager::Loop()
@@ -18,6 +18,7 @@ void GameManager::Loop()
 		InputManager::GetInstance().Update();
 
 		mp_currentScene->OnUpdate();
+		PhysicsManager::GetInstance().Update(0.016f);
 
 		time.ResetChrono();
 

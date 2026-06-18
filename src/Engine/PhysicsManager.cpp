@@ -7,8 +7,8 @@ PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gc
 		&PhysicsManager::CheckRectCircle,
 	},
 	{
-		&PhysicsManager::CheckCircleCircle,
 		&PhysicsManager::CheckCircleRect,
+		&PhysicsManager::CheckCircleCircle,
 	}
 };
 
@@ -18,14 +18,72 @@ PhysicsManager& PhysicsManager::GetInstance()
 	return instance;
 }
 
+void PhysicsManager::AddEntity(Entity* pEntity)
+{
+	EntityInfo info = { pEntity, false };
+	m_EntitiesToUpdate.push_back(info);
+}
+
+void PhysicsManager::RemoveEntity(Entity* pEntity)
+{
+	for (auto& info : m_EntitiesToUpdate)
+	{
+		if (info.pEntity->GetId() == pEntity->GetId())
+		{
+			info.toRemove = true;
+		}
+	}
+}
+
 void PhysicsManager::Update(float64 deltaTime)
 {
+
+	//Collision
+	for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
+	{
+		auto it2 = it1;
+		++it2;
+		for (; it2 != m_EntitiesToUpdate.end(); ++it2)
+		{
+			Entity* entity = (*it1).pEntity;
+			Entity* otherEntity = (*it2).pEntity;
+
+			if (entity->IsColliding(otherEntity))
+			{
+				if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+				{
+					DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL; 
+					entity->Repulse(otherEntity);  //TODO Check with other shapes
+				}
+
+				entity->OnCollision(otherEntity);
+				otherEntity->OnCollision(entity);
+			}
+		}
+	}
+
+
+	//Erase
+	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+	{
+		if (m_EntitiesToUpdate[i].toRemove == false)
+		{
+			continue;
+		}
+
+		m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+	}
 }
 
 bool PhysicsManager::IsColliding(Entity* pEntity1, Entity* pEntity2)
 {
 	auto* shapeA = pEntity1->GetShape();
 	auto* shapeB = pEntity2->GetShape();
+
+	if (shapeA->GetShape() == gcle::Shapes::Triangle || shapeB->GetShape() == gcle::Shapes::Triangle)
+	{
+		return false;
+	}
 
 	int32 typeA = static_cast<int32>(shapeA->GetShape()) - 1;
 	int32 typeB = static_cast<int32>(shapeB->GetShape()) - 1;
@@ -34,7 +92,30 @@ bool PhysicsManager::IsColliding(Entity* pEntity1, Entity* pEntity2)
 }
 
 bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
-{
+{ 
+
+	switch (pEntity->GetShape()->GetShape())
+	{
+	case gcle::Shapes::Rectangle:
+	{
+		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetShape());
+		return
+		{
+			positionToCheck.x >= pRect->GetPosition().x &&
+			positionToCheck.x <= pRect->GetPosition().x + pRect->GetWidth() &&
+			positionToCheck.y >= pRect->GetPosition().y &&
+			positionToCheck.y <= pRect->GetPosition().y + pRect->GetHeight()
+		};
+	}
+	case gcle::Shapes::Circle:
+	{
+		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetShape());
+		return pCircle->GetPosition().GetDistance(positionToCheck) <= pCircle->GetRadius();
+	}
+	default:
+		break;
+	}
+
 	return false;
 }
 bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
@@ -60,8 +141,8 @@ bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Recta
 
 bool PhysicsManager::CheckAABBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle)
 {
-	float32 rx = pRect->GetPosition().x;
-	float32 ry = pRect->GetPosition().y;
+	float32 rx = pRect->GetPosition(0.0f, 0.0f).x;
+	float32 ry = pRect->GetPosition(0.0f, 0.0f).y;
 	float32 rw = pRect->GetWidth();
 	float32 rh = pRect->GetHeight();
 
@@ -85,13 +166,15 @@ bool PhysicsManager::CheckAABBCircleCollision(gcle::Rectangle* pRect, gcle::Circ
 
 	float32 dist = pCircle->GetPosition().GetDistance(test);
 
-	return dist <= pCircle->GetRadius();
+	return (dist <= pCircle->GetRadius());
 }
 
 bool PhysicsManager::CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Circle* pCircle2)
 {
-	float32 distance = pCircle1->GetPosition(0.5f, 0.5f).GetDistance(pCircle2->GetPosition(0.5f, 0.5f));
-	return distance <= pCircle1->GetRadius() + pCircle2->GetRadius();
+	Vector2f pos1 = pCircle1->GetPosition();
+	Vector2f pos2 = pCircle2->GetPosition();
+	float32 distance = pos1.GetDistance(pos2);
+	return (distance <= (pCircle1->GetRadius() + pCircle2->GetRadius()));
 }
 
 
