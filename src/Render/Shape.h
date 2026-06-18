@@ -31,7 +31,7 @@ namespace gcle
 		Vector2f m_origin = { 0.0f, 0.0f };
 
 		//triangle
-		std::vector<Vector2f> m_points;
+		std::vector<Vector2f> m_trianglepoints;
 
 		Shapes m_shape = Shapes::Triangle;
 
@@ -59,6 +59,7 @@ namespace gcle
 		virtual float32 GetWidth() { return 0.f; };
 		virtual int32 GetSmoothness() { return 0; };
 		virtual Vector2f GetCenter() { return { 0, 0 }; };
+		virtual std::vector<Vector2f> GetTrianglePoints() { return m_trianglepoints; };
 
 
 	public:
@@ -139,9 +140,9 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color)
 		{
-			m_points[0] = { x1, y1 };
-			m_points[1] = { x2, y2 };
-			m_points[2] = { x3, y3 };
+			m_trianglepoints[0] = { x1, y1 };
+			m_trianglepoints[1] = { x2, y2 };
+			m_trianglepoints[2] = { x3, y3 };
 
 
 			m_shape = Shapes::Triangle; 
@@ -149,9 +150,9 @@ namespace gcle
 			m_verticies.resize(3);
 			m_indicies.resize(3);
 
-			m_verticies[0] = SDL_Vertex{ {m_points[0].x, m_points[0].y}, color, {0.f, 0.f} };
-			m_verticies[1] = SDL_Vertex{ {m_points[1].x, m_points[1].y}, color, {1, 0.f} };
-			m_verticies[2] = SDL_Vertex{ {m_points[2].x, m_points[2].y}, color, {1.f, 1.f} };
+			m_verticies[0] = SDL_Vertex{ {m_trianglepoints[0].x, m_trianglepoints[0].y}, color, {0.f, 0.f} };
+			m_verticies[1] = SDL_Vertex{ {m_trianglepoints[1].x, m_trianglepoints[1].y}, color, {1, 0.f} };
+			m_verticies[2] = SDL_Vertex{ {m_trianglepoints[2].x, m_trianglepoints[2].y}, color, {1.f, 1.f} };
 
 			m_indicies = { 0, 1, 2 };
 
