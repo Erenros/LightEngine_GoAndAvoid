@@ -27,6 +27,6 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* 
 
 void Window::Draw(gcle::Shape* pShape)
 {
-	SDL_RenderGeometry(mp_Renderer, pShape->GetTexture(), pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+	SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 }
 

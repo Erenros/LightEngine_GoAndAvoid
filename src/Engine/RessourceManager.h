@@ -1,15 +1,18 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include "Render/Texture.h"
+#include "Render/Sound.h"
+#include "Render/Music.h"
+#include "Render/Font.h"
+#include "Render/GCLE_Audio.h"
 
+class Window;
 //Faudra biennnn optimiser ca plus tard
-//je fais rien depuis 1H aled
 
 
 //Temporaire
@@ -49,12 +52,12 @@ class RessourceManager
 {
 private:
 
-	std::unordered_map<std::string, Mix_Chunk*> m_soundMap;
-	std::unordered_map<std::string, Mix_Music*> m_musicMap;
+	std::unordered_map<std::string, Sound*> m_soundMap;
+	std::unordered_map<std::string, Music*> m_musicMap;
 
-	std::unordered_map<std::string, SDL_Texture*> m_textureMap;
+	std::unordered_map<std::string, Texture*> m_textureMap;
 
-	std::unordered_map<std::string, TTF_Font*> m_fontMap;
+	std::unordered_map<std::string, Font*> m_fontMap;
 
 public:
 
@@ -63,23 +66,23 @@ public:
 		return instance;
 	}
 
-	SDL_Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
-	SDL_Texture* LoadTexture(SDL_Renderer* renderer, const std::string& path, const std::string& id);
+	Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
+	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
-	TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
+	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 
 	void SetFontSize(const std::string& id, int size);
 
-	void SetMusicVolume(int volume) { Mix_VolumeMusic(volume); };
+	void SetMusicVolume(int volume) { AudioTest::SetMusicVolumeA(volume); };
 
-	void StopMusic() { Mix_HaltMusic(); };
-	void PauseMusic() { Mix_PauseMusic(); };
-	void ResumeMusic() { Mix_ResumeMusic(); };
+	void StopMusic() { AudioTest::StopMusicA(); };
+	void PauseMusic() { AudioTest::PauseMusicA(); };
+	void ResumeMusic() { AudioTest::ResumeMusicA(); };
 
-	void StopAllSound() { Mix_HaltChannel(-1); };
+	void StopAllSound() { AudioTest::StopAllSoundA(); };
 
-	bool isMusicPlaying() { return (Mix_PlayingMusic() ? true : false); };
-	bool IsMusicPaused() { return (Mix_PausedMusic() ? true : false); }
+	bool isMusicPlaying() { return AudioTest::IsMusicPlayingA(); };
+	bool IsMusicPaused() { return AudioTest::IsMusicPausedA(); }
 
 	/// <summary>
 	/// Mode : 1 = 1 fois,  0 = 1 boucle, -1 = infinite loop
@@ -92,18 +95,18 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	/// <param name="mode"></param>
-	void PlaySound(const std::string& id, int mode, int volume);
+	void PlaySoundEffect(const std::string& id, int mode, int volume);
 
 	bool LoadMusic(const std::string& path, const std::string& id);
 	bool LoadSound(const std::string& path, const std::string& id);
 
 	bool LoadFont(const std::string& path, const std::string& id, int size);
 
-	void Init(SDL_Renderer* renderer);
+	void Init(Window* window);
 
 
 	//I'm just gonna make only one function for this four later
-	void InitTextureFolder(SDL_Renderer* renderer);
+	void InitTextureFolder(Window* window);
 	void InitMusicFolder();
 	void InitSoundFolder();
 	void InitFont();

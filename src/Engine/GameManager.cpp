@@ -69,7 +69,7 @@ bool GameManager::Init()
 		return false;
 	} 
 
-	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
+	RessourceManager::GetInstance().Init(mp_window);
 
 	return true;
 }

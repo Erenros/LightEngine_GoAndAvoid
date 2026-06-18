@@ -5,7 +5,7 @@
 #include <SDL_ttf.h>
 
 #include <vector>
-#include "Window.h"
+#include "Render/Window.h"
 #include "include.h"
 
 #include "RessourceManager.h"

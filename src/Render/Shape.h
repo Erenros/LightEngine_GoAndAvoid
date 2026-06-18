@@ -4,6 +4,7 @@
 #include <iostream> 
 #include "MathGC.h"
 #include "Engine/Transform.h"
+#include "Texture.h"
 
 namespace gcle
 {
@@ -15,7 +16,7 @@ namespace gcle
 
 	class Shape {
 
-		SDL_Texture* m_texture = nullptr;
+		Texture* m_texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
@@ -45,7 +46,7 @@ namespace gcle
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		SDL_Texture* GetTexture() { return m_texture; };
+		Texture* GetTexture() { return m_texture; };
 		std::vector<int32>& GetIndicies() { return m_indicies; };
 		std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
 
@@ -69,7 +70,7 @@ namespace gcle
 	public:
 
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-		void SetTexture(SDL_Texture* tex) { m_texture = tex; }
+		void SetTexture(Texture* tex) { m_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 
 	public:
