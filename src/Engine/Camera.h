@@ -1,5 +1,4 @@
 #pragma once
-#include "SDL.h"
 #include "Entity.h"
 #include "Window.h"
 #include "Vector2.hpp"
@@ -16,12 +15,10 @@ class Camera
 
 		Entity* followingEntity = nullptr;
 
-		SDL_Renderer* renderer;
-
 		double zoom = 1;
 
 		// Cette fonction doit être lancée sinon la caméra ne marchera pas
-		void Init(SDL_Renderer* pRenderer);
+		void Init(Window* pWindow);
 
 		void SetFollowing(Entity* newEntity);
 		Entity* GetFollowing();
@@ -35,6 +32,7 @@ class Camera
 		double GetZoom();
 
 private:
+	Window* mp_Window = nullptr;
 	Vector2f screenMiddle;
 };
 

@@ -1,7 +1,8 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_mixer.h>
+
 #include <string>
+
+class Mix_Music;
 
 class Music
 {
@@ -16,7 +17,7 @@ public:
 	Music(const std::string& path);
 	Music() = default;
 
-	~Music() { Mix_FreeMusic(mp_music); };
+	~Music();
 
 	void InitMusic(const std::string& path);
 

@@ -1,9 +1,9 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_image.h>
+
 #include <string>
 
 class Window;
+class SDL_Texture;
 
 class Texture
 {
@@ -24,7 +24,7 @@ public:
 	Texture(Window* window, const std::string& path);
 	Texture() = default;
 
-	~Texture() { SDL_DestroyTexture(mp_texture); };
+	~Texture() ;
 
 	void InitTexture(Window* window, const std::string& path);
 };

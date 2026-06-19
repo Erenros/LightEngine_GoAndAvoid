@@ -1,11 +1,11 @@
 #include "Camera.h"
 #include "GameManager.h"
 
-void Camera::Init(SDL_Renderer* pRenderer)
+void Camera::Init(Window* pWindow)
 {
 	t.SetPosition({ 0.f, 0.f });
 
-	renderer = pRenderer;
+	mp_Window = pWindow;
 
 	screenMiddle = { GameManager::GetInstance().GetWindow()->GetWidth() / 2.f, GameManager::GetInstance().GetWindow()->GetHeight() / 2.f };
 }

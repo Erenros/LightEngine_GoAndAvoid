@@ -1,10 +1,18 @@
 #pragma once
-#include <SDL.h>
 #include <vector>
 #include <iostream> 
 #include "MathGC.h"
 #include "Engine/Transform.h"
 #include "Texture.h"
+
+struct SDL_Vertex;
+
+struct Color {
+	uint8 r;
+	uint8 g;
+	uint8 b;
+	uint8 a;
+};
 
 namespace gcle
 {
@@ -37,12 +45,13 @@ namespace gcle
 
 		Shapes m_shape = Shapes::Triangle;
 
-		std::vector<SDL_Vertex> m_verticies;
+		std::vector<SDL_Vertex*> m_verticies;
 		std::vector<int32> m_indicies;
 
 		//Constructors 
 
 		Shape() = default;
+		virtual ~Shape();
 		Shape(Shape* pShape);
 
 
@@ -52,7 +61,7 @@ namespace gcle
 		Vector2f GetOrigin() { return m_origin; }
 		Texture* GetTexture() { return m_texture; };
 		std::vector<int32>& GetIndicies() { return m_indicies; };
-		std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
+		std::vector<SDL_Vertex*>& GetVerticies() { return m_verticies; };
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	public:
@@ -88,30 +97,8 @@ namespace gcle
 	class Rectangle : public Shape {
 
 	public:
-		Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color)
-		{
-
-			m_shape = Shapes::Rectangle;
-
-			m_verticies.resize(4);
-			m_indicies.resize(6);
-
-			m_height = height;
-			m_width = width;
-
-			m_verticies[0] = (SDL_Vertex{ {x, y}, color, {0.f, 0.f} });
-			m_verticies[1] = (SDL_Vertex{ {x + m_width, y}, color, {1.f, 0.f} });
-			m_verticies[2] = (SDL_Vertex{ {x, y + m_height}, color, {0.f, 1.f} });
-			m_verticies[3] = (SDL_Vertex{ {x + m_width, y + m_height}, color, {1.f, 1.f} });
-
-			m_indicies = {
-				0, 1, 2,
-				2, 3, 1
-			};
-
-			m_origin = { x, y };
-			m_Transform.Initialize({ x, y }, 0);
-		}
+		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color);
+	
 
 
 		//Getters
@@ -142,29 +129,7 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color)
-		{
-			m_trianglepoints.push_back({ x1, y1 });
-			m_trianglepoints.push_back({ x2, y2 });
-			m_trianglepoints.push_back({ x2, y2 });
-			m_trianglepoints.push_back({ x3, y3 });
-
-
-			m_shape = Shapes::Triangle; 
-
-			m_verticies.resize(3);
-			m_indicies.resize(3);
-
-			m_verticies[0] = SDL_Vertex{ {x1, y1}, color, {0.f, 0.f} };
-			m_verticies[1] = SDL_Vertex{ {x2, y2}, color, {1, 0.f} };
-			m_verticies[2] = SDL_Vertex{ {x3, y3}, color, {1.f, 1.f} };
-
-			m_indicies = { 0, 1, 2 };
-
-			m_origin = { x1, y1 };
-
-			m_Transform.Initialize({ x1, y1 }, 0);
-		}
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
 	};
 
 	class Circle : public Shape {
@@ -172,51 +137,12 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int _smoothness, SDL_Color color) {
-			if (_smoothness < 3) {
-				return;
-			}
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color);
 
-			m_smoothness = _smoothness;
-
-			m_center.x = x + radius;
-			m_center.y = y + radius;
-
-			m_radius = radius;
-
-			m_shape = Shapes::Circle;
-
-			m_verticies.resize(_smoothness + 1);
-			m_indicies.resize(_smoothness * 3);
-
-			m_origin = { x, y };
-
-			m_Transform.Initialize({ x, y }, 0);
-
-			Degrees degreesBetweenPoints = 360.0f / _smoothness;
-
-			m_verticies[0] = SDL_Vertex{ {x + radius, y + radius} , color, {1, 1} };
-
-			for (int i = 0; i < _smoothness; i++) {
-				Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
-
-				float cx = x + sin(radian) * radius + radius;
-				float cy = y + cos(radian) * radius + radius;
-
-				SDL_Vertex vertex{ {cx, cy}, color, {1, 1} };
-				m_verticies[i + 1] = vertex;
-
-				m_indicies[i * 3] = 0;
-				m_indicies[i * 3 + 1] = i + 1;
-				m_indicies[i * 3 + 2] = (i + 1) % _smoothness + 1;
-			}
-		}
 
 		float32 GetRadius() override { return m_radius; };
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
-
-
 
 	};
 }

@@ -3,8 +3,11 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
+#include "SDL_video.h"
+#include "SDL_image.h"
 
-void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y)
+
+void Window::Create(const char* pName,int width, int height, uint32 windowFlags, uint32 rendererFlags, int x, int y)
 {
 	m_width = width;
 	m_height = height;
@@ -18,8 +21,7 @@ void Window::Create(const char* pName,int width, int height, Uint32 windowFlags,
 	if (IMG_Init(IMG_INIT_PNG) == 0) {
 		std::cout << "Error SDL2_image Initialization";
 		return;
-	}
-
+	} 
 
 	mp_Window = SDL_CreateWindow(pName, x, y, width, height, windowFlags);
 	if (mp_Window == nullptr) {
@@ -73,8 +75,8 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* 
 void Window::Draw(gcle::Shape* pShape)
 {
 	if (pShape->GetTexture() == nullptr)
-		SDL_RenderGeometry(mp_Renderer, nullptr, pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, nullptr, *pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 	else
-		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), *pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 }
 
