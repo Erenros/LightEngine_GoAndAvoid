@@ -7,6 +7,9 @@
 
 #include "Shape.h"
 
+
+
+
 GameManager::GameManager(int32 _width, int32 _height) : m_WindW(_width), m_WindH(_height)
 {
 }
@@ -22,9 +25,12 @@ void GameManager::Loop()
 	cam.SetFollowing(m_entities[3]);
 
 	Vector2f screenMiddle = { m_WindW / 2.f, m_WindH / 2.f };
+	
+	cam.SetZoom(3.f);
 
 	while (isRunning == true)
 	{ 
+		SDL_Delay(10);
 
 		InputManager::GetInstance().Update();
 
@@ -43,6 +49,12 @@ void GameManager::Loop()
 			Shape* realShape = m_entities[i]->GetShape();
 
 			m_entities[i]->SetRenderPosition((realShape->GetPosition() - cam.GetPosition()) * cam.GetZoom() + screenMiddle);
+			
+			if(i == 0)
+			{
+				std::cout << "Position X de realShape : " << realShape->GetPosition().x << std::endl;
+				std::cout << "Position X de RenderShape : " << m_entities[i]->GetRenderShape()->GetPosition().x << std::endl;
+			}
 
 			int mode = 0;
 
@@ -51,8 +63,8 @@ void GameManager::Loop()
 			if (realShape->GetShape() == gcle::Shapes::Rectangle)
 			{
 				gcle::Rectangle* rect = static_cast<gcle::Rectangle*>(realShape);
-				points[0] = rect->GetWidth();
-				points[1] = rect->GetHeight();
+				points.push_back(rect->GetWidth());
+				points.push_back(rect->GetHeight());
 
 				mode = 0;
 			}
@@ -60,7 +72,7 @@ void GameManager::Loop()
 			else if (realShape->GetShape() == gcle::Shapes::Circle)
 			{
 				gcle::Circle* circ = static_cast<gcle::Circle*>(realShape);
-				points[0] = circ->GetRadius();
+				points.push_back(circ->GetRadius());
 
 				mode = 1;
 			}
@@ -68,12 +80,13 @@ void GameManager::Loop()
 			else if (realShape->GetShape() == gcle::Shapes::Triangle)
 			{
 				gcle::Triangle* tri = static_cast<gcle::Triangle*>(realShape);
-				points[0] = tri->GetTrianglePoints()[0].x;
-				points[1] = tri->GetTrianglePoints()[0].y;
-				points[2] = tri->GetTrianglePoints()[1].x;
-				points[3] = tri->GetTrianglePoints()[1].y;
-				points[4] = tri->GetTrianglePoints()[2].x;
-				points[5] = tri->GetTrianglePoints()[2].y;
+
+				points.push_back(tri->GetTrianglePoints()[0].x);
+				points.push_back(tri->GetTrianglePoints()[0].y);
+				points.push_back(tri->GetTrianglePoints()[1].x);
+				points.push_back(tri->GetTrianglePoints()[1].y);
+				points.push_back(tri->GetTrianglePoints()[2].x);
+				points.push_back(tri->GetTrianglePoints()[2].y);
 
 				mode = 2;
 			}
@@ -91,6 +104,8 @@ void GameManager::Loop()
 
 bool GameManager::Init()
 {
+	int a;
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 	{
 		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;

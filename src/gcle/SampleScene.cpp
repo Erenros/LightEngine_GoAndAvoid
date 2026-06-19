@@ -2,6 +2,8 @@
 
 void SampleScene::OnInitialize()
 {
+	int a;
+
 	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
 	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });

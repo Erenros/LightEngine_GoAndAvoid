@@ -3,12 +3,12 @@
 
 class SampleScene : public Scene
 {
-public:
-	void OnInitialize() override;
-	void OnUpdate() override;
+	public:
+		void OnInitialize() override;
+		void OnUpdate() override;
 
-private:
-	Entity* pEntity = nullptr;
-	Entity* otherEntity = nullptr;
+	private:
+		Entity* pEntity = nullptr;
+		Entity* otherEntity = nullptr;
 };
 

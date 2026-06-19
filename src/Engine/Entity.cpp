@@ -11,7 +11,8 @@ void Entity::Initialize(Shape& shape)
 	m_RigidBody = false;
 
 	mp_Shape = &shape;
-	mp_RenderShape = &shape;
+
+	mp_RenderShape = new Shape(shape);
 
 	m_Target.isSet = false;
 
@@ -125,9 +126,9 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 	else if (shapeType == 2)
 	{
 		std::vector<Vector2f> newTrianglePoints;
-		newTrianglePoints[0] = { points[0], points[1] };
-		newTrianglePoints[1] = { points[2], points[3] };
-		newTrianglePoints[2] = { points[4], points[5] };
+		newTrianglePoints.push_back({ points[0], points[1] });
+		newTrianglePoints.push_back({ points[2], points[3] });
+		newTrianglePoints.push_back({ points[4], points[5] });
 
 		mp_RenderShape->SetTrianglePoints(newTrianglePoints);
 	}

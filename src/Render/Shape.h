@@ -41,6 +41,7 @@ namespace gcle
 		//Constructors 
 
 		Shape() = default;
+		Shape(Shape* pShape);
 
 
 	public:
@@ -140,9 +141,10 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color)
 		{
-			m_trianglepoints[0] = { x1, y1 };
-			m_trianglepoints[1] = { x2, y2 };
-			m_trianglepoints[2] = { x3, y3 };
+			m_trianglepoints.push_back({ x1, y1 });
+			m_trianglepoints.push_back({ x2, y2 });
+			m_trianglepoints.push_back({ x2, y2 });
+			m_trianglepoints.push_back({ x3, y3 });
 
 
 			m_shape = Shapes::Triangle; 

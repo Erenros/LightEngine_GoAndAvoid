@@ -30,7 +30,7 @@ public:
 	void SetTag(int32 tag) { m_Tag = tag; }
 	void SetSpeed(float32 speed) { m_Speed = speed; }
 	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
-	void SetRigidBody(bool isRigitBody) { m_RigidBody = isRigitBody; }
+	void SetRigidBody(bool isRigidBody) { m_RigidBody = isRigidBody; }
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
