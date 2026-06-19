@@ -19,8 +19,8 @@ void SampleScene::OnInitialize()
 
 
 	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle2 = new gcle::Circle(500, 400, 100, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle3 = new gcle::Circle(200, 400, 100, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle2 = new gcle::Circle(400, 200, 100, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle3 = new gcle::Circle(200, 200, 100, 50, { 0, 0, 230, 255 });
 
 	pEntity = CreateEntity<Entity>(*rectangle);
 	pEntity->SetRigidBody(true);

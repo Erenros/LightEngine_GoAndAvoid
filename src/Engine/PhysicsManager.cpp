@@ -68,8 +68,21 @@ void PhysicsManager::Update(float64 deltaTime)
 					Repulse(entity, otherEntity);
 				}
 
+				if (entity->m_OnCollisionEnter)
+				{
+					entity->OnCollisionEnter(otherEntity);
+					entity->m_OnCollisionEnter = false;
+				}
+				if (otherEntity->m_OnCollisionEnter)
+				{
+					otherEntity->OnCollisionEnter(otherEntity);
+					otherEntity->m_OnCollisionEnter = false;
+				}
+
 				entity->OnCollision(otherEntity);
+				entity->m_WasOnCollision = true;
 				otherEntity->OnCollision(entity);
+				otherEntity->m_WasOnCollision = true;
 			}
 		}
 	}
@@ -313,33 +326,57 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(a);
 	gcle::Circle* pCircle = static_cast<gcle::Circle*>(b);
 
-	Vector2f p;
+	float32 rx = pRect->GetPosition(0.0f, 0.0f).x;
+	float32 ry = pRect->GetPosition(0.0f, 0.0f).y;
+	float32 rw = pRect->GetWidth();
+	float32 rh = pRect->GetHeight();
 
-	if (pCircle->GetCenter().x < pRect->GetPosition(0.5f, 0.5f).x)
+	Vector2f circlePos = pCircle->GetCenter();
+
+	float32 nearestX = std::max(rx, std::min(circlePos.x, rx + rw));
+	float32 nearestY = std::max(ry, std::min(circlePos.y, ry + rh));
+	Vector2f nearest({ nearestX, nearestY });
+
+	Vector2f delta = circlePos - nearest;
+	float32 dist = delta.x * delta.x + delta.y * delta.y;
+
+	if (dist == 0.0f)
 	{
-		p = Vector2f({ pRect->GetPosition(0.0f, 0.0f).x, pCircle->GetCenter().y });
+		float32 overlapL = circlePos.x - rx;
+		float32 overlapR = (rx + rw) - circlePos.x;
+		float32 overlapT = circlePos.y - ry;
+		float32 overlapB = (ry + rh) - circlePos.y;
+
+		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
+
+		Vector2f newPos = circlePos;
+		if (minOverlap == overlapL) 
+		{
+			newPos.x = rx - pCircle->GetRadius();
+		}
+		else if (minOverlap == overlapR) 
+		{
+			newPos.x = rx + rw + pCircle->GetRadius();
+		}
+		else if (minOverlap == overlapT) 
+		{
+			newPos.y = ry - pCircle->GetRadius();
+		}
+		else                             
+		{
+			newPos.y = ry + rh + pCircle->GetRadius();
+		}
+
+		pCircle->SetPosition(newPos.x, newPos.y, 0.5f, 0.5f);
+		return;
 	}
-	else if (pCircle->GetCenter().x > pRect->GetPosition(0.5f, 0.5f).x)
-	{
-		p = Vector2f({ pRect->GetPosition(1.0f, 0.0f).x, pCircle->GetCenter().y });
-	}
 
-	float32 r = p.GetDistance(pCircle->GetCenter()) - pCircle->GetRadius();
+	float32 length = std::sqrt(dist);
+	Vector2f normal = delta / length;
+	float32  overlap = pCircle->GetRadius() - length;
 
-	pCircle->SetPosition(pCircle->GetPosition().x + r, pCircle->GetPosition().y);
-
-	if (pCircle->GetCenter().y < pRect->GetPosition(0.5f, 0.5f).y)
-	{
-		p = Vector2f({ pCircle->GetCenter().x, pRect->GetPosition(0.0f, 0.0f).y });
-	}
-	else if (pCircle->GetCenter().y > pRect->GetPosition(0.5f, 0.5f).y)
-	{
-		p = Vector2f({ pCircle->GetCenter().x, pRect->GetPosition(0.0f, 1.0f).y });
-	}
-
-	r = p.GetDistance(pCircle->GetCenter()) - pCircle->GetRadius();
-
-	pCircle->SetPosition(pCircle->GetPosition().x, pCircle->GetPosition().y + r);
+	Vector2f newPos = circlePos + normal * overlap;
+	pCircle->SetPosition(newPos.x, newPos.y, 0.5f, 0.5f);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)

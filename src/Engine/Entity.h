@@ -45,7 +45,9 @@ protected:
 	~Entity() = default;
 
 	virtual void OnUpdate() {};
+	virtual void OnCollisionEnter(Entity* collidedWith) {};
 	virtual void OnCollision(Entity* collidedWith) {};
+	//virtual void OnCollisionExit(Entity* collidedWith) {};
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 
@@ -64,6 +66,11 @@ protected:
 	Target			m_Target;
 	bool			m_RigidBody = false;
 	Shape*			mp_Shape = nullptr;
+
+private:
+	bool m_OnCollisionEnter = true;
+	bool m_WasOnCollision	= false;
+	bool m_OnCollisionExit	= false;
 
 private:
 
