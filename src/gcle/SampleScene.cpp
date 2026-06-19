@@ -21,9 +21,10 @@ void SampleScene::OnInitialize()
 
 
 
-	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle2 = new gcle::Circle(50, 50, 10, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle3 = new gcle::Circle(100, 100, 10, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 250,250, 250, 250 });
+	gcle::Circle* circle2 = new gcle::Circle(50, 50, 10, 50, { 250,250, 250, 250 });
+	circle2->SetTexture(tex);
+	gcle::Circle* circle3 = new gcle::Circle(100, 100, 10, 50, { 250,250, 250, 250 });
 
 	/*pEntity = CreateEntity<Entity>(*rectangle);
 	pEntity->SetRigidBody(true);*/

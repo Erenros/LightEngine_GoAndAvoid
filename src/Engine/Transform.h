@@ -65,6 +65,8 @@ private:
 
     Radians m_ParentAncientAngle = 0;
     
+    float matrix[3][3];
+
     bool m_IsDirty = false;
 
 public:

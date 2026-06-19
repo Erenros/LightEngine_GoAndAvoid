@@ -7,8 +7,26 @@
 
 #undef main
 
+
 int main(int argc, char** argv)
 { 
+    Matrix3x3 m1;
+    m1[0][0] = 1.0f; m1[1][0] = 0.0f; m1[2][0] = 2.0f;
+    m1[0][1] = 0.0f; m1[1][1] = -1.0f; m1[2][1] = 1.0f;
+    m1[0][2] = 1.0f; m1[1][2] = -2.0f; m1[2][2] = 0.0f;
+
+    Matrix3x3 m2 = m1.Inverse();
+
+    DEBUG_INFO << m1;
+    DEBUG_INFO << ENDL;
+    DEBUG_INFO << "Determinant : " << m1.determinant() << ENDL;
+    DEBUG_INFO << ENDL;
+    DEBUG_INFO << m2;
+    DEBUG_INFO << ENDL;
+    DEBUG_INFO << m1 * m2;
+
+    return 1;
+
     GameManager& gm = GameManager::GetInstance();
 
     gm.Init(640, 480);

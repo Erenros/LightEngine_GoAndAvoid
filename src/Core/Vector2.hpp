@@ -9,7 +9,12 @@ template <typename T>
 struct Vector2
 {
 public:
-	T x, y;
+	union {
+		struct {
+			T x, y;
+		};
+		T coord[2];
+	};
 
 	Vector2()
 	{

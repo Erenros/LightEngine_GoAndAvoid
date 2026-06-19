@@ -19,8 +19,6 @@ void GameManager::Loop()
 	cam.Init(mp_window->GetRenderer());
 	cam.SetFollowing(m_entities[0]);
 
-	SDL_Renderer* renderer = mp_window->GetRenderer(); 
-
 	while (isRunning == true)
 	{
 		time.ResetChrono();
