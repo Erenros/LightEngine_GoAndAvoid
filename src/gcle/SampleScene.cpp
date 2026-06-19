@@ -1,5 +1,6 @@
 #include "SampleScene.h"
 #include "Player.h"
+
 void SampleScene::OnInitialize()
 {
 	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
@@ -35,4 +36,8 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate(Timer& time)
 {
+	if (InputManager::GetInstance().IsDown(Space))
+	{
+		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
+	}
 } 

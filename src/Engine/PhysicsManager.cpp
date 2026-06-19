@@ -1,4 +1,5 @@
 #include "PhysicsManager.h"
+#include "SceneManager.h"
 
 PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
 {
@@ -60,29 +61,32 @@ void PhysicsManager::Update(float64 deltaTime)
 			Entity* entity = (*it1).pEntity;
 			Entity* otherEntity = (*it2).pEntity;
 
-			if (entity->IsColliding(otherEntity))
+			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()) && otherEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
 			{
-				if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+				if (entity->IsColliding(otherEntity))
 				{
-					DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL;
-					Repulse(entity, otherEntity);
-				}
+					if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+					{
+						DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL;
+						Repulse(entity, otherEntity);
+					}
 
-				if (entity->m_OnCollisionEnter)
-				{
-					entity->OnCollisionEnter(otherEntity);
-					entity->m_OnCollisionEnter = false;
-				}
-				if (otherEntity->m_OnCollisionEnter)
-				{
-					otherEntity->OnCollisionEnter(otherEntity);
-					otherEntity->m_OnCollisionEnter = false;
-				}
+					if (entity->m_OnCollisionEnter)
+					{
+						entity->OnCollisionEnter(otherEntity);
+						entity->m_OnCollisionEnter = false;
+					}
+					if (otherEntity->m_OnCollisionEnter)
+					{
+						otherEntity->OnCollisionEnter(otherEntity);
+						otherEntity->m_OnCollisionEnter = false;
+					}
 
-				entity->OnCollision(otherEntity);
-				entity->m_WasOnCollision = true;
-				otherEntity->OnCollision(entity);
-				otherEntity->m_WasOnCollision = true;
+					entity->OnCollision(otherEntity);
+					entity->m_WasOnCollision = true;
+					otherEntity->OnCollision(entity);
+					otherEntity->m_WasOnCollision = true;
+				}
 			}
 		}
 	}
@@ -238,6 +242,9 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
+
+#undef min
+#undef max
 
 void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 {

@@ -5,6 +5,7 @@
 #include "include.h"
 
 #include "RessourceManager.h"
+#include "SceneManager.h"
 
 class Entity;
 class Scene;

@@ -8,17 +8,16 @@
 #undef main
 
 int main(int argc, char** argv)
-{
-    //Temporaire
+{ 
     GameManager& gm = GameManager::GetInstance();
 
     gm.Init(640, 480);
 
     SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
-    //SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene2");
+    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene2");
 
     SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
-    //SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene2");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene2");
 
     
     gm.Loop();
