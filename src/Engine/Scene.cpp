@@ -1,5 +1,5 @@
 #include "Scene.h"
-
+#include "Render/Text.h"
 
 
 void Scene::Draw(Window* window) {

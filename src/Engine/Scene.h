@@ -3,9 +3,10 @@
 #include <iostream>
 #include "Entity.h"
 #include "Core/InputManager.h"
-#include "Render/Text.h"
 
 //class Entity;
+class Font;
+class Text;
 class GameManager;
 class Window;
 
