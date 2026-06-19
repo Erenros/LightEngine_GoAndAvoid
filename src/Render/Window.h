@@ -3,6 +3,8 @@
 #include <SDL.h> 
 #include "Render/Shape.h"
 
+class Text;
+
 class Window 
 {
 public:
@@ -37,6 +39,7 @@ public:
 	SDL_Window* GetWindow() { return mp_Window; }
 	SDL_Renderer* GetRenderer() { return mp_Renderer; }
 	  
+	void DrawTextOnRenderer(Text* text);
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
 

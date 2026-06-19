@@ -43,7 +43,7 @@ public:
 	void Close();
 
 	void AddEntity(Entity* entity) { m_entities.push_back(entity); };
-	
+
 	Window* GetWindow() { return mp_window; };
 
 private:

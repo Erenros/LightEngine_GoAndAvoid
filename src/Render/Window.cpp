@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
+#include "Render/Text.h"
 
 void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y)
 {
@@ -66,6 +67,15 @@ void Window::Clear()
 	SDL_RenderClear(mp_Renderer);
 }
 
+void Window::DrawTextOnRenderer(Text* text)
+{
+	SDL_Texture* texture = text->CreateTexture(this);
+	if (texture == nullptr)
+		return;
+
+	DrawOnRenderer(texture, nullptr,text->GetSDLRect());
+}
+
 void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){
 	SDL_RenderCopy(mp_Renderer, pTexture, srcrect, dstrect);
 }
@@ -77,4 +87,3 @@ void Window::Draw(gcle::Shape* pShape)
 	else
 		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 }
-

@@ -11,6 +11,8 @@ private:
 
 public:
 	
+	TTF_Font* GetSDLFont() { return mp_font; };
+
 	bool IsFontInit() { return mp_font == nullptr ? false : true; };
 
 	Font(const std::string& path, int size = 25);
