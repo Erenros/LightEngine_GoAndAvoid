@@ -44,10 +44,11 @@ namespace gcle
 			x -= size * ratioX;
 			y -= size * ratioY;
 
-			dx = x - m_center.x;
-			dy = y - m_center.y;
-			m_center.x = x;
-			m_center.y = y;
+			dx = (x + m_radius) - m_center.x;
+			dy = (y + m_radius) - m_center.y;
+
+			m_center.x = x + m_radius;
+			m_center.y = y + m_radius;
 
 		}
 		else if (m_shape == Shapes::Rectangle)

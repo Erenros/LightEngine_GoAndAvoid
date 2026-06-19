@@ -8,7 +8,8 @@ class Window
 public:
 	 
 	Window() = default;
-	Window(const char* pName, int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y) {
+	Window(const char* pName, int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y) 
+	{
 		Create(pName, width, height, windowFlags, rendererFlags, x, y);
 	};
 	 
@@ -26,6 +27,9 @@ public:
 		int x = SDL_WINDOWPOS_UNDEFINED, 
 		int y = SDL_WINDOWPOS_UNDEFINED
 	);
+
+	void Present();
+	void Clear();
 	
 	 
 	void End();

@@ -1,11 +1,7 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
 
 #include <vector>
-#include "Window.h"
+#include "Render/Window.h"
 #include "include.h"
 
 #include "RessourceManager.h"
@@ -18,7 +14,9 @@ class GameManager
 {
 private: 
 
-	Window* mp_window = nullptr; 
+	GameManager* mp_Instance = nullptr;
+
+	Window* mp_window = nullptr;
 
 	bool isRunning = false;
 
@@ -26,13 +24,20 @@ private:
 
 	std::vector <Entity*> m_entities;
 
-	Scene* mp_currentScene = nullptr;
+	friend class Scene;
+
+public:
+
+	static GameManager& GetInstance() {
+		static GameManager instance;
+		return instance;
+	}
 
 
-public:	
-	GameManager(int32 _width, int32 _height);
+	GameManager() = default;
 
-	bool Init();
+
+	bool Init(int windowWidth, int windowHeight);
 	void Loop();
 	void Close();
 
@@ -40,8 +45,7 @@ public:
 	
 	Window* GetWindow() { return mp_window; };
 
-	template<typename T>
-	T* LaunchScene();
-};
+private:
+	int m_loopTour = 0;
 
-#include "GameManager.inl"
+};

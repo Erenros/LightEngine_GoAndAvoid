@@ -1,15 +1,18 @@
 #include "SampleScene.h"
-
+#include "Player.h"
 void SampleScene::OnInitialize()
 {
-	int a;
+	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
-	SDL_Texture* tex = RessourceManager::GetInstance().GetTexture("images");
-
-	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 300, 300, { 250,250, 250, 250 });
-
-
+	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 20, 20, { 250,250, 250, 250 });
 	rectangle->SetTexture(tex);
+	Entity* entity = CreateEntity<Player>(*rectangle);
+	entity->SetRigidBody(true);
+
+	gcle::Rectangle* rectangle2 = new gcle::Rectangle(200, 200, 100, 100, { 250,250, 250, 250 });
+	gcle::Rectangle* rectangle3 = new gcle::Rectangle(200, 50, 100, 100, { 250,250, 250, 250 });
+
+	rectangle2->SetTexture(tex);
 
 
 	gcle::Triangle* triangle = new gcle::Triangle(100.f, 100.f, 600.f, 400.f, 600.f, 600.f, { 255, 0, 0, 255 });
@@ -17,46 +20,19 @@ void SampleScene::OnInitialize()
 
 
 
-	gcle::Circle* circle = new gcle::Circle(0, 0, 100, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle2 = new gcle::Circle(50, 50, 10, 50, { 0, 0, 230, 255 });
+	gcle::Circle* circle3 = new gcle::Circle(100, 100, 10, 50, { 0, 0, 230, 255 });
 
-
-	Circle* circle2 = new Circle(300, 300, 80, 50, { 255, 255, 0, 255 });
-
-	pEntity = CreateEntity<Entity>(*rectangle);
-	pEntity = CreateEntity<Entity>(*triangle);
-	pEntity = CreateEntity<Entity>(*circle);
-	pEntity = CreateEntity<Entity>(*circle2);
-
-
-
+	/*pEntity = CreateEntity<Entity>(*rectangle);
+	pEntity->SetRigidBody(true);*/
+	Entity* entity1 = CreateEntity<Entity>(*circle2);
+	entity1->SetRigidBody(true);
+	Entity* entity2 = CreateEntity<Entity>(*circle3);
+	entity2->SetRigidBody(true);
 	
 }
 
-void SampleScene::OnUpdate()
+void SampleScene::OnUpdate(Timer& time)
 {
-	Vector2f pos = pEntity->GetPosition(0.5f, 0.5f);
-
-	if ((InputManager::GetInstance().IsHeld('D')))
-	{
-		pEntity->SetPosition(pos.x + 1, pos.y);
-		pos = pEntity->GetPosition();
-	}
-
-	if (InputManager::GetInstance().IsHeld('Q'))
-	{
-		pEntity->SetPosition(pos.x - 1, pos.y);
-		pos = pEntity->GetPosition();
-	}
-
-	if (InputManager::GetInstance().IsHeld('S'))
-	{
-		pEntity->SetPosition(pos.x, pos.y + 1);
-		pos = pEntity->GetPosition();
-	}
-
-	if (InputManager::GetInstance().IsHeld('Z'))
-	{
-		pEntity->SetPosition(pos.x, pos.y - 1);
-		pos = pEntity->GetPosition();
-	}
-}
+} 

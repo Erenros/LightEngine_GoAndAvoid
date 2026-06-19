@@ -1,0 +1,32 @@
+#include "Music.h"
+#include "Utils.h"
+
+Music::Music(const std::string& path)
+{
+	InitMusic(path);
+}
+
+void Music::InitMusic(const std::string& path)
+{
+    Mix_Music* music = Mix_LoadMUS(path.c_str());
+    if (music == NULL)
+    {
+        DEBUG_WARN << "Couldn't inititialize music with path : " + path << ENDL;
+        return;
+    }
+
+    mp_music = music;
+}
+
+
+
+void Music::PlayMusic(int mode)
+{
+    if (mp_music == nullptr)
+    {
+        DEBUG_WARN << "Music is not inititialize can't play it" << ENDL;
+        return;
+    }
+
+    Mix_PlayMusic(mp_music, mode);
+}
