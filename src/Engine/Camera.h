@@ -4,6 +4,9 @@
 #include "Window.h"
 #include "Vector2.hpp"
 #include "Transform.h"
+#include "Timer.h"
+
+#include <vector>
 
 
 class Camera
@@ -26,9 +29,12 @@ class Camera
 		void SetPosition(Vector2f v);
 		Vector2f GetPosition();
 
-		void Update();
+		void Update(Timer& time, std::vector<Entity*>& entities);
 
 		void SetZoom(double d);
 		double GetZoom();
+
+private:
+	Vector2f screenMiddle;
 };
 

@@ -128,7 +128,8 @@ namespace gcle
 		void SetHeight(float32 height) override {
 			m_height = height;
 		}
-		void SetWidth(float32 width) override {
+		void SetWidth(float32 width) override
+		{
 			m_width = width;
 		}
 
@@ -152,9 +153,9 @@ namespace gcle
 			m_verticies.resize(3);
 			m_indicies.resize(3);
 
-			m_verticies[0] = SDL_Vertex{ {m_trianglepoints[0].x, m_trianglepoints[0].y}, color, {0.f, 0.f} };
-			m_verticies[1] = SDL_Vertex{ {m_trianglepoints[1].x, m_trianglepoints[1].y}, color, {1, 0.f} };
-			m_verticies[2] = SDL_Vertex{ {m_trianglepoints[2].x, m_trianglepoints[2].y}, color, {1.f, 1.f} };
+			m_verticies[0] = SDL_Vertex{ {x1, y1}, color, {0.f, 0.f} };
+			m_verticies[1] = SDL_Vertex{ {x2, y2}, color, {1, 0.f} };
+			m_verticies[2] = SDL_Vertex{ {x3, y3}, color, {1.f, 1.f} };
 
 			m_indicies = { 0, 1, 2 };
 

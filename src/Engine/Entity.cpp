@@ -114,7 +114,15 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 {
 	if (shapeType == 0)
 	{
-		mp_RenderShape->SetWidth(points[0]);
+		
+		
+		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
+
+
+		float a = static_cast<gcle::Rectangle*>(mp_RenderShape)->GetWidth();
+
+
+
 		mp_RenderShape->SetHeight(points[1]);
 	}
 

@@ -3,11 +3,8 @@
 #include <SDL.h> 
 #include "Render/Shape.h"
 
-class Window {
-	SDL_Window* mp_Window = nullptr;
-	SDL_Renderer* mp_Renderer = nullptr;
-
-
+class Window 
+{
 public:
 	 
 	Window() = default;
@@ -35,8 +32,16 @@ public:
 	 
 	SDL_Window* GetWindow() { return mp_Window; }
 	SDL_Renderer* GetRenderer() { return mp_Renderer; }
-	 
-	//TODO changer SDL_Rect pour le vect2 custom
+	  
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
+
+public:
+	uint32 GetWidth() { return m_width; }
+	uint32 GetHeight() { return m_height; }
+
+private:
+	SDL_Window* mp_Window = nullptr;
+	SDL_Renderer* mp_Renderer = nullptr;
+	uint32 m_width, m_height = 0;
 };

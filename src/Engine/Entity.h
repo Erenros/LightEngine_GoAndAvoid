@@ -74,4 +74,5 @@ private:
 
 	friend class Scene;
 	friend class GameManager;
+	friend class Camera;
 };

@@ -28,10 +28,8 @@ private:
 
 	Scene* mp_currentScene = nullptr;
 
-	
 
-public:
-
+public:	
 	GameManager(int32 _width, int32 _height);
 
 	bool Init();
@@ -40,7 +38,7 @@ public:
 
 	void AddEntity(Entity* entity) { m_entities.push_back(entity); };
 	
-	Window* GetWindow() { return mp_window; }; 
+	Window* GetWindow() { return mp_window; };
 
 	template<typename T>
 	T* LaunchScene();

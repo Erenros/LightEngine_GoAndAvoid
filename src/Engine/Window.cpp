@@ -2,7 +2,11 @@
 #include <iostream>
 #include "SDL.h"
 
-void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y){
+void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y)
+{
+	m_width = width;
+	m_height = height;
+
 	mp_Window = SDL_CreateWindow(pName, x, y, width, height, windowFlags);
 	if (mp_Window == nullptr) {
 		std::cerr << "Window failed to create" << std::endl;
