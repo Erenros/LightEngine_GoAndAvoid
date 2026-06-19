@@ -6,21 +6,28 @@
 
 //class Entity;
 class GameManager;
+class Window;
+
 
 class Scene
 {
 private:
 
-	GameManager* mp_GameManager = nullptr;
 
-	void SetGameManager(GameManager* gameManager) { mp_GameManager = gameManager; };
+	void Update(Timer& time);
+	void Draw(Window* window);
 
 protected:
+	std::string m_tag;
 
 	Scene() = default;
+		
+	~Scene() = default;
 
 	virtual void OnInitialize() {};
-	virtual void OnUpdate() {};
+	virtual void OnUpdate(Timer& time) {};
+	virtual void OnExit() {};
+
 
 public:
 
@@ -29,6 +36,7 @@ public:
 
 
 	friend class GameManager;
+	friend class SceneManager;
 };
 
 #include "Scene.inl"

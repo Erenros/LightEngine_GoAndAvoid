@@ -15,12 +15,12 @@ Transform2D::~Transform2D() {
         pChild->SetParent(nullptr);
     }
 }
-
+ 
 void Transform2D::Initialize(Vector2f position, Degrees angle)
 {
     m_Position = position;
     m_DegAngle = angle;
-    m_RadAngle = MathGC::DegToRad(m_DegAngle);
+    m_RadAngle = MathGC::DegToRad(m_DegAngle); 
 
     isSet = true;
 }
@@ -87,9 +87,9 @@ void Transform2D::SetParent(Transform2D* pParent) {
         m_DistanceFromParent = std::sqrt(dx * dx + dy * dy);
 
         m_AngleDifferenceToParent = m_RadAngle - mp_Parent->GetRadAngle();
-
+         
         Vector2f offset = m_Position - mp_Parent->GetPosition();
-        m_OffsetAngle = MathGC::VecToAngle(offset) - mp_Parent->GetRadAngle();
+        m_OffsetAngle = MathGC::VecToAngle(offset) - mp_Parent->GetRadAngle(); 
     }
 }
 
@@ -102,13 +102,13 @@ void Transform2D::SetDirection(Vector2f position)
 {
     m_Direction = position;
 }
-
-void Transform2D::SetDegAngle(Degrees angle)
+ 
+void Transform2D::SetDegAngle(Degrees angle) 
 {
     m_DegAngle = angle;
 }
-
-void Transform2D::SetRadAngle(Radians angle)
+ 
+void Transform2D::SetRadAngle(Radians angle) 
 {
     m_RadAngle = angle;
 }
@@ -161,16 +161,16 @@ void Transform2D::RemoveChild(uint32 index) {
 #pragma region Updates
 
 void Transform2D::RotateToDirection()
-{
+{ 
     Radians rad = MathGC::VecToAngle(m_Direction);
 
     SetRadAngle(rad);
-    SetDegAngle(MathGC::RadToDeg(rad));
+    SetDegAngle(MathGC::RadToDeg(rad)); 
 }
 
 void Transform2D::Forward()
-{
-    m_Direction = MathGC::AngleToVec(m_RadAngle);
+{ 
+    m_Direction = MathGC::AngleToVec(m_RadAngle); 
 }
 
 void Transform2D::UpdatePositionWithParentPosition()
@@ -179,14 +179,14 @@ void Transform2D::UpdatePositionWithParentPosition()
         //DEBUG_WARN << "this transform has no parent" << ENDL;
         return;
     }
-
-    Radians currentParentAngle = mp_Parent->GetRadAngle();
+     
+    Radians currentParentAngle = mp_Parent->GetRadAngle(); 
 
     m_Position.x = mp_Parent->GetPosition().x + m_DistanceFromParent * std::cos(currentParentAngle + m_OffsetAngle);
     m_Position.y = mp_Parent->GetPosition().y + m_DistanceFromParent * std::sin(currentParentAngle + m_OffsetAngle);
 
-    m_RadAngle = mp_Parent->GetRadAngle() + m_AngleDifferenceToParent;
-    m_DegAngle = MathGC::RadToDeg(m_RadAngle);
+    m_RadAngle = mp_Parent->GetRadAngle() + m_AngleDifferenceToParent; 
+    m_DegAngle = MathGC::RadToDeg(m_RadAngle); 
 }
 
 

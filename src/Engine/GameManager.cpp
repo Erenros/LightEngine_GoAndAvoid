@@ -1,10 +1,13 @@
 #include "GameManager.h"
 #include <iostream>
 #include "Core/InputManager.h" 
+#include "Camera.h"
 #include "Entity.h"
 #include "Scene.h" 
-
+#include "SceneManager.h"
+#include "PhysicsManager.h"
 #include "Shape.h"
+#include "SDLEvent.h"
 
 void GameManager::Loop()
 {
@@ -12,42 +15,56 @@ void GameManager::Loop()
 	 
 	Timer time;
 
-	while (isRunning == true)
-	{ 
+	Camera cam;
+	cam.Init(mp_window->GetRenderer());
+	cam.SetFollowing(m_entities[0]);
 
+	SDL_Renderer* renderer = mp_window->GetRenderer(); 
+
+	while (isRunning == true)
+	{
+		time.ResetChrono();
+		
 		InputManager::GetInstance().Update();
 
-		mp_currentScene->OnUpdate();
+		SceneManager::GetInstance().UpdateCurrentScene(time);
 
-		time.ResetChrono();
+		if (m_loopTour < 3)
+			m_loopTour++;
+		else
+			PhysicsManager::GetInstance().Update(0.016f);
+		
+	
+		cam.Update(time, m_entities);
 
-		SDL_RenderClear(mp_window->GetRenderer());
+		mp_window->Clear();
 
-		for (Entity* entity : m_entities) {
-			entity->Update(time);
-			mp_window->Draw(entity->GetShape());
-		} 
+		SceneManager::GetInstance().DrawCurrentScene(mp_window);
     
-		SDL_RenderPresent(mp_window->GetRenderer());
+		mp_window->Present();
+
+		if (Event::WindowEvent())
+		{
+			isRunning = false;
+		}
+
 	}
 
 	isRunning = false;
 }
 
-bool GameManager::Init()
+bool GameManager::Init(int windowWidth, int windowHeight)
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
-	{
-		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;
-		return false;
-	}
+	srand(time(NULL));
 
-	if (IMG_Init(IMG_INIT_PNG) == 0) {
-		std::cout << "Error SDL2_image Initialization";
-		return false;
-	}
+	m_WindW = windowWidth;
+	m_WindH = windowHeight;
 
-	mp_window = new Window("gcle", m_WindW, m_WindH, SDL_WINDOW_SHOWN, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+	uint32 windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
+	uint32 renderFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+
+
+	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
 
 	if (!mp_window)
 	{
@@ -55,36 +72,16 @@ bool GameManager::Init()
 		return false;
 	}
 
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		std::cout << "[Initialisation] : Audio Error : " << SDL_GetError() << std::endl;
-		Close();
-		return false;
-	}
-
-	if (TTF_Init() != 0)
-	{
-		std::cout << "[Initialisation] : Font Error" << std::endl;
-		Close();
-		return false;
-	} 
-
-	RessourceManager::GetInstance().Init(mp_window->GetRenderer());
+	RessourceManager::GetInstance().Init(mp_window);
 
 	return true;
 }
 
 void GameManager::Close()
 {
+	RessourceManager::GetInstance().DeleteAll();
 	mp_window->End();
 
 	delete mp_window;
 
-	RessourceManager::GetInstance().DeleteAll();
-
-	Mix_CloseAudio();
-	TTF_Quit();
-	IMG_Quit();
-	SDL_Quit();
-	SDL_Quit();
 }

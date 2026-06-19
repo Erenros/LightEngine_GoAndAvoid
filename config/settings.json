@@ -1,25 +1,25 @@
 {
     "projects": {
         "54212CB9-415A-4328-6DD8-4FEC6BF856E9": {
-            "config-debug": {
-              "additionalDependencies": [
-                "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
-              ],
-              "additionalIncludeDirectories": [
-                "$(SolutionDir)../lib/SDL2/include",
-                "$(SolutionDir)../lib/SDL2_ttf/include",
-                "$(SolutionDir)../lib/SDL2_mixer/include",
-                "$(SolutionDir)../lib/SDL2_image/include"
-              ],
-              "additionalLibraryDirectories": [
-                "$(SolutionDir)../lib/SDL2/lib/x64",
-                "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
-                "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
-                "$(SolutionDir)../lib/SDL2_image/lib/x64"
-              ],
-                "preprocessorDefinitions": [
-                ]
-            },
+          "config-debug": {
+            "additionalDependencies": [
+              "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
+            ],
+            "additionalIncludeDirectories": [
+              "$(SolutionDir)../lib/SDL2/include",
+              "$(SolutionDir)../lib/SDL2_ttf/include",
+              "$(SolutionDir)../lib/SDL2_mixer/include",
+              "$(SolutionDir)../lib/SDL2_image/include"
+            ],
+            "additionalLibraryDirectories": [
+              "$(SolutionDir)../lib/SDL2/lib/x64",
+              "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
+              "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
+              "$(SolutionDir)../lib/SDL2_image/lib/x64"
+            ],
+            "preprocessorDefinitions": [
+            ]
+          },
             "config-release": {
                 "additionalDependencies": [],
                 "additionalIncludeDirectories": [],

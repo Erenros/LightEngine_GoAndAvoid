@@ -2,6 +2,13 @@
 
 namespace gcle
 {
+	Shape::Shape(Shape* pShape) : m_texture(pShape->m_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
+		m_smoothness(pShape->m_smoothness), m_height(pShape->m_height), m_width(pShape->m_width), m_origin(pShape->m_origin), m_trianglepoints(pShape->m_trianglepoints),
+		m_shape(pShape->m_shape), m_verticies(pShape->m_verticies), m_indicies(pShape->m_indicies)
+	{
+	}
+
+
 	Vector2f Shape::GetPosition(float32 ratioX, float32 ratioY)
 	{
 		Vector2f position = m_Transform.GetPosition();
@@ -37,10 +44,11 @@ namespace gcle
 			x -= size * ratioX;
 			y -= size * ratioY;
 
-			dx = x - m_center.x;
-			dy = y - m_center.y;
-			m_center.x = x;
-			m_center.y = y;
+			dx = (x + m_radius) - m_center.x;
+			dy = (y + m_radius) - m_center.y;
+
+			m_center.x = x + m_radius;
+			m_center.y = y + m_radius;
 
 		}
 		else if (m_shape == Shapes::Rectangle)

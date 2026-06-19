@@ -50,7 +50,7 @@ public:
     void Initialize(Vector2f m_Position, Degrees angle);
 
 private:
-    Vector2f m_Position = {0.f,0.f};
+    Vector2f m_Position = { 0.f,0.f };
     Vector2f m_Direction = { 0.f,0.f };
 
     Degrees m_DegAngle = 0.f;

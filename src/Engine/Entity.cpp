@@ -1,5 +1,8 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
+#include "PhysicsManager.h"
+
+static int64 sId = 0;
 
 void Entity::Initialize(Shape& shape)
 { 
@@ -9,11 +12,16 @@ void Entity::Initialize(Shape& shape)
 	m_Tag = -1;
 	m_Target;
 	m_RigidBody = false;
-	mp_Shape = nullptr;
 
 	mp_Shape = &shape;
 
+	mp_RenderShape = new Shape(shape);
+
 	m_Target.isSet = false;
+
+	m_Id = sId++;
+
+	PhysicsManager::GetInstance().AddEntity(this);
 
 	OnInitialize();
 }
@@ -50,6 +58,7 @@ void Entity::Update(Timer& timer)
 void Entity::Destroy()
 {
 	m_ToDestroy = true;
+	PhysicsManager::GetInstance().RemoveEntity(this);
 	OnDestroy();
 }
 
@@ -94,8 +103,91 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
 	m_Direction = { x, y };
 }
 
+void Entity::SetRigidBody(bool isRigitBody)
+{
+	m_RigidBody = isRigitBody; 
+}
+
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
+void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
+{
+	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
+}
+
+void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
+{
+	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
+}
+
+void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
+{
+	if (shapeType == 0)
+	{
+		
+		
+		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
+
+
+		float a = static_cast<gcle::Rectangle*>(mp_RenderShape)->GetWidth();
+
+
+
+		mp_RenderShape->SetHeight(points[1]);
+	}
+
+	else if (shapeType == 1)
+	{
+		mp_RenderShape->SetRadius(points[0]);
+	}
+
+	else if (shapeType == 2)
+	{
+		std::vector<Vector2f> newTrianglePoints;
+		newTrianglePoints.push_back({ points[0], points[1] });
+		newTrianglePoints.push_back({ points[2], points[3] });
+		newTrianglePoints.push_back({ points[4], points[5] });
+
+		mp_RenderShape->SetTrianglePoints(newTrianglePoints);
+	}
+}
+
+Vector2f Entity::GetRenderPosition()
+{
+	return mp_RenderShape->GetPosition();
+}
+
+bool Entity::IsColliding(Entity* other)
+{
+	return PhysicsManager::GetInstance().IsColliding(this, other);
+}
+
+bool Entity::IsInside(Vector2f position)
+{
+	return PhysicsManager::GetInstance().IsInside(this, position);
+}
+
+void Entity::AddActiveScene(const std::string& sceneTag) {
+	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
+		std::cerr << sceneTag << " exists" << std::endl;
+		return;
+	}
+
+	m_activeScenes.push_back(sceneTag);
+}
+
+void Entity::RemoveActiveScene(const std::string& sceneTag) {
+	std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
+	if (it == m_activeScenes.end()) {
+		std::cerr << sceneTag << " doesn't exists " << std::endl;
+		return;
+	}
+	m_activeScenes.erase(it);
+}
+
+bool Entity::IsActiveIn(const std::string& sceneTag) {
+	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+}
