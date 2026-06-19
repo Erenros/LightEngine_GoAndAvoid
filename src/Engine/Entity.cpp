@@ -1,5 +1,8 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
+#include "PhysicsManager.h"
+
+static int64 sId = 0;
 
 void Entity::Initialize(Shape& shape)
 { 
@@ -14,6 +17,10 @@ void Entity::Initialize(Shape& shape)
 	mp_Shape = &shape;
 
 	m_Target.isSet = false;
+
+	m_Id = sId++;
+
+	PhysicsManager::GetInstance().AddEntity(this);
 
 	OnInitialize();
 }
@@ -75,6 +82,7 @@ void Entity::Update(Timer& timer)
 void Entity::Destroy()
 {
 	m_ToDestroy = true;
+	PhysicsManager::GetInstance().RemoveEntity(this);
 	OnDestroy();
 }
 
@@ -119,8 +127,23 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
 	m_Direction = { x, y };
 }
 
+void Entity::SetRigidBody(bool isRigitBody)
+{
+	m_RigidBody = isRigitBody; 
+}
+
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
+}
+
+bool Entity::IsColliding(Entity* other)
+{
+	return PhysicsManager::GetInstance().IsColliding(this, other);
+}
+
+bool Entity::IsInside(Vector2f position)
+{
+	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 

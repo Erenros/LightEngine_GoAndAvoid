@@ -10,7 +10,8 @@ namespace gcle
 	enum class Shapes {
 		Triangle,
 		Rectangle,
-		Circle
+		Circle,
+		Count
 	};
 
 	class Shape {
@@ -23,7 +24,7 @@ namespace gcle
 		//circle
 		float32 m_radius = 0.0f;
 		Vector2f m_center = { 0.0f, 0.0f };
-		int smoothness = 16;
+		int m_smoothness = 16;
 
 		//rectangle
 		float32 m_height = 0.0f;
@@ -42,20 +43,20 @@ namespace gcle
 
 	public:
 		//Getters 
+		Shapes GetShape()						{ return m_shape; };
+		Vector2f GetOrigin()					{ return m_origin; }
+		SDL_Texture* GetTexture()				{ return m_texture; };
+		std::vector<int32>& GetIndicies()		{ return m_indicies; };
+		std::vector<SDL_Vertex>& GetVerticies()	{ return m_verticies; };
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-		Shapes GetShape() { return m_shape; };
-		Vector2f GetOrigin() { return m_origin; }
-		SDL_Texture* GetTexture() { return m_texture; };
-		std::vector<int32>& GetIndicies() { return m_indicies; };
-		std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
 
 	public:
 
-		virtual float32 GetRadius() { return 0.f; };
-		virtual float32 GetHeight() { return 0.f; };
-		virtual float32 GetWidth() { return 0.f; };
-		virtual int32 GetSmoothness() { return 0; };
-		virtual Vector2f GetCenter() { return { 0, 0 }; };
+		virtual float32 GetWidth()		{ return 0.f; };
+		virtual float32 GetHeight()		{ return 0.f; };
+		virtual float32 GetRadius()		{ return 0.f; };
+		virtual int32 GetSmoothness()	{ return 0; };
+		virtual Vector2f GetCenter()	{ return { 0, 0 }; };
 
 
 	public:
@@ -68,9 +69,9 @@ namespace gcle
 
 	public:
 
-		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		void SetTexture(SDL_Texture* tex) { m_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
+		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	public:
 		void Move(Vector2f translation);
@@ -156,30 +157,32 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int smoothness, SDL_Color color) {
-			if (smoothness == 0) {
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, SDL_Color color) {
+			if (_smoothness < 3) {
 				return;
 			}
 
-			m_center.x = x;
-			m_center.y = y;
+			m_smoothness = _smoothness;
+
+			m_center.x = x + radius;
+			m_center.y = y + radius;
 
 			m_radius = radius;
 
 			m_shape = Shapes::Circle;
 
-			m_verticies.resize(smoothness + 1);
-			m_indicies.resize(smoothness * 3);
+			m_verticies.resize(_smoothness + 1);
+			m_indicies.resize(_smoothness * 3);
 
 			m_origin = { x, y };
 
 			m_Transform.Initialize({ x, y }, 0);
 
-			Degrees degreesBetweenPoints = 360.0f / smoothness;
+			Degrees degreesBetweenPoints = 360.0f / _smoothness;
 
 			m_verticies[0] = SDL_Vertex{ {x + radius, y + radius} , color, {1, 1} };
 
-			for (int i = 0; i < smoothness; i++) {
+			for (int i = 0; i < _smoothness; i++) {
 				Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 
 				float cx = x + sin(radian) * radius + radius;
@@ -190,10 +193,16 @@ namespace gcle
 
 				m_indicies[i * 3] = 0;
 				m_indicies[i * 3 + 1] = i + 1;
-				m_indicies[i * 3 + 2] = (i + 1) % smoothness + 1;
+				m_indicies[i * 3 + 2] = (i + 1) % _smoothness + 1;
 			}
-
 		}
+
+		float32 GetRadius() override { return m_radius; };
+		int32 GetSmoothness() override { return m_smoothness; };
+		Vector2f GetCenter() override { return m_center; };
+		
+		
+		
 	};
 }
 

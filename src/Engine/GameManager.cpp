@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Scene.h" 
 #include "SceneManager.h"
+#include "PhysicsManager.h"
 #include "Shape.h"
 
 void GameManager::Loop()
@@ -12,16 +13,11 @@ void GameManager::Loop()
 	 
 	Timer time;
 	while (isRunning == true)
-	{ 
-		PROFILER_START("main loop", "main loop");
-		if (InputManager::GetInstance().IsDown(Space)) {
-			SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
-		}
-
+	{
 		time.ResetChrono();
-
+		
 		InputManager::GetInstance().Update();
-
+		PhysicsManager::GetInstance().Update(0.016f);
 		SceneManager::GetInstance().UpdateCurrentScene(time);
 
 
@@ -30,8 +26,6 @@ void GameManager::Loop()
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
     
 		SDL_RenderPresent(mp_window->GetRenderer());
-
-		PROFILER_END("main loop");
 
 	}
 
