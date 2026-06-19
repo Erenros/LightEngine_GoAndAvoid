@@ -9,14 +9,6 @@
 #include "Shape.h"
 #include "SDLEvent.h"
 
-
-
-
-GameManager::GameManager(int32 _width, int32 _height) : m_WindW(_width), m_WindH(_height)
-{
-	mp_Instance = this;
-}
-
 void GameManager::Loop()
 {
 	isRunning = true;
@@ -25,7 +17,7 @@ void GameManager::Loop()
 
 	Camera cam;
 	cam.Init(mp_window->GetRenderer());
-	cam.SetFollowing(m_entities[3]);
+	cam.SetFollowing(m_entities[0]);
 
 	SDL_Renderer* renderer = mp_window->GetRenderer(); 
 

@@ -6,6 +6,9 @@
 
 void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y)
 {
+	m_width = width;
+	m_height = height;
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 	{
 		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;

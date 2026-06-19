@@ -20,7 +20,7 @@ private:
 
 	bool isRunning = false;
 
-	int32 m_WindW, m_WindH;
+	int32 m_WindW, m_WindH = 0;
 
 	std::vector <Entity*> m_entities;
 

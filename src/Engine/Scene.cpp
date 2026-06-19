@@ -5,7 +5,7 @@
 void Scene::Draw(Window* window) {
 	for (Entity* e : GameManager::GetInstance().m_entities) {
 		if(e->IsActiveIn(m_tag)){
-			GameManager::GetInstance().GetWindow()->Draw(e->GetShape());
+			GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
 		}
 	}
 }

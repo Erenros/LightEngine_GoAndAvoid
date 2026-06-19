@@ -7,7 +7,7 @@ void Camera::Init(SDL_Renderer* pRenderer)
 
 	renderer = pRenderer;
 
-	screenMiddle = { GameManager::GetInstance()->GetWindow()->GetWidth() / 2.f, GameManager::GetInstance()->GetWindow()->GetHeight() / 2.f };
+	screenMiddle = { GameManager::GetInstance().GetWindow()->GetWidth() / 2.f, GameManager::GetInstance().GetWindow()->GetHeight() / 2.f };
 }
 
 void Camera::SetFollowing(Entity* newEntity)
@@ -45,8 +45,6 @@ void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 		Shape* realShape = entities[i]->GetShape();
 
 		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * GetZoom() + screenMiddle);
-
-
 
 		/*
 		if(i == 0)
