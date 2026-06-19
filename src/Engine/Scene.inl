@@ -12,9 +12,11 @@ T* Scene::CreateEntity(Shape& shape)
 	T* new_entity = new T();
 	Entity* entity = new_entity;
 
+	entity->m_activeScenes.push_back(m_tag);
+
 	entity->Initialize(shape);
 
-	mp_GameManager->AddEntity(new_entity);
+	GameManager::GetInstance().AddEntity(new_entity);
 
 	return new_entity;
 }
