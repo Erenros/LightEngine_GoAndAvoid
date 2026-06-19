@@ -43,11 +43,10 @@ private:
 private:
 	std::vector<EntityInfo> m_EntitiesToUpdate;
 
-private: 
+private:
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
 	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
 
 	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
 	static RepulseFn repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
 };
-

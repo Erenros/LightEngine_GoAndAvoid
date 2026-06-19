@@ -49,6 +49,7 @@ public:
 	
 	Window* GetWindow() { return mp_window; }; 
 
-};
+private:
+	int m_loopTour = 0;
 
-#include "GameManager.inl"
+};

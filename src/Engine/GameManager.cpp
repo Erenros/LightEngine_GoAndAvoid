@@ -17,8 +17,14 @@ void GameManager::Loop()
 		time.ResetChrono();
 		
 		InputManager::GetInstance().Update();
-		PhysicsManager::GetInstance().Update(0.016f);
+
 		SceneManager::GetInstance().UpdateCurrentScene(time);
+
+		if (m_loopTour < 3)
+			m_loopTour++;
+		else
+			PhysicsManager::GetInstance().Update(0.016f);
+
 
 
 		SDL_RenderClear(mp_window->GetRenderer());

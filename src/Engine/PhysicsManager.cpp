@@ -24,7 +24,7 @@ PhysicsManager::RepulseFn PhysicsManager::repulseTable[static_cast<int32>(gcle::
 	}
 };
 
-PhysicsManager& PhysicsManager::GetInstance() 
+PhysicsManager& PhysicsManager::GetInstance()
 {
 	static PhysicsManager instance;
 	return instance;
@@ -64,7 +64,7 @@ void PhysicsManager::Update(float64 deltaTime)
 			{
 				if (entity->IsRigidBody() && otherEntity->IsRigidBody())
 				{
-					DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL; 
+					DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL;
 					Repulse(entity, otherEntity);
 				}
 
@@ -117,7 +117,7 @@ bool PhysicsManager::IsColliding(Entity* pEntity1, Entity* pEntity2)
 }
 
 bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
-{ 
+{
 
 	switch (pEntity->GetShape()->GetShape())
 	{
@@ -350,19 +350,19 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
 
 		Vector2f newPos = circlePos;
-		if (minOverlap == overlapL) 
+		if (minOverlap == overlapL)
 		{
 			newPos.x = rx - pCircle->GetRadius();
 		}
-		else if (minOverlap == overlapR) 
+		else if (minOverlap == overlapR)
 		{
 			newPos.x = rx + rw + pCircle->GetRadius();
 		}
-		else if (minOverlap == overlapT) 
+		else if (minOverlap == overlapT)
 		{
 			newPos.y = ry - pCircle->GetRadius();
 		}
-		else                             
+		else
 		{
 			newPos.y = ry + rh + pCircle->GetRadius();
 		}
@@ -383,4 +383,3 @@ void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	RepulseRectCircle(b, a);
 }
-

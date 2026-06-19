@@ -25,31 +25,6 @@ void Entity::Initialize(Shape& shape)
 	OnInitialize();
 }
 
-
-void Entity::AddActiveScene(const std::string& sceneTag){
-	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
-		std::cerr << sceneTag << " exists" << std::endl;
-		return;
-	}
-
-	m_activeScenes.push_back(sceneTag);
-}
-
-void Entity::RemoveActiveScene(const std::string& sceneTag){
-	std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
-	if ( it == m_activeScenes.end()) {
-		std::cerr << sceneTag << " doesn't exists " << std::endl;
-		return;
-	}
-	m_activeScenes.erase(it);
-}
-
-bool Entity::IsActiveIn(const std::string& sceneTag){
-	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
-}
-
-
-
 void Entity::Update(Timer& timer)
 {
 	double dt = timer.GetChronoTime();
@@ -147,3 +122,24 @@ bool Entity::IsInside(Vector2f position)
 	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 
+void Entity::AddActiveScene(const std::string& sceneTag) {
+	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
+		std::cerr << sceneTag << " exists" << std::endl;
+		return;
+	}
+
+	m_activeScenes.push_back(sceneTag);
+}
+
+void Entity::RemoveActiveScene(const std::string& sceneTag) {
+	std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
+	if (it == m_activeScenes.end()) {
+		std::cerr << sceneTag << " doesn't exists " << std::endl;
+		return;
+	}
+	m_activeScenes.erase(it);
+}
+
+bool Entity::IsActiveIn(const std::string& sceneTag) {
+	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+}

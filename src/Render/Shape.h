@@ -43,20 +43,20 @@ namespace gcle
 
 	public:
 		//Getters 
-		Shapes GetShape()						{ return m_shape; };
-		Vector2f GetOrigin()					{ return m_origin; }
-		SDL_Texture* GetTexture()				{ return m_texture; };
-		std::vector<int32>& GetIndicies()		{ return m_indicies; };
-		std::vector<SDL_Vertex>& GetVerticies()	{ return m_verticies; };
+		Shapes GetShape() { return m_shape; };
+		Vector2f GetOrigin() { return m_origin; }
+		SDL_Texture* GetTexture() { return m_texture; };
+		std::vector<int32>& GetIndicies() { return m_indicies; };
+		std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	public:
 
-		virtual float32 GetWidth()		{ return 0.f; };
-		virtual float32 GetHeight()		{ return 0.f; };
-		virtual float32 GetRadius()		{ return 0.f; };
-		virtual int32 GetSmoothness()	{ return 0; };
-		virtual Vector2f GetCenter()	{ return { 0, 0 }; };
+		virtual float32 GetWidth() { return 0.f; };
+		virtual float32 GetHeight() { return 0.f; };
+		virtual float32 GetRadius() { return 0.f; };
+		virtual int32 GetSmoothness() { return 0; };
+		virtual Vector2f GetCenter() { return { 0, 0 }; };
 
 
 	public:
@@ -200,9 +200,8 @@ namespace gcle
 		float32 GetRadius() override { return m_radius; };
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
-		
-		
-		
+
+
+
 	};
 }
-
