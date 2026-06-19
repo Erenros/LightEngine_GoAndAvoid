@@ -1,4 +1,3 @@
-#include "SDL.h"
 #include "GameManager.h"
 #include "include.h"
 

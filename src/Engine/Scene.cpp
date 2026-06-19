@@ -16,5 +16,5 @@ void Scene::Update(Timer& time){
 			e->Update(time);
 		}
 	}
-}
+} 
 

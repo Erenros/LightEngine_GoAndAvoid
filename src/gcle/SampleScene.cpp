@@ -12,8 +12,6 @@ void SampleScene::OnInitialize()
 	gcle::Rectangle* rectangle2 = new gcle::Rectangle(200, 200, 100, 100, { 250,250, 250, 250 });
 	gcle::Rectangle* rectangle3 = new gcle::Rectangle(200, 50, 100, 100, { 250,250, 250, 250 });
 
-
-	rectangle->SetTexture(tex);
 	rectangle2->SetTexture(tex);
 
 

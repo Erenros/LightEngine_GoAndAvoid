@@ -281,42 +281,42 @@ void RessourceManager::DeleteAllTexture()
     m_textureMap.clear();
 }
 
-Sprite::Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet, int row, int column, float duration) :
-    SpriteSheet(is_spritesheet),
-    Row(row),
-    Column(column),
-    SourceRect(sourceRect),
-    Duration(duration),
-    Timer(duration)
-{
-    pTexture = RessourceManager::GetInstance().GetTexture(id)->GetSDLTexture();
-}
-
-void Sprite::PlayAnimation(int nbr)
-{
-    if (!SpriteSheet) return;
-
-    if (nbr >= Row) nbr = Row;
-    if (nbr < Row) nbr = 0;
-
-    CurrentRow = nbr;
-    SourceRect.y = CurrentRow * SourceRect.h;
-}
-
-void Sprite::UpdateAnimation(float deltaTime)
-{
-    if (!SpriteSheet) return;
-
-    Timer -= deltaTime;
-
-    //-Waiting for class Deltatime-
-    //if (Timer > 0)
-    //    return;
-
-    //Timer = Duration;
-
-    CurrentColumn += 1;
-    if (CurrentColumn >= Column) CurrentColumn = 0;
-
-    SourceRect.x = CurrentColumn * SourceRect.w;
-}
+//Sprite::Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet, int row, int column, float duration) :
+//    SpriteSheet(is_spritesheet),
+//    Row(row),
+//    Column(column),
+//    SourceRect(sourceRect),
+//    Duration(duration),
+//    Timer(duration)
+//{
+//    pTexture = RessourceManager::GetInstance().GetTexture(id)->GetSDLTexture();
+//}
+//
+//void Sprite::PlayAnimation(int nbr)
+//{
+//    if (!SpriteSheet) return;
+//
+//    if (nbr >= Row) nbr = Row;
+//    if (nbr < Row) nbr = 0;
+//
+//    CurrentRow = nbr;
+//    SourceRect.y = CurrentRow * SourceRect.h;
+//}
+//
+//void Sprite::UpdateAnimation(float deltaTime)
+//{
+//    if (!SpriteSheet) return;
+//
+//    Timer -= deltaTime;
+//
+//    //-Waiting for class Deltatime-
+//    //if (Timer > 0)
+//    //    return;
+//
+//    //Timer = Duration;
+//
+//    CurrentColumn += 1;
+//    if (CurrentColumn >= Column) CurrentColumn = 0;
+//
+//    SourceRect.x = CurrentColumn * SourceRect.w;
+//}

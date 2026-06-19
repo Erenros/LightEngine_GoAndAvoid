@@ -6,6 +6,7 @@
 #include "SceneManager.h"
 #include "PhysicsManager.h"
 #include "Shape.h"
+#include "SDLEvent.h"
 
 void GameManager::Loop()
 {
@@ -26,12 +27,16 @@ void GameManager::Loop()
 			PhysicsManager::GetInstance().Update(0.016f);
 
 
-
-		SDL_RenderClear(mp_window->GetRenderer());
+		mp_window->Clear();
 
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
     
-		SDL_RenderPresent(mp_window->GetRenderer());
+		mp_window->Present();
+
+		if (Event::WindowEvent())
+		{
+			isRunning = false;
+		}
 
 	}
 
@@ -45,38 +50,17 @@ bool GameManager::Init(int windowWidth, int windowHeight)
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
-	{
-		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;
-		return false;
-	}
+	uint32 windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
+	uint32 renderFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
 
-	if (IMG_Init(IMG_INIT_PNG) == 0) {
-		std::cout << "Error SDL2_image Initialization";
-		return false;
-	}
 
-	mp_window = new Window("gcle", m_WindW, m_WindH, SDL_WINDOW_SHOWN, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
 
 	if (!mp_window)
 	{
 		std::cout << "Window Initialization";
 		return false;
 	}
-
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		std::cout << "[Initialisation] : Audio Error : " << SDL_GetError() << std::endl;
-		Close();
-		return false;
-	}
-
-	if (TTF_Init() != 0)
-	{
-		std::cout << "[Initialisation] : Font Error" << std::endl;
-		Close();
-		return false;
-	} 
 
 	RessourceManager::GetInstance().Init(mp_window);
 
@@ -85,15 +69,9 @@ bool GameManager::Init(int windowWidth, int windowHeight)
 
 void GameManager::Close()
 {
+	RessourceManager::GetInstance().DeleteAll();
 	mp_window->End();
 
 	delete mp_window;
 
-	RessourceManager::GetInstance().DeleteAll();
-
-	Mix_CloseAudio();
-	TTF_Quit();
-	IMG_Quit();
-	SDL_Quit();
-	SDL_Quit();
 }

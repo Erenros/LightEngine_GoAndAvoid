@@ -16,7 +16,10 @@ public:
 	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
 
 	//Temporaire
-	SDL_Texture* GetSDLTexture() { return mp_texture; };;
+	SDL_Texture* GetSDLTexture() 
+	{ 
+		return mp_texture; 
+	};
 
 	Texture(Window* window, const std::string& path);
 	Texture() = default;
