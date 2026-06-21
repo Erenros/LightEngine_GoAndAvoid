@@ -44,9 +44,13 @@ namespace gcle
 		std::vector<Vector2f> m_trianglepoints;
 
 		Shapes m_shape = Shapes::Triangle;
+		 
+		std::vector<Vector2f> m_localPositions;
 
 		std::vector<SDL_Vertex*> m_verticies;
 		std::vector<int32> m_indicies;
+		 
+		void UpdateRenderVertices();
 
 		//Constructors 
 
@@ -60,9 +64,12 @@ namespace gcle
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
 		Texture* GetTexture() { return m_texture; };
-		std::vector<int32>& GetIndicies() { return m_indicies; };
-		std::vector<SDL_Vertex*>& GetVerticies() { return m_verticies; };
+		std::vector<int32>& GetIndicies() { return m_indicies; }; 
+		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+
+		Vector2f GetScale() { return m_Transform.GetScale(); }
+		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
 
 	public:
 
@@ -88,6 +95,13 @@ namespace gcle
 		void SetTexture(Texture* tex) { m_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+		 
+		void SetScale(Vector2f scale);
+		void SetScale(float32 scale) { SetScale({ scale, scale }); } 
+		void ScaleBy(Vector2f factor);
+		 
+		void SetRotation(Degrees angle); 
+		void Rotate(Degrees delta);
 
 	public:
 		void Move(Vector2f translation);
@@ -102,25 +116,20 @@ namespace gcle
 
 
 		//Getters
-
+		 
 		float32 GetHeight() override {
-			return m_height;
+			return m_height * m_Transform.GetScale().y;
 		}
 		float32 GetWidth() override {
-			return m_width;
+			return m_width * m_Transform.GetScale().x;
 		}
 
 
 
 		//Setters
 
-		void SetHeight(float32 height) override {
-			m_height = height;
-		}
-		void SetWidth(float32 width) override
-		{
-			m_width = width;
-		}
+		void SetHeight(float32 height) override;
+		void SetWidth(float32 width) override;
 
 	};
 
@@ -130,6 +139,8 @@ namespace gcle
 		//Contructors
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
+
+		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 	};
 
 	class Circle : public Shape {
@@ -139,10 +150,11 @@ namespace gcle
 
 		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color);
 
-
-		float32 GetRadius() override { return m_radius; };
+		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
+
+		void SetRadius(float32 radius) override;
 
 	};
 }

@@ -26,6 +26,8 @@ public:
 	Shape* GetRenderShape() { return mp_RenderShape; };
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	int64 GetId() const { return m_Id; }
+	Vector2f GetScale();
+	Degrees GetRotation();
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
@@ -40,6 +42,13 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
+	 
+	void SetScale(Vector2f scale);
+	void SetScale(float32 scale) { SetScale({ scale, scale }); }
+	void ScaleBy(Vector2f factor);
+	 
+	void SetRotation(Degrees angle);
+	void Rotate(Degrees delta);
 
 public:
 	bool IsRigidBody() const { return m_RigidBody; }

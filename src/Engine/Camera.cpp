@@ -47,6 +47,10 @@ void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 
 		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * GetZoom() + screenMiddle);
 
+		Vector2f realScale = entities[i]->GetScale();
+		entities[i]->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+		entities[i]->GetRenderShape()->SetRotation(entities[i]->GetRotation());
+
 		/*
 		if(i == 0)
 		{

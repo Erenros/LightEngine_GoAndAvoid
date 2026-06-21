@@ -141,6 +141,13 @@ public:
 		m[2][1] = position.y; 
 		return m;
 	}
+	 
+	Vector2f TransformPoint(Vector2f point) const {
+		Vector2f result;
+		result.x = m[0][0] * point.x + m[1][0] * point.y + m[2][0];
+		result.y = m[0][1] * point.x + m[1][1] * point.y + m[2][1];
+		return result;
+	}
 
 };
 

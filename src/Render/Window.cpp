@@ -1,5 +1,6 @@
 #include "Window.h"
 #include <iostream>
+#include <vector>
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
@@ -73,10 +74,19 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* 
 }
 
 void Window::Draw(gcle::Shape* pShape)
-{
+{ 
+	const std::vector<SDL_Vertex*>& verticesPtr = pShape->GetVerticies();
+
+	std::vector<SDL_Vertex> vertices;
+	vertices.reserve(verticesPtr.size());
+	for (SDL_Vertex* v : verticesPtr)
+	{
+		vertices.push_back(*v);
+	}
+
 	if (pShape->GetTexture() == nullptr)
-		SDL_RenderGeometry(mp_Renderer, nullptr, *pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), vertices.size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 	else
-		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), *pShape->GetVerticies().data(), pShape->GetVerticies().size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), vertices.size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
 }
 

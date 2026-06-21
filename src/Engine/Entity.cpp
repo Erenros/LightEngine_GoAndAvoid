@@ -113,6 +113,36 @@ void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
+Vector2f Entity::GetScale()
+{
+	return mp_Shape->GetScale();
+}
+
+Degrees Entity::GetRotation()
+{
+	return mp_Shape->GetRotation();
+}
+
+void Entity::SetScale(Vector2f scale)
+{
+	mp_Shape->SetScale(scale);
+}
+
+void Entity::ScaleBy(Vector2f factor)
+{
+	mp_Shape->ScaleBy(factor);
+}
+
+void Entity::SetRotation(Degrees angle)
+{
+	mp_Shape->SetRotation(angle);
+}
+
+void Entity::Rotate(Degrees delta)
+{
+	mp_Shape->Rotate(delta);
+}
+
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
 {
 	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
