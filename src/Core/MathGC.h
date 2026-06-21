@@ -6,16 +6,15 @@
 using Radians = float32;
 using Degrees = float32;
 
-class MathGC
+namespace MathGC
 {
-public:
-	static float32 RadToDeg(Radians rad);
-	static float32 DegToRad(Degrees deg);
-	static Vector2f AngleToVec(Radians rad);
-	static Radians VecToAngle(Vector2f& vec);
+	float32 RadToDeg(Radians rad);
+	float32 DegToRad(Degrees deg);
+	Vector2f AngleToVec(Radians rad);
+	Radians VecToAngle(Vector2f& vec);
 
 	template<typename T>
-	static T Lerp(T minValue, T maxValue, float t);
+	T Lerp(T minValue, T maxValue, float t);
 };
 
 template<typename T>

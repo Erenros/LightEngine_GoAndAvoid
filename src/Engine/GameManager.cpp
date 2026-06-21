@@ -16,8 +16,7 @@ void GameManager::Loop()
 	Timer time;
 
 	Camera cam;
-	cam.Init(mp_window);
-	cam.SetFollowing(m_entities[0]);
+	cam.Init(mp_window); 
 
 	while (isRunning == true)
 	{

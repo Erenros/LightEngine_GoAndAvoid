@@ -5,7 +5,7 @@ void SampleScene::OnInitialize()
 {
 	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
 
-	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 50000, 50000, { 250,250, 250, 250 });
+	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 200, 200, { 250,250, 250, 250 });
 	rectangle->SetTexture(tex);
 	Entity* entity = CreateEntity<Player>(*rectangle);
 	//entity->SetRigidBody(true);
@@ -27,10 +27,8 @@ void SampleScene::OnInitialize()
 
 	/*pEntity = CreateEntity<Entity>(*rectangle);
 	pEntity->SetRigidBody(true);*/
-	Entity* entity1 = CreateEntity<Entity>(*circle2);
-	entity1->SetRigidBody(true);
-	Entity* entity2 = CreateEntity<Entity>(*circle3);
-	entity2->SetRigidBody(true);
+	Entity* entity1 = CreateEntity<Entity>(*circle2); 
+	Entity* entity2 = CreateEntity<Entity>(*circle3); 
 	
 }
 

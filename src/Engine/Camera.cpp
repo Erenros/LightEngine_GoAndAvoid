@@ -36,7 +36,8 @@ Vector2f Camera::GetPosition()
 
 void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 {
-	t.SetPosition(followingEntity->GetPosition());
+	if (followingEntity != nullptr)
+		t.SetPosition(followingEntity->GetPosition());
 	
 	for (int i = 0; i < entities.size(); i++)
 	{
