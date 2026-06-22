@@ -5,7 +5,7 @@
 
 
 template<typename T>
-T* Scene::CreateEntity(Shape& shape)
+T* Scene::CreateEntity(gcle::Shapes shape)
 {
 	static_assert(std::is_base_of<Entity, T>::value, "T must be derived from Entity");
 
