@@ -20,38 +20,38 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
-		PROFILER_START("time", "Timer Update");
+		//PROFILER_START("time", "Timer Update");
 		time.Update();
-		PROFILER_END("time");
+		//PROFILER_END("time");
 		
-		PROFILER_START("Input", "Input Update");
+		//PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
-		PROFILER_END("Input");
+		//PROFILER_END("Input");
 
-		PROFILER_START("SceneU", "Scene Update");
+		//PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(time);
-		PROFILER_END("SceneU");
+		//PROFILER_END("SceneU");
 
-		PROFILER_START("Colliders", "Colliders Update");
+		//PROFILER_START("Colliders", "Colliders Update");
 		if (m_loopTour < 3)
 			m_loopTour++;
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
-		PROFILER_END("Colliders");
+		//PROFILER_END("Colliders");
 		
-		PROFILER_START("Camera", "Camera Update");
+		//PROFILER_START("Camera", "Camera Update");
 		cam.Update(time, m_entities);
-		PROFILER_END("Camera");
+		//PROFILER_END("Camera");
 	
-		PROFILER_START("Entity", "Entity Creation / Deletion");
+		//PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
-		PROFILER_END("Entity");
+		//PROFILER_END("Entity");
 
 		mp_window->Clear();
 
-		PROFILER_START("SceneD", "Scene Draw");
+		//PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
-		PROFILER_END("SceneD");
+		//PROFILER_END("SceneD");
     
 		mp_window->Present();
 
@@ -60,7 +60,7 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
-		system("CLS");
+		//system("CLS");
 
 	}
 

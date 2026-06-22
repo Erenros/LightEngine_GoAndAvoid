@@ -27,7 +27,7 @@ void RigidBody2D::Update(Clock& timer)
 	ClampVelocity();
 	ApplyVelocity(dt);
 
-	DEBUG_INFO << mp_Transform->GetPosition().x << " : " << mp_Transform->GetPosition().y << ENDL;
+	//DEBUG_INFO << mp_Transform->GetPosition().x << " : " << mp_Transform->GetPosition().y << ENDL;
 
 }
 

@@ -19,7 +19,7 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
 Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
 	if (m_textureMap.count(id))
-		return m_textureMap[id];
+		return m_textureMap[id].mp_texture;
 
     Texture* texture = new Texture(window, path);
     if (texture == nullptr || !texture->IsTextureInit())
@@ -30,7 +30,7 @@ Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, 
     }
 
     DEBUG_INFO << "Texture created" << ENDL;
-    m_textureMap[id] = texture;
+    m_textureMap[id].mp_texture = texture;
     return texture;
 }
 
@@ -269,14 +269,14 @@ void RessourceManager::DeleteTexture(const std::string& id)
     if (!m_textureMap.count(id))
         return;
 
-    delete m_textureMap[id];
+    delete m_textureMap[id].mp_texture;
     m_textureMap.erase(id);
 }
 
 void RessourceManager::DeleteAllTexture()
 {
     for (auto& pair : m_textureMap)
-        delete pair.second;
+        delete pair.second.mp_texture;
 
     m_textureMap.clear();
 }

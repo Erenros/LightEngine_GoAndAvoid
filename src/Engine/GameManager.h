@@ -43,7 +43,7 @@ private:
 
 	bool isRunning = false;
 
-	int32 m_WindW, m_WindH = 0;
+	int32 m_WindW = 0, m_WindH = 0;
 
 	std::vector <Entity*> m_entities;
 	std::vector <Entity*> m_entitiesToDestroy;

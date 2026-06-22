@@ -13,6 +13,7 @@ class Window;
 class Scene
 {
 private:
+	uint32 m_flag;
 
 	std::vector<Text*> m_texts;
 
@@ -29,7 +30,6 @@ protected:
 	virtual void OnInitialize() {};
 	virtual void OnUpdate(Clock& time) {};
 	virtual void OnExit() {};
-
 
 public:
 

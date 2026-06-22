@@ -17,7 +17,6 @@ class Camera
 
 		float32 m_zoom = 1;
 
-		// Cette fonction doit être lancée sinon la caméra ne marchera pas
 		void Init(Window* pWindow);
 
 		void SetFollowing(Entity* newEntity);

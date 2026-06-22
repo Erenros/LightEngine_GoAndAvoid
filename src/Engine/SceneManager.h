@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <string>
+#include "include.h"
 
 
 class Scene;
@@ -15,7 +16,7 @@ class SceneManager {
 	std::string m_CurrentSceneTag = "";
 	std::string m_PreviousSceneTag = "";
 
-
+	int8 m_sceneCount = 0;
 
 	//Update
 	void UpdateCurrentScene(Clock& time);
