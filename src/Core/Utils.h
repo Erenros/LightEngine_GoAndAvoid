@@ -20,4 +20,8 @@ int8 GenerateRandomNumer(int8 min, int8 max);
 #define billion 0x4
 #define trillion 0x5
 
-std::string ChangeUnite(int16 value, short unit, int8 precision);
+std::string NumberToString(float64 value);
+std::string RemoveZeroes(std::string string);
+std::string RemoveZeroes(float64 value);
+std::string ChangeUnit(std::string string, int32 precision);
+std::string ChangeUnit(float64 value, int32 precision);
