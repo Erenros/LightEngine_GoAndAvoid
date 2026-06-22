@@ -1,6 +1,4 @@
 #pragma once
-//#include <SDL.h>
-//#include <SDL_image.h>
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
@@ -16,25 +14,25 @@ class Window;
 
 
 //Temporaire
-struct Sprite
-{
-	/*bool SpriteSheet = true;
-
-	SDL_Texture* pTexture = nullptr;
-	SDL_Rect SourceRect;
-	
-	float Duration;
-	float Timer;
-
-	int Row, Column;
-	int CurrentRow = 0;
-	int CurrentColumn = 0;
-
-	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
-
-	void PlayAnimation(int nbr);
-	void UpdateAnimation(float deltaTime = 0.f);*/
-};
+//struct Sprite
+//{
+//	/*bool SpriteSheet = true;
+//
+//	SDL_Texture* pTexture = nullptr;
+//	SDL_Rect SourceRect;
+//	
+//	float Duration;
+//	float Timer;
+//
+//	int Row, Column;
+//	int CurrentRow = 0;
+//	int CurrentColumn = 0;
+//
+//	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
+//
+//	void PlayAnimation(int nbr);
+//	void UpdateAnimation(float deltaTime = 0.f);*/
+//};
 
 
 

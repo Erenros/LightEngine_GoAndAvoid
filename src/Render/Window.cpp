@@ -4,6 +4,7 @@
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
 #include "Render/Text.h"
+#include "Texture.h"
 
 void Window::Create(const char* pName,int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y)
 {

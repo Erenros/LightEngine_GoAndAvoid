@@ -82,6 +82,8 @@ namespace gcle
 
 	public:
 		void Move(Vector2f translation);
+
+		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) {};
 	};
 
 
@@ -135,6 +137,8 @@ namespace gcle
 			m_width = width;
 		}
 
+
+		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 
 	class Triangle : public Shape {
@@ -165,6 +169,8 @@ namespace gcle
 
 			m_Transform.Initialize({ x1, y1 }, 0);
 		}
+
+		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 
 	class Circle : public Shape {
@@ -216,7 +222,6 @@ namespace gcle
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
 
-
-
+		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 }
