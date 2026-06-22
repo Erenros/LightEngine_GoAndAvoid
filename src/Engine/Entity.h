@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "Render/Shape.h"
 #include "Render/Texture.h"
+#include "RigidBody.h"
 
 struct Target
 {
@@ -27,12 +28,13 @@ public:
 	int64 GetId() const { return m_Id; }
 	Vector2f GetScale();
 	Degrees GetRotation();
+	RigidBody2D& GetRigidBody() { return m_RigidBody; }
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
 	void SetSpeed(float32 speed) { m_Speed = speed; }
 	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
-	void SetRigidBody(bool isRigitBody);
+	void SetRigidBody(bool isRigidBody);
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -52,7 +54,7 @@ public:
 	void SetTexture(Texture* pTexture);
 
 public:
-	bool IsRigidBody() const { return m_RigidBody; }
+	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 	bool ToDestroy() const { return m_ToDestroy; }
 	bool IsTag(int32 tag) const { return m_Tag == tag; }
 	bool IsColliding(Entity* other);
@@ -71,7 +73,7 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Timer& timer); 
+	void Update(Clock& timer);
 	void Initialize(gcle::Shapes shape);
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
@@ -89,14 +91,20 @@ protected:
 	bool			m_ToDestroy = false;
 	int32			m_Tag = -1;
 	Target			m_Target;
-	bool			m_RigidBody = false;
+
+
+private:
 	gcle::Shape*	mp_Shape = nullptr;
 	gcle::Shape*	mp_RenderShape = nullptr;
+	RigidBody2D		m_RigidBody;
 
 private:
 	bool m_OnCollisionEnter = true;
 	bool m_WasOnCollision	= false;
 	bool m_OnCollisionExit	= false;
+
+
+private:
 	std::vector<std::string> m_activeScenes;
 
 

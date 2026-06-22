@@ -44,6 +44,8 @@ namespace gcle
 		std::vector<Vector2f> m_trianglepoints;
 
 		Shapes m_shape = Shapes::Triangle;
+
+		bool m_IsKinematic;
 		 
 		std::vector<Vector2f> m_localPositions;
 
@@ -71,6 +73,10 @@ namespace gcle
 
 		Vector2f GetScale() { return m_Transform.GetScale(); }
 		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
+
+		Transform2D& GetTransform() { return m_Transform; }
+
+		bool IsKinematic() { return m_IsKinematic; }
 
 	public:
 
@@ -103,6 +109,8 @@ namespace gcle
 		 
 		void SetRotation(Degrees angle); 
 		void Rotate(Degrees delta);
+
+		void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
 
 	public:
 		void Move(Vector2f translation);

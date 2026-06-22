@@ -1,43 +1,57 @@
-#include "GameManager.h"
 #include <iostream>
-#include "Core/InputManager.h" 
-#include "Camera.h"
-#include "Entity.h"
 #include "Scene.h" 
-#include "SceneManager.h"
-#include "PhysicsManager.h"
 #include "Shape.h"
 #include "Event.h"
+#include "Entity.h"
+#include "Camera.h"
+#include "GameManager.h"
+#include "SceneManager.h"
+#include "PhysicsManager.h"
+#include "Core/InputManager.h" 
 
 void GameManager::Loop()
 {
 	isRunning = true;
 	 
-	Timer time;
+	Clock time;
 
 	Camera cam;
-	cam.Init(mp_window); 
+	cam.Init(mp_window);
 
 	while (isRunning == true)
 	{
-		time.ResetChrono();
+		PROFILER_START("time", "Timer Update");
+		time.Update();
+		PROFILER_END("time");
 		
+		PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
+		PROFILER_END("Input");
 
+		PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(time);
+		PROFILER_END("SceneU");
 
+		PROFILER_START("Colliders", "Colliders Update");
 		if (m_loopTour < 3)
 			m_loopTour++;
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
+		PROFILER_END("Colliders");
 		
+		PROFILER_START("Camera", "Camera Update");
 		cam.Update(time, m_entities);
+		PROFILER_END("Camera");
 	
+		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
+		PROFILER_END("Entity");
 
 		mp_window->Clear();
 
+		PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
+		PROFILER_END("SceneD");
     
 		mp_window->Present();
 
@@ -45,6 +59,8 @@ void GameManager::Loop()
 		{
 			isRunning = false;
 		}
+
+		system("CLS");
 
 	}
 
