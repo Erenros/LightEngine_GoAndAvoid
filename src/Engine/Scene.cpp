@@ -29,7 +29,7 @@ Text* Scene::CreateText(Font* font, std::string& text, int x, int y, int w, int 
 
 void Scene::DestroyText(Text* text)
 {
-	std::erase(m_texts, [text](Text* t) { return t == text; });
+	std::erase_if(m_texts, [text](Text* t) { return t == text; });
 	delete text;
 }
 
