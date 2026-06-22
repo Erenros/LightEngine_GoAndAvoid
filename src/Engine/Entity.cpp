@@ -61,8 +61,8 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 
 void Entity::Update(Timer& timer)
 {
-	double dt = timer.GetChronoTime();
-	float distance = dt * m_Speed;
+	float32 dt = static_cast<float32>(timer.GetChronoTime());
+	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;
 
 	mp_Shape->Move(translation);
