@@ -250,18 +250,18 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(a);
 	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(b);
 
-	float x1 = pRect1->GetPosition(0.0f, 0.0f).x;
-	float y1 = pRect1->GetPosition(0.0f, 0.0f).y;
-	float w1 = pRect1->GetWidth();
-	float h1 = pRect1->GetHeight();
+	float32 x1 = pRect1->GetPosition(0.0f, 0.0f).x;
+	float32 y1 = pRect1->GetPosition(0.0f, 0.0f).y;
+	float32 w1 = pRect1->GetWidth();
+	float32 h1 = pRect1->GetHeight();
 
-	float x2 = pRect2->GetPosition(0.0f, 0.0f).x;
-	float y2 = pRect2->GetPosition(0.0f, 0.0f).y;
-	float w2 = pRect2->GetWidth();
-	float h2 = pRect2->GetHeight();
+	float32 x2 = pRect2->GetPosition(0.0f, 0.0f).x;
+	float32 y2 = pRect2->GetPosition(0.0f, 0.0f).y;
+	float32 w2 = pRect2->GetWidth();
+	float32 h2 = pRect2->GetHeight();
 
-	float overlapX = std::min(x1 + w1, x2 + w2) - std::max(x1, x2);
-	float overlapY = std::min(y1 + h1, y2 + h2) - std::max(y1, y2);
+	float32 overlapX = std::min(x1 + w1, x2 + w2) - std::max(x1, x2);
+	float32 overlapY = std::min(y1 + h1, y2 + h2) - std::max(y1, y2);
 
 	if (overlapX <= 0.0f || overlapY <= 0.0f)
 		return;
@@ -269,34 +269,36 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 	Vector2f pos1 = a->GetPosition(0.5f, 0.5f);
 	Vector2f pos2 = b->GetPosition(0.5f, 0.5f);
 
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
+
 	if (overlapX < overlapY)
 	{
-		float correction = overlapX * 0.5f;
+		float32 correction = overlapX * correctionMultiplyer;
 
 		if (x1 < x2)
 		{
-			pos1.x -= correction;
-			pos2.x += correction;
+			pos1.x -= correction * a->IsKinematic();
+			pos2.x += correction * b->IsKinematic();
 		}
 		else
 		{
-			pos1.x += correction;
-			pos2.x -= correction;
+			pos1.x += correction * a->IsKinematic();
+			pos2.x -= correction * b->IsKinematic();
 		}
 	}
 	else
 	{
-		float correction = overlapY * 0.5f;
+		float32 correction = overlapY * correctionMultiplyer;
 
 		if (y1 < y2)
 		{
-			pos1.y -= correction;
-			pos2.y += correction;
+			pos1.y -= correction * a->IsKinematic();
+			pos2.y += correction * b->IsKinematic();
 		}
 		else
 		{
-			pos1.y += correction;
-			pos2.y -= correction;
+			pos1.y += correction * a->IsKinematic();
+			pos2.y -= correction * b->IsKinematic();
 		}
 	}
 
@@ -314,14 +316,14 @@ void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
 	float32 radius1 = a->GetRadius();
 	float32 radius2 = b->GetRadius();
 
-	float32 overlap = (length - (radius1 + radius2)) * 0.5f;
+	float32 overlap = (length - (radius1 + radius2)) * GetRepulseCorrectionMultiplyer(a, b);
 
 	Vector2f normal = distance / length;
 
 	Vector2f translation = normal * overlap;
 
-	Vector2f position1 = a->GetPosition(0.5f, 0.5f) - translation;
-	Vector2f position2 = b->GetPosition(0.5f, 0.5f) + translation;
+	Vector2f position1 = a->GetPosition(0.5f, 0.5f) - translation * a->IsKinematic();
+	Vector2f position2 = b->GetPosition(0.5f, 0.5f) + translation * b->IsKinematic();
 
 	a->SetPosition(position1.x, position1.y, 0.5f, 0.5f);
 	b->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
@@ -338,6 +340,7 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	float32 rh = pRect->GetHeight();
 
 	Vector2f circlePos = pCircle->GetCenter();
+	Vector2f rectPos = pRect->GetPosition(0.5f, 0.5f);
 
 	float32 nearestX = std::max(rx, std::min(circlePos.x, rx + rw));
 	float32 nearestY = std::max(ry, std::min(circlePos.y, ry + rh));
@@ -345,6 +348,8 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	Vector2f delta = circlePos - nearest;
 	float32 dist = delta.x * delta.x + delta.y * delta.y;
+
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
 
 	if (dist == 0.0f)
 	{
@@ -354,38 +359,43 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		float32 overlapB = (ry + rh) - circlePos.y;
 
 		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
-
 		Vector2f newPos = circlePos;
-		if (minOverlap == overlapL)
-		{
-			newPos.x = rx - pCircle->GetRadius();
-		}
-		else if (minOverlap == overlapR)
-		{
-			newPos.x = rx + rw + pCircle->GetRadius();
-		}
-		else if (minOverlap == overlapT)
-		{
-			newPos.y = ry - pCircle->GetRadius();
-		}
-		else
-		{
-			newPos.y = ry + rh + pCircle->GetRadius();
-		}
 
-		pCircle->SetPosition(newPos.x, newPos.y, 0.5f, 0.5f);
+		if (minOverlap == overlapL)      newPos.x = rx - pCircle->GetRadius();
+		else if (minOverlap == overlapR) newPos.x = rx + rw + pCircle->GetRadius();
+		else if (minOverlap == overlapT) newPos.y = ry - pCircle->GetRadius();
+		else                              newPos.y = ry + rh + pCircle->GetRadius();
+
+		Vector2f circleTranslation = (newPos - circlePos) * correctionMultiplyer;
+
+		pCircle->SetPosition(circlePos.x + circleTranslation.x * b->IsKinematic(),
+			circlePos.y + circleTranslation.y * b->IsKinematic(),
+			0.5f, 0.5f);
 		return;
 	}
 
 	float32 length = std::sqrt(dist);
 	Vector2f normal = delta / length;
-	float32  overlap = pCircle->GetRadius() - length;
+	float32  overlap = (pCircle->GetRadius() - length) * correctionMultiplyer;
 
-	Vector2f newPos = circlePos + normal * overlap;
-	pCircle->SetPosition(newPos.x, newPos.y, 0.5f, 0.5f);
+	Vector2f translation = normal * overlap;
+
+	Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
+	pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+
+	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
+	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	RepulseRectCircle(b, a);
+}
+
+float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
+{
+	if (a->IsKinematic() && b->IsKinematic())
+		return 0.5;
+	else
+		return 1.0;
 }
