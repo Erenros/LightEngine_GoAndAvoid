@@ -3,41 +3,40 @@
 
 void SampleScene::OnInitialize()
 {
-	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
+	Texture* tex = RessourceManager::GetInstance().GetTexture("images"); 
+	 
+	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	pEntity->SetTexture(tex);
+	pEntity->SetScale(0.5f);
+	pEntity->SetRigidBody(true);   
+	 
+	
 
-	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 20, 20, { 250,250, 250, 250 });
-	rectangle->SetTexture(tex);
-	Entity* entity = CreateEntity<Player>(*rectangle);
-	entity->SetRigidBody(true);
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 
-	gcle::Rectangle* rectangle2 = new gcle::Rectangle(200, 200, 100, 100, { 250,250, 250, 250 });
-	gcle::Rectangle* rectangle3 = new gcle::Rectangle(200, 50, 100, 100, { 250,250, 250, 250 });
-
-	rectangle2->SetTexture(tex);
-
-
-	gcle::Triangle* triangle = new gcle::Triangle(100.f, 100.f, 600.f, 400.f, 600.f, 600.f, { 255, 0, 0, 255 });
-	triangle->SetTexture(tex);
-
-
-
-	gcle::Circle* circle = new gcle::Circle(200, 0, 50, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle2 = new gcle::Circle(50, 50, 10, 50, { 0, 0, 230, 255 });
-	gcle::Circle* circle3 = new gcle::Circle(100, 100, 10, 50, { 0, 0, 230, 255 });
-
-	/*pEntity = CreateEntity<Entity>(*rectangle);
-	pEntity->SetRigidBody(true);*/
-	Entity* entity1 = CreateEntity<Entity>(*circle2);
+	std::string text = "Test";
+	CreateText(font,text , 40, 40, 20, 20);
+	 
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
+	entity1->SetPosition(100, 100);
 	entity1->SetRigidBody(true);
-	Entity* entity2 = CreateEntity<Entity>(*circle3);
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Circle);
+	entity2->SetPosition(-100, -100);
 	entity2->SetRigidBody(true);
 	
 }
 
 void SampleScene::OnUpdate(Timer& time)
 {
+	//pEntity->Rotate(1);
+
 	if (InputManager::GetInstance().IsDown(Space))
 	{
 		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
+	}
+
+	if (InputManager::GetInstance().IsDown('A'))
+	{
+		pEntity->Destroy();
 	}
 } 

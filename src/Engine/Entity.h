@@ -3,8 +3,7 @@
 #include "include.h"
 #include "Transform.h"
 #include "Render/Shape.h"
-
-using namespace gcle;
+#include "Render/Texture.h"
 
 struct Target
 {
@@ -22,10 +21,12 @@ public:
 	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
 public: 
-	Shape* GetShape() { return mp_Shape; }
-	Shape* GetRenderShape() { return mp_RenderShape; };
+	gcle::Shape* GetShape() { return mp_Shape; }
+	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	int64 GetId() const { return m_Id; }
+	Vector2f GetScale();
+	Degrees GetRotation();
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
@@ -40,6 +41,15 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
+	 
+	void SetScale(Vector2f scale);
+	void SetScale(float32 scale) { SetScale({ scale, scale }); }
+	void ScaleBy(Vector2f factor);
+	 
+	void SetRotation(Degrees angle);
+	void Rotate(Degrees delta);
+
+	void SetTexture(Texture* pTexture);
 
 public:
 	bool IsRigidBody() const { return m_RigidBody; }
@@ -50,7 +60,8 @@ public:
 
 protected:
 	Entity() = default;
-	~Entity() = default;
+	~Entity();
+
 
 	virtual void OnUpdate() {};
 	virtual void OnCollisionEnter(Entity* collidedWith) {};
@@ -61,7 +72,8 @@ protected:
 
 private:
 	void Update(Timer& timer); 
-	void Initialize(Shape& shape);
+	void Initialize(gcle::Shapes shape);
+	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
 public:
 	void AddActiveScene(const std::string& sceneTag);
@@ -78,8 +90,8 @@ protected:
 	int32			m_Tag = -1;
 	Target			m_Target;
 	bool			m_RigidBody = false;
-	Shape*			mp_Shape = nullptr;
-	Shape*		mp_RenderShape = nullptr;
+	gcle::Shape*	mp_Shape = nullptr;
+	gcle::Shape*	mp_RenderShape = nullptr;
 
 private:
 	bool m_OnCollisionEnter = true;

@@ -4,7 +4,7 @@
 
 static int64 sId = 0;
 
-void Entity::Initialize(Shape& shape)
+void Entity::Initialize(gcle::Shapes shape)
 { 
 	m_Direction = { 0.0f, 0.0f };
 	m_Speed = 0.f;
@@ -13,9 +13,11 @@ void Entity::Initialize(Shape& shape)
 	m_Target;
 	m_RigidBody = false;
 
-	mp_Shape = &shape;
 
-	mp_RenderShape = new Shape(shape);
+
+	mp_Shape = GetBaseShape(shape);
+
+	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
 
 	m_Target.isSet = false;
 
@@ -26,10 +28,41 @@ void Entity::Initialize(Shape& shape)
 	OnInitialize();
 }
 
+gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
+{
+	switch (shape)
+	{
+	case gcle::Shapes::Rectangle:
+	{
+		gcle::Rectangle* pRect = new gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
+		return pRect;
+		break;
+	}
+	case gcle::Shapes::Circle:
+	{
+		gcle::Circle* pCircle = new gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 });
+		return pCircle;
+		break;
+	}
+	case gcle::Shapes::Triangle:
+	{
+		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
+		return pTriangle;
+		break;
+	}
+	case gcle::Shapes::Count:
+		break;
+	default:
+		break;
+	}
+
+	return nullptr;
+}
+
 void Entity::Update(Timer& timer)
 {
-	double dt = timer.GetChronoTime();
-	float distance = dt * m_Speed;
+	float32 dt = static_cast<float32>(timer.GetChronoTime());
+	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;
 
 	mp_Shape->Move(translation);
@@ -113,6 +146,41 @@ void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	mp_Shape->SetPosition(x, y, ratioX, ratioY);
 }
 
+Vector2f Entity::GetScale()
+{
+	return mp_Shape->GetScale();
+}
+
+Degrees Entity::GetRotation()
+{
+	return mp_Shape->GetRotation();
+}
+
+void Entity::SetScale(Vector2f scale)
+{
+	mp_Shape->SetScale(scale);
+}
+
+void Entity::ScaleBy(Vector2f factor)
+{
+	mp_Shape->ScaleBy(factor);
+}
+
+void Entity::SetRotation(Degrees angle)
+{
+	mp_Shape->SetRotation(angle);
+}
+
+void Entity::Rotate(Degrees delta)
+{
+	mp_Shape->Rotate(delta);
+}
+
+void Entity::SetTexture(Texture* pTexture)
+{
+	mp_Shape->SetTexture(pTexture);
+}
+
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
 {
 	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
@@ -168,6 +236,11 @@ bool Entity::IsColliding(Entity* other)
 bool Entity::IsInside(Vector2f position)
 {
 	return PhysicsManager::GetInstance().IsInside(this, position);
+}
+
+Entity::~Entity(){
+	delete mp_Shape;
+	delete mp_RenderShape;
 }
 
 void Entity::AddActiveScene(const std::string& sceneTag) {

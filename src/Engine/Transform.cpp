@@ -44,7 +44,7 @@ const Transform2D* Transform2D::GetChild(uint32 index) const {
 }
 
 uint32 Transform2D::GetChildCount() const {
-    return mp_Childs.size();
+    return static_cast<uint32>(mp_Childs.size());
 }
 
 Vector2f& Transform2D::GetPosition()
@@ -55,6 +55,11 @@ Vector2f& Transform2D::GetPosition()
 Vector2f& Transform2D::GetDirection()
 {
     return m_Direction;
+}
+
+Vector2f& Transform2D::GetScale()
+{
+    return m_Scale;
 }
 
 Degrees& Transform2D::GetDegAngle()
@@ -96,6 +101,13 @@ void Transform2D::SetParent(Transform2D* pParent) {
 void Transform2D::SetPosition(Vector2f position)
 {
     m_Position = position;
+    SetDirty();
+}
+
+void Transform2D::SetScale(Vector2f scale)
+{
+    m_Scale = scale;
+    SetDirty();
 }
 
 void Transform2D::SetDirection(Vector2f position)
@@ -106,11 +118,13 @@ void Transform2D::SetDirection(Vector2f position)
 void Transform2D::SetDegAngle(Degrees angle) 
 {
     m_DegAngle = angle;
+    SetDirty();
 }
  
 void Transform2D::SetRadAngle(Radians angle) 
 {
     m_RadAngle = angle;
+    SetDirty();
 }
 
 void Transform2D::SetDirty() {
@@ -119,6 +133,18 @@ void Transform2D::SetDirty() {
     for (auto pChild : mp_Childs) {
         pChild->SetDirty();
     }
+}
+
+void Transform2D::ClearDirty() {
+    m_IsDirty = false;
+}
+
+bool Transform2D::IsDirty() const {
+    return m_IsDirty;
+}
+
+Matrix3x3 Transform2D::GetMatrix() const {
+    return Matrix3x3::Translation(m_Position) * Matrix3x3::Rotation(m_RadAngle) * Matrix3x3::Scale(m_Scale);
 }
 
 #pragma endregion

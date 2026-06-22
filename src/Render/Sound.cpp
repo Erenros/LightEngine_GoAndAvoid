@@ -1,9 +1,16 @@
 #include "Sound.h"
 #include "Utils.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
+
 
 Sound::Sound(const std::string& path)
 {
 	InitSound(path);
+}
+
+Sound::~Sound(){
+    Mix_FreeChunk(mp_sound);
 }
 
 void Sound::InitSound(const std::string& path)

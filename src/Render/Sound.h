@@ -1,7 +1,8 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_mixer.h>
+
 #include <string>
+
+struct Mix_Chunk;
 
 class Sound
 {
@@ -15,7 +16,7 @@ public:
 
 	Sound(const std::string& path);
 	Sound() = default;
-	~Sound() { Mix_FreeChunk(mp_sound); };
+	~Sound();
 
 	void InitSound(const std::string& path);
 

@@ -1,14 +1,37 @@
 #pragma once
-
-#include <SDL.h> 
 #include "Render/Shape.h"
+#include "Core/include.h"
+
+struct SDL_Renderer;
+struct SDL_Window;
+struct SDL_Rect;
+
+enum SDL_WINDOW_FLAGS{
+	WINDOW_SHOWN = 0x00000004,
+	WINDOW_RESIZABLE = 0x00000020
+};
+enum SDL_RENDERER_FLAGS : int32{
+	RENDERER_SOFTWARE = 0x00000001,
+	RENDERER_ACCELERATED = 0x00000002,
+	RENDERER_PRESENTVSYNC = 0x00000004,
+	RENDERER_TARGETTEXTURE = 0x00000008
+};
+
+enum SDL_WINDOW_POSITION
+{
+	WINDOWPOS_CENTERED	= (0x2FFF0000u | (0)),
+	WINDOWPOS_UNDEFINED = (0x1FFF0000u | (0))
+};
+
+
+class Text;
 
 class Window 
 {
 public:
 	 
 	Window() = default;
-	Window(const char* pName, int width, int height, Uint32 windowFlags, Uint32 rendererFlags, int x, int y) 
+	Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y) 
 	{
 		Create(pName, width, height, windowFlags, rendererFlags, x, y);
 	};
@@ -20,12 +43,12 @@ public:
 
 	 
 	void Create(const char* pName, 
-		int width, 
-		int height, 
-		Uint32 windowFlags = SDL_WINDOW_SHOWN, 
-		Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, 
-		int x = SDL_WINDOWPOS_UNDEFINED, 
-		int y = SDL_WINDOWPOS_UNDEFINED
+		int32 width, 
+		int32 height, 
+		uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_SHOWN, 
+		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC,
+		int32 x = 0, 
+		int32 y = 0
 	);
 
 	void Present();
@@ -37,6 +60,7 @@ public:
 	SDL_Window* GetWindow() { return mp_Window; }
 	SDL_Renderer* GetRenderer() { return mp_Renderer; }
 	  
+	void DrawTextOnRenderer(Text* text);
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
 

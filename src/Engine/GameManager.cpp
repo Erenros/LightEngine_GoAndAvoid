@@ -7,7 +7,7 @@
 #include "SceneManager.h"
 #include "PhysicsManager.h"
 #include "Shape.h"
-#include "SDLEvent.h"
+#include "Event.h"
 
 void GameManager::Loop()
 {
@@ -16,10 +16,7 @@ void GameManager::Loop()
 	Timer time;
 
 	Camera cam;
-	cam.Init(mp_window->GetRenderer());
-	cam.SetFollowing(m_entities[0]);
-
-	SDL_Renderer* renderer = mp_window->GetRenderer(); 
+	cam.Init(mp_window); 
 
 	while (isRunning == true)
 	{
@@ -34,8 +31,9 @@ void GameManager::Loop()
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
 		
-	
 		cam.Update(time, m_entities);
+	
+		UpdateEntitySystem();
 
 		mp_window->Clear();
 
@@ -53,18 +51,18 @@ void GameManager::Loop()
 	isRunning = false;
 }
 
-bool GameManager::Init(int windowWidth, int windowHeight)
+bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
-	srand(time(NULL));
+	srand(static_cast<int32>(time(NULL)));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
 
-	uint32 windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
-	uint32 renderFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+	uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_RESIZABLE | SDL_WINDOW_FLAGS::WINDOW_SHOWN;
+	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC;
 
 
-	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
 
 	if (!mp_window)
 	{
@@ -84,4 +82,34 @@ void GameManager::Close()
 
 	delete mp_window;
 
+}
+
+void GameManager::UpdateEntitySystem()
+{
+	for (auto it = m_entities.begin(); it != m_entities.end(); )
+	{
+		Entity* entity = *it;
+
+		if (entity->ToDestroy())
+		{
+			m_entitiesToDestroy.push_back(entity);
+			it = m_entities.erase(it);
+		}
+
+		++it;		
+	}
+
+	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
+	{
+		delete* it;
+	}
+
+	m_entitiesToDestroy.clear();
+
+	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
+	{
+		m_entities.push_back(*it);
+	}
+
+	m_entitiesToCreate.clear();
 }
