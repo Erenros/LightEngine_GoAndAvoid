@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "Render/Shape.h"
 #include "Render/Texture.h"
+#include "Render/Sprite.h"
 #include "RigidBody.h"
 
 struct Target

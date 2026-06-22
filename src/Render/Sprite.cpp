@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "Utils.h"
+#include "Shape.h"
 
 Sprite::Sprite(Window* window, const std::string& path)
 {
@@ -16,6 +17,11 @@ Sprite::Sprite(Window* window, const std::string& path)
 	DEBUG_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
 }
 
+Sprite::Sprite(Texture* texture)
+{
+	m_isSprite = true;
+}
+
 void Sprite::PlayAnimation(const std::string& id)
 {
 	if (!m_animationMap.contains(id))
@@ -26,22 +32,32 @@ void Sprite::PlayAnimation(const std::string& id)
 
 
 	//Yea it sucks but for now i don't want to think of how to do smooth transition
-	m_currentAnimation = m_animationMap[id];
-	m_currentFrameX = m_currentAnimation->m_firstFrame;
-	m_currentFrameY = m_currentAnimation->m_line;
-	m_timer = m_currentAnimation->m_duration;
+	mp_currentAnimation = m_animationMap[id];
+	m_currentFrameX = mp_currentAnimation->m_firstFrame;
+	m_currentFrameY = mp_currentAnimation->m_line;
+	m_timer = mp_currentAnimation->m_duration;
 }
 
 
-void Sprite::UpdateAnimation(float deltatime)
+void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 {
-	m_timer -= deltatime;
-	if(m_timer > 0)
+	Animation* anim = mp_currentAnimation;
+
+	if (anim == nullptr)
 		return;
 
-	m_timer = m_currentAnimation->m_duration;
+	m_timer += deltatime;
+	if(m_timer < mp_currentAnimation->m_duration)
+		return;
+
+	m_timer = 0;
 
 	m_currentFrameX++;
-	if (m_currentFrameX > m_currentAnimation->m_lastFrame)
-		m_currentFrameX = m_currentAnimation->m_firstFrame;
+	if (m_currentFrameX > anim->m_lastFrame)
+		m_currentFrameX = anim->m_firstFrame;
+
+	int x = m_currentFrameX * anim->m_tileW;
+	int y = m_currentFrameY * anim->m_tileH;
+
+	shape->SetTextureRect(x, y, anim->m_tileW, anim->m_tileH, m_width, m_height);
 }

@@ -115,7 +115,7 @@ namespace gcle
 	public:
 		void Move(Vector2f translation);
 
-		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) {};
+		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH);
 	};
 
 
@@ -143,7 +143,7 @@ namespace gcle
 		void SetWidth(float32 width) override;
 
 
-		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 
 	class Triangle : public Shape {
@@ -153,7 +153,7 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
 
-		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 	};
 
@@ -168,7 +168,7 @@ namespace gcle
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
 
-		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetRadius(float32 radius) override;
 
 	};

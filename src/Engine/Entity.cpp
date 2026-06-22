@@ -61,7 +61,7 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 
 void Entity::Update(Clock& timer)
 {
-	float32 dt = static_cast<float32>(timer.GetTimeScale());
+	float32 dt = static_cast<float32>(timer.GetDeltaTime());
 
 	m_RigidBody.Update(timer);
 
@@ -69,7 +69,12 @@ void Entity::Update(Clock& timer)
 	Vector2f translation = m_Direction * distance;
 
 	mp_Shape->Move(translation);
-
+	Texture* tex = mp_RenderShape->GetTexture();
+	if (tex != nullptr)
+	{
+		if (tex->IsSprite())
+			static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+	}
 	if (m_Target.isSet)
 	{
 		float32 x1 = GetPosition(0.5f, 0.5f).x;
@@ -181,7 +186,7 @@ void Entity::Rotate(Degrees delta)
 
 void Entity::SetTexture(Texture* pTexture)
 {
-	mp_Shape->SetTexture(pTexture);
+	mp_RenderShape->SetTexture(pTexture);
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)

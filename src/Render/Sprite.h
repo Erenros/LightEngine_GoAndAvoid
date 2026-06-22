@@ -3,6 +3,10 @@
 #include "Core/include.h"
 #include <unordered_map>
 
+namespace gcle
+{
+	class Shape;
+}
 class Window;
 
 struct Animation
@@ -37,7 +41,7 @@ private:
 
 	std::unordered_map<std::string, Animation*> m_animationMap;
 
-	Animation* m_currentAnimation = nullptr;
+	Animation* mp_currentAnimation = nullptr;
 	int32 m_currentFrameX = 0;
 	int32 m_currentFrameY = 0;
 
@@ -46,11 +50,12 @@ private:
 
 public:
 	
-	void UpdateAnimation(float deltatime);
+	void UpdateAnimation(float32 deltatime, gcle::Shape* shape);
 
-	bool IsAnimationPlaying() { return m_currentAnimation == nullptr ? false : true; };
+	bool IsAnimationPlaying() { return mp_currentAnimation == nullptr ? false : true; };
 
 	Sprite(Window* window, const std::string& path);
+	Sprite(Texture* texture);
 
 	void AddAnimation(const std::string& id, Animation* animation) { m_animationMap[id] = animation; };
 	void PlayAnimation(const std::string& id);
