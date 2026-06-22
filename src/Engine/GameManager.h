@@ -21,7 +21,7 @@ private:
 
 	bool isRunning = false;
 
-	int32 m_WindW, m_WindH = 0;
+	int32 m_WindW = 0, m_WindH = 0;
 
 	std::vector <Entity*> m_entities;
 
@@ -38,7 +38,7 @@ public:
 	GameManager() = default;
 
 
-	bool Init(int windowWidth, int windowHeight);
+	bool Init(int32 windowWidth, int32 windowHeight);
 	void Loop();
 	void Close();
 
@@ -47,6 +47,6 @@ public:
 	Window* GetWindow() { return mp_window; };
 
 private:
-	int m_loopTour = 0;
+	int32 m_loopTour = 0;
 
 };

@@ -3,7 +3,7 @@
 #include <string>
 
 class Window;
-class SDL_Texture;
+struct SDL_Texture;
 
 class Texture
 {

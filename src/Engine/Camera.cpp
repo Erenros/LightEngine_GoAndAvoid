@@ -45,7 +45,7 @@ void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 
 		Shape* realShape = entities[i]->GetShape();
 
-		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * GetZoom() + screenMiddle);
+		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * static_cast<float32>(GetZoom()) + screenMiddle);
 
 		Vector2f realScale = entities[i]->GetScale();
 		entities[i]->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
@@ -98,12 +98,12 @@ void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 	}
 }
 
-void Camera::SetZoom(double d)
+void Camera::SetZoom(float32 zoom)
 {
-	zoom = d;
+	m_zoom = zoom;
 }
 
-double Camera::GetZoom()
+float32 Camera::GetZoom()
 {
-	return zoom;
+	return m_zoom;
 }

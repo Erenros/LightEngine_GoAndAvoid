@@ -2,9 +2,9 @@
 #include "Render/Shape.h"
 #include "Core/include.h"
 
-class SDL_Renderer;
-class SDL_Window;
-class SDL_Rect;
+struct SDL_Renderer;
+struct SDL_Window;
+struct SDL_Rect;
 
 enum SDL_WINDOW_FLAGS{
 	WINDOW_SHOWN = 0x00000004,
@@ -29,7 +29,7 @@ class Window
 public:
 	 
 	Window() = default;
-	Window(const char* pName, int width, int height, uint32 windowFlags, uint32 rendererFlags, int x, int y) 
+	Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y) 
 	{
 		Create(pName, width, height, windowFlags, rendererFlags, x, y);
 	};
@@ -41,12 +41,12 @@ public:
 
 	 
 	void Create(const char* pName, 
-		int width, 
-		int height, 
+		int32 width, 
+		int32 height, 
 		uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_SHOWN, 
 		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC,
-		int x = 0, 
-		int y = 0
+		int32 x = 0, 
+		int32 y = 0
 	);
 
 	void Present();
