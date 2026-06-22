@@ -35,7 +35,7 @@ std::string RemoveZeroes(std::string string)
 {
 	bool isInteger = true;
 
-	for (int i = 0; (i < string.size() - 1) and (isInteger == true); i++)
+	for (int32 i = 0; (i < string.size() - 1) && (isInteger == true); i++)
 	{
 		if (string[i] == '.')
 		{
@@ -45,7 +45,7 @@ std::string RemoveZeroes(std::string string)
 
 	if (isInteger == false)
 	{
-		for (int j = string.size() - 2; string[j] == '0'; j--)
+		for (int32 j = static_cast<int32>(string.size()) - 2; string[j] == '0'; j--)
 		{
 			string.erase(j);
 		}
@@ -77,7 +77,7 @@ std::string ChangeUnit(std::string string, int32 precision)
 
 	int dotPos = -1; 
 
-	for (int i = string.size() - 1; i >= 0; i--)
+	for (int32 i = static_cast<int32>(string.size()) - 1; i >= 0; i--)
 	{
 		if (string[i] == '.')
 		{
@@ -96,7 +96,7 @@ std::string ChangeUnit(std::string string, int32 precision)
 	{
 		string.append(".");
 
-		dotPos = string.size() - 1;
+		dotPos = static_cast<int32>(string.size()) - 1;
 	}
 
 	int amountToMove = 0;
