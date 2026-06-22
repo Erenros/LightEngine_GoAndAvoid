@@ -31,10 +31,10 @@ Vector2u = $Vector2<int> $
 
 ---
 #### Constructor
-Vector2() = {x = 0, y = 0}
-Vector2(int i) = {x = i, y = i}
-Vector2({4, 5}) = {x = 4, y = 5}
-Vector2(Vector2() u) = {x = u.x, y = u.y}
+Vector2() = {x = 0, y = 0}    
+Vector2(int i) = {x = i, y = i}    
+Vector2({4, 5}) = {x = 4, y = 5}    
+Vector2(Vector2() u) = {x = u.x, y = u.y}    
 
 ---
 #### NormSquared
