@@ -285,6 +285,10 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 			pos1.x += correction * a->IsKinematic();
 			pos2.x -= correction * b->IsKinematic();
 		}
+
+		a->GetOwner()->GetRigidBody().ZeroVelocityX();
+		b->GetOwner()->GetRigidBody().ZeroVelocityX();
+
 	}
 	else
 	{
@@ -300,10 +304,13 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 			pos1.y += correction * a->IsKinematic();
 			pos2.y -= correction * b->IsKinematic();
 		}
+		a->GetOwner()->GetRigidBody().ZeroVelocityY();
+		b->GetOwner()->GetRigidBody().ZeroVelocityY();
 	}
 
 	a->SetPosition(pos1.x, pos1.y, 0.5f, 0.5f);
 	b->SetPosition(pos2.x, pos2.y, 0.5f, 0.5f);
+
 }
 
 void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
@@ -327,6 +334,11 @@ void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
 
 	a->SetPosition(position1.x, position1.y, 0.5f, 0.5f);
 	b->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
+
+	//gestion de la velocity
+
+	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 }
 
 void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
@@ -385,6 +397,9 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+
+	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)

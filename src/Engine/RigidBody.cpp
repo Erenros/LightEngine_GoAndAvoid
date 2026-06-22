@@ -76,6 +76,17 @@ Vector2f RigidBody2D::GetVelocity() const
 	return m_Velocity;
 }
 
+void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
+{
+	float dot = m_Velocity.Dot(normal);
+
+	if (dot < 0.0f)
+	{
+		m_Velocity -= normal * dot;
+		SetVelocity(m_Velocity);
+	}
+}
+
 void RigidBody2D::ApplyVelocity(float32 dt)
 {
 	Vector2f pos = mp_Transform->GetPosition();

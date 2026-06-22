@@ -34,6 +34,12 @@ public:
 	float32 GetSpeed() const;
 	Vector2f GetVelocity() const;
 
+	void SetVelocity(Vector2f velocity) { m_Velocity = velocity; }
+	void ZeroVelocityX() { m_Velocity.x = 0.f; }
+	void ZeroVelocityY() { m_Velocity.y = 0.f; }
+
+	void RemoveVelocityAlongNormal(const Vector2f& normal);
+
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
