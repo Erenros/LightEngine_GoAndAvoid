@@ -32,7 +32,7 @@ protected:
 public:
 
 	template<typename T>
-	T* CreateEntity(Shape& shape);
+	T* CreateEntity(gcle::Shapes shape);
 
 
 	friend class GameManager;

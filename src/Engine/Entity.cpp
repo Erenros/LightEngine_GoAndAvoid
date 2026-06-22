@@ -4,7 +4,7 @@
 
 static int64 sId = 0;
 
-void Entity::Initialize(Shape& shape)
+void Entity::Initialize(gcle::Shapes shape)
 { 
 	m_Direction = { 0.0f, 0.0f };
 	m_Speed = 0.f;
@@ -13,9 +13,11 @@ void Entity::Initialize(Shape& shape)
 	m_Target;
 	m_RigidBody = false;
 
-	mp_Shape = &shape;
 
-	mp_RenderShape = new Shape(shape);
+
+	mp_Shape = GetBaseShape(shape);
+
+	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
 
 	m_Target.isSet = false;
 
@@ -24,6 +26,37 @@ void Entity::Initialize(Shape& shape)
 	PhysicsManager::GetInstance().AddEntity(this);
 
 	OnInitialize();
+}
+
+gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
+{
+	switch (shape)
+	{
+	case gcle::Shapes::Rectangle:
+	{
+		gcle::Rectangle* pRect = new gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
+		return pRect;
+		break;
+	}
+	case gcle::Shapes::Circle:
+	{
+		gcle::Circle* pCircle = new gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 });
+		return pCircle;
+		break;
+	}
+	case gcle::Shapes::Triangle:
+	{
+		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
+		return pTriangle;
+		break;
+	}
+	case gcle::Shapes::Count:
+		break;
+	default:
+		break;
+	}
+
+	return nullptr;
 }
 
 void Entity::Update(Timer& timer)
@@ -141,6 +174,11 @@ void Entity::SetRotation(Degrees angle)
 void Entity::Rotate(Degrees delta)
 {
 	mp_Shape->Rotate(delta);
+}
+
+void Entity::SetTexture(Texture* pTexture)
+{
+	mp_Shape->SetTexture(pTexture);
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
