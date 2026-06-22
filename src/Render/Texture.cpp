@@ -1,11 +1,16 @@
 #include "Texture.h"
 #include "Utils.h"
 #include "Window.h"
+#include <SDL.h>
+#include <SDL_image.h>
+
 
 Texture::Texture(Window* window, const std::string& path)
 {
     InitTexture(window, path);
 }
+
+Texture::~Texture() { SDL_DestroyTexture(mp_texture); }
 
 void Texture::InitTexture(Window* window, const std::string& path)
 {

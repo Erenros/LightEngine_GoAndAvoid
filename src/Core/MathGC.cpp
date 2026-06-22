@@ -25,3 +25,16 @@ Radians MathGC::VecToAngle(Vector2f& vec)
     Radians rad = std::atan2(vec.y, vec.x);
     return rad;
 }
+
+std::ostream& operator<<(std::ostream& stream, const Matrix3x3& mat)
+{
+	stream << std::endl;
+	for (uint32 j = 0; j < mat.HEIGHT; j++) {
+		stream << " | ";
+		for (uint32 i = 0; i < mat.WIDTH; i++) {
+			stream << mat[i][j] << " | ";
+		}
+		stream << std::endl;
+	}
+	return stream;
+}

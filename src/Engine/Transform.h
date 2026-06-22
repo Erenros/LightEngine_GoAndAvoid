@@ -24,13 +24,17 @@ public:
     void SetDegAngle(Degrees angle);
     void SetRadAngle(Radians angle);
 
+    void SetScale(Vector2f scale);
+
     void SetParent(Transform2D* pParent);
     
     void SetDirty();
+    void ClearDirty();
 
 public:
     Vector2f& GetPosition();
     Vector2f& GetDirection();
+    Vector2f& GetScale();
 
     Radians& GetRadAngle();
     Degrees& GetDegAngle();
@@ -43,6 +47,10 @@ public:
 
     uint32 GetChildCount() const;
 
+    bool IsDirty() const;
+     
+    Matrix3x3 GetMatrix() const;
+
 public:
     void AddChild(Transform2D* pChild);
     void RemoveParent();
@@ -52,6 +60,7 @@ public:
 private:
     Vector2f m_Position = { 0.f,0.f };
     Vector2f m_Direction = { 0.f,0.f };
+    Vector2f m_Scale = { 1.f,1.f };
 
     Degrees m_DegAngle = 0.f;
     Radians m_RadAngle = 0.f;
@@ -64,7 +73,7 @@ private:
     Radians m_OffsetAngle = 0;
 
     Radians m_ParentAncientAngle = 0;
-    
+
     bool m_IsDirty = false;
 
 public:

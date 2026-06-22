@@ -1,11 +1,11 @@
 #include "Camera.h"
 #include "GameManager.h"
 
-void Camera::Init(SDL_Renderer* pRenderer)
+void Camera::Init(Window* pWindow)
 {
 	t.SetPosition({ 0.f, 0.f });
 
-	renderer = pRenderer;
+	mp_Window = pWindow;
 
 	screenMiddle = { GameManager::GetInstance().GetWindow()->GetWidth() / 2.f, GameManager::GetInstance().GetWindow()->GetHeight() / 2.f };
 }
@@ -34,17 +34,22 @@ Vector2f Camera::GetPosition()
 
 
 
-void Camera::Update(Timer& time, std::vector<Entity*>& entities)
+void Camera::Update(Clock& time, std::vector<Entity*>& entities)
 {
-	t.SetPosition(followingEntity->GetPosition());
+	if (followingEntity != nullptr)
+		t.SetPosition(followingEntity->GetPosition());
 	
 	for (int i = 0; i < entities.size(); i++)
 	{
 		entities[i]->Update(time);
 
-		Shape* realShape = entities[i]->GetShape();
+		gcle::Shape* realShape = entities[i]->GetShape();
 
-		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * GetZoom() + screenMiddle);
+		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * static_cast<float32>(GetZoom()) + screenMiddle);
+
+		Vector2f realScale = entities[i]->GetScale();
+		entities[i]->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+		entities[i]->GetRenderShape()->SetRotation(entities[i]->GetRotation());
 
 		/*
 		if(i == 0)
@@ -93,12 +98,12 @@ void Camera::Update(Timer& time, std::vector<Entity*>& entities)
 	}
 }
 
-void Camera::SetZoom(double d)
+void Camera::SetZoom(float32 zoom)
 {
-	zoom = d;
+	m_zoom = zoom;
 }
 
-double Camera::GetZoom()
+float32 Camera::GetZoom()
 {
-	return zoom;
+	return m_zoom;
 }

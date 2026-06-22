@@ -4,14 +4,175 @@
 int8 GenerateRandomNumer(int8 min, int8 max){
 	return (rand() % max) + min;
 }
+ 
+std::string MoveElementInVector(std::string string, int32 startPos, int32 endPos)
+{
+	string.insert(string.begin() + endPos, string[startPos]);
 
-//std::string ChangeUnite(int16 value, short unit, int8 precision){
-//	std::string sValue = std::to_string(value);
-//	std::string result = "";
-//
-//	//int8 dot = unit * 3;
-//	//std::distance(sValue.begin(), dot);
-//	//sValue.insert('.');
-//
-//
-//}
+	string;
+
+	if (startPos < endPos)
+	{
+		string.erase(startPos, startPos);
+	}
+
+	else
+	{
+		string.erase(startPos + 1, startPos + 1);
+	}
+
+	return string;
+}
+
+std::string NumberToString(float64 value)
+{
+	std::string string = std::to_string(value);
+
+	return string;
+}
+
+std::string RemoveZeroes(std::string string)
+{
+	bool isInteger = true;
+
+	for (int32 i = 0; (i < string.size() - 1) && (isInteger == true); i++)
+	{
+		if (string[i] == '.')
+		{
+			isInteger = false;
+		}
+	}
+
+	if (isInteger == false)
+	{
+		for (int32 j = static_cast<int32>(string.size()) - 2; string[j] == '0'; j--)
+		{
+			string.erase(j);
+		}
+
+		if (string[string.size() - 1] == '.')
+		{
+			string.erase(string.size() - 1);
+		}
+	}
+
+	string;
+
+	return string;
+}
+
+std::string RemoveZeroes(long double value)
+{
+	return RemoveZeroes(NumberToString(value));
+} 
+
+std::string ChangeUnit(std::string string, int32 precision)
+{
+	string = RemoveZeroes(string);
+
+	std::cout << string << std::endl;
+
+	int amountOfDigits = 0;
+	int amountOfDigitsAfterDot = 0;
+
+	int dotPos = -1; 
+
+	for (int32 i = static_cast<int32>(string.size()) - 1; i >= 0; i--)
+	{
+		if (string[i] == '.')
+		{
+			amountOfDigitsAfterDot = amountOfDigits;
+			amountOfDigits = 0;
+			dotPos = i;
+		}
+
+		else
+		{
+			amountOfDigits++;
+		}
+	}
+
+	if ((dotPos == -1) and (amountOfDigits > 3))
+	{
+		string.append(".");
+
+		dotPos = static_cast<int32>(string.size()) - 1;
+	}
+
+	int amountToMove = 0;
+	std::string stringToAppend;
+
+	if (amountOfDigits > 21)
+	{
+		amountToMove = 21;
+		stringToAppend = "Sx";
+	}
+
+	else if (amountOfDigits > 18)
+	{
+		amountToMove = 18;
+		stringToAppend = "Qi";
+	}
+
+	else if (amountOfDigits > 15)
+	{
+		amountToMove = 15;
+		stringToAppend = "Qa";
+	}
+
+	else if (amountOfDigits > 12)
+	{
+		amountToMove = 12;
+		stringToAppend = "T";
+	}
+
+	else if (amountOfDigits > 9)
+	{
+		amountToMove = 9;
+		stringToAppend = "B";
+	}
+
+	else if (amountOfDigits > 6)
+	{
+		amountToMove = 6;
+		stringToAppend = "M";
+	}
+
+	else if (amountOfDigits > 3)
+	{
+		amountToMove = 3;
+		stringToAppend = "K";
+	}
+
+	if (dotPos != -1)
+	{
+		string = MoveElementInVector(string, dotPos, dotPos - amountToMove);
+
+
+		int startPopping = (dotPos - amountToMove) + 1 + precision;
+
+
+		while (string.size() > startPopping)
+		{
+			string.pop_back();
+		}
+	}
+
+	if (string[string.size() - 1] == '.')
+	{
+		string.pop_back();
+	}
+
+	string.append(stringToAppend);
+
+	return string;
+} 
+
+std::string ChangeUnit(float64 value, int32 precision)
+{
+	std::string string = RemoveZeroes(value);
+
+	string = ChangeUnit(string, precision);
+
+	return string;
+}

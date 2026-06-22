@@ -74,7 +74,7 @@ void SceneManager::DeleteScene(const std::string& tag) {
 }
 
 
-void SceneManager::UpdateCurrentScene(Timer& time) {
+void SceneManager::UpdateCurrentScene(Clock& time) {
     if (m_CurrentSceneTag != "") {
         //DEBUG_INFO << m_CurrentSceneTag << ENDL;
 

@@ -1,10 +1,18 @@
 #pragma once
-#include <SDL.h>
 #include <vector>
 #include <iostream> 
 #include "MathGC.h"
 #include "Engine/Transform.h"
 #include "Texture.h"
+
+struct SDL_Vertex;
+
+struct Color {
+	uint8 r;
+	uint8 g;
+	uint8 b;
+	uint8 a;
+};
 
 namespace gcle
 {
@@ -17,7 +25,7 @@ namespace gcle
 
 	class Shape {
 
-		Texture* m_texture = nullptr;
+		Texture* mp_texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
@@ -25,7 +33,7 @@ namespace gcle
 		//circle
 		float32 m_radius = 0.0f;
 		Vector2f m_center = { 0.0f, 0.0f };
-		int m_smoothness = 16;
+		int32 m_smoothness = 16;
 
 		//rectangle
 		float32 m_height = 0.0f;
@@ -37,8 +45,14 @@ namespace gcle
 
 		Shapes m_shape = Shapes::Triangle;
 
-		std::vector<SDL_Vertex> m_verticies;
+		bool m_IsKinematic;
+		 
+		std::vector<Vector2f> m_localPositions;
+
+		std::vector<SDL_Vertex*> m_verticies;
 		std::vector<int32> m_indicies;
+		 
+		void UpdateRenderVertices();
 
 		//Constructors 
 
@@ -47,13 +61,22 @@ namespace gcle
 
 
 	public:
+		virtual ~Shape();
+
 		//Getters 
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		Texture* GetTexture() { return m_texture; };
-		std::vector<int32>& GetIndicies() { return m_indicies; };
-		std::vector<SDL_Vertex>& GetVerticies() { return m_verticies; };
+		Texture* GetTexture() { return mp_texture; };
+		std::vector<int32>& GetIndicies() { return m_indicies; }; 
+		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+
+		Vector2f GetScale() { return m_Transform.GetScale(); }
+		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
+
+		Transform2D& GetTransform() { return m_Transform; }
+
+		bool IsKinematic() { return m_IsKinematic; }
 
 	public:
 
@@ -76,9 +99,18 @@ namespace gcle
 
 	public:
 
-		void SetTexture(Texture* tex) { m_texture = tex; }
+		void SetTexture(Texture* tex) { mp_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+		 
+		void SetScale(Vector2f scale);
+		void SetScale(float32 scale) { SetScale({ scale, scale }); } 
+		void ScaleBy(Vector2f factor);
+		 
+		void SetRotation(Degrees angle); 
+		void Rotate(Degrees delta);
+
+		void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
 
 	public:
 		void Move(Vector2f translation);
@@ -90,52 +122,25 @@ namespace gcle
 	class Rectangle : public Shape {
 
 	public:
-		Rectangle(float32 x, float32 y, float32 height, float32 width, SDL_Color color)
-		{
-
-			m_shape = Shapes::Rectangle;
-
-			m_verticies.resize(4);
-			m_indicies.resize(6);
-
-			m_height = height;
-			m_width = width;
-
-			m_verticies[0] = (SDL_Vertex{ {x, y}, color, {0.f, 0.f} });
-			m_verticies[1] = (SDL_Vertex{ {x + m_width, y}, color, {1.f, 0.f} });
-			m_verticies[2] = (SDL_Vertex{ {x, y + m_height}, color, {0.f, 1.f} });
-			m_verticies[3] = (SDL_Vertex{ {x + m_width, y + m_height}, color, {1.f, 1.f} });
-
-			m_indicies = {
-				0, 1, 2,
-				2, 3, 1
-			};
-
-			m_origin = { x, y };
-			m_Transform.Initialize({ x, y }, 0);
-		}
+		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color);
+	
 
 
 		//Getters
-
+		 
 		float32 GetHeight() override {
-			return m_height;
+			return m_height * m_Transform.GetScale().y;
 		}
 		float32 GetWidth() override {
-			return m_width;
+			return m_width * m_Transform.GetScale().x;
 		}
 
 
 
 		//Setters
 
-		void SetHeight(float32 height) override {
-			m_height = height;
-		}
-		void SetWidth(float32 width) override
-		{
-			m_width = width;
-		}
+		void SetHeight(float32 height) override;
+		void SetWidth(float32 width) override;
 
 
 		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
@@ -146,12 +151,7 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, SDL_Color color)
-		{
-			m_trianglepoints.push_back({ x1, y1 });
-			m_trianglepoints.push_back({ x2, y2 });
-			m_trianglepoints.push_back({ x2, y2 });
-			m_trianglepoints.push_back({ x3, y3 });
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
 
 
 			m_shape = Shapes::Triangle; 
@@ -171,6 +171,7 @@ namespace gcle
 		}
 
 		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
+		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 	};
 
 	class Circle : public Shape {
@@ -178,50 +179,14 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int _smoothness, SDL_Color color) {
-			if (_smoothness < 3) {
-				return;
-			}
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color);
 
-			m_smoothness = _smoothness;
-
-			m_center.x = x + radius;
-			m_center.y = y + radius;
-
-			m_radius = radius;
-
-			m_shape = Shapes::Circle;
-
-			m_verticies.resize(_smoothness + 1);
-			m_indicies.resize(_smoothness * 3);
-
-			m_origin = { x, y };
-
-			m_Transform.Initialize({ x, y }, 0);
-
-			Degrees degreesBetweenPoints = 360.0f / _smoothness;
-
-			m_verticies[0] = SDL_Vertex{ {x + radius, y + radius} , color, {1, 1} };
-
-			for (int i = 0; i < _smoothness; i++) {
-				Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
-
-				float cx = x + sin(radian) * radius + radius;
-				float cy = y + cos(radian) * radius + radius;
-
-				SDL_Vertex vertex{ {cx, cy}, color, {1, 1} };
-				m_verticies[i + 1] = vertex;
-
-				m_indicies[i * 3] = 0;
-				m_indicies[i * 3 + 1] = i + 1;
-				m_indicies[i * 3 + 2] = (i + 1) % _smoothness + 1;
-			}
-		}
-
-		float32 GetRadius() override { return m_radius; };
+		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
 
 		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
+		void SetRadius(float32 radius) override;
+
 	};
 }

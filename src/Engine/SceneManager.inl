@@ -15,4 +15,5 @@ Scene* SceneManager::CreateScene(const std::string& tag) {
         return m_Scenes[tag];
     }
     std::cerr << "Scene " << tag << "already exists" << std::endl;
+    return nullptr;
 }

@@ -3,19 +3,11 @@
         "54212CB9-415A-4328-6DD8-4FEC6BF856E9": {
           "config-debug": {
             "additionalDependencies": [
-              "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
+              "%(AdditionalDependencies)"
             ],
             "additionalIncludeDirectories": [
-              "$(SolutionDir)../lib/SDL2/include",
-              "$(SolutionDir)../lib/SDL2_ttf/include",
-              "$(SolutionDir)../lib/SDL2_mixer/include",
-              "$(SolutionDir)../lib/SDL2_image/include"
             ],
             "additionalLibraryDirectories": [
-              "$(SolutionDir)../lib/SDL2/lib/x64",
-              "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
-              "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
-              "$(SolutionDir)../lib/SDL2_image/lib/x64"
             ],
             "preprocessorDefinitions": [
             ]
@@ -80,19 +72,11 @@
         "54961438-1180-7B10-1855-781E21A93B43": {
           "config-debug": {
             "additionalDependencies": [
-              "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
+              "%(AdditionalDependencies)"
             ],
             "additionalIncludeDirectories": [
-              "$(SolutionDir)../lib/SDL2/include",
-              "$(SolutionDir)../lib/SDL2_ttf/include",
-              "$(SolutionDir)../lib/SDL2_mixer/include",
-              "$(SolutionDir)../lib/SDL2_image/include"
             ],
             "additionalLibraryDirectories": [
-              "$(SolutionDir)../lib/SDL2/lib/x64",
-              "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
-              "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
-              "$(SolutionDir)../lib/SDL2_image/lib/x64"
             ],
             "preprocessorDefinitions": [
             ]
@@ -118,13 +102,13 @@
         "74C953F4-397E-34EF-5EE4-6ADB4D5E66D1": {
           "config-debug": {
             "additionalDependencies": [
-              "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
+              "SDL2.lib",
+              "SDL2_ttf.lib",
+              "SDL2_mixer.lib",
+              "SDL2_image.lib",
+              "%(AdditionalDependencies)"
             ],
             "additionalIncludeDirectories": [
-              "$(SolutionDir)../lib/SDL2/include",
-              "$(SolutionDir)../lib/SDL2_ttf/include",
-              "$(SolutionDir)../lib/SDL2_mixer/include",
-              "$(SolutionDir)../lib/SDL2_image/include"
             ],
             "additionalLibraryDirectories": [
               "$(SolutionDir)../lib/SDL2/lib/x64",

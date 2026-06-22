@@ -2,6 +2,8 @@
 #include "Utils.h"
 #include "Window.h"
 
+#include <SDL_ttf.h>
+
 
 SDL_Texture* Text::CreateTexture(Window* window)
 {
@@ -33,3 +35,23 @@ Text::Text(Font* font, std::string& text, int x, int y, int w, int h, byte r, by
 	m_color = new SDL_Color(r, g, b);
 	m_rect = new SDL_Rect(x, y, w, h);
 }
+
+Text::~Text()
+{
+	if (mp_texture != nullptr) 
+		SDL_DestroyTexture(mp_texture);
+}
+
+void Text::SetPosition(int x, int y)
+{
+	m_rect->x = x;
+	m_rect->y = y;
+}
+void Text::SetWidth(int w)
+{
+	m_rect->w = w;
+}
+void Text::SetHeight(int h)
+{
+	m_rect->h = h;
+} 

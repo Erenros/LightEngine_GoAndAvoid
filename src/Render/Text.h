@@ -4,6 +4,10 @@
 #include "PrimitiveTypes.h"
 
 class Window;
+struct SDL_Texture;
+struct SDL_Color;
+struct SDL_Rect;
+
 
 class Text
 {
@@ -24,9 +28,9 @@ public:
 
 	Text(Font* font, std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255);
 	
-	~Text() { if(mp_texture != nullptr) SDL_DestroyTexture(mp_texture); };
+	~Text();
 
-	void SetPosition(int x, int y) { m_rect->x = x, m_rect->y; };
-	void SetWidth(int w) { m_rect->w = w; };
-	void SetHeight(int h) { m_rect->h = h; };
+	void SetPosition(int x, int y);
+	void SetWidth(int w)		  ;
+	void SetHeight(int h);
 };

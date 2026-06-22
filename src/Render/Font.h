@@ -1,7 +1,7 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_ttf.h>
 #include <string>
+
+struct TTF_Font;
 
 class Font
 {
@@ -17,7 +17,7 @@ public:
 
 	Font(const std::string& path, int size = 25);
 	Font() = default;
-	~Font() { TTF_CloseFont(mp_font); };
+	~Font();
 
 	void InitFont(const std::string& path, int size = 25);
 

@@ -33,7 +33,7 @@ void Scene::DestroyText(Text* text)
 	delete text;
 }
 
-void Scene::Update(Timer& time){
+void Scene::Update(Clock& time){
 	for (Entity* e : GameManager::GetInstance().m_entities) {
 		if (e->IsActiveIn(m_tag)) {
 			e->Update(time);

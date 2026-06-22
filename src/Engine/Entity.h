@@ -3,8 +3,8 @@
 #include "include.h"
 #include "Transform.h"
 #include "Render/Shape.h"
-
-using namespace gcle;
+#include "Render/Texture.h"
+#include "RigidBody.h"
 
 struct Target
 {
@@ -22,16 +22,19 @@ public:
 	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
 public: 
-	Shape* GetShape() { return mp_Shape; }
-	Shape* GetRenderShape() { return mp_RenderShape; };
+	gcle::Shape* GetShape() { return mp_Shape; }
+	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	int64 GetId() const { return m_Id; }
+	Vector2f GetScale();
+	Degrees GetRotation();
+	RigidBody2D& GetRigidBody() { return m_RigidBody; }
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
 	void SetSpeed(float32 speed) { m_Speed = speed; }
 	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
-	void SetRigidBody(bool isRigitBody);
+	void SetRigidBody(bool isRigidBody);
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -40,9 +43,18 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
+	 
+	void SetScale(Vector2f scale);
+	void SetScale(float32 scale) { SetScale({ scale, scale }); }
+	void ScaleBy(Vector2f factor);
+	 
+	void SetRotation(Degrees angle);
+	void Rotate(Degrees delta);
+
+	void SetTexture(Texture* pTexture);
 
 public:
-	bool IsRigidBody() const { return m_RigidBody; }
+	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 	bool ToDestroy() const { return m_ToDestroy; }
 	bool IsTag(int32 tag) const { return m_Tag == tag; }
 	bool IsColliding(Entity* other);
@@ -50,7 +62,8 @@ public:
 
 protected:
 	Entity() = default;
-	~Entity() = default;
+	~Entity();
+
 
 	virtual void OnUpdate() {};
 	virtual void OnCollisionEnter(Entity* collidedWith) {};
@@ -60,8 +73,9 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Timer& timer); 
-	void Initialize(Shape& shape);
+	void Update(Clock& timer);
+	void Initialize(gcle::Shapes shape);
+	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
 public:
 	void AddActiveScene(const std::string& sceneTag);
@@ -77,14 +91,20 @@ protected:
 	bool			m_ToDestroy = false;
 	int32			m_Tag = -1;
 	Target			m_Target;
-	bool			m_RigidBody = false;
-	Shape*			mp_Shape = nullptr;
-	Shape*		mp_RenderShape = nullptr;
+
+
+private:
+	gcle::Shape*	mp_Shape = nullptr;
+	gcle::Shape*	mp_RenderShape = nullptr;
+	RigidBody2D		m_RigidBody;
 
 private:
 	bool m_OnCollisionEnter = true;
 	bool m_WasOnCollision	= false;
 	bool m_OnCollisionExit	= false;
+
+
+private:
 	std::vector<std::string> m_activeScenes;
 
 

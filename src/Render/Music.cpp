@@ -1,9 +1,17 @@
 #include "Music.h"
 #include "Utils.h"
 
+#include <SDL.h>
+#include <SDL_mixer.h>
+
 Music::Music(const std::string& path)
 {
 	InitMusic(path);
+}
+
+Music::~Music()
+{
+    Mix_FreeMusic(mp_music);
 }
 
 void Music::InitMusic(const std::string& path)
