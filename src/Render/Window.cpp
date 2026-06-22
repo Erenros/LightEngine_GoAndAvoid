@@ -6,6 +6,7 @@
 #include "SDL_ttf.h"
 #include "SDL_video.h"
 #include "SDL_image.h"
+#include "Render/Text.h"
 
 
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
@@ -67,6 +68,15 @@ void Window::Present()
 void Window::Clear()
 {
 	SDL_RenderClear(mp_Renderer);
+}
+
+void Window::DrawTextOnRenderer(Text* text)
+{
+	SDL_Texture* texture = text->CreateTexture(this);
+	if (texture == nullptr)
+		return;
+
+	DrawOnRenderer(texture, nullptr,text->GetSDLRect());
 }
 
 void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){

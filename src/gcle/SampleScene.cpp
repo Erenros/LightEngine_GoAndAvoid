@@ -3,7 +3,7 @@
 
 void SampleScene::OnInitialize()
 {
-	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
+	Texture* tex = RessourceManager::GetInstance().GetTexture("images"); 
 	 
 	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetTexture(tex);
@@ -12,6 +12,14 @@ void SampleScene::OnInitialize()
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity1->SetPosition(100, 100);
+	
+
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+
+	std::string text = "Test";
+	CreateText(font,text , 40, 40, 20, 20);
+
+	Entity* entity1 = CreateEntity<Entity>(*circle2);
 	entity1->SetRigidBody(true);
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity2->SetPosition(-100, -100);
