@@ -18,7 +18,7 @@ public:
 
 	void SetForce(Vector2f direction, float32 speed);
 	void AddImpulse(Vector2f direction, float32 strength);
-	void SetMass(float32 mass) { m_Mass = mass; }
+	void SetMass(float32 mass) { m_Mass = std::max(0.0001f, mass); }
 
 	bool IsActive() const { return IsRigidBody; }
 	void SetActive(bool Active) { IsRigidBody = Active; }

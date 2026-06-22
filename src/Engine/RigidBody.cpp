@@ -36,10 +36,10 @@ void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
 	m_Velocity += direction.Normalized() * (strength / m_Mass) * dt;
 }
 
-void RigidBody2D::SetForce(Vector2f direction, float32 speed)
+void RigidBody2D::SetForce(Vector2f direction, float32 strenght)
 {
 	Vector2f dir = direction.Normalized();
-	m_Velocity = dir * speed / m_Mass;
+	m_Velocity = dir * (strenght / m_Mass);
 }
 
 void RigidBody2D::AddImpulse(Vector2f direction, float32 strength)
@@ -78,13 +78,10 @@ Vector2f RigidBody2D::GetVelocity() const
 
 void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 {
-	float dot = m_Velocity.Dot(normal);
+	normal.Norm();
 
-	if (dot < 0.0f)
-	{
-		m_Velocity -= normal * dot;
-		SetVelocity(m_Velocity);
-	}
+	float dot = m_Velocity.Dot(normal);
+	m_Velocity -= normal * dot;
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)
