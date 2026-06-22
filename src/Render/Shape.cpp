@@ -78,38 +78,6 @@ namespace gcle
 		m_center.y += translation.y;
 	}
 
-	void Rectangle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
-	{
-		float32 u0 = x / textW;
-		float32 v0 = y / textH;
-
-		float32 u1 = (x + w) / textW;
-		float32 v1 = (y + h) / textH;
-
-		m_verticies[0].tex_coord = { u0, v0 };
-		m_verticies[1].tex_coord = { u1, v0 };
-		m_verticies[2].tex_coord = { u1, v1 };
-		m_verticies[3].tex_coord = { u0, v1 };
-	}
-
-	void Triangle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
-	{
-		float32 u0 = x / textW;
-		float32 v0 = y / textH;
-
-		float32 u1 = (x + w) / textW;
-		float32 v1 = (y + h) / textH;
-
-		m_verticies[0].tex_coord = { u0, v0 };
-		m_verticies[1].tex_coord = { u1, v0 };
-		m_verticies[2].tex_coord = { u1, v1 };
-	}
-
-	void Circle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
-	{
-		//NON
-	}
-}
 	void Shape::SetScale(Vector2f scale)
 	{
 		m_Transform.SetScale(scale);
@@ -340,5 +308,37 @@ namespace gcle
 		}
 
 		m_Transform.SetDirty();
+	}
+
+	void Rectangle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
+	{
+		float32 u0 = x / textW;
+		float32 v0 = y / textH;
+
+		float32 u1 = (x + w) / textW;
+		float32 v1 = (y + h) / textH;
+
+		m_verticies[0]->tex_coord = { u0, v0 };
+		m_verticies[1]->tex_coord = { u1, v0 };
+		m_verticies[2]->tex_coord = { u1, v1 };
+		m_verticies[3]->tex_coord = { u0, v1 };
+	}
+
+	void Triangle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
+	{
+		float32 u0 = x / textW;
+		float32 v0 = y / textH;
+
+		float32 u1 = (x + w) / textW;
+		float32 v1 = (y + h) / textH;
+
+		m_verticies[0]->tex_coord = { u0, v0 };
+		m_verticies[1]->tex_coord = { u1, v0 };
+		m_verticies[2]->tex_coord = { u1, v1 };
+	}
+
+	void Circle::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
+	{
+		//NON
 	}
 }

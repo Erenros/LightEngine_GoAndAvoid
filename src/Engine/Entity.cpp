@@ -87,7 +87,7 @@ void Entity::Update(Clock& timer)
 			m_Target.isSet = false;
 		}
 	}
-	and
+
 	OnUpdate();
 }
 

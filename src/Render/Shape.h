@@ -153,23 +153,6 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
 
-
-			m_shape = Shapes::Triangle; 
-
-			m_verticies.resize(3);
-			m_indicies.resize(3);
-
-			m_verticies[0] = SDL_Vertex{ {x1, y1}, color, {0.f, 0.f} };
-			m_verticies[1] = SDL_Vertex{ {x2, y2}, color, {1, 0.f} };
-			m_verticies[2] = SDL_Vertex{ {x3, y3}, color, {1.f, 1.f} };
-
-			m_indicies = { 0, 1, 2 };
-
-			m_origin = { x1, y1 };
-
-			m_Transform.Initialize({ x1, y1 }, 0);
-		}
-
 		void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 	};
