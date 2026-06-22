@@ -1,36 +1,28 @@
-#include "SDL.h"
+#include "GameManager.h"
+#include "include.h"
+
+#include "SampleScene.h"
+#include "SceneManager.h"
+#include "Profiler.h"
 
 #undef main
 
+
 int main(int argc, char** argv)
-{
-    /* Initialisation simple */
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-    { 
-        return -1;
-    }
+{ 
+    GameManager& gm = GameManager::GetInstance();
 
-    {
-        /* Création de la fenêtre */
-        SDL_Window* pWindow = NULL;
-        pWindow = SDL_CreateWindow("Ma première application SDL2", SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            640,
-            480,
-            SDL_WINDOW_SHOWN);
+    gm.Init(640, 480);
 
-        if (pWindow)
-        {
-            SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fenêtre */
+    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
+    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene2");
 
-            SDL_DestroyWindow(pWindow);
-        }
-        else
-        { 
-        }
-    }
+    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene2");
 
-    SDL_Quit();
+    
+    gm.Loop();
+    gm.Close();
 
     return 0;
 }

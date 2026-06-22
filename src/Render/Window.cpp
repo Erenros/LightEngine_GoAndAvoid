@@ -1,0 +1,102 @@
+#include "Window.h"
+#include <iostream>
+#include <vector>
+#include "SDL.h"
+#include "SDL_mixer.h"
+#include "SDL_ttf.h"
+#include "SDL_video.h"
+#include "SDL_image.h"
+#include "Render/Text.h"
+
+
+void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
+{
+	m_width = width;
+	m_height = height;
+
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
+	{
+		std::cout << "SDL_Init_Error :  " << SDL_GetError() << std::endl;
+		return;
+	}
+
+	if (IMG_Init(IMG_INIT_PNG) == 0) {
+		std::cout << "Error SDL2_image Initialization";
+		return;
+	} 
+
+	mp_Window = SDL_CreateWindow(pName, x, y, width, height, windowFlags);
+	if (mp_Window == nullptr) {
+		std::cerr << "Window failed to create" << std::endl;
+		return;
+	}
+
+	mp_Renderer = SDL_CreateRenderer(mp_Window, -1, rendererFlags);
+	if (mp_Renderer == nullptr) {
+		std::cerr << "Renderer failed to create" << std::endl;
+		return;
+	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		std::cout << "[Initialisation] : Audio Error : " << SDL_GetError() << std::endl;
+		return;
+	}
+
+	if (TTF_Init() != 0)
+	{
+		std::cout << "[Initialisation] : Font Error" << std::endl;
+		return;
+	}
+}
+
+void Window::End(){
+	SDL_DestroyRenderer(mp_Renderer);
+	SDL_DestroyWindow(mp_Window);
+
+	Mix_CloseAudio();
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
+}
+
+void Window::Present()
+{
+	SDL_RenderPresent(mp_Renderer);
+}
+
+void Window::Clear()
+{
+	SDL_RenderClear(mp_Renderer);
+}
+
+void Window::DrawTextOnRenderer(Text* text)
+{
+	SDL_Texture* texture = text->CreateTexture(this);
+	if (texture == nullptr)
+		return;
+
+	DrawOnRenderer(texture, nullptr,text->GetSDLRect());
+}
+
+void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){
+	SDL_RenderCopy(mp_Renderer, pTexture, srcrect, dstrect);
+}
+
+void Window::Draw(gcle::Shape* pShape)
+{ 
+	const std::vector<SDL_Vertex*>& verticesPtr = pShape->GetVerticies();
+
+	std::vector<SDL_Vertex> vertices;
+	vertices.reserve(verticesPtr.size());
+	for (SDL_Vertex* v : verticesPtr)
+	{
+		vertices.push_back(*v);
+	}
+
+	if (pShape->GetTexture() == nullptr)
+		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
+	else
+		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
+}
+

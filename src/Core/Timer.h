@@ -1,24 +1,44 @@
 #pragma once
-#include <chrono>
+#include <chrono> 
 
-using namespace std::chrono;
-using second = double;
+#include "include.h"
 
+using Seconds = float64;
 
-class Timer
+class Clock
 {
-private:
-	system_clock::time_point m_beginning_time = system_clock::now();
-	system_clock::time_point m_ending_time;
+    using clock = std::chrono::steady_clock;
 
-	float scale = 1;
+    clock::time_point m_LastUpdateTime;
+    double m_TimeScale;
 
+    Seconds m_UnscaleTime;
+    Seconds m_Time;
+
+    Seconds m_DeltaTime;
+    Seconds m_UnscaleDeltaTime;
 public:
-	void ResetChrono();
-	second GetChronoTime();
-	second GetChronoTimeScale();
+    Clock() :
+        m_TimeScale(1.0),
+        m_UnscaleTime(0.0),
+        m_Time(0.0),
+        m_DeltaTime(0.0),
+        m_UnscaleDeltaTime(0.0)
+    {
+        m_LastUpdateTime = clock::now();
+    }
 
-	void SetScale(float f);
-	float GetScale();
+    ~Clock() = default;
+
+    void Restart(float64 t = 0.0);
+    void Update();
+
+    [[nodiscard]] Seconds GetDeltaTime() const;
+    [[nodiscard]] Seconds GetDeltaTimeUnscaled() const;
+
+    [[nodiscard]] Seconds GetTime() const;
+    [[nodiscard]] Seconds GetTimeUnscaled() const;
+
+    [[nodiscard]] float64 GetTimeScale() const;
+    void SetTimeScale(float64 scale);
 };
-
