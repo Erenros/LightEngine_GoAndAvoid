@@ -16,7 +16,7 @@ private:
 
 	std::vector<Text*> m_texts;
 
-	void Update(Timer& time);
+	void Update(Clock& time);
 	void Draw(Window* window);
 
 protected:
@@ -27,7 +27,7 @@ protected:
 	~Scene();
 
 	virtual void OnInitialize() {};
-	virtual void OnUpdate(Timer& time) {};
+	virtual void OnUpdate(Clock& time) {};
 	virtual void OnExit() {};
 
 

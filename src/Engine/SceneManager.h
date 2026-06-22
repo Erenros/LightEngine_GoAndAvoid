@@ -7,7 +7,7 @@
 
 class Scene;
 class Window;
-class Timer;
+class Clock;
 
 
 class SceneManager {
@@ -18,7 +18,7 @@ class SceneManager {
 
 
 	//Update
-	void UpdateCurrentScene(Timer& time);
+	void UpdateCurrentScene(Clock& time);
 
 	//Draw
 	void DrawCurrentScene(Window* window);

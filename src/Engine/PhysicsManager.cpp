@@ -67,7 +67,6 @@ void PhysicsManager::Update(float64 deltaTime)
 				{
 					if (entity->IsRigidBody() && otherEntity->IsRigidBody())
 					{
-						DEBUG_INFO << "COLLISION: " << entity->GetId() << " / " << otherEntity->GetId() << ENDL;
 						Repulse(entity, otherEntity);
 					}
 

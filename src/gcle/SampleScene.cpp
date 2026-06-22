@@ -26,7 +26,7 @@ void SampleScene::OnInitialize()
 	
 }
 
-void SampleScene::OnUpdate(Timer& time)
+void SampleScene::OnUpdate(Clock& time)
 {
 	//pEntity->Rotate(1);
 

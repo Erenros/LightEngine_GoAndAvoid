@@ -1,34 +1,49 @@
 #include "Timer.h"
 
-void Timer::ResetChrono()
-{
-	m_beginning_time = system_clock::now();
+void Clock::Restart(float64 t) {
+    m_DeltaTime = 0.0;
+    m_UnscaleDeltaTime = 0.0;
+    m_Time = 0.0;
+    m_UnscaleTime = 0.0;
+    m_LastUpdateTime = clock::now();
 }
 
-second Timer::GetChronoTime()
-{
-	m_ending_time = system_clock::now();
+void Clock::Update() {
+    auto t = clock::now();
+    auto time = t - m_LastUpdateTime;
+    uint64 time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time).count();
+    constexpr float64 NANOSECONDS_TO_SECOND = 0.000000001;
+    Seconds time_s = static_cast<float64>(time_ns) * NANOSECONDS_TO_SECOND;
 
-	double d = (m_ending_time - m_beginning_time).count() / 10000000.f;
+    m_UnscaleTime += time_s;
+    m_Time += time_s * m_TimeScale;
 
-	return d;
+    m_UnscaleDeltaTime = time_s;
+    m_DeltaTime = time_s * m_TimeScale;
+
+    m_LastUpdateTime = t;
 }
 
-second Timer::GetChronoTimeScale()
-{
-	m_ending_time = system_clock::now();
-
-	double d = ((m_ending_time - m_beginning_time).count() / 10000000.f) * scale;
-
-	return d;
+float64 Clock::GetDeltaTime() const {
+    return m_DeltaTime;
 }
 
-void Timer::SetScale(float f)
-{
-	scale = f;
+float64 Clock::GetDeltaTimeUnscaled() const {
+    return m_UnscaleDeltaTime;
 }
 
-float Timer::GetScale()
-{
-	return scale;
+float64 Clock::GetTime() const {
+    return m_Time;
+}
+
+float64 Clock::GetTimeUnscaled() const {
+    return m_UnscaleTime;
+}
+
+float64 Clock::GetTimeScale() const {
+    return m_TimeScale;
+}
+
+void Clock::SetTimeScale(float64 scale) {
+    m_TimeScale = scale;
 }
