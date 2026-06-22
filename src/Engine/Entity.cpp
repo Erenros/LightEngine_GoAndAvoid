@@ -238,6 +238,11 @@ bool Entity::IsInside(Vector2f position)
 	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 
+Entity::~Entity(){
+	delete mp_Shape;
+	delete mp_RenderShape;
+}
+
 void Entity::AddActiveScene(const std::string& sceneTag) {
 	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
 		std::cerr << sceneTag << " exists" << std::endl;

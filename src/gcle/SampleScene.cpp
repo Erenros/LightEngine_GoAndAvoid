@@ -21,10 +21,15 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate(Timer& time)
 {
-	pEntity->Rotate(1);
+	//pEntity->Rotate(1);
 
 	if (InputManager::GetInstance().IsDown(Space))
 	{
 		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
+	}
+
+	if (InputManager::GetInstance().IsDown('A'))
+	{
+		pEntity->Destroy();
 	}
 } 

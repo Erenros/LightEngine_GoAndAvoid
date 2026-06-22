@@ -9,12 +9,12 @@ namespace gcle
 		{
 			if (vertex != nullptr)
 			{
-				delete vertex;
+				delete vertex; 
 			}
 		}
 	}
 
-	Shape::Shape(Shape* pShape) : m_texture(pShape->m_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
+	Shape::Shape(Shape* pShape) : mp_texture(pShape->mp_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
 		m_smoothness(pShape->m_smoothness), m_height(pShape->m_height), m_width(pShape->m_width), m_origin(pShape->m_origin), m_trianglepoints(pShape->m_trianglepoints),
 		m_shape(pShape->m_shape), m_localPositions(pShape->m_localPositions), m_indicies(pShape->m_indicies)
 	{ 

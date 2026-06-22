@@ -25,7 +25,7 @@ namespace gcle
 
 	class Shape {
 
-		Texture* m_texture = nullptr;
+		Texture* mp_texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
@@ -33,7 +33,7 @@ namespace gcle
 		//circle
 		float32 m_radius = 0.0f;
 		Vector2f m_center = { 0.0f, 0.0f };
-		int m_smoothness = 16;
+		int32 m_smoothness = 16;
 
 		//rectangle
 		float32 m_height = 0.0f;
@@ -55,15 +55,16 @@ namespace gcle
 		//Constructors 
 
 		Shape() = default;
-		virtual ~Shape();
 		Shape(Shape* pShape);
 
 
 	public:
+		virtual ~Shape();
+
 		//Getters 
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		Texture* GetTexture() { return m_texture; };
+		Texture* GetTexture() { return mp_texture; };
 		std::vector<int32>& GetIndicies() { return m_indicies; }; 
 		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
@@ -92,7 +93,7 @@ namespace gcle
 
 	public:
 
-		void SetTexture(Texture* tex) { m_texture = tex; }
+		void SetTexture(Texture* tex) { mp_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		 

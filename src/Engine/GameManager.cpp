@@ -31,8 +31,9 @@ void GameManager::Loop()
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
 		
-	
 		cam.Update(time, m_entities);
+	
+		UpdateEntitySystem();
 
 		mp_window->Clear();
 
@@ -81,4 +82,34 @@ void GameManager::Close()
 
 	delete mp_window;
 
+}
+
+void GameManager::UpdateEntitySystem()
+{
+	for (auto it = m_entities.begin(); it != m_entities.end(); )
+	{
+		Entity* entity = *it;
+
+		if (entity->ToDestroy())
+		{
+			m_entitiesToDestroy.push_back(entity);
+			it = m_entities.erase(it);
+		}
+
+		++it;		
+	}
+
+	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
+	{
+		delete* it;
+	}
+
+	m_entitiesToDestroy.clear();
+
+	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
+	{
+		m_entities.push_back(*it);
+	}
+
+	m_entitiesToCreate.clear();
 }
