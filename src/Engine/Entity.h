@@ -28,6 +28,7 @@ public:
 	int64 GetId() const { return m_Id; }
 	Vector2f GetScale();
 	Degrees GetRotation();
+	RigidBody2D& GetRigidBody() { return m_RigidBody; }
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }

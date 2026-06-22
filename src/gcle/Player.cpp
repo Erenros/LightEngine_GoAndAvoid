@@ -3,21 +3,17 @@
 void Player::OnUpdate(){
 	InputManager& im = InputManager::GetInstance();
 
-	Vector2f pos = GetPosition();
+	
 	if (im.IsHeld('Q')) {
-		SetPosition(pos.x - 5, pos.y);
-		pos = GetPosition();
+		GetRigidBody().AddForce({ -1, 0 }, 100, 0.016f);
 	}
 	if (im.IsHeld('D')) {
-		SetPosition(pos.x + 5, pos.y);
-		pos = GetPosition();
+		GetRigidBody().AddForce({ 1, 0 }, 100, 0.016f);
 	}
 	if (im.IsHeld('S')) {
-		SetPosition(pos.x, pos.y + 5);
-		pos = GetPosition();
+		GetRigidBody().AddForce({ 0, 1 }, 100, 0.016f);
 	}
 	if (im.IsHeld('Z')) {
-		SetPosition(pos.x, pos.y - 5);
-		pos = GetPosition();
+		GetRigidBody().AddForce({ 0, -1 }, 100, 0.016f);		 
 	}
 }

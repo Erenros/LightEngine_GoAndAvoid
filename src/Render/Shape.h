@@ -72,6 +72,8 @@ namespace gcle
 		Vector2f GetScale() { return m_Transform.GetScale(); }
 		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
 
+		Transform2D& GetTransform() { return m_Transform; }
+
 	public:
 
 		virtual float32 GetWidth() { return 0.f; };

@@ -20,14 +20,14 @@ void RigidBody2D::Initialize(Transform2D* transform)
 void RigidBody2D::Update(Clock& timer)
 {
 	float32 dt = static_cast<float32>(timer.GetDeltaTime());
-	dt = 0.016;
+	dt = 0.016f;
 
 	ApplyGravity(dt);
 	ApplyFriction(dt);
 	ClampVelocity();
 	ApplyVelocity(dt);
 
-	std::cout << mp_Transform->GetPosition().x << " : " << mp_Transform->GetPosition().y << std::endl;
+	DEBUG_INFO << mp_Transform->GetPosition().x << " : " << mp_Transform->GetPosition().y << ENDL;
 
 }
 

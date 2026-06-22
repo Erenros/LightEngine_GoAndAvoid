@@ -16,7 +16,7 @@ void GameManager::Loop()
 	Clock time;
 
 	Camera cam;
-	cam.Init(mp_window); 
+	cam.Init(mp_window);
 
 	while (isRunning == true)
 	{

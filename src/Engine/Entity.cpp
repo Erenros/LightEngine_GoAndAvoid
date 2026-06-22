@@ -11,13 +11,13 @@ void Entity::Initialize(gcle::Shapes shape)
 	m_ToDestroy = false;
 	m_Tag = -1;
 	m_Target;
-	m_RigidBody.SetActive(false);
 
 
-
-	mp_Shape = GetBaseShape(shape);
-
+	mp_Shape = GetBaseShape(shape); 
 	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+
+	m_RigidBody.Initialize(&mp_Shape->GetTransform());
+	m_RigidBody.SetActive(true);
 
 	m_Target.isSet = false;
 
@@ -62,6 +62,9 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 void Entity::Update(Clock& timer)
 {
 	float32 dt = static_cast<float32>(timer.GetTimeScale());
+
+	m_RigidBody.Update(timer);
+
 	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;
 
