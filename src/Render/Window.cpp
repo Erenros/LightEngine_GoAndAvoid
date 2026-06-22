@@ -8,7 +8,7 @@
 #include "SDL_image.h"
 
 
-void Window::Create(const char* pName,int width, int height, uint32 windowFlags, uint32 rendererFlags, int x, int y)
+void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
 	m_width = width;
 	m_height = height;
@@ -85,8 +85,8 @@ void Window::Draw(gcle::Shape* pShape)
 	}
 
 	if (pShape->GetTexture() == nullptr)
-		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), vertices.size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	else
-		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), vertices.size(), pShape->GetIndicies().data(), pShape->GetIndicies().size());
+		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 }
 

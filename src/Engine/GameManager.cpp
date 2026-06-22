@@ -51,9 +51,9 @@ void GameManager::Loop()
 	isRunning = false;
 }
 
-bool GameManager::Init(int windowWidth, int windowHeight)
+bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
-	srand(time(NULL));
+	srand(static_cast<int32>(time(NULL)));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;

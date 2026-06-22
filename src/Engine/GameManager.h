@@ -24,7 +24,7 @@ public:
 	GameManager() = default;
 
 
-	bool Init(int windowWidth, int windowHeight);
+	bool Init(int32 windowWidth, int32 windowHeight);
 	void Loop();
 	void Close();
 

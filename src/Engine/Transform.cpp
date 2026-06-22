@@ -44,7 +44,7 @@ const Transform2D* Transform2D::GetChild(uint32 index) const {
 }
 
 uint32 Transform2D::GetChildCount() const {
-    return mp_Childs.size();
+    return static_cast<uint32>(mp_Childs.size());
 }
 
 Vector2f& Transform2D::GetPosition()

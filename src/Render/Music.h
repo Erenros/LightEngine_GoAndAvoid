@@ -2,7 +2,7 @@
 
 #include <string>
 
-class Mix_Music;
+struct Mix_Music;
 
 class Music
 {

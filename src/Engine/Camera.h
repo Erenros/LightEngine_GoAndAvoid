@@ -15,7 +15,7 @@ class Camera
 
 		Entity* followingEntity = nullptr;
 
-		double zoom = 1;
+		float32 m_zoom = 1;
 
 		// Cette fonction doit être lancée sinon la caméra ne marchera pas
 		void Init(Window* pWindow);
@@ -28,8 +28,8 @@ class Camera
 
 		void Update(Timer& time, std::vector<Entity*>& entities);
 
-		void SetZoom(double d);
-		double GetZoom();
+		void SetZoom(float32 zoom);
+		float32 GetZoom();
 
 private:
 	Window* mp_Window = nullptr;
