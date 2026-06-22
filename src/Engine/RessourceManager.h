@@ -66,6 +66,7 @@ public:
 		return instance;
 	}
 
+	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
 	Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
 	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
 

@@ -4,6 +4,10 @@
 void SampleScene::OnInitialize()
 {
 	Texture* tex = RessourceManager::GetInstance().GetTexture("images");
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+
+	std::string text = "Test";
+	CreateText(font,text , 40, 40, 20, 20);
 
 	gcle::Rectangle* rectangle = new gcle::Rectangle(0, 0, 20, 20, { 250,250, 250, 250 });
 	rectangle->SetTexture(tex);
