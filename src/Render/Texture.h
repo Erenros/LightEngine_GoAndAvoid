@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 
 class Window;
@@ -7,13 +6,16 @@ struct SDL_Texture;
 
 class Texture
 {
-private:
+protected:
 
 	SDL_Texture* mp_texture = nullptr;
+
+	bool m_isSprite = false;
 
 public:
 
 	std::string id = "";
+	bool IsSprite() { return m_isSprite; };
 
 	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
 
@@ -26,7 +28,7 @@ public:
 	Texture(Window* window, const std::string& path);
 	Texture() = default;
 
-	~Texture() ;
+	virtual ~Texture() ;
 
 	void InitTexture(Window* window, const std::string& path);
 };

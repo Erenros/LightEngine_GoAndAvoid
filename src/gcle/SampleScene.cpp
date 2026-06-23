@@ -1,5 +1,7 @@
 #include "SampleScene.h"
 #include "Player.h"
+#include "Render/Sprite.h"
+#include "Render/Text.h"
 
 void SampleScene::OnInitialize()
 {
@@ -30,6 +32,7 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 	//pEntity->Rotate(1);
+	pEntity->GetId();
 
 	if (InputManager::GetInstance().IsDown(Space))
 	{

@@ -7,6 +7,7 @@
 #include "SDL_video.h"
 #include "SDL_image.h"
 #include "Render/Text.h"
+#include "Texture.h"
 
 
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)

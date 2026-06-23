@@ -24,6 +24,7 @@ void Texture::InitTexture(Window* window, const std::string& path)
 
     SDL_FreeSurface(surface);
 
+
     mp_texture = texture;
     
     std::filesystem::path path2(path);

@@ -1,10 +1,9 @@
 #pragma once
-
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include "Render/Texture.h"
+#include "Render/Sprite.h"
 #include "Render/Sound.h"
 #include "Render/Music.h"
 #include "Render/Font.h"
@@ -53,30 +52,30 @@ public:
 };
 
 //Temporaire
-struct Sprite
-{
-	/*bool SpriteSheet = true;
-
-	SDL_Texture* pTexture = nullptr;
-	SDL_Rect SourceRect;
-	
-	float Duration;
-	float Timer;
-
-	int Row, Column;
-	int CurrentRow = 0;
-	int CurrentColumn = 0;
-
-	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
-
-	void PlayAnimation(int nbr);
-	void UpdateAnimation(float deltaTime = 0.f);*/
-};
+//struct Sprite
+//{
+//	/*bool SpriteSheet = true;
+//
+//	SDL_Texture* pTexture = nullptr;
+//	SDL_Rect SourceRect;
+//	
+//	float Duration;
+//	float Timer;
+//
+//	int Row, Column;
+//	int CurrentRow = 0;
+//	int CurrentColumn = 0;
+//
+//	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
+//
+//	void PlayAnimation(int nbr);
+//	void UpdateAnimation(float deltaTime = 0.f);*/
+//};
 
 
 
 /*
-Dans l'idée ça donnera un truc du style 
+Dans l'idï¿½e ï¿½a donnera un truc du style 
 	Entity* e = CreateEntity.... ect
 		
 	e->AddSprite(new Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
