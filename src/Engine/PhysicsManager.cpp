@@ -365,8 +365,6 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	if (dist == 0.0f)
 	{
-		// Le centre du cercle est a l'interieur du rectangle : on cherche
-		// le bord le plus proche pour determiner la direction de sortie.
 		float32 overlapL = circlePos.x - rx;
 		float32 overlapR = (rx + rw) - circlePos.x;
 		float32 overlapT = circlePos.y - ry;
@@ -381,9 +379,6 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		else if (minOverlap == overlapT) { newPos.y = ry - pCircle->GetRadius();       normal = { 0.0f, -1.0f }; }
 		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
-		// Translation totale a appliquer, repartie ensuite entre les deux
-		// objets selon leur IsKinematic(), exactement comme dans le cas
-		// general ci-dessous et dans RepulseRectRect / RepulseCircleCircle.
 		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
 
 		Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
