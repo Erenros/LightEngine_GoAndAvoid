@@ -3,7 +3,6 @@
 #include "Shape.h"
 #include "Event.h"
 #include "Entity.h"
-#include "Camera.h"
 #include "GameManager.h"
 #include "SceneManager.h"
 #include "PhysicsManager.h"

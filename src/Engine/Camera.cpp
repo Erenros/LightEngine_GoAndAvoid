@@ -1,5 +1,5 @@
-#include "Camera.h"
 #include "GameManager.h"
+#include "Camera.h"
 
 void Camera::Init(Window* pWindow)
 {

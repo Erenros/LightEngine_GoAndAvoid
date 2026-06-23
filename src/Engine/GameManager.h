@@ -3,6 +3,7 @@
 #include <vector>
 #include "Render/Window.h"
 #include "include.h"
+#include "Camera.h"
 
 #include "RessourceManager.h"
 #include "SceneManager.h"

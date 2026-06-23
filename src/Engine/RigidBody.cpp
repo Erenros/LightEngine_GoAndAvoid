@@ -22,8 +22,8 @@ void RigidBody2D::Update(Clock& timer)
 	float32 dt = static_cast<float32>(timer.GetDeltaTime());
 	dt = 0.016f;
 
-	ApplyGravity(dt);
 	ApplyFriction(dt);
+	ApplyGravity(dt);
 	ClampVelocity();
 	ApplyVelocity(dt);
 
