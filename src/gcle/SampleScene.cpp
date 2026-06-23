@@ -18,12 +18,12 @@ void SampleScene::OnInitialize()
 	CreateText(font,text , 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
-	entity1->SetPosition(10, -200);
+	entity1->SetPosition(50, -200);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
-	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Circle);
+	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
@@ -31,7 +31,7 @@ void SampleScene::OnInitialize()
 	 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(320, 300);
-	entity3->SetScale({ 30, 1 });
+	//entity3->SetScale({ 30, 1 });
 	entity3->SetRigidBody(true);
 	entity3->GetRigidBody().SetGravity(false);
 	entity3->GetShape()->SetIsKinematic(false);

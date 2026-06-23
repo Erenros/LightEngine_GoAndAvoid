@@ -351,7 +351,7 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	float32 rw = pRect->GetWidth();
 	float32 rh = pRect->GetHeight();
 
-	Vector2f circlePos = pCircle->GetCenter();
+	Vector2f circlePos = pCircle->GetPosition(0.5f, 0.5f);
 	Vector2f rectPos = pRect->GetPosition(0.5f, 0.5f);
 
 	float32 nearestX = std::max(rx, std::min(circlePos.x, rx + rw));
@@ -365,6 +365,8 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	if (dist == 0.0f)
 	{
+		// Le centre du cercle est a l'interieur du rectangle : on cherche
+		// le bord le plus proche pour determiner la direction de sortie.
 		float32 overlapL = circlePos.x - rx;
 		float32 overlapR = (rx + rw) - circlePos.x;
 		float32 overlapT = circlePos.y - ry;
@@ -372,15 +374,27 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
 		Vector2f newPos = circlePos;
+		Vector2f normal({ 0.0f, 0.0f });
 
-		if (minOverlap == overlapL)      newPos.x = rx - pCircle->GetRadius();
-		else if (minOverlap == overlapR) newPos.x = rx + rw + pCircle->GetRadius();
-		else if (minOverlap == overlapT) newPos.y = ry - pCircle->GetRadius();
-		else                              newPos.y = ry + rh + pCircle->GetRadius();
+		if (minOverlap == overlapL) { newPos.x = rx - pCircle->GetRadius();       normal = { -1.0f,  0.0f }; }
+		else if (minOverlap == overlapR) { newPos.x = rx + rw + pCircle->GetRadius();  normal = { 1.0f,  0.0f }; }
+		else if (minOverlap == overlapT) { newPos.y = ry - pCircle->GetRadius();       normal = { 0.0f, -1.0f }; }
+		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
-		Vector2f circleTranslation = (newPos - circlePos) * correctionMultiplyer;
+		// Translation totale a appliquer, repartie ensuite entre les deux
+		// objets selon leur IsKinematic(), exactement comme dans le cas
+		// general ci-dessous et dans RepulseRectRect / RepulseCircleCircle.
+		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
 
-		pCircle->SetPosition(circlePos.x + circleTranslation.x * b->IsKinematic(), circlePos.y + circleTranslation.y * b->IsKinematic(), 0.5f, 0.5f);
+		Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
+		pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+
+		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
+		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+
 		return;
 	}
 
