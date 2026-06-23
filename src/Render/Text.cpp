@@ -1,6 +1,7 @@
 #include "Text.h"
 #include "Utils.h"
 #include "Window.h"
+#include "Engine/RessourceManager.h"
 
 #include <SDL_ttf.h>
 
@@ -16,7 +17,7 @@ SDL_Texture* Text::CreateTexture(Window* window)
 		return nullptr;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Solid(mp_font->GetSDLFont(), m_text.c_str(), *m_color);
+	SDL_Surface* surface = TTF_RenderText_Solid(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
 	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 
 	mp_texture = text_texture;
@@ -26,32 +27,56 @@ SDL_Texture* Text::CreateTexture(Window* window)
 	return text_texture;
 }
 
-Text::Text(Font* font, std::string& text, int x, int y, int w, int h, byte r, byte g, byte b) :
+Text::Text(Font* font, const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b, byte a) :
 	mp_font(font),
-	m_text(text)/*,
-	m_color({r,g,b}),
-	m_rect({x,y,w,h})*/
+	m_text(text)
 {
-	m_color = new SDL_Color(r, g, b);
-	m_rect = new SDL_Rect(x, y, w, h);
+	mp_color = new SDL_Color(r, g, b, a);
+	mp_rect = new SDL_Rect(x, y, w, h);
 }
 
 Text::~Text()
 {
 	if (mp_texture != nullptr) 
 		SDL_DestroyTexture(mp_texture);
+
+	delete mp_color;
+	delete mp_rect;
+}
+
+void Text::SetColor(byte r, byte g, byte b, byte a)
+{
+	delete mp_color;
+	mp_color = new SDL_Color(r, g, b, a);
+}
+
+void Text::SetFont(const std::string& id)
+{
+	Font* font = RessourceManager::GetInstance().GetFont(id);
+	if (font == nullptr)
+	{
+		DEBUG_WARN << "Font : " << id << " doesn't exist" << ENDL;
+		return;
+	}
+
+	mp_font = font;
+}
+
+void Text::SetText(const std::string& text)
+{
+	m_text = text;
 }
 
 void Text::SetPosition(int x, int y)
 {
-	m_rect->x = x;
-	m_rect->y = y;
+	mp_rect->x = x;
+	mp_rect->y = y;
 }
 void Text::SetWidth(int w)
 {
-	m_rect->w = w;
+	mp_rect->w = w;
 }
 void Text::SetHeight(int h)
 {
-	m_rect->h = h;
+	mp_rect->h = h;
 } 

@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include "Render/Texture.h"
+#include "Render/Sprite.h"
 #include "Render/Sound.h"
 #include "Render/Music.h"
 #include "Render/Font.h"
@@ -53,7 +53,7 @@ private:
 	std::unordered_map<std::string, Sound*> m_soundMap;
 	std::unordered_map<std::string, Music*> m_musicMap;
 
-	std::unordered_map<std::string, Texture*> m_textureMap;
+	std::unordered_map<std::string, Sprite*> m_textureMap;
 
 	std::unordered_map<std::string, Font*> m_fontMap;
 
@@ -65,8 +65,8 @@ public:
 	}
 
 	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
-	Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
-	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
+	Sprite* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
+	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 

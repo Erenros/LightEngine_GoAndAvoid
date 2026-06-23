@@ -55,8 +55,14 @@ public:
 	bool IsAnimationPlaying() { return mp_currentAnimation == nullptr ? false : true; };
 
 	Sprite(Window* window, const std::string& path);
-	Sprite(Texture* texture);
 
-	void AddAnimation(const std::string& id, Animation* animation) { m_animationMap[id] = animation; };
+	void AddAnimation(const std::string& id, 
+		int32 firstFrame, 
+		int32 lastFrame, 
+		int32 line, 
+		int32 tileWidth, 
+		int32 tileHeight, 
+		float32 duration = 0.5f);
+
 	void PlayAnimation(const std::string& id);
 };

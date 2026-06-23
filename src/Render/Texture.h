@@ -6,11 +6,10 @@ struct SDL_Texture;
 
 class Texture
 {
-private:
+protected:
 
 	SDL_Texture* mp_texture = nullptr;
 
-protected:
 	bool m_isSprite = false;
 
 public:

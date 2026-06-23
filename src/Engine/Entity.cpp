@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
+#include "RessourceManager.h"
 #include "PhysicsManager.h"
 
 static int64 sId = 0;
@@ -46,7 +47,7 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	}
 	case gcle::Shapes::Triangle:
 	{
-		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
+		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 100.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 });
 		return pTriangle;
 		break;
 	}
@@ -184,9 +185,15 @@ void Entity::Rotate(Degrees delta)
 	mp_Shape->Rotate(delta);
 }
 
-void Entity::SetTexture(Texture* pTexture)
+void Entity::SetTexture(const std::string& id)
 {
-	mp_RenderShape->SetTexture(pTexture);
+	Sprite* sprite = RessourceManager::GetInstance().GetTexture(id);
+	if (!sprite)
+	{
+		DEBUG_WARN << "No texture found with id : " << id << ENDL;
+		return;
+	}
+	mp_RenderShape->SetTexture(sprite);
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
@@ -271,4 +278,28 @@ void Entity::RemoveActiveScene(const std::string& sceneTag) {
 
 bool Entity::IsActiveIn(const std::string& sceneTag) {
 	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+}
+
+void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+
+	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
+}
+
+void Entity::PlayAnimation(const std::string& id, int32 mode)
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+
+	sprite->PlayAnimation(id);
 }
