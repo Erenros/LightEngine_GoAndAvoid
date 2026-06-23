@@ -31,7 +31,7 @@ void SampleScene::OnInitialize()
 	 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(320, 300);
-	//entity3->SetScale({ 30, 1 });
+	entity3->SetScale({ 10, 1 });
 	entity3->SetRigidBody(true);
 	entity3->GetRigidBody().SetGravity(false);
 	entity3->GetShape()->SetIsKinematic(false);

@@ -165,13 +165,13 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 
 bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
 {
-	float32 x1 = pRect1->GetPosition().x;
-	float32 y1 = pRect1->GetPosition().y;
+	float32 x1 = pRect1->GetPosition(0, 0).x;
+	float32 y1 = pRect1->GetPosition(0, 0).y;
 	float32 w1 = pRect1->GetWidth();
 	float32 h1 = pRect1->GetHeight();
 
-	float32 x2 = pRect2->GetPosition().x;
-	float32 y2 = pRect2->GetPosition().y;
+	float32 x2 = pRect2->GetPosition(0, 0).x;
+	float32 y2 = pRect2->GetPosition(0, 0).y;
 	float32 w2 = pRect2->GetWidth();
 	float32 h2 = pRect2->GetHeight();
 
@@ -337,8 +337,10 @@ void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
 
 	//gestion de la velocity
 
-	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	if (!a->IsKinematic() || !b->IsKinematic()){
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	}
 }
 
 void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
@@ -387,8 +389,10 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 
-		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
-		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		if (!a->IsKinematic() || !b->IsKinematic()) {
+			a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+			b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		}
 
 		return;
 	}
@@ -405,8 +409,10 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 
-	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	if (!a->IsKinematic() || !b->IsKinematic()) {
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	}
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
