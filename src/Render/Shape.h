@@ -3,7 +3,7 @@
 #include <iostream> 
 #include "MathGC.h"
 #include "Engine/Transform.h"
-#include "Texture.h"
+#include "Sprite.h"
 
 struct SDL_Vertex;
 
@@ -25,7 +25,7 @@ namespace gcle
 
 	class Shape {
 
-		Texture* mp_texture = nullptr;
+		Sprite* mp_texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
@@ -66,7 +66,7 @@ namespace gcle
 		//Getters 
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		Texture* GetTexture() { return mp_texture; };
+		Sprite* GetTexture() { return mp_texture; };
 		std::vector<int32>& GetIndicies() { return m_indicies; }; 
 		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
@@ -99,7 +99,7 @@ namespace gcle
 
 	public:
 
-		void SetTexture(Texture* tex) { mp_texture = tex; }
+		void SetTexture(Sprite* tex) { mp_texture = tex; }
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		 
@@ -114,6 +114,8 @@ namespace gcle
 
 	public:
 		void Move(Vector2f translation);
+
+		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH);
 	};
 
 
@@ -140,6 +142,8 @@ namespace gcle
 		void SetHeight(float32 height) override;
 		void SetWidth(float32 width) override;
 
+
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 
 	class Triangle : public Shape {
@@ -149,6 +153,7 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
 
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 	};
 
@@ -163,6 +168,7 @@ namespace gcle
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
 
+		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetRadius(float32 radius) override;
 
 	};

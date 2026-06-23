@@ -16,12 +16,12 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
     m_soundMap[id]->PlaySound(mode, volume);
 }
 
-Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
+Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
 	if (m_textureMap.count(id))
 		return m_textureMap[id];
 
-    Texture* texture = new Texture(window, path);
+    Sprite* texture = new Sprite(window, path);
     if (texture == nullptr || !texture->IsTextureInit())
     {
         DEBUG_WARN << "Got a nullptr Texture for path : " + path << ENDL;
@@ -194,7 +194,7 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        if (entry.path().extension() != ".ttf")
+        if (entry.path().extension() != ".ttf" && entry.path().extension() != ".otf")
         {
             std::cout << "Extension is not correct, expected : .ttf, receive" + entry.path().extension().string();
             continue;

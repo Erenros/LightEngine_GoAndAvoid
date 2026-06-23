@@ -1,11 +1,9 @@
 #pragma once
-//#include <SDL.h>
-//#include <SDL_image.h>
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include "Render/Texture.h"
+#include "Render/Sprite.h"
 #include "Render/Sound.h"
 #include "Render/Music.h"
 #include "Render/Font.h"
@@ -16,25 +14,25 @@ class Window;
 
 
 //Temporaire
-struct Sprite
-{
-	/*bool SpriteSheet = true;
-
-	SDL_Texture* pTexture = nullptr;
-	SDL_Rect SourceRect;
-	
-	float Duration;
-	float Timer;
-
-	int Row, Column;
-	int CurrentRow = 0;
-	int CurrentColumn = 0;
-
-	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
-
-	void PlayAnimation(int nbr);
-	void UpdateAnimation(float deltaTime = 0.f);*/
-};
+//struct Sprite
+//{
+//	/*bool SpriteSheet = true;
+//
+//	SDL_Texture* pTexture = nullptr;
+//	SDL_Rect SourceRect;
+//	
+//	float Duration;
+//	float Timer;
+//
+//	int Row, Column;
+//	int CurrentRow = 0;
+//	int CurrentColumn = 0;
+//
+//	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
+//
+//	void PlayAnimation(int nbr);
+//	void UpdateAnimation(float deltaTime = 0.f);*/
+//};
 
 
 
@@ -55,7 +53,7 @@ private:
 	std::unordered_map<std::string, Sound*> m_soundMap;
 	std::unordered_map<std::string, Music*> m_musicMap;
 
-	std::unordered_map<std::string, Texture*> m_textureMap;
+	std::unordered_map<std::string, Sprite*> m_textureMap;
 
 	std::unordered_map<std::string, Font*> m_fontMap;
 
@@ -67,8 +65,8 @@ public:
 	}
 
 	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
-	Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
-	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
+	Sprite* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id] : nullptr); };
+	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 
