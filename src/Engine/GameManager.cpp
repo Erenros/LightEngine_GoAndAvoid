@@ -15,8 +15,7 @@ void GameManager::Loop()
 	 
 	Clock time;
 
-	Camera cam;
-	cam.Init(mp_window);
+	m_Cam.Init(mp_window);
 
 	while (isRunning == true)
 	{
@@ -40,7 +39,7 @@ void GameManager::Loop()
 		PROFILER_END("SceneU");
 		
 		PROFILER_START("Camera", "Camera Update");
-		cam.Update(time, m_entities);
+		m_Cam.Update(time, m_entities);
 		PROFILER_END("Camera");
 	
 		PROFILER_START("Entity", "Entity Creation / Deletion");
