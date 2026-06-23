@@ -346,91 +346,58 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(a);
 	gcle::Circle* pCircle = static_cast<gcle::Circle*>(b);
 
-	const float32 EPSILON = 0.0001f;
-
 	float32 rx = pRect->GetPosition(0.0f, 0.0f).x;
 	float32 ry = pRect->GetPosition(0.0f, 0.0f).y;
 	float32 rw = pRect->GetWidth();
 	float32 rh = pRect->GetHeight();
 
-	float32 radius = pCircle->GetRadius();
+	Vector2f circlePos = pCircle->GetCenter();
+	Vector2f rectPos = pRect->GetPosition(0.5f, 0.5f);
 
-	Vector2f circleCenter = pCircle->GetCenter();
-	Vector2f rectCenter = pRect->GetPosition(0.5f, 0.5f);
-
-	float32 nearestX = std::max(rx, std::min(circleCenter.x, rx + rw));
-	float32 nearestY = std::max(ry, std::min(circleCenter.y, ry + rh));
-
+	float32 nearestX = std::max(rx, std::min(circlePos.x, rx + rw));
+	float32 nearestY = std::max(ry, std::min(circlePos.y, ry + rh));
 	Vector2f nearest({ nearestX, nearestY });
-	Vector2f delta = circleCenter - nearest;
 
-	float32 distSq = delta.x * delta.x + delta.y * delta.y;
-
-	Vector2f normal({ 0.0f, 0.0f });
-	float32 penetration = 0.0f;
-
-	// Cas normal : le centre du cercle est hors du rectangle.
-	// La normale va du rectangle vers le cercle.
-	if (distSq > EPSILON)
-	{
-		float32 dist = std::sqrt(distSq);
-
-		if (dist >= radius)
-			return;
-
-		normal = delta / dist;
-		penetration = radius - dist;
-	}
-	else
-	{
-		// Cas spécial : le centre du cercle est dans le rectangle
-		// ou exactement sur un bord.
-		// On choisit la sortie la plus courte en tenant compte du rayon.
-
-		float32 moveLeft = circleCenter.x - (rx - radius);
-		float32 moveRight = (rx + rw + radius) - circleCenter.x;
-		float32 moveTop = circleCenter.y - (ry - radius);
-		float32 moveBottom = (ry + rh + radius) - circleCenter.y;
-
-		penetration = moveLeft;
-		normal = Vector2f({ -1.0f, 0.0f });
-
-		if (moveRight < penetration)
-		{
-			penetration = moveRight;
-			normal = Vector2f({ 1.0f, 0.0f });
-		}
-
-		if (moveTop < penetration)
-		{
-			penetration = moveTop;
-			normal = Vector2f({ 0.0f, -1.0f });
-		}
-
-		if (moveBottom < penetration)
-		{
-			penetration = moveBottom;
-			normal = Vector2f({ 0.0f, 1.0f });
-		}
-	}
-
-	if (penetration <= 0.0f)
-		return;
+	Vector2f delta = circlePos - nearest;
+	float32 dist = delta.x * delta.x + delta.y * delta.y;
 
 	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
 
-	Vector2f translation = normal * penetration * correctionMultiplyer;
+	if (dist == 0.0f)
+	{
+		float32 overlapL = circlePos.x - rx;
+		float32 overlapR = (rx + rw) - circlePos.x;
+		float32 overlapT = circlePos.y - ry;
+		float32 overlapB = (ry + rh) - circlePos.y;
 
-	Vector2f newCircleCenter = circleCenter + translation * b->IsKinematic();
-	Vector2f newRectCenter = rectCenter - translation * a->IsKinematic();
+		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
+		Vector2f newPos = circlePos;
 
-	pCircle->SetPosition(newCircleCenter.x, newCircleCenter.y, 0.5f, 0.5f);
-	pRect->SetPosition(newRectCenter.x, newRectCenter.y, 0.5f, 0.5f);
+		if (minOverlap == overlapL)      newPos.x = rx - pCircle->GetRadius();
+		else if (minOverlap == overlapR) newPos.x = rx + rw + pCircle->GetRadius();
+		else if (minOverlap == overlapT) newPos.y = ry - pCircle->GetRadius();
+		else                              newPos.y = ry + rh + pCircle->GetRadius();
 
-	// Le cercle est poussé dans le sens de "normal".
-	// Le rectangle est poussé dans le sens inverse.
-	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+		Vector2f circleTranslation = (newPos - circlePos) * correctionMultiplyer;
+
+		pCircle->SetPosition(circlePos.x + circleTranslation.x * b->IsKinematic(), circlePos.y + circleTranslation.y * b->IsKinematic(), 0.5f, 0.5f);
+		return;
+	}
+
+	float32 length = std::sqrt(dist);
+	Vector2f normal = delta / length;
+	float32  overlap = (pCircle->GetRadius() - length) * correctionMultiplyer;
+
+	Vector2f translation = normal * overlap;
+
+	Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
+	pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+
+	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
+	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+
+	a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+	b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
