@@ -31,7 +31,6 @@ public:
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
 	Window* GetWindow() { return mp_window; };
-	Camera* GetCamera() { return &m_Cam; }
 
 private:
 	void UpdateEntitySystem();
@@ -42,7 +41,6 @@ private:
 
 	Window* mp_window = nullptr;
 
-	Camera m_Cam;
 
 
 	bool isRunning = false;
