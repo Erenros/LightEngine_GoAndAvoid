@@ -36,10 +36,10 @@ void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
 	m_Velocity += direction.Normalized() * (strength / m_Mass) * dt;
 }
 
-void RigidBody2D::SetForce(Vector2f direction, float32 speed)
+void RigidBody2D::SetForce(Vector2f direction, float32 strenght)
 {
 	Vector2f dir = direction.Normalized();
-	m_Velocity = dir * speed / m_Mass;
+	m_Velocity = dir * (strenght / m_Mass);
 }
 
 void RigidBody2D::AddImpulse(Vector2f direction, float32 strength)
@@ -74,6 +74,25 @@ float32 RigidBody2D::GetSpeed() const
 Vector2f RigidBody2D::GetVelocity() const
 {
 	return m_Velocity;
+}
+
+void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
+{
+	float32 lengthSq = normal.x * normal.x + normal.y * normal.y;
+
+	if (lengthSq <= 0.0001f)
+		return;
+
+	Vector2f n = normal / std::sqrt(lengthSq);
+
+	float32 dot = m_Velocity.Dot(n);
+
+	// Si dot < 0, l'objet va contre la normale, donc il rentre dans l'obstacle.
+	// Si dot > 0, l'objet s'éloigne déjà, donc on ne touche pas à sa velocity.
+	if (dot < 0.0f)
+	{
+		m_Velocity -= n * dot;
+	}
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)

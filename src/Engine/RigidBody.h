@@ -18,7 +18,7 @@ public:
 
 	void SetForce(Vector2f direction, float32 speed);
 	void AddImpulse(Vector2f direction, float32 strength);
-	void SetMass(float32 mass) { m_Mass = mass; }
+	void SetMass(float32 mass) { m_Mass = std::max(0.0001f, mass); }
 
 	bool IsActive() const { return IsRigidBody; }
 	void SetActive(bool Active) { IsRigidBody = Active; }
@@ -33,6 +33,12 @@ public:
 
 	float32 GetSpeed() const;
 	Vector2f GetVelocity() const;
+
+	void SetVelocity(Vector2f velocity) { m_Velocity = velocity; }
+	void ZeroVelocityX() { m_Velocity.x = 0.f; }
+	void ZeroVelocityY() { m_Velocity.y = 0.f; }
+
+	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
 private:
 	void ApplyVelocity(float32 dt);
