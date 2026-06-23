@@ -15,9 +15,9 @@ void SampleScene::OnInitialize()
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 
 	std::string text = "Test";
-	CreateText(font,text , 40, 40, 20, 20);
+	CreateText(font, text, 40, 40, 20, 20);
 	 
-	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
 	entity1->SetPosition(10, -200);
 	entity1->SetRigidBody(true);
 	entity1->GetShape()->SetIsKinematic(true);

@@ -1,10 +1,10 @@
 # Gaming Campus Light Engine
 
 # Table of Contents
-1. [gcle](#gcle)
-2. [Engine](#engine)
-3. [Render](#render)
-4. [Core](#core)
+1. [gcle](#gcle)     
+2. [Engine](#engine)    
+3. [Render](#render)    
+4. [Core](#core)    
 
 
 ## gcle
@@ -12,20 +12,146 @@
 
 ## Engine
 
-
+---
 ## Render
 
+You normaly don't need to use this part of the code. It's the render library where all SDL2 code is used.       
+The only one you will needs are:
 
+a. [Sound](#sound)     
+b. [Music](#music)      
+c. [Audio](#audio)     
+d. [Text](#text) 
+
+---
+### Sound:
+
+#### InitSound(Path)
+
+Initialize the sound you'll want to play.
+
+---
+#### PlaySound(Mode, Volume)
+
+Play the actual loaded sound.   
+Mode define how much time you want to loop on the sound.   
+If you want to loop infinitely this parameter should be -1.
+
+---
+### Music
+
+#### InitMusic(Path)
+
+Initialize the music you'll want to play.
+
+---
+#### PlayMusic(Mode)
+
+Play the actual loaded music.   
+Mode define how much time you want to loop on the music.   
+If you want to loop infinitely this parameter should be -1.
+
+---
+### Audio
+
+All next functions can be called by writing Audio::Funtion() and are explicit.
+
+#### SetMusicVolume(Volume)
+#### StopMusic()
+#### PauseMusic()
+#### ResumeMusic()
+#### StopAllSound()
+#### IsAMusicPlaying()
+#### IsAMusicPaused()
+
+---
+### Text:
+
+#### Usage
+
+In your scene use the function CreateText("text", x, y, width , height)
+
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+```
+
+---
+#### SetText("text")
+
+Replace the actual text by the new one.
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+pText->SetText("Hello World!")
+```
+
+return ``` Hello World! ```
+
+---
+#### SetColor(r, g, b ,a)
+
+Replace the actual text color by the new one.
+
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+pText->SetColor(255, 0, 0, 255)
+```
+
+return <span style="color:red">Test</span>
+
+---
+#### SetFont("font")
+
+Replace the actual font by the new one.
+Can be .ttf or .otf
+
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+pText->SetFont("Papyrus.ttf")
+```
+
+return <span style="font-family:Papyrus;">Test</span>
+
+---
+#### SetPosition(x, y)
+
+Replace the actual position by the new one.
+
+---
+#### SetWidth(width)
+
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+pText->SetWidth(30)
+```
+
+return <span style="display:inline-block; transform:scaleX(1.5);">   Test</span>
+
+---
+#### SetHeight(height)
+
+```cpp
+std::string text = "Test";
+Text* pText = CreateText(text, 40, 40, 20, 20);
+pText->SetHeight(30)
+```
+
+return <span style="display:inline-block; transform:scaleY(1.5);">   Test</span>
+
+---
 ## Core
 a. [Vector2](#vector2)     
 b. [Utils](#utils)      
 c. [MathGC](#mathgc)     
 d. [InputManager](#inputmanager)    
 
-### Vector2:
-
 ---
-#### Defined Vector2 types
+### Vector2:
+  
 Vector2f = $Vector2<float>$        
 Vector2u = $Vector2<int> $
 
