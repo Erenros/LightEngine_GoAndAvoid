@@ -186,7 +186,7 @@ void Entity::SetTexture(const std::string& id){
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
 		for(auto& sId : m_activeScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
-		if (RessourceManager::GetInstance().GetTexture(id) == nullptr) {
+		if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
 			std::string path = "../../assets/textures/" + id + ".png";
 			RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
 		}
