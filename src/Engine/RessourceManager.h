@@ -15,7 +15,7 @@ class Window;
 
 struct TextureStruct {
 public:
-	Texture* mp_texture = nullptr;
+	Sprite* mp_texture = nullptr;
 	
 private:
 	int32 m_useCount = 0;
@@ -106,7 +106,7 @@ public:
 
 	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
 	TextureStruct* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? &m_textureMap[id] : nullptr); };
-	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
+	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 

@@ -13,8 +13,6 @@ void SampleScene::OnInitialize()
 	 
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 
-	std::string text = "Test";
-	CreateText(font,text , 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
  	entity1->SetPosition(10, -200);
@@ -31,8 +29,6 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate(Clock& time)
 {
-	//pEntity->Rotate(1);
-	pEntity->GetId();
 
 	if (InputManager::GetInstance().IsDown(Space))
 	{

@@ -12,9 +12,6 @@ void SampleScene2::OnInitialize()
 	
 
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
-
-	std::string text = "Test";
-	CreateText(font,text , 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
  	entity1->SetPosition(10, -200);
@@ -26,7 +23,9 @@ void SampleScene2::OnInitialize()
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
-	entity2->SetTexture("images");
+	entity2->SetTexture("test");
+	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32);
+	entity2->PlayAnimation("anim1");
 }
 
 void SampleScene2::OnUpdate(Clock& time)

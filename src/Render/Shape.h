@@ -68,7 +68,7 @@ namespace gcle
 		//Getters 
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		Texture* GetTexture() { return (mp_texture == nullptr ? nullptr : mp_texture->mp_texture);};
+		Sprite* GetTexture() { return (mp_texture == nullptr ? nullptr : mp_texture->mp_texture);};
 		std::vector<int32>& GetIndicies() { return m_indicies; }; 
 		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
