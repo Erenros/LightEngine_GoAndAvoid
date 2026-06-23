@@ -78,10 +78,21 @@ Vector2f RigidBody2D::GetVelocity() const
 
 void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 {
-	normal.Norm();
+	float32 lengthSq = normal.x * normal.x + normal.y * normal.y;
 
-	float dot = m_Velocity.Dot(normal);
-	m_Velocity -= normal * dot;
+	if (lengthSq <= 0.0001f)
+		return;
+
+	Vector2f n = normal / std::sqrt(lengthSq);
+
+	float32 dot = m_Velocity.Dot(n);
+
+	// Si dot < 0, l'objet va contre la normale, donc il rentre dans l'obstacle.
+	// Si dot > 0, l'objet s'éloigne déjà, donc on ne touche pas à sa velocity.
+	if (dot < 0.0f)
+	{
+		m_Velocity -= n * dot;
+	}
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)
