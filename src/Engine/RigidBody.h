@@ -40,6 +40,8 @@ public:
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
+	void SetDampingStrenght(float32 strenght) { m_Friction = strenght; }
+
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
