@@ -20,13 +20,14 @@ void SampleScene::OnInitialize()
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity1->SetPosition(10, -200);
 	entity1->SetRigidBody(true);
+	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->GetShape()->SetIsKinematic(false);
+	entity2->GetShape()->SetIsKinematic(true);
 	
 }
 
