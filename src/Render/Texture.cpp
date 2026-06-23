@@ -3,7 +3,7 @@
 #include "Window.h"
 #include <SDL.h>
 #include <SDL_image.h>
-
+#include <filesystem>
 
 Texture::Texture(Window* window, const std::string& path)
 {
@@ -25,4 +25,7 @@ void Texture::InitTexture(Window* window, const std::string& path)
     SDL_FreeSurface(surface);
 
     mp_texture = texture;
+    
+    std::filesystem::path path2(path);
+    id = path2.stem().string();
 }

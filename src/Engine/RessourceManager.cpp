@@ -1,6 +1,10 @@
 #include "RessourceManager.h"
 #include "Texture.h"
 #include "Utils.h"
+#include "SceneManager.h"
+
+#undef PlaySound
+
 
 void RessourceManager::PlayMusic(const std::string& id, int mode)
 {
@@ -18,7 +22,7 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
 
 Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
-	if (m_textureMap.count(id))
+	if (m_textureMap[id].mp_texture != nullptr)
 		return m_textureMap[id].mp_texture;
 
     Texture* texture = new Texture(window, path);
@@ -28,7 +32,7 @@ Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, 
         delete texture;
         return nullptr;
     }
-
+     
     DEBUG_INFO << "Texture created" << ENDL;
     m_textureMap[id].mp_texture = texture;
     return texture;
@@ -116,8 +120,16 @@ void RessourceManager::InitTextureFolder(Window* window)
             continue;
         }
 
-        LoadTexture(window,entry.path().string(), entry.path().stem().string());
+        //LoadTexture(window,entry.path().string(), entry.path().stem().string());
+        m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
     }
+
+    
+    //for (auto& tex : m_textureMap) {
+    //    if (tex.second.GetFlag() & SceneManager::GetInstance().GetCurrentSceneFlag() == 0b0) {
+    //        tex.second.UnloadTexture();
+    //    }
+    //}
 }
 
 void RessourceManager::InitMusicFolder()
@@ -203,7 +215,6 @@ void RessourceManager::InitFont()
         LoadFont(entry.path().string(), entry.path().stem().string(), 25);
     }
 }
-
 
 void RessourceManager::DeleteAll()
 {

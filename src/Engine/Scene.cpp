@@ -33,6 +33,17 @@ void Scene::DestroyText(Text* text)
 	delete text;
 }
 
+void Scene::AddDrawnTexture(const std::string& textureName){
+	if (std::find(m_activeTextures.begin(), m_activeTextures.end(), textureName) != m_activeTextures.end()) {
+		return;
+	}
+	m_activeTextures.push_back(textureName);
+}
+
+bool Scene::isDrawn(const std::string& tag){
+	return (std::find(m_activeTextures.begin(), m_activeTextures.end(), tag) != m_activeTextures.end());
+}
+
 void Scene::Update(Clock& time){
 	for (Entity* e : GameManager::GetInstance().m_entities) {
 		if (e->IsActiveIn(m_tag)) {

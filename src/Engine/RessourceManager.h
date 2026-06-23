@@ -21,11 +21,33 @@ public:
 private:
 	int32 m_useCount = 0;
 	bool m_destroyeWhenUnused = true;
-	uint32 m_flag;
+	uint32 m_flag = 0b0;
 		
 public:
-	void setFlag(uint32 flag) {
+	void SetFlag(uint32 flag) {
 		m_flag = flag;
+	}
+
+	void AddFlag(uint32 flag) {
+		m_flag |= flag;
+	}
+
+	uint32 GetFlag() {
+		return m_flag;
+	}
+	
+	void UnloadTexture() {
+		if(mp_texture != nullptr)
+			delete mp_texture;
+			mp_texture = nullptr;
+	}
+
+	bool IsLoaded() {
+		return mp_texture == nullptr;
+	}
+
+	~TextureStruct() {
+		delete mp_texture;
 	}
 
 };
@@ -74,6 +96,8 @@ private:
 
 	std::unordered_map<std::string, Font*> m_fontMap;
 
+	friend class SceneManager;
+
 public:
 
 	static RessourceManager& GetInstance() {
@@ -82,7 +106,7 @@ public:
 	}
 
 	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
-	Texture* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? m_textureMap[id].mp_texture : nullptr); };
+	TextureStruct* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? &m_textureMap[id] : nullptr); };
 	Texture* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
@@ -121,7 +145,6 @@ public:
 	void Init(Window* window);
 
 
-	//I'm just gonna make only one function for this four later
 	void InitTextureFolder(Window* window);
 	void InitMusicFolder();
 	void InitSoundFolder();

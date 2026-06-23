@@ -1,6 +1,8 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
 #include "PhysicsManager.h"
+#include "SceneManager.h"
+
 
 static int64 sId = 0;
 
@@ -179,9 +181,16 @@ void Entity::Rotate(Degrees delta)
 	mp_Shape->Rotate(delta);
 }
 
-void Entity::SetTexture(Texture* pTexture)
-{
-	mp_Shape->SetTexture(pTexture);
+void Entity::SetTexture(const std::string& id){
+	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
+	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
+		for(auto& sId : m_activeScenes)
+			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
+		if (RessourceManager::GetInstance().GetTexture(id) == nullptr) {
+			std::string path = "../../assets/textures/" + id + ".png";
+			RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
+		}
+	}
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
@@ -248,11 +257,14 @@ Entity::~Entity(){
 
 void Entity::AddActiveScene(const std::string& sceneTag) {
 	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
-		std::cerr << sceneTag << " exists" << std::endl;
+		std::cerr << sceneTag << "exists" << std::endl;
 		return;
 	}
 
 	m_activeScenes.push_back(sceneTag);
+	if (mp_RenderShape->GetTexture() != nullptr) {
+		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
+	}
 }
 
 void Entity::RemoveActiveScene(const std::string& sceneTag) {

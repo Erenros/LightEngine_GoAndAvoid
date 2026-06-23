@@ -4,11 +4,15 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
 
+
+
 //class Entity;
 class Font;
 class Text;
 class GameManager;
 class Window;
+
+
 
 class Scene
 {
@@ -20,12 +24,14 @@ private:
 	void Update(Clock& time);
 	void Draw(Window* window);
 
+	std::vector<std::string> m_activeTextures;
+
 protected:
 	std::string m_tag;
 
 	Scene() = default;
 		
-	~Scene();
+	virtual ~Scene();
 
 	virtual void OnInitialize() {};
 	virtual void OnUpdate(Clock& time) {};
@@ -39,6 +45,11 @@ public:
 
 	template<typename T>
 	T* CreateEntity(gcle::Shapes shape);
+
+	uint32 GetFlag() { return m_flag; }
+
+	void AddDrawnTexture(const std::string&);
+	bool isDrawn(const std::string&);
 
 
 	friend class GameManager;

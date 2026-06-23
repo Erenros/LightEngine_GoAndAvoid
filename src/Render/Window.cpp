@@ -84,7 +84,7 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* 
 }
 
 void Window::Draw(gcle::Shape* pShape)
-{ 
+{
 	const std::vector<SDL_Vertex*>& verticesPtr = pShape->GetVerticies();
 
 	std::vector<SDL_Vertex> vertices;
@@ -96,7 +96,9 @@ void Window::Draw(gcle::Shape* pShape)
 
 	if (pShape->GetTexture() == nullptr)
 		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
-	else
+	else {
+		Texture* text = pShape->GetTexture();
 		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
-}
 
+	}
+}

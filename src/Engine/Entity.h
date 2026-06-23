@@ -51,7 +51,7 @@ public:
 	void SetRotation(Degrees angle);
 	void Rotate(Degrees delta);
 
-	void SetTexture(Texture* pTexture);
+	void SetTexture(const std::string&);
 
 public:
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }

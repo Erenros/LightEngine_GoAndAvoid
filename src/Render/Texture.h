@@ -13,6 +13,8 @@ private:
 
 public:
 
+	std::string id = "";
+
 	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
 
 	//Temporaire

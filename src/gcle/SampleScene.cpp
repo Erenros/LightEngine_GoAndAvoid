@@ -3,22 +3,19 @@
 
 void SampleScene::OnInitialize()
 {
-	Texture* tex = RessourceManager::GetInstance().GetTexture("images"); 
 	 
 	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetTexture(tex);
 	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);   */
+	pEntity->SetRigidBody(true);*/
 	 
-	
-
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 
 	std::string text = "Test";
 	CreateText(font,text , 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
-	entity1->SetPosition(10, -200);
+ 	entity1->SetPosition(10, -200);
 	entity1->SetRigidBody(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
@@ -27,7 +24,7 @@ void SampleScene::OnInitialize()
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
-	
+	entity2->SetTexture("images");
 }
 
 void SampleScene::OnUpdate(Clock& time)
