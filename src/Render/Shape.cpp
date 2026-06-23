@@ -327,11 +327,11 @@ namespace gcle
 		}
 		else if (m_shape == Shapes::Triangle)
 		{
-			float32 u0 = x / textW;
-			float32 v0 = y / textH;
+			float32 u0 = x / static_cast<float32>(textW);
+			float32 v0 = y / static_cast<float32>(textH);
 
-			float32 u1 = (x + w) / textW;
-			float32 v1 = (y + h) / textH;
+			float32 u1 = (x + w) / static_cast<float32>(textW);
+			float32 v1 = (y + h) / static_cast<float32>(textH);
 
 			m_verticies[0]->tex_coord = { u0, v0 };
 			m_verticies[1]->tex_coord = { u1, v0 };
