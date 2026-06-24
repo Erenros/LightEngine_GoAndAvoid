@@ -70,21 +70,30 @@ void PhysicsManager::Update(float64 deltaTime)
 						Repulse(entity, otherEntity);
 					}
 
-					if (entity->m_OnCollisionEnter)
+					if (!entity->CollidingEntity.contains(otherEntity->GetId()))
 					{
 						entity->OnCollisionEnter(otherEntity);
-						entity->m_OnCollisionEnter = false;
-					}
-					if (otherEntity->m_OnCollisionEnter)
-					{
+						entity->CollidingEntity.insert(otherEntity->GetId());
+
 						otherEntity->OnCollisionEnter(entity);
-						otherEntity->m_OnCollisionEnter = false;
+						otherEntity->CollidingEntity.insert(entity->GetId());
 					}
 
-					entity->OnCollision(otherEntity);
-					entity->m_WasOnCollision = true;
-					otherEntity->OnCollision(entity);
-					otherEntity->m_WasOnCollision = true;
+					else
+					{
+						entity->OnCollision(otherEntity);
+						otherEntity->OnCollision(entity);
+					}
+				}
+				else 
+				{
+					if (entity->CollidingEntity.contains(otherEntity->GetId())) 
+					{
+						entity->OnCollisionExit(otherEntity);
+						entity->CollidingEntity.erase(otherEntity->GetId());
+						otherEntity->OnCollisionExit(entity);
+						otherEntity->CollidingEntity.erase(entity->GetId());
+					}
 				}
 			}
 		}
@@ -279,16 +288,24 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 		{
 			pos1.x -= correction * a->IsKinematic();
 			pos2.x += correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			
+			a->GetCollider()->CollidingOnX(-correction);
+			b->GetCollider()->CollidingOnX(correction);
 		}
 		else
 		{
 			pos1.x += correction * a->IsKinematic();
 			pos2.x -= correction * b->IsKinematic();
+
+			b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+			a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+
+			a->GetCollider()->CollidingOnX(correction);
+			b->GetCollider()->CollidingOnX(-correction);
 		}
-
-		a->GetOwner()->GetRigidBody().ZeroVelocityX();
-		b->GetOwner()->GetRigidBody().ZeroVelocityX();
-
 	}
 	else
 	{
@@ -298,14 +315,24 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 		{
 			pos1.y -= correction * a->IsKinematic();
 			pos2.y += correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+			b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+
+			a->GetCollider()->CollidingOnY(-correction);
+			b->GetCollider()->CollidingOnY(correction);
 		}
 		else
 		{
 			pos1.y += correction * a->IsKinematic();
 			pos2.y -= correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+			b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+
+			a->GetCollider()->CollidingOnY(correction);
+			b->GetCollider()->CollidingOnY(-correction);
 		}
-		a->GetOwner()->GetRigidBody().ZeroVelocityY();
-		b->GetOwner()->GetRigidBody().ZeroVelocityY();
 	}
 
 	a->SetPosition(pos1.x, pos1.y, 0.5f, 0.5f);
@@ -389,7 +416,6 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 
-
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		if (!a->IsKinematic() || !b->IsKinematic()) {
@@ -414,6 +440,9 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 	}
+
+	a->GetCollider()->CollidingOn(normal);
+	b->GetCollider()->CollidingOn(normal);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)

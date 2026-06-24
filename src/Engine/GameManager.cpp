@@ -12,9 +12,6 @@ void GameManager::Loop()
 {
 	isRunning = true;
 	 
-	Clock time;
-
-	Camera m_Cam;
 	m_Cam.Init(mp_window);
 
 	while (isRunning == true)
@@ -69,7 +66,7 @@ void GameManager::Loop()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
-	srand(static_cast<int32>(time(NULL)));
+	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
