@@ -281,13 +281,20 @@ void RessourceManager::DeleteTexture(const std::string& id)
         return;
 
     delete m_textureMap[id].mp_texture;
+    m_textureMap[id].mp_texture = nullptr;
     m_textureMap.erase(id);
 }
 
 void RessourceManager::DeleteAllTexture()
 {
     for (auto& pair : m_textureMap)
-        delete pair.second.mp_texture;
+    {
+        if (pair.second.mp_texture)
+        {
+            delete pair.second.mp_texture;
+            pair.second.mp_texture = nullptr;
+        }
+    }
 
     m_textureMap.clear();
 }

@@ -39,7 +39,7 @@ void GameManager::Loop()
 		//PROFILER_END("SceneU");
 		
 		//PROFILER_START("Camera", "Camera Update");
-		cam.Update(time, m_entities);
+		m_Cam.Update(time, m_entities);
 		//PROFILER_END("Camera");
 	
 		//PROFILER_START("Entity", "Entity Creation / Deletion");

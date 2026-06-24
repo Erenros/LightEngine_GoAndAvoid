@@ -11,10 +11,8 @@ void SampleScene::OnInitialize()
 	pEntity->SetScale(0.5f);
 	pEntity->SetRigidBody(true);*/
 	 
-	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
-
 	std::string text = "Test";
-	CreateText(font, text, 40, 40, 20, 20);
+	CreateText(text, 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
 	entity1->SetPosition(10, -200);

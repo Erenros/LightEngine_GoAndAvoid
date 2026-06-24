@@ -19,7 +19,7 @@ public:
 	
 private:
 	int32 m_useCount = 0;
-	bool m_destroyeWhenUnused = true;
+	bool m_destroyWhenUnused = true;
 	uint32 m_flag = 0b0;
 		
 public:
