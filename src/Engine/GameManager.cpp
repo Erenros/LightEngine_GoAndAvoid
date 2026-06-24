@@ -17,6 +17,21 @@ void GameManager::Loop()
 	Camera m_Cam;
 	m_Cam.Init(mp_window);
 
+
+	Matrix m1(2, 2);
+	Matrix m2(2, 2);
+
+	m1.m_matrix = { {2, 5}, {9, -6} };
+	m2.m_matrix = { {-8, 1}, {-7, -4} };
+
+	Matrix m3 = m1 * m2;
+
+	std::cout << m3.m_matrix[0][0] << std::endl << m3.m_matrix[0][1] << std::endl << m3.m_matrix[1][0] << std::endl << m3.m_matrix[1][1] << std::endl;
+
+	int c;
+	std::cin >> c;
+
+
 	while (isRunning == true)
 	{
 		//PROFILER_START("Colliders", "Colliders Update");
