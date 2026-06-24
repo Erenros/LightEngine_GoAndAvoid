@@ -3,7 +3,6 @@
 #include "Shape.h"
 #include "Event.h"
 #include "Entity.h"
-#include "Camera.h"
 #include "GameManager.h"
 #include "SceneManager.h"
 #include "PhysicsManager.h"
@@ -15,11 +14,17 @@ void GameManager::Loop()
 	 
 	Clock time;
 
-	Camera cam;
-	cam.Init(mp_window);
+	m_Cam.Init(mp_window);
 
 	while (isRunning == true)
 	{
+		PROFILER_START("Colliders", "Colliders Update");
+		if (m_loopTour < 1)
+			m_loopTour++;
+		else
+			PhysicsManager::GetInstance().Update(0.016f);
+		PROFILER_END("Colliders");
+    
 		//PROFILER_START("time", "Timer Update");
 		time.Update();
 		//PROFILER_END("time");
@@ -31,13 +36,6 @@ void GameManager::Loop()
 		//PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(time);
 		//PROFILER_END("SceneU");
-
-		//PROFILER_START("Colliders", "Colliders Update");
-		if (m_loopTour < 3)
-			m_loopTour++;
-		else
-			PhysicsManager::GetInstance().Update(0.016f);
-		//PROFILER_END("Colliders");
 		
 		//PROFILER_START("Camera", "Camera Update");
 		cam.Update(time, m_entities);

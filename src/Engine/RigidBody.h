@@ -24,7 +24,7 @@ public:
 	void SetActive(bool Active) { IsRigidBody = Active; }
 
 	void ClampVelocity();
-	void Stop();
+	void Stop() { m_Velocity = { 0,0 }; }
 	void SetMaxSpeed(float32 speed) { m_MaxSpeed = speed; }
 
 	void SetGravity(float32 strenght, bool isActive) { m_Gravity = strenght; m_UseGravity = isActive; }
@@ -40,6 +40,10 @@ public:
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
+	void SetDampingStrenght(float32 strenght) { m_Friction = { strenght, strenght }; }
+	void SetDampingOnXAxis(Vector2f strenght) { m_Friction = strenght; }
+	void SetDampingOnYAxis(Vector2f strenght) { m_Friction = strenght; }
+
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
@@ -50,7 +54,7 @@ private:
 	Vector2f m_Direction;
 	Vector2f m_Velocity;
 	float32 m_Mass = 1.0f;
-	float32 m_Friction = 0.1f;
+	Vector2f m_Friction = {0.1, 0.1};
 
 	float32 m_MaxSpeed = 500.0f;
 

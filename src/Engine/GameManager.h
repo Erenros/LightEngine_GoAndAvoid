@@ -3,6 +3,7 @@
 #include <vector>
 #include "Render/Window.h"
 #include "include.h"
+#include "Camera.h"
 
 #include "RessourceManager.h"
 #include "SceneManager.h"
@@ -31,6 +32,7 @@ public:
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
 	Window* GetWindow() { return mp_window; };
+	Camera* GetCamera() { return &m_Cam; }
 
 private:
 	void UpdateEntitySystem();
@@ -40,6 +42,9 @@ private:
 	GameManager* mp_Instance = nullptr;
 
 	Window* mp_window = nullptr;
+
+	Camera m_Cam;
+
 
 	bool isRunning = false;
 

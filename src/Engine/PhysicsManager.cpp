@@ -389,9 +389,10 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 
+
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		if (!a->IsKinematic() || !b->IsKinematic()) {
-			a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
-			b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		}
 
 		return;
