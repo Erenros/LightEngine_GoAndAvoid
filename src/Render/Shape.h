@@ -4,6 +4,7 @@
 #include "MathGC.h"
 #include "Engine/Transform.h"
 #include "Texture.h"
+#include "Engine/Collider.h"
 
 class Entity;
 struct SDL_Vertex;
@@ -31,6 +32,7 @@ namespace gcle
 	protected:
 		Transform2D m_Transform;
 		Entity* mp_Owner;
+		Collider m_Collider;
 
 		//circle
 		float32 m_radius = 0.0f;
@@ -79,6 +81,7 @@ namespace gcle
 		Transform2D& GetTransform() { return m_Transform; }
 
 		bool IsKinematic() { return m_IsKinematic; }
+		Collider* GetCollider() { return &m_Collider; }
 
 	public:
 

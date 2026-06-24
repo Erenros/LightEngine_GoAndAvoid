@@ -19,15 +19,22 @@ void RigidBody2D::Initialize(Transform2D* transform)
 
 void RigidBody2D::Update(Clock& timer)
 {
+
 	float32 dt = static_cast<float32>(timer.GetDeltaTime());
 	dt = 0.016f;
 
 	ApplyFriction(dt);
 	ApplyGravity(dt);
+
+	if (m_TempVelHasChanged) {
+		m_Velocity = m_TempVelocity;
+		m_TempVelHasChanged = false;
+	}
+
 	ClampVelocity();
 	ApplyVelocity(dt);
 
-
+	m_TempVelocity = m_Velocity;
 }
 
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
@@ -70,6 +77,26 @@ Vector2f RigidBody2D::GetVelocity() const
 	return m_Velocity;
 }
 
+void RigidBody2D::ZeroVelocityX(bool right)
+{
+	if (right && m_TempVelocity.x < 0)
+		m_TempVelocity.x = 0;
+	if (!right && m_TempVelocity.x > 0)
+		m_TempVelocity.x = 0;
+
+	m_TempVelHasChanged = true;
+}
+
+void RigidBody2D::ZeroVelocityY(bool down)
+{
+	if (down && m_TempVelocity.y < 0)
+		m_TempVelocity.y = 0;
+	if (!down && m_TempVelocity.y > 0)
+		m_TempVelocity.y = 0;
+
+	m_TempVelHasChanged = true;
+}
+
 void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 {
 	float32 lengthSq = normal.x * normal.x + normal.y * normal.y;
@@ -79,14 +106,15 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 
 	Vector2f n = normal / std::sqrt(lengthSq);
 
-	float32 dot = m_Velocity.Dot(n);
+	float32 dot = m_TempVelocity.Dot(n);
 
-	// Si dot < 0, l'objet va contre la normale, donc il rentre dans l'obstacle.
-	// Si dot > 0, l'objet s'éloigne déjà, donc on ne touche pas à sa velocity.
 	if (dot < 0.0f)
 	{
-		m_Velocity -= n * dot;
+		m_TempVelocity -= n * dot;
 	}
+
+	m_TempVelHasChanged = true;
+
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)

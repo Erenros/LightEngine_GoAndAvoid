@@ -5,5 +5,6 @@
 
 class Player: public Entity{
 	void OnUpdate() override;
+	void OnInitialize() override;
 };
 

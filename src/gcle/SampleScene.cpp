@@ -17,17 +17,19 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(font,text , 40, 40, 20, 20);
 	 
-	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(50, -200);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
-	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(10, 100);
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(320, 150);
+	entity2->SetScale({ 2, 1 });
+	entity2->Rotate(180);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->GetShape()->SetIsKinematic(true);
+	entity2->GetShape()->SetIsKinematic(false);
 	 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(320, 300);

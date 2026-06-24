@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_set>
 #include "include.h"
 #include "Transform.h"
 #include "Render/Shape.h"
@@ -12,7 +13,6 @@ struct Target
 	float distance;
 	bool isSet;
 };
-
 
 class Entity
 {
@@ -66,9 +66,9 @@ protected:
 
 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {};
-	virtual void OnCollision(Entity* collidedWith) {};
-	//virtual void OnCollisionExit(Entity* collidedWith) {};
+	virtual void OnCollisionEnter(Entity* collidedWith) {DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
+	virtual void OnCollision(Entity* collidedWith) { DEBUG_INFO << "stay" << collidedWith->GetId() << ENDL };
+	virtual void OnCollisionExit(Entity* collidedWith) { DEBUG_INFO << "exit" << collidedWith->GetId() << ENDL };
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 
@@ -82,6 +82,7 @@ public:
 	void RemoveActiveScene(const std::string& sceneTag);
 
 	bool IsActiveIn(const std::string& sceneTag);
+
 
 protected:
 
@@ -99,14 +100,9 @@ private:
 	RigidBody2D		m_RigidBody;
 
 private:
-	bool m_OnCollisionEnter = true;
-	bool m_WasOnCollision	= false;
-	bool m_OnCollisionExit	= false;
-
-
-private:
+	std::unordered_set<int64> CollidingEntity;
+	std::vector<Collider*> mp_Colliders;
 	std::vector<std::string> m_activeScenes;
-
 
 private:
 
