@@ -40,7 +40,7 @@ private:
 private:
 
 	GameManager* mp_Instance = nullptr;
-
+	Camera m_Cam;
 	Window* mp_window = nullptr;
 
 
