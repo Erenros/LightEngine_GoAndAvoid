@@ -41,7 +41,7 @@ void Camera::Update(Clock& time, std::vector<Entity*>& entities)
 	
 	for (int i = 0; i < entities.size(); i++)
 	{
-		entities[i]->Update(time);
+		//entities[i]->Update(time);
 
 		gcle::Shape* realShape = entities[i]->GetShape();
 
