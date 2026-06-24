@@ -14,18 +14,24 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 	 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
-	entity1->SetPosition(10, -200);
-	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(true);
-	entity1->GetShape()->SetIsKinematic(true);
+	/*for (int i = 0; i < 50; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
+			Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+			entity1->SetPosition(10 * i, -200 * j);
+			entity1->SetRigidBody(true);
+			entity1->GetRigidBody().SetGravity(true);
+			entity1->GetShape()->SetIsKinematic(true);
+		}
+	}*/
 	 
-	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	/*Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
-	entity2->SetTexture("images");
+	entity2->SetTexture("images");*/
 }
 
 void SampleScene::OnUpdate(Clock& time)

@@ -10,8 +10,8 @@
 struct Target
 {
 	Vector2f position;
-	float distance;
-	bool isSet;
+	float distance = 0;
+	bool isSet = false;
 };
 
 
@@ -39,9 +39,7 @@ public:
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
-	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
-
-	void SetRenderSize(int shapeType, std::vector<float32> points);
+	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f); 
 
 	Vector2f GetRenderPosition();
 	 

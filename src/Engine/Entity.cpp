@@ -209,38 +209,6 @@ void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
 	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
-void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
-{
-	if (shapeType == 0)
-	{
-		
-		
-		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
-
-
-		float a = static_cast<gcle::Rectangle*>(mp_RenderShape)->GetWidth();
-
-
-
-		mp_RenderShape->SetHeight(points[1]);
-	}
-
-	else if (shapeType == 1)
-	{
-		mp_RenderShape->SetRadius(points[0]);
-	}
-
-	else if (shapeType == 2)
-	{
-		std::vector<Vector2f> newTrianglePoints;
-		newTrianglePoints.push_back({ points[0], points[1] });
-		newTrianglePoints.push_back({ points[2], points[3] });
-		newTrianglePoints.push_back({ points[4], points[5] });
-
-		mp_RenderShape->SetTrianglePoints(newTrianglePoints);
-	}
-}
-
 Vector2f Entity::GetRenderPosition()
 {
 	return mp_RenderShape->GetPosition();

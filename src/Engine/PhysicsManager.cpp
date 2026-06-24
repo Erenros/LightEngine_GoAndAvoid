@@ -55,11 +55,19 @@ void PhysicsManager::Update(float64 deltaTime)
 	for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
 	{
 		auto it2 = it1;
+		Entity* entity = (*it1).pEntity;
+
+		if (entity->GetRigidBody().IsActive() == false)
+			continue;
+
 		++it2;
 		for (; it2 != m_EntitiesToUpdate.end(); ++it2)
 		{
-			Entity* entity = (*it1).pEntity;
+			
 			Entity* otherEntity = (*it2).pEntity;
+
+			if (otherEntity->GetRigidBody().IsActive() == false)
+				continue;
 
 			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()) && otherEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
 			{
