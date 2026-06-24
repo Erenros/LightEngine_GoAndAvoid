@@ -1,7 +1,7 @@
 #include "GameManager.h"
 #include "include.h"
 
-#include "SampleScene.h"
+#include "DebugScene.h"
 #include "SampleScene2.h"
 #include "SceneManager.h"
 #include "Profiler.h"
@@ -15,11 +15,9 @@ int main(int argc, char** argv)
 
     gm.Init(640, 480);
 
-    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
-    SceneManager::GetInstance().CreateScene<SampleScene2>("SampleScene2");
+    SceneManager::GetInstance().CreateScene<DebugScene>("DebugScene");
 
-    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
-    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene2");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 
     
     gm.Loop();
