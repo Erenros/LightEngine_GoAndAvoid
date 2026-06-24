@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-#include "Window.h"
+#include "Render/Window.h"
 #include "Vector2.hpp"
 #include "Transform.h"
 #include "Timer.h"
@@ -17,7 +17,6 @@ class Camera
 
 		float32 m_zoom = 1;
 
-		// Cette fonction doit être lancée sinon la caméra ne marchera pas
 		void Init(Window* pWindow);
 
 		void SetFollowing(Entity* newEntity);

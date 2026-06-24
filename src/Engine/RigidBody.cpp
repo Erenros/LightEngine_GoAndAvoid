@@ -22,12 +22,10 @@ void RigidBody2D::Update(Clock& timer)
 	float32 dt = static_cast<float32>(timer.GetDeltaTime());
 	dt = 0.016f;
 
-	ApplyGravity(dt);
 	ApplyFriction(dt);
+	ApplyGravity(dt);
 	ClampVelocity();
 	ApplyVelocity(dt);
-
-	DEBUG_INFO << mp_Transform->GetPosition().x << " : " << mp_Transform->GetPosition().y << ENDL;
 
 }
 
@@ -61,11 +59,6 @@ void RigidBody2D::ClampVelocity()
 	}
 }
 
-void RigidBody2D::Stop()
-{
-	m_Velocity = { 0,0 };
-}
-
 float32 RigidBody2D::GetSpeed() const
 {
 	return std::sqrt(m_Velocity.x * m_Velocity.x + m_Velocity.y * m_Velocity.y);
@@ -88,7 +81,7 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	float32 dot = m_Velocity.Dot(n);
 
 	// Si dot < 0, l'objet va contre la normale, donc il rentre dans l'obstacle.
-	// Si dot > 0, l'objet s'Èloigne dÈj‡, donc on ne touche pas ‡ sa velocity.
+	// Si dot > 0, l'objet s'√©loigne d√©j√†, donc on ne touche pas √† sa velocity.
 	if (dot < 0.0f)
 	{
 		m_Velocity -= n * dot;
@@ -104,9 +97,14 @@ void RigidBody2D::ApplyVelocity(float32 dt)
 
 void RigidBody2D::ApplyFriction(float32 dt)
 {
-	m_Velocity *= std::pow(1.0f - m_Friction, dt);
-	if (std::abs(m_Velocity.x) < 0.01f) m_Velocity.x = 0.f;
-	if (std::abs(m_Velocity.y) < 0.01f) m_Velocity.y = 0.f;
+	m_Velocity.x *= std::pow(1.0f - m_Friction.x, dt);
+	m_Velocity.y *= std::pow(1.0f - m_Friction.y, dt);
+
+	if (std::abs(m_Velocity.x) < 0.01f)
+		m_Velocity.x = 0.f;
+
+	if (std::abs(m_Velocity.y) < 0.01f)
+		m_Velocity.y = 0.f;
 }
 
 void RigidBody2D::ApplyGravity(float32 dt)
