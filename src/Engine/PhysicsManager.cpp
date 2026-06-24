@@ -163,6 +163,7 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 	(this->*repulseTable[typeA][typeB])(shapeA, shapeB);
 }
 
+
 bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
 {
 	float32 x1 = pRect1->GetPosition(0, 0).x;
@@ -222,8 +223,39 @@ bool PhysicsManager::CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Ci
 	return (distance <= (pCircle1->GetRadius() + pCircle2->GetRadius()));
 }
 
+
+bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
+	
+
+	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
+	return false;
+}
+
+bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
+
+	return false;
+}
+
+bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle){
+
+	return false;
+}
+
+
 bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
+	int16 angleA = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
+	int16 angleB = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+
+	if (angleA != 0) {
+		if (angleB != 0)
+			return CheckOBBOBBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
+		else
+			return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
+	}
+	else if (angleB != 0)
+		return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
+
 	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 }
 
@@ -234,11 +266,20 @@ bool PhysicsManager::CheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
 
 bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 {
+	int16 angle = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
+	if (angle != 0) {
+		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
+	}
+
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 }
 
 bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
+	int16 angle = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+	if (angle != 0) {
+		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+	}
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
 

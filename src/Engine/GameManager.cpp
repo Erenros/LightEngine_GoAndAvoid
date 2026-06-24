@@ -19,12 +19,12 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
-		PROFILER_START("Colliders", "Colliders Update");
+		//PROFILER_START("Colliders", "Colliders Update");
 		if (m_loopTour < 1)
 			m_loopTour++;
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
-		PROFILER_END("Colliders");
+		//PROFILER_END("Colliders");
     
 		//PROFILER_START("time", "Timer Update");
 		time.Update();
