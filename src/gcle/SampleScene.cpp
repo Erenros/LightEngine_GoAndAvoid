@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
+#include "AudioEmitter.h"
 
 void SampleScene::OnInitialize()
 {
@@ -26,6 +27,12 @@ void SampleScene::OnInitialize()
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
 	entity2->SetTexture("images");
+
+
+
+	AudioEmitter test;
+	test.PlayMusic("test", 3);
+
 }
 
 void SampleScene::OnUpdate(Clock& time)
