@@ -1,5 +1,6 @@
 #include "Shape.h" 
 #include <SDL.h>
+#include "Engine/Entity.h"
 
 namespace gcle
 {
@@ -12,6 +13,10 @@ namespace gcle
 				delete vertex;
 			}
 		}
+	}
+
+	Shape::Shape(Entity* owner) : mp_Owner(owner), m_IsKinematic(false)
+	{
 	}
 
 	Shape::Shape(Shape* pShape) : mp_texture(pShape->mp_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
@@ -123,7 +128,8 @@ namespace gcle
 		return m_verticies;
 	}
 
-	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color) {
+	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner) : Shape(owner)
+	{
 		{
 			m_shape = Shapes::Rectangle;
 
@@ -185,7 +191,8 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-	Triangle::Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color) {
+	Triangle::Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner) : Shape(owner)
+	{
 		m_trianglepoints.push_back({ x1, y1 });
 		m_trianglepoints.push_back({ x2, y2 });
 		m_trianglepoints.push_back({ x2, y2 });
@@ -250,7 +257,8 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color) {
+	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner) : Shape(owner)
+	{
 		if (_smoothness < 3) {
 			return;
 		}

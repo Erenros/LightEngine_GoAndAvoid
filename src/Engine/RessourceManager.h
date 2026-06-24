@@ -112,16 +112,16 @@ public:
 
 	void SetFontSize(const std::string& id, int size);
 
-	void SetMusicVolume(int volume) { Audio::SetMusicVolumeA(volume); };
+	void SetMusicVolume(int volume) { Audio::SetMusicVolume(volume); };
 
-	void StopMusic() { Audio::StopMusicA(); };
-	void PauseMusic() { Audio::PauseMusicA(); };
-	void ResumeMusic() { Audio::ResumeMusicA(); };
+	void StopMusic() { Audio::StopMusic(); };
+	void PauseMusic() { Audio::PauseMusic(); };
+	void ResumeMusic() { Audio::ResumeMusic(); };
 
-	void StopAllSound() { Audio::StopAllSoundA(); };
+	void StopAllSound() { Audio::StopAllSound(); };
 
-	bool isMusicPlaying() { return Audio::IsMusicPlayingA(); };
-	bool IsMusicPaused() { return Audio::IsMusicPausedA(); }
+	bool isMusicPlaying() { return Audio::IsAMusicPlaying(); };
+	bool IsMusicPaused() { return Audio::IsAMusicPaused(); }
 
 	/// <summary>
 	/// Mode : 1 = 1 fois,  0 = 1 boucle, -1 = infinite loop

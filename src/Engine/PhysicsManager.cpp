@@ -77,7 +77,7 @@ void PhysicsManager::Update(float64 deltaTime)
 					}
 					if (otherEntity->m_OnCollisionEnter)
 					{
-						otherEntity->OnCollisionEnter(otherEntity);
+						otherEntity->OnCollisionEnter(entity);
 						otherEntity->m_OnCollisionEnter = false;
 					}
 
@@ -165,13 +165,13 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 
 bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
 {
-	float32 x1 = pRect1->GetPosition().x;
-	float32 y1 = pRect1->GetPosition().y;
+	float32 x1 = pRect1->GetPosition(0, 0).x;
+	float32 y1 = pRect1->GetPosition(0, 0).y;
 	float32 w1 = pRect1->GetWidth();
 	float32 h1 = pRect1->GetHeight();
 
-	float32 x2 = pRect2->GetPosition().x;
-	float32 y2 = pRect2->GetPosition().y;
+	float32 x2 = pRect2->GetPosition(0, 0).x;
+	float32 y2 = pRect2->GetPosition(0, 0).y;
 	float32 w2 = pRect2->GetWidth();
 	float32 h2 = pRect2->GetHeight();
 
@@ -285,6 +285,10 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 			pos1.x += correction * a->IsKinematic();
 			pos2.x -= correction * b->IsKinematic();
 		}
+
+		a->GetOwner()->GetRigidBody().ZeroVelocityX();
+		b->GetOwner()->GetRigidBody().ZeroVelocityX();
+
 	}
 	else
 	{
@@ -300,10 +304,13 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 			pos1.y += correction * a->IsKinematic();
 			pos2.y -= correction * b->IsKinematic();
 		}
+		a->GetOwner()->GetRigidBody().ZeroVelocityY();
+		b->GetOwner()->GetRigidBody().ZeroVelocityY();
 	}
 
 	a->SetPosition(pos1.x, pos1.y, 0.5f, 0.5f);
 	b->SetPosition(pos2.x, pos2.y, 0.5f, 0.5f);
+
 }
 
 void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
@@ -327,6 +334,13 @@ void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
 
 	a->SetPosition(position1.x, position1.y, 0.5f, 0.5f);
 	b->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
+
+	//gestion de la velocity
+
+	if (!a->IsKinematic() || !b->IsKinematic()){
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	}
 }
 
 void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
@@ -339,7 +353,7 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	float32 rw = pRect->GetWidth();
 	float32 rh = pRect->GetHeight();
 
-	Vector2f circlePos = pCircle->GetCenter();
+	Vector2f circlePos = pCircle->GetPosition(0.5f, 0.5f);
 	Vector2f rectPos = pRect->GetPosition(0.5f, 0.5f);
 
 	float32 nearestX = std::max(rx, std::min(circlePos.x, rx + rw));
@@ -360,17 +374,26 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 		float32 minOverlap = std::min({ overlapL, overlapR, overlapT, overlapB });
 		Vector2f newPos = circlePos;
+		Vector2f normal({ 0.0f, 0.0f });
 
-		if (minOverlap == overlapL)      newPos.x = rx - pCircle->GetRadius();
-		else if (minOverlap == overlapR) newPos.x = rx + rw + pCircle->GetRadius();
-		else if (minOverlap == overlapT) newPos.y = ry - pCircle->GetRadius();
-		else                              newPos.y = ry + rh + pCircle->GetRadius();
+		if (minOverlap == overlapL) { newPos.x = rx - pCircle->GetRadius();       normal = { -1.0f,  0.0f }; }
+		else if (minOverlap == overlapR) { newPos.x = rx + rw + pCircle->GetRadius();  normal = { 1.0f,  0.0f }; }
+		else if (minOverlap == overlapT) { newPos.y = ry - pCircle->GetRadius();       normal = { 0.0f, -1.0f }; }
+		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
-		Vector2f circleTranslation = (newPos - circlePos) * correctionMultiplyer;
+		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
 
-		pCircle->SetPosition(circlePos.x + circleTranslation.x * b->IsKinematic(),
-			circlePos.y + circleTranslation.y * b->IsKinematic(),
-			0.5f, 0.5f);
+		Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
+		pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+
+		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
+		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+
+		if (!a->IsKinematic() || !b->IsKinematic()) {
+			a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+			b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		}
+
 		return;
 	}
 
@@ -385,6 +408,11 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+
+	if (!a->IsKinematic() || !b->IsKinematic()) {
+		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
+		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
+	}
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)

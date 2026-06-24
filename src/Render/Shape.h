@@ -7,6 +7,7 @@
 #include "Engine/RessourceManager.h"
 #include "Sprite.h"
 
+class Entity;
 struct SDL_Vertex;
 
 struct Color {
@@ -31,6 +32,7 @@ namespace gcle
 
 	protected:
 		Transform2D m_Transform;
+		Entity* mp_Owner;
 
 		//circle
 		float32 m_radius = 0.0f;
@@ -58,7 +60,7 @@ namespace gcle
 
 		//Constructors 
 
-		Shape() = default;
+		Shape(Entity* owner);
 		Shape(Shape* pShape);
 
 
@@ -86,6 +88,7 @@ namespace gcle
 		virtual float32 GetHeight() { return 0.f; };
 		virtual float32 GetRadius() { return 0.f; };
 		virtual int32 GetSmoothness() { return 0; };
+		virtual Entity* GetOwner() { return mp_Owner; };
 		virtual Vector2f GetCenter() { return { 0, 0 }; };
 		virtual std::vector<Vector2f> GetTrianglePoints() { return m_trianglepoints; };
 
@@ -124,7 +127,7 @@ namespace gcle
 	class Rectangle : public Shape {
 
 	public:
-		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color);
+		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner);
 	
 
 
@@ -153,7 +156,7 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color);
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner);
 
 		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
@@ -164,7 +167,7 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color);
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner);
 
 		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
 		int32 GetSmoothness() override { return m_smoothness; };

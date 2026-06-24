@@ -2,37 +2,37 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-void Audio::SetMusicVolumeA(int volume)
+void Audio::SetMusicVolume(int volume)
 {
     Mix_VolumeMusic(volume);
 }
 
-void Audio::StopMusicA()
+void Audio::StopMusic()
 {
     Mix_HaltMusic();
 }
 
-void Audio::PauseMusicA()
+void Audio::PauseMusic()
 {
     Mix_PauseMusic();
 }
 
-void Audio::ResumeMusicA()
+void Audio::ResumeMusic()
 {
     Mix_ResumeMusic();
 }
 
-void Audio::StopAllSoundA()
+void Audio::StopAllSound()
 {
     Mix_HaltChannel(-1);
 }
 
-bool Audio::IsMusicPlayingA()
+bool Audio::IsAMusicPlaying()
 {
     return (Mix_PlayingMusic() ? true : false);
 }
 
-bool Audio::IsMusicPausedA()
+bool Audio::IsAMusicPaused()
 {
     return (Mix_PausedMusic() ? true : false);
 }      

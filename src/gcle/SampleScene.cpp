@@ -13,13 +13,16 @@ void SampleScene::OnInitialize()
 	 
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 
+	std::string text = "Test";
+	CreateText(font, text, 40, 40, 20, 20);
 	 
-	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
- 	entity1->SetPosition(10, -200);
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
+	entity1->SetPosition(10, -200);
 	entity1->SetRigidBody(true);
+	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
