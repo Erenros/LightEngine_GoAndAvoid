@@ -255,41 +255,78 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 	absoluteRotation.m_matrix[0][1] = rotation[0][1];
 	absoluteRotation.m_matrix[1][1] = rotation[1][1];
 	
-	const float Epsilon = 1e-16;
+	const float64 Epsilon = 1e-16;
 	
 	for (int i = 0; i < 2; i++) {
 		relativeRotation.m_matrix[0][i] = axes[i].x;
 		relativeRotation.m_matrix[1][i] = axes[i].y;
 
 		for (int j = 0; j < 2; j++) {
-			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + Epsilon;
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + static_cast<float32>(Epsilon);
 		}
 	}
 
 
 	float ra = 0.f, rb = 0.f;
 
+	float32 minOverlap = std::numeric_limits<float32>::max();
+	Vector2f collisionNormal;
+
+
 	ra = aabbExtents.x;
 	rb = obbExtents.x * absoluteRotation.m_matrix[0][0] + obbExtents.y * absoluteRotation.m_matrix[0][1];
-	if (std::abs(T.x) > ra + rb)
+	float32 overlapX = (ra + rb) - std::abs(T.x);
+	if (overlapX <= 0.f)
 		return false;
+
+	if (overlapX < minOverlap) {
+		minOverlap = overlapX;
+		collisionNormal = { (T.x * 0.f ? 1.f : -1.f), 0.f };
+		collisionNormal.x = (T.x > 0.f) ? 1.0f : -1.0f;
+	}
 
 	ra = aabbExtents.y;
 	rb = obbExtents.x * absoluteRotation.m_matrix[1][0] + obbExtents.y * absoluteRotation.m_matrix[1][1];
-	if (std::abs(T.y) > ra + rb)
+	float32 overlapY = (ra + rb) - std::abs(T.y);
+	if (overlapY <= 0.f)
 		return false;
+
+	if (overlapY < minOverlap) {
+		minOverlap = overlapY;
+		collisionNormal = { 0.f, (T.y > 0.f ? 1.f : -1.f) };
+	}
+	
+	
+	
 
 	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
 	rb = obbExtents.x;
 	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
-	if (std::abs(t_obbX) > ra + rb)
+	float32 overlapObbX = (ra + rb) - std::abs(t_obbX);
+	if (overlapObbX <= 0.f)
 		return false;
+
+	if (overlapObbX < minOverlap) {
+		minOverlap = overlapObbX;
+		float32 sign = (t_obbX > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes[0].x * sign, axes[0].y * sign };
+	}
 
 	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
 	rb = obbExtents.y;
 	float32 t_obbY = T.x * relativeRotation.m_matrix[0][1] + T.y * relativeRotation.m_matrix[1][1];
-	if (std::abs(t_obbY) > ra + rb)
+	float32 overlapObbY = (ra + rb) - std::abs(t_obbY);
+	if (overlapObbY <= 0.f)
 		return false;
+
+	if (overlapObbY < minOverlap) {
+		minOverlap = overlapObbY;
+		float32 sign = (t_obbY > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes[1].x * sign, axes[1].y };
+	}
+	
+	colDatas.orientation = collisionNormal;
+	colDatas.penetration = minOverlap;
 
 	DEBUG_INFO << "ca touche obb aabb" << ENDL;
 	return true;
@@ -319,12 +356,12 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	Matrix relativeRotation(2, 2);
 	Matrix absoluteRotation(2, 2);
 
-	const float Epsilon = 1e-16;
+	const float64 Epsilon = 1e-16;
 
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
 			relativeRotation.m_matrix[j][i] = axes1[i].x * axes2[j].x + axes1[i].y * axes2[j].y;
-			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + Epsilon;
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + static_cast<float32>(Epsilon);
 		}
 	}
 
@@ -394,7 +431,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	return false;
 
 }
-
+	
 
 bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
@@ -612,6 +649,22 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	RepulseRectCircle(b, a);
+}
+
+void PhysicsManager::RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b) {
+	if (a->IsKinematic() == false) {
+	
+		Vector2f actualPosition= a->GetPosition();
+		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		a->SetPosition(pos.x, pos.y);
+	}
+	if (b->IsKinematic() == false) {
+
+		Vector2f actualPosition = b->GetPosition();
+		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		b->SetPosition(pos.x, pos.y);
+	}
+
 }
 
 float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)

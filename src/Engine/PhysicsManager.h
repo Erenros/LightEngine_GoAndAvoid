@@ -12,6 +12,10 @@ struct EntityInfo
 };
 
 
+struct CollisionInfo {
+	int32 penetration = 0;
+	Vector2f orientation{ 0, 0 };
+};
 
 class PhysicsManager
 {
@@ -45,6 +49,8 @@ private:
 	void RepulseRectCircle(gcle::Shape* a, gcle::Shape* b);
 	void RepulseCircleRect(gcle::Shape* a, gcle::Shape* b);
 
+	void RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b);
+
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
 private:
@@ -56,5 +62,8 @@ private:
 
 	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
 	static RepulseFn repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+
+private:
+	CollisionInfo colDatas;
 };
 
