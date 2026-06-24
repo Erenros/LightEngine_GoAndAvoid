@@ -6,221 +6,70 @@
 3. [Render](#render)    
 4. [Core](#core)    
 
----
 
 ## gcle
 
----
 
 ## Engine
 
-This is where you'll find most of the functions you want to use.
+---
+## Render
 
-### Entity
+You normaly don't need to use this part of the code. It's the render library where all SDL2 code is used.       
+The only one you will needs are:
 
-- [Destroy](#destroy)
-- [ToDestroy](#todestroy)
-
-- [GetShape](#getshape)
-- [GetPosition](#getpositionoffsetx--05f-offsety--05f)
-- [GetId](#getid)
-
-- [SetTag](#settag)
-- [IsTag](#istag)
-
-- [GoToPosition](#gotoposition)
-- [GoToDirection](#gotodirection)
-- [SetSpeed](#setspeed)
-- [SetDirection](#setdirection)
-
-- [SetPosition](#setposition)
-- [SetScale](#setscale)
-- [ScaleBy](#scaleby)
-- [GetScale](#getscale)
-
-- [GetRotation](#getrotation)
-- [SetRotation](#setrotation)
-- [Rotate](#rotate)
-
-- [GetRigidBody](#getrigidbody)
-- [SetRigidBody](#setrigidbody)
-- [IsRigidBody](#isrigidbody)
-
-- [SetTexture](#settexture)
-- [AddAnimation](#addanimation)
-- [PlayAnimation](#playanimation)
-
-- [IsColliding](#iscolliding)
-- [IsInside](#isinside)
+a. [Sound](#sound)     
+b. [Music](#music)      
+c. [Audio](#audio)     
+d. [Text](#text) 
 
 ---
+### Sound:
 
-## Destroy()
+#### InitSound(Path)
 
-Destroy the Entity at the end of the frame.
-
----
-
-## ToDestroy()
-
-Returns whether the Entity is scheduled to be destroyed at the end of the frame.
+Initialize the sound you'll want to play.
 
 ---
+#### PlaySound(Mode, Volume)
 
-## GetShape()
-
-Returns the `gcle::Shape*` of the Entity.
-
----
-
-## GetPosition(offsetX = 0.5f, offsetY = 0.5f)
-
-Returns the actual position of the Entity with an offset.
-
-- `offsetX = 0.5f`, `offsetY = 0.5f` → center of the shape  
-- `offsetX = 0.0f`, `offsetY = 0.0f` → top-left of the shape  
+Play the actual loaded sound.   
+Mode define how much time you want to loop on the sound.   
+If you want to loop infinitely this parameter should be -1.
 
 ---
-
-## GetId()
-
-Each created Entity has a different ID based on its creation order.
-
----
-
-## SetTag(tag)
-
-Sets a tag to the entity, which can be used with `IsTag`.
-
----
-
-## IsTag(tag)
-
-Returns `true` if the given tag matches the Entity’s tag.
-
----
-
-## GoToPosition(x, y, speed = -1.0f)
-
-Makes the Entity move to the given position.
-
----
-
-## GoToDirection(x, y, speed = 1.0f)
-
-Makes the Entity move in the given direction.
-
----
-
-## SetSpeed(speed)
-
-Sets the Entity’s speed.
-
----
-
-## SetDirection(x, y)
-
-Sets the Entity’s direction.
-
----
-
-## SetPosition(x, y, offsetX = 0.5f, offsetY = 0.5f)
-
-Sets the position of the Entity using an offset between 0 and 1.
-
----
-
-## SetScale(Vector2f) | SetScale(Scale)
-
-Sets the scale of the Entity shape. Can use a Vector2f to scale in x and/or y.
-
----
-
-## GetScale()
-
-Returns the scale of the Entity shape.
-
----
-
-## ScaleBy(Vector2)
-
-Scales the Entity shape by the given parameter.
-
----
-
-## SetRotation(angle)
-
-Sets the rotation of the Entity shape (in degrees).
-
----
-
-## GetRotation()
-
-Returns the rotation of the Entity shape in degrees.
-
----
-
-## Rotate(angle)
-
-Rotates the Entity shape by the given parameter.
-
----
-
-# Render
-
-You normally don’t need to use this part of the code. It is the rendering library where all SDL2 code is used.
-
-### Sound
-
-## InitSound(path)
-
-Initializes the sound you want to play.
-
----
-
-## PlaySound(mode, volume)
-
-Plays the currently loaded sound.
-
-- `mode` defines the number of loops  
-- `-1` = infinite loop  
-
----
-
 ### Music
 
-## InitMusic(path)
+#### InitMusic(Path)
 
-Initializes the music you want to play.
-
----
-
-## PlayMusic(mode)
-
-Plays the currently loaded music.
-
-- `mode` defines the number of loops  
-- `-1` = infinite loop  
+Initialize the music you'll want to play.
 
 ---
+#### PlayMusic(Mode)
 
+Play the actual loaded music.   
+Mode define how much time you want to loop on the music.   
+If you want to loop infinitely this parameter should be -1.
+
+---
 ### Audio
 
-All functions can be called using `Audio::Function()`.
+All next functions can be called by writing Audio::Funtion() and are explicit.
 
-- SetMusicVolume(volume)  
-- StopMusic()  
-- PauseMusic()  
-- ResumeMusic()  
-- StopAllSound()  
-- IsMusicPlaying()  
-- IsMusicPaused()  
+#### SetMusicVolume(Volume)
+#### StopMusic()
+#### PauseMusic()
+#### ResumeMusic()
+#### StopAllSound()
+#### IsAMusicPlaying()
+#### IsAMusicPaused()
 
 ---
+### Text:
 
-### Text
+#### Usage
 
-### Usage
+In your scene use the function CreateText("text", x, y, width , height)
 
 ```cpp
 std::string text = "Test";

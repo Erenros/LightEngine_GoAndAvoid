@@ -11,17 +11,21 @@ void SampleScene2::OnInitialize()
 	 
 	
 
-	for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-			entity1->SetPosition(10 * i, -200 * j);
-			entity1->SetRigidBody(false);
-			entity1->GetRigidBody().SetGravity(false);
-			entity1->GetShape()->SetIsKinematic(false);
-		}
-	}
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+	 
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
+ 	entity1->SetPosition(10, -200);
+	entity1->SetRigidBody(true);
+	entity1->GetShape()->SetIsKinematic(true);
+	 
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(10, 100);
+	entity2->SetRigidBody(true);
+	entity2->GetRigidBody().SetGravity(false);
+	entity2->GetShape()->SetIsKinematic(false);
+	entity2->SetTexture("test");
+	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32);
+	entity2->PlayAnimation("anim1");
 }
 
 void SampleScene2::OnUpdate(Clock& time)
