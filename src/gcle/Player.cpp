@@ -1,19 +1,20 @@
 #include "Player.h"
 
-void Player::OnUpdate(){
-	InputManager& im = InputManager::GetInstance();
+void Player::OnUpdate() {
+    InputManager& im = InputManager::GetInstance();
+    RigidBody2D rb = GetRigidBody();
 
-	
-	if (im.IsHeld('Q')) {
-		GetRigidBody().AddForce({ -1, 0 }, 100, 0.016f);
-	}
-	if (im.IsHeld('D')) {
-		GetRigidBody().AddForce({ 1, 0 }, 100, 0.016f);
-	}
-	if (im.IsHeld('S')) {
-		GetRigidBody().AddForce({ 0, 1 }, 100, 0.016f);
-	}
-	if (im.IsHeld('Z')) {
-		GetRigidBody().AddForce({ 0, -1 }, 100, 0.016f);		 
-	}
+
+    if (im.IsHeld('Q')) {
+        GetRigidBody().SetForce({ -1, 0 }, 100);
+    }
+    if (im.IsHeld('D')) {
+        GetRigidBody().SetForce({ 1, 0 }, 100);
+    }
+    if (im.IsHeld('S')) {
+        GetRigidBody().SetForce({ 0, 1 }, 100);
+    }
+    if (im.IsHeld('Z')) {
+        GetRigidBody().SetForce({ 0, -1 }, 100);
+    }
 }
