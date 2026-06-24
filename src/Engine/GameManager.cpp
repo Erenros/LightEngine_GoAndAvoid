@@ -24,7 +24,7 @@ void GameManager::Loop()
 		//PROFILER_END("Colliders");
     
 		//PROFILER_START("time", "Timer Update");
-		time.Update();
+		m_Time.Update();
 		//PROFILER_END("time");
 	
 		//PROFILER_START("Entity", "Entity Creation / Deletion");
@@ -37,11 +37,11 @@ void GameManager::Loop()
 		//PROFILER_END("Input");
 
 		//PROFILER_START("SceneU", "Scene Update");
-		SceneManager::GetInstance().UpdateCurrentScene(time);
+		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		//PROFILER_END("SceneU");
 		
 		//PROFILER_START("Camera", "Camera Update");
-		m_Cam.Update(time, m_entities);
+		m_Cam.Update(m_Time, m_entities);
 		//PROFILER_END("Camera");
 	
 		mp_window->Clear();
