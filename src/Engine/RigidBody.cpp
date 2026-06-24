@@ -27,7 +27,6 @@ void RigidBody2D::Update(Clock& timer)
 	ClampVelocity();
 	ApplyVelocity(dt);
 
-
 }
 
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
@@ -82,7 +81,7 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	float32 dot = m_Velocity.Dot(n);
 
 	// Si dot < 0, l'objet va contre la normale, donc il rentre dans l'obstacle.
-	// Si dot > 0, l'objet s'Èloigne dÈj‡, donc on ne touche pas ‡ sa velocity.
+	// Si dot > 0, l'objet s'√©loigne d√©j√†, donc on ne touche pas √† sa velocity.
 	if (dot < 0.0f)
 	{
 		m_Velocity -= n * dot;

@@ -1,9 +1,7 @@
-#include "SampleScene.h"
+#include "SampleScene2.h"
 #include "Player.h"
-#include "Render/Sprite.h"
-#include "Render/Text.h"
 
-void SampleScene::OnInitialize()
+void SampleScene2::OnInitialize()
 {
 	 
 	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
@@ -11,27 +9,28 @@ void SampleScene::OnInitialize()
 	pEntity->SetScale(0.5f);
 	pEntity->SetRigidBody(true);*/
 	 
-	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+	
 
-	std::string text = "Test";
-	CreateText(font, text, 40, 40, 20, 20);
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
-	entity1->SetPosition(10, -200);
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
+ 	entity1->SetPosition(10, -200);
 	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
 	 
-	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
-	entity2->SetTexture("images");
+	entity2->SetTexture("test");
+	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32);
+	entity2->PlayAnimation("anim1");
 }
 
-void SampleScene::OnUpdate(Clock& time)
+void SampleScene2::OnUpdate(Clock& time)
 {
+	//pEntity->Rotate(1);
 
 	if (InputManager::GetInstance().IsDown(Space))
 	{
