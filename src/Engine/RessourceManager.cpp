@@ -28,12 +28,12 @@ Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, c
     Sprite* texture = new Sprite(window, path);
     if (texture == nullptr || !texture->IsTextureInit())
     {
-        DEBUG_WARN << "Got a nullptr Texture for path : " + path << ENDL;
+        GCLE_WARN << "Got a nullptr Texture for path : " + path << ENDL;
         delete texture;
         return nullptr;
     }
      
-    DEBUG_INFO << "Texture created" << ENDL;
+    GCLE_INFO << "Texture created" << ENDL;
     m_textureMap[id].mp_texture = texture;
     return texture;
 }
@@ -51,7 +51,7 @@ bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
     Music* music = new Music(path);
     if (music == nullptr || !music->IsMusicInit())
     {
-        DEBUG_WARN << "Got nullptr music for path " + path << ENDL;
+        GCLE_WARN << "Got nullptr music for path " + path << ENDL;
         delete music;
         return false;
     }
@@ -65,7 +65,7 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
     Sound* sound = new Sound(path);
     if (sound == nullptr || !sound->IsSoundInit())
     {
-        DEBUG_WARN << "Got a nullptr sound for path : " + path << ENDL;
+        GCLE_WARN << "Got a nullptr sound for path : " + path << ENDL;
         delete sound;
         return false;
     }
@@ -79,7 +79,7 @@ bool RessourceManager::LoadFont(const std::string& path, const std::string& id, 
     Font* font = new Font(path, size);
     if (font == NULL)
     {
-        DEBUG_WARN << "Got a nullptr font for path " + path << ENDL;
+        GCLE_WARN << "Got a nullptr font for path " + path << ENDL;
         delete font;
         return false;
     }

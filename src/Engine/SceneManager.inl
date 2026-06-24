@@ -7,7 +7,7 @@ template <typename S>
 Scene* SceneManager::CreateScene(const std::string& tag) {
     if (m_validFlag.size() == 0) {
         std::cerr << "You can't create more than 32 scenes" << std::endl;
-        DEBUG_ERROR << "There is no more scene flag disponible" << ENDL;
+        GCLE_ERROR << "There is no more scene flag disponible" << ENDL;
         return nullptr;
     }
 
