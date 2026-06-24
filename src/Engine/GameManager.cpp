@@ -12,19 +12,26 @@ void GameManager::Loop()
 {
 	isRunning = true;
 	 
-	Clock time;
-
-	Camera m_Cam;
 	m_Cam.Init(mp_window);
 
 	while (isRunning == true)
 	{
-		PROFILER_START("Colliders", "Colliders Update");
+
+		m_Time.Update();
+		
+		InputManager::GetInstance().Update();
+
+		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+		
+		m_Cam.Update(m_Time, m_entities);
+	
+		UpdateEntitySystem();
+
 		if (m_loopTour < 1)
 			m_loopTour++;
 		else
 			PhysicsManager::GetInstance().Update(0.016f);
-		PROFILER_END("Colliders");
+		// PROFILER_END("Colliders");
     
 		//PROFILER_START("time", "Timer Update");
 		time.Update();
@@ -68,7 +75,7 @@ void GameManager::Loop()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
-	srand(static_cast<int32>(time(NULL)));
+	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;

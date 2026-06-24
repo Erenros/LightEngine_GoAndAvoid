@@ -28,6 +28,7 @@ public:
 	bool Init(int32 windowWidth, int32 windowHeight);
 	void Loop();
 	void Close();
+	Clock* GetTime() { return &m_Time; }
 
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
@@ -43,6 +44,7 @@ private:
 	Window* mp_window = nullptr;
 
 
+	Clock m_Time;
 
 	bool isRunning = false;
 
