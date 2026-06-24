@@ -14,13 +14,16 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 	 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(10, -200);
+	entity1->SetRotation(45);
 	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(true);
+	entity1->GetRigidBody().SetGravity(false);
 	entity1->GetShape()->SetIsKinematic(true);
+	entity1->GetRigidBody().SetDampingStrenght(0.9);
+
 	 
-	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);

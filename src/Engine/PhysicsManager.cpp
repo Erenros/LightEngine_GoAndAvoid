@@ -1,5 +1,6 @@
 #include "PhysicsManager.h"
 #include "SceneManager.h"
+#include "MathGC.h"
 
 PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
 {
@@ -225,15 +226,141 @@ bool PhysicsManager::CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Ci
 
 
 bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
-	
+
+	Vector2f axes[2];
+
+	float32 radRotation = pRect1->GetTransform().GetRadAngle();
+	axes[0] = {std::cos(radRotation), std::sin(radRotation) };
+	axes[1] = {-std::sin(radRotation), std::cos(radRotation) };
+
+
+	Matrix3x3 rotation = pRect1->GetTransform().GetMatrix();
+
+	//OBB values
+	Vector2f obbExtents{pRect1->GetWidth() / 2, pRect1->GetHeight()/2};
+
+	//AABB values
+	Vector2f aabbExtents{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
 
 	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
-	return false;
+	
+	Matrix relativeRotation(2, 2);
+	Matrix absoluteRotation(2, 2);
+
+	absoluteRotation.m_matrix[0][0] = rotation[0][0];
+	absoluteRotation.m_matrix[1][0] = rotation[1][0];
+	absoluteRotation.m_matrix[0][1] = rotation[0][1];
+	absoluteRotation.m_matrix[1][1] = rotation[1][1];
+	
+	const float Epsilon = 1e-16;
+	
+	for (int i = 0; i < 2; i++) {
+		relativeRotation.m_matrix[0][i] = axes[i].x;
+		relativeRotation.m_matrix[1][i] = axes[i].y;
+
+		for (int j = 0; j < 2; j++) {
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + Epsilon;
+		}
+	}
+
+
+	float ra = 0.f, rb = 0.f;
+
+	ra = aabbExtents.x;
+	rb = obbExtents.x * absoluteRotation.m_matrix[0][0] + obbExtents.y * absoluteRotation.m_matrix[0][1];
+	if (std::abs(T.x) > ra + rb)
+		return false;
+
+	ra = aabbExtents.y;
+	rb = obbExtents.x * absoluteRotation.m_matrix[1][0] + obbExtents.y * absoluteRotation.m_matrix[1][1];
+	if (std::abs(T.y) > ra + rb)
+		return false;
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
+	rb = obbExtents.x;
+	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
+	if (std::abs(T.x) > ra + rb)
+		return false;
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
+	rb = obbExtents.y;
+	float32 t_obbY = T.x * relativeRotation.m_matrix[0][1] + T.y * relativeRotation.m_matrix[1][1];
+	if (std::abs(t_obbY) > ra + rb)
+		return false;
+
+	DEBUG_INFO << "ca touche obb aabb" << ENDL;
+	return true;
 }
 
 bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
+	Vector2f axes1[2];
+	Vector2f axes2[2];
 
-	return false;
+	float32 radRotation1 = pRect1->GetTransform().GetRadAngle();
+	float32 radRotation2 = pRect2->GetTransform().GetRadAngle();
+	
+	axes1[0] = { std::cos(radRotation1), std::sin(radRotation1) };
+	axes1[1] = { -std::sin(radRotation1), std::cos(radRotation1) };
+
+	axes1[0] = { std::cos(radRotation2), std::sin(radRotation2) };
+	axes1[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
+
+	Matrix3x3 rotation1 = pRect1->GetTransform().GetMatrix();
+	Matrix3x3 rotation2 = pRect2->GetTransform().GetMatrix();
+
+	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
+	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
+
+	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
+
+	Matrix relativeRotation(2, 2);
+	Matrix absoluteRotation(2, 2);
+
+	absoluteRotation.m_matrix[0][0] = rotation[0][0];
+	absoluteRotation.m_matrix[1][0] = rotation[1][0];
+	absoluteRotation.m_matrix[0][1] = rotation[0][1];
+	absoluteRotation.m_matrix[1][1] = rotation[1][1];
+
+	const float Epsilon = 1e-16;
+
+	for (int i = 0; i < 2; i++) {
+		relativeRotation.m_matrix[0][i] = axes[i].x;
+		relativeRotation.m_matrix[1][i] = axes[i].y;
+
+		for (int j = 0; j < 2; j++) {
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + Epsilon;
+		}
+	}
+
+
+	float ra = 0.f, rb = 0.f;
+
+	ra = aabbExtents.x;
+	rb = obbExtents.x * absoluteRotation.m_matrix[0][0] + obbExtents.y * absoluteRotation.m_matrix[0][1];
+	if (std::abs(T.x) > ra + rb)
+		return false;
+
+	ra = aabbExtents.y;
+	rb = obbExtents.x * absoluteRotation.m_matrix[1][0] + obbExtents.y * absoluteRotation.m_matrix[1][1];
+	if (std::abs(T.y) > ra + rb)
+		return false;
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
+	rb = obbExtents.x;
+	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
+	if (std::abs(T.x) > ra + rb)
+		return false;
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
+	rb = obbExtents.y;
+	float32 t_obbY = T.x * relativeRotation.m_matrix[0][1] + T.y * relativeRotation.m_matrix[1][1];
+	if (std::abs(t_obbY) > ra + rb)
+		return false;
+
+
+
+	DEBUG_INFO << "ca touche obb obb" << ENDL;
+	return true;
 }
 
 bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle){
