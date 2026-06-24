@@ -2,6 +2,9 @@
 #include "SceneManager.h"
 #include "MathGC.h"
 
+#undef min
+#undef max
+
 PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
 {
 	{
@@ -279,7 +282,7 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
 	rb = obbExtents.x;
 	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
-	if (std::abs(T.x) > ra + rb)
+	if (std::abs(t_obbX) > ra + rb)
 		return false;
 
 	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
@@ -302,11 +305,11 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	axes1[0] = { std::cos(radRotation1), std::sin(radRotation1) };
 	axes1[1] = { -std::sin(radRotation1), std::cos(radRotation1) };
 
-	axes1[0] = { std::cos(radRotation2), std::sin(radRotation2) };
-	axes1[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
+	axes2[0] = { std::cos(radRotation2), std::sin(radRotation2) };
+	axes2[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
 
-	Matrix3x3 rotation1 = pRect1->GetTransform().GetMatrix();
-	Matrix3x3 rotation2 = pRect2->GetTransform().GetMatrix();
+	/*Matrix3x3 rotation1 = pRect1->GetTransform().GetMatrix();
+	Matrix3x3 rotation2 = pRect2->GetTransform().GetMatrix();*/
 
 	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
 	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
@@ -316,45 +319,39 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	Matrix relativeRotation(2, 2);
 	Matrix absoluteRotation(2, 2);
 
-	absoluteRotation.m_matrix[0][0] = rotation[0][0];
-	absoluteRotation.m_matrix[1][0] = rotation[1][0];
-	absoluteRotation.m_matrix[0][1] = rotation[0][1];
-	absoluteRotation.m_matrix[1][1] = rotation[1][1];
-
 	const float Epsilon = 1e-16;
 
 	for (int i = 0; i < 2; i++) {
-		relativeRotation.m_matrix[0][i] = axes[i].x;
-		relativeRotation.m_matrix[1][i] = axes[i].y;
-
 		for (int j = 0; j < 2; j++) {
+			relativeRotation.m_matrix[j][i] = axes1[i].x * axes2[j].x + axes1[i].y * axes2[j].y;
 			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + Epsilon;
 		}
 	}
 
-
 	float ra = 0.f, rb = 0.f;
 
-	ra = aabbExtents.x;
-	rb = obbExtents.x * absoluteRotation.m_matrix[0][0] + obbExtents.y * absoluteRotation.m_matrix[0][1];
-	if (std::abs(T.x) > ra + rb)
+	ra = extents1.x;
+	rb = extents2.x * absoluteRotation.m_matrix[0][0] + extents2.y * absoluteRotation.m_matrix[0][1];
+	float32 t1_X = std::abs(T.x * axes1[0].x + T.y * axes1[0].y);
+	if (t1_X > ra + rb)
 		return false;
 
-	ra = aabbExtents.y;
-	rb = obbExtents.x * absoluteRotation.m_matrix[1][0] + obbExtents.y * absoluteRotation.m_matrix[1][1];
-	if (std::abs(T.y) > ra + rb)
+	ra = extents1.y;
+	rb = extents2.x * absoluteRotation.m_matrix[1][0] + extents2.y * absoluteRotation.m_matrix[1][1];
+	float32 t1_Y = std::abs(T.x * axes1[1].x + T.y * axes1[1].y);
+	if (t1_Y > ra + rb)
 		return false;
 
-	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
-	rb = obbExtents.x;
-	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
-	if (std::abs(T.x) > ra + rb)
+	ra = extents1.x * absoluteRotation.m_matrix[0][0] + extents1.y * absoluteRotation.m_matrix[1][0];
+	rb = extents2.x;
+	float32 t2_X = std::abs(T.x * axes2[0].x + T.y * axes2[0].y);
+	if (t2_X > ra + rb)
 		return false;
 
-	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
-	rb = obbExtents.y;
-	float32 t_obbY = T.x * relativeRotation.m_matrix[0][1] + T.y * relativeRotation.m_matrix[1][1];
-	if (std::abs(t_obbY) > ra + rb)
+	ra = extents1.x * absoluteRotation.m_matrix[0][1] + extents1.y * absoluteRotation.m_matrix[1][1];
+	rb = extents2.y;
+	float32 t2_Y = std::abs(T.x * axes2[1].x + T.y * axes2[1].y);
+	if (t2_Y > ra + rb)
 		return false;
 
 
@@ -363,9 +360,39 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	return true;
 }
 
-bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle){
+bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle) {
 
+	Vector2f rectPos = pRect->GetPosition();
+	Vector2f extents{ pRect->GetWidth() / 2 , pRect->GetHeight() / 2 };
+	float32 angle = pRect->GetTransform().GetRadAngle();
+
+	Vector2f circlePos = pCircle->GetPosition();
+	float32 radius = pCircle->GetRadius();
+
+	Vector2f T = circlePos - rectPos;
+
+	float32 cos = std::cos(angle);
+	float32 sin = std::sin(angle);
+
+	Vector2f localCirclePos;
+	localCirclePos.x = T.x * cos + T.y * sin;
+	localCirclePos.y = -T.x * sin + T.y * cos;
+
+	Vector2f closestPoint;
+	closestPoint.x = std::max(-extents.x, std::min(localCirclePos.x, extents.x));
+	closestPoint.y = std::max(-extents.y, std::min(localCirclePos.y, extents.y));
+
+	float32 deltaX = localCirclePos.x - closestPoint.x;
+	float32 deltaY = localCirclePos.y - closestPoint.y;
+
+	float32 distanceCarree = (deltaX * deltaX) + (deltaY * deltaY);
+
+	if (distanceCarree <= (radius * radius)) {
+	DEBUG_INFO << "ca touche obb circle" << ENDL;
+	return true;
+	}
 	return false;
+
 }
 
 
@@ -410,8 +437,6 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
 
-#undef min
-#undef max
 
 void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 {

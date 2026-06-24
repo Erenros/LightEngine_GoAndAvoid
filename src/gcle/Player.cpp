@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "GameManager.h"
+
 
 void Player::OnUpdate() {
     InputManager& im = InputManager::GetInstance();
@@ -6,15 +8,15 @@ void Player::OnUpdate() {
 
 
     if (im.IsHeld('Q')) {
-        GetRigidBody().SetForce({ -1, 0 }, 100);
+        GetRigidBody().AddForce({ -1, 0 }, 600, 0.006);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody().SetForce({ 1, 0 }, 100);
+        GetRigidBody().AddForce({ 1, 0 }, 600, 0.006);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody().SetForce({ 0, 1 }, 100);
+        GetRigidBody().AddForce({ 0, 1 }, 600, 0.006);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody().SetForce({ 0, -1 }, 100);
+        GetRigidBody().AddForce({ 0, -1 }, 600, 0.006);
     }
 }
