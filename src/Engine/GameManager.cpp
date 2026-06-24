@@ -114,6 +114,22 @@ void GameManager::UpdateEntitySystem()
 		++it;		
 	}
 
+	for (auto layer : m_entities2)
+	{
+		for (auto it = layer.begin(); it != layer.end(); )
+		{
+			Entity* entity = *it;
+
+			if (entity->ToDestroy())
+			{
+				m_entitiesToDestroy.push_back(entity);
+				it = layer.erase(it);
+			}
+
+			++it;
+		}
+	}
+
 	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
 	{
 		delete* it;
@@ -123,7 +139,8 @@ void GameManager::UpdateEntitySystem()
 
 	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
 	{
-		m_entities.push_back(*it);
+		Entity* e= *it;
+		m_entities2[e->GetLayer()].push_back(*it);
 	}
 
 	m_entitiesToCreate.clear();

@@ -57,6 +57,8 @@ public:
 	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
 	void PlayAnimation(const std::string& id, int32 mode = 0);
 
+	int32 GetLayer() { return m_layer; };
+
 public:
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 	bool ToDestroy() const { return m_ToDestroy; }
@@ -110,7 +112,8 @@ private:
 
 private:
 	std::vector<std::string> m_activeScenes;
-
+	
+	int32 m_layer = 0;
 
 private:
 
