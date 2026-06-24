@@ -33,7 +33,6 @@ public:
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
 	Window* GetWindow() { return mp_window; };
-	Camera* GetCamera() { return &m_Cam; }
 
 private:
 	void UpdateEntitySystem();
@@ -44,13 +43,12 @@ private:
 
 	Window* mp_window = nullptr;
 
-	Camera m_Cam;
 
 	Clock m_Time;
 
 	bool isRunning = false;
 
-	int32 m_WindW, m_WindH = 0;
+	int32 m_WindW = 0, m_WindH = 0;
 
 	std::vector <Entity*> m_entities;
 	std::vector <Entity*> m_entitiesToDestroy;

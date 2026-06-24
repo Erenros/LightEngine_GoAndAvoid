@@ -5,6 +5,7 @@
 #include "Transform.h"
 #include "Render/Shape.h"
 #include "Render/Texture.h"
+#include "Render/Sprite.h"
 #include "RigidBody.h"
 
 struct Target
@@ -51,7 +52,10 @@ public:
 	void SetRotation(Degrees angle);
 	void Rotate(Degrees delta);
 
-	void SetTexture(Texture* pTexture);
+	void SetTexture(const std::string& id);
+
+	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
+	void PlayAnimation(const std::string& id, int32 mode = 0);
 
 public:
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }

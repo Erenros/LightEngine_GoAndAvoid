@@ -1,6 +1,9 @@
 #include "Entity.h"
 #include "Core/InputManager.h"
+#include "RessourceManager.h"
 #include "PhysicsManager.h"
+#include "SceneManager.h"
+
 
 static int64 sId = 0;
 
@@ -70,7 +73,12 @@ void Entity::Update(Clock& timer)
 	Vector2f translation = m_Direction * distance;
 
 	mp_Shape->Move(translation);
-
+	Texture* tex = mp_RenderShape->GetTexture();
+	if (tex != nullptr)
+	{
+		if (tex->IsSprite())
+			static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+	}
 	if (m_Target.isSet)
 	{
 		float32 x1 = GetPosition(0.5f, 0.5f).x;
@@ -180,9 +188,16 @@ void Entity::Rotate(Degrees delta)
 	mp_Shape->Rotate(delta);
 }
 
-void Entity::SetTexture(Texture* pTexture)
-{
-	mp_Shape->SetTexture(pTexture);
+void Entity::SetTexture(const std::string& id){
+	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
+	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
+		for(auto& sId : m_activeScenes)
+			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
+		if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
+			std::string path = "../../assets/textures/" + id + ".png";
+			RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
+		}
+	}
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
@@ -249,11 +264,14 @@ Entity::~Entity(){
 
 void Entity::AddActiveScene(const std::string& sceneTag) {
 	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
-		std::cerr << sceneTag << " exists" << std::endl;
+		std::cerr << sceneTag << "exists" << std::endl;
 		return;
 	}
 
 	m_activeScenes.push_back(sceneTag);
+	if (mp_RenderShape->GetTexture() != nullptr) {
+		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
+	}
 }
 
 void Entity::RemoveActiveScene(const std::string& sceneTag) {
@@ -267,4 +285,28 @@ void Entity::RemoveActiveScene(const std::string& sceneTag) {
 
 bool Entity::IsActiveIn(const std::string& sceneTag) {
 	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+}
+
+void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+
+	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
+}
+
+void Entity::PlayAnimation(const std::string& id, int32 mode)
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+
+	sprite->PlayAnimation(id);
 }

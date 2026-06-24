@@ -21,17 +21,23 @@ std::string& SceneManager::GetPreviousSceneTag() {
 
 }
 
+uint32 SceneManager::GetCurrentSceneFlag(){
+    if (m_CurrentSceneTag == "") {
+        return 0b0;
+    }
+    return m_Scenes[m_CurrentSceneTag]->GetFlag();
+}
 
 Scene* SceneManager::GetSceneWithTag(const std::string& tag) {
     return m_Scenes[tag];
 }
 
-
-
 void SceneManager::SetCurrentSceneWithTag(const std::string& tag) {
     if (m_Scenes[tag] != nullptr) {
-      
-        m_PreviousSceneTag = m_CurrentSceneTag;
+        if (m_CurrentSceneTag != "") {
+            m_PreviousSceneTag = m_CurrentSceneTag;
+            LoadUnloadActiveTextures(tag);
+        }
         m_CurrentSceneTag = tag;
         return;
     }
@@ -42,7 +48,8 @@ void SceneManager::SetCurrentSceneToPreviousScene() {
     if (m_PreviousSceneTag != "") {
         if (m_CurrentSceneTag != "") {
             m_Scenes[m_CurrentSceneTag]->OnExit();
-        }        
+        }     
+        LoadUnloadActiveTextures(m_PreviousSceneTag);
         std::string currentTag = m_PreviousSceneTag;
         m_PreviousSceneTag = m_CurrentSceneTag;
         m_CurrentSceneTag = currentTag;
@@ -51,13 +58,13 @@ void SceneManager::SetCurrentSceneToPreviousScene() {
     std::cerr << "there is no previous scene " << std::endl;
 }
 
-
-
-
 void SceneManager::DeleteScene(const std::string& tag) {
     
     if (m_Scenes[tag] != nullptr) {
         Scene* scene = m_Scenes[tag];
+
+        m_validFlag.push_back(scene->m_flag);
+
         m_Scenes.erase(tag);
 
         if (m_CurrentSceneTag == tag) {
@@ -73,6 +80,13 @@ void SceneManager::DeleteScene(const std::string& tag) {
     std::cerr << "Scene " << tag << "doesn't exist" << std::endl;
 }
 
+bool SceneManager::isLoaded(uint32 flag){
+    uint32 test = m_Scenes[m_CurrentSceneTag]->m_flag & flag;
+    if (test != 0b0) {
+        return true;
+    }
+    return false;
+}
 
 void SceneManager::UpdateCurrentScene(Clock& time) {
     if (m_CurrentSceneTag != "") {
@@ -89,3 +103,30 @@ void SceneManager::DrawCurrentScene(Window* pWindow) {
         m_Scenes[m_CurrentSceneTag]->Draw(pWindow);
     }
 }
+
+void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
+    Scene* currentScene = m_Scenes[m_CurrentSceneTag];
+    Scene* newScene = m_Scenes[newSceneId];
+    std::vector<std::string> m_activatedTextures;
+
+    for (auto& texture : currentScene->m_activeTextures) {
+        if (std::find(newScene->m_activeTextures.begin(), newScene->m_activeTextures.end(), texture) != newScene->m_activeTextures.end()) {
+            m_activatedTextures.push_back(texture);
+            DEBUG_INFO << "don't change " << texture << ENDL
+            continue;
+        }
+        else {
+            RessourceManager::GetInstance().m_textureMap[texture].UnloadTexture();
+            DEBUG_INFO << "unload " << texture << ENDL
+        }
+    }
+    for (auto& texture : newScene->m_activeTextures) {
+        if (std::find(m_activatedTextures.begin(),m_activatedTextures.end(), texture) == m_activatedTextures.end()) {
+            std::string path = "../../assets/textures/" + texture + ".png";
+            RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, texture);
+            m_activatedTextures.push_back(texture);
+            DEBUG_INFO << "load " << texture << ENDL
+        }
+    }
+}
+

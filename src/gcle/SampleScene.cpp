@@ -1,21 +1,18 @@
 #include "SampleScene.h"
 #include "Player.h"
+#include "Render/Sprite.h"
+#include "Render/Text.h"
 
 void SampleScene::OnInitialize()
 {
-	Texture* tex = RessourceManager::GetInstance().GetTexture("images"); 
 	 
 	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetTexture(tex);
 	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);   */
+	pEntity->SetRigidBody(true);*/
 	 
-	
-
-	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
-
 	std::string text = "Test";
-	CreateText(font,text , 40, 40, 20, 20);
+	CreateText(text, 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(50, -200);
@@ -42,7 +39,6 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate(Clock& time)
 {
-	//pEntity->Rotate(1);
 
 	if (InputManager::GetInstance().IsDown(Space))
 	{

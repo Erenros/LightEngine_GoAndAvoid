@@ -1,6 +1,10 @@
 #include "RessourceManager.h"
 #include "Texture.h"
 #include "Utils.h"
+#include "SceneManager.h"
+
+#undef PlaySound
+
 
 void RessourceManager::PlayMusic(const std::string& id, int mode)
 {
@@ -16,21 +20,21 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
     m_soundMap[id]->PlaySound(mode, volume);
 }
 
-Texture* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
+Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
-	if (m_textureMap.count(id))
-		return m_textureMap[id];
+	if (m_textureMap[id].mp_texture != nullptr)
+		return m_textureMap[id].mp_texture;
 
-    Texture* texture = new Texture(window, path);
+    Sprite* texture = new Sprite(window, path);
     if (texture == nullptr || !texture->IsTextureInit())
     {
         DEBUG_WARN << "Got a nullptr Texture for path : " + path << ENDL;
         delete texture;
         return nullptr;
     }
-
+     
     DEBUG_INFO << "Texture created" << ENDL;
-    m_textureMap[id] = texture;
+    m_textureMap[id].mp_texture = texture;
     return texture;
 }
 
@@ -116,8 +120,16 @@ void RessourceManager::InitTextureFolder(Window* window)
             continue;
         }
 
-        LoadTexture(window,entry.path().string(), entry.path().stem().string());
+        //LoadTexture(window,entry.path().string(), entry.path().stem().string());
+        m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
     }
+
+    
+    //for (auto& tex : m_textureMap) {
+    //    if (tex.second.GetFlag() & SceneManager::GetInstance().GetCurrentSceneFlag() == 0b0) {
+    //        tex.second.UnloadTexture();
+    //    }
+    //}
 }
 
 void RessourceManager::InitMusicFolder()
@@ -194,7 +206,7 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        if (entry.path().extension() != ".ttf")
+        if (entry.path().extension() != ".ttf" && entry.path().extension() != ".otf")
         {
             std::cout << "Extension is not correct, expected : .ttf, receive" + entry.path().extension().string();
             continue;
@@ -203,7 +215,6 @@ void RessourceManager::InitFont()
         LoadFont(entry.path().string(), entry.path().stem().string(), 25);
     }
 }
-
 
 void RessourceManager::DeleteAll()
 {
@@ -269,14 +280,21 @@ void RessourceManager::DeleteTexture(const std::string& id)
     if (!m_textureMap.count(id))
         return;
 
-    delete m_textureMap[id];
+    delete m_textureMap[id].mp_texture;
+    m_textureMap[id].mp_texture = nullptr;
     m_textureMap.erase(id);
 }
 
 void RessourceManager::DeleteAllTexture()
 {
     for (auto& pair : m_textureMap)
-        delete pair.second;
+    {
+        if (pair.second.mp_texture)
+        {
+            delete pair.second.mp_texture;
+            pair.second.mp_texture = nullptr;
+        }
+    }
 
     m_textureMap.clear();
 }
