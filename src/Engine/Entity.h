@@ -105,7 +105,7 @@ private:
 
 private:
 	std::unordered_set<int64> CollidingEntity;
-	std::vector<Collider*> mp_Colliders;
+	std::unordered_set<Collider*> mp_Colliders;
 	std::vector<std::string> m_activeScenes;
 
 private:
