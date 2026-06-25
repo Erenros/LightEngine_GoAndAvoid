@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
+#include "AudioEmitter.h"
 
 void SampleScene::OnInitialize()
 {
@@ -25,7 +26,7 @@ void SampleScene::OnInitialize()
 	 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
-	entity2->SetRigidBody(true);
+	entity2->SetRigidBody(false);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(true);
 	entity2->SetTexture("images");

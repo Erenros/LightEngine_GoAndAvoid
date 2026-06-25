@@ -87,6 +87,9 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 
 	RessourceManager::GetInstance().Init(mp_window);
 
+	for (int i = 0; i < 32; i++)
+		m_entities.push_back({});
+
 	return true;
 }
 
@@ -101,17 +104,26 @@ void GameManager::Close()
 
 void GameManager::UpdateEntitySystem()
 {
-	for (auto it = m_entities.begin(); it != m_entities.end(); )
+	for (int i = 0; i < m_entities.size(); i++)
 	{
-		Entity* entity = *it;
-
-		if (entity->ToDestroy())
+		for (auto it = m_entities[i].begin(); it != m_entities[i].end(); )
 		{
-			m_entitiesToDestroy.push_back(entity);
-			it = m_entities.erase(it);
-		}
+			Entity* entity = *it;
 
-		++it;		
+			if (entity->ToDestroy())
+			{
+				m_entitiesToDestroy.push_back(entity);
+				it = m_entities[i].erase(it);
+			}
+
+			else if (entity->GetLayer() != i)
+			{
+				m_entitiesToCreate.push_back(entity);
+				it = m_entities[i].erase(it);
+			}
+
+			++it;
+		}
 	}
 
 	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
@@ -123,7 +135,8 @@ void GameManager::UpdateEntitySystem()
 
 	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
 	{
-		m_entities.push_back(*it);
+		Entity* e= *it;
+		m_entities[e->GetLayer()].push_back(*it);
 	}
 
 	m_entitiesToCreate.clear();
