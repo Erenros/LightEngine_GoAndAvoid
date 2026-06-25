@@ -202,7 +202,7 @@ void Transform2D::Forward()
 void Transform2D::UpdatePositionWithParentPosition()
 {
     if (mp_Parent == nullptr) {
-        //DEBUG_WARN << "this transform has no parent" << ENDL;
+        //GCLE_WARN << "this transform has no parent" << ENDL;
         return;
     }
      

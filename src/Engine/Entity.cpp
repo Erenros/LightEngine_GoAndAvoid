@@ -295,7 +295,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 
@@ -307,7 +307,7 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 

@@ -13,7 +13,7 @@ SDL_Texture* Text::CreateTexture(Window* window)
 
 	if (mp_font == nullptr || !mp_font->IsFontInit())
 	{
-		DEBUG_WARN << "Font is nullptr can't create texture for text" << ENDL;
+		GCLE_WARN << "Font is nullptr can't create texture for text" << ENDL;
 		return nullptr;
 	}
 
@@ -55,7 +55,7 @@ void Text::SetFont(const std::string& id)
 	Font* font = RessourceManager::GetInstance().GetFont(id);
 	if (font == nullptr)
 	{
-		DEBUG_WARN << "Font : " << id << " doesn't exist" << ENDL;
+		GCLE_WARN << "Font : " << id << " doesn't exist" << ENDL;
 		return;
 	}
 

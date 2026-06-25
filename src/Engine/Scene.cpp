@@ -48,7 +48,7 @@ Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byt
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	if (font == nullptr)
 	{
-		DEBUG_WARN << "Couldn't find the default font" << ENDL;
+		GCLE_WARN << "Couldn't find the default font" << ENDL;
 		return nullptr;
 	}
 

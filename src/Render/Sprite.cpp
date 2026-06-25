@@ -14,7 +14,7 @@ Sprite::Sprite(Window* window, const std::string& path)
 		return;
 
 	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	DEBUG_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
+	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
 }
 
 
@@ -28,7 +28,7 @@ void Sprite::PlayAnimation(const std::string& id)
 {
 	if (!m_animationMap.contains(id))
 	{
-		DEBUG_WARN << "No animation with id : " << id << ENDL;
+		GCLE_WARN << "No animation with id : " << id << ENDL;
 		return;
 	}
 

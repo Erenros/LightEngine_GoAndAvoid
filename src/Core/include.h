@@ -1,6 +1,7 @@
 #pragma once
 #include "PrimitiveTypes.h"
 #include "Vector2.hpp"
+#include "Debugger.h"
 #include "Profiler.h"
 #include "Utils.h"
 #include "Timer.h"

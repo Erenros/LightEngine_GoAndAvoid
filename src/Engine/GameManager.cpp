@@ -10,6 +10,12 @@
 
 void GameManager::Loop()
 {
+#ifndef NDEBUG
+	GCLE::DebuggerDesc desc{};
+	desc.output = GCLE::DebuggerOutput::CONSOLE | GCLE::DebuggerOutput::LOGS;
+	GCLE::Debugger::Init(&desc); 
+#endif
+
 	isRunning = true;
 	 
 	m_Cam.Init(mp_window);
@@ -74,7 +80,7 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
-		//system("CLS");
+		system("CLS");
 
 		fpsTimer += m_Time.GetDeltaTime();
 		if (fpsTimer >= 1.f) {

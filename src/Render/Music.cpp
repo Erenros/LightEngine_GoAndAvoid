@@ -19,7 +19,7 @@ void Music::InitMusic(const std::string& path)
     Mix_Music* music = Mix_LoadMUS(path.c_str());
     if (music == NULL)
     {
-        DEBUG_WARN << "Couldn't inititialize music with path : " + path << ENDL;
+        GCLE_WARN << "Couldn't inititialize music with path : " + path << ENDL;
         return;
     }
 
@@ -32,7 +32,7 @@ void Music::PlayMusic(int mode)
 {
     if (mp_music == nullptr)
     {
-        DEBUG_WARN << "Music is not inititialize can't play it" << ENDL;
+        GCLE_WARN << "Music is not inititialize can't play it" << ENDL;
         return;
     }
 
