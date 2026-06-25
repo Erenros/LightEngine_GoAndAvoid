@@ -5,9 +5,7 @@ void Collider::CollidingOn(Vector2f direction)
     m_CollisionDirection.IsCollidingOnRight = direction.x > 0;
     m_CollisionDirection.IsCollidingOnLeft = direction.x < 0;
     m_CollisionDirection.IsCollidingOnTop = direction.y > 0;
-    m_CollisionDirection.IsCollidingOnBottom = direction.y < 0;
-
-    std::cout << "colliding" << direction.x << " : " << direction.y << std::endl;
+    m_CollisionDirection.IsCollidingOnBottom = direction.y < 0; 
 }
 
 void Collider::CollidingOnX(float32 direction)

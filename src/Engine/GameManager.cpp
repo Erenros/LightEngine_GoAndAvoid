@@ -87,7 +87,7 @@ void GameManager::Loop()
 			fpsTimer -= 1.f;
 			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
 		}
-		DEBUG_INFO << "FPS : " << fpsCount << std::endl;
+		GCLE_INFO << "FPS : " << fpsCount << ENDL;
 
 		
 	}

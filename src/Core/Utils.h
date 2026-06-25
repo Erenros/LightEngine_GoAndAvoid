@@ -3,6 +3,8 @@
 #include <string>
 #include "Debugger.h"
 
+#define assert( condition ) if ( condition == false ) throw;
+
 int8 GenerateRandomNumer(int8 min, int8 max);
 
 #define hundred 0x1
