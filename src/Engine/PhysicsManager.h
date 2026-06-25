@@ -13,8 +13,8 @@ struct EntityInfo
 
 
 struct CollisionInfo {
-	int32 penetration = 0;
-	Vector2f orientation{ 0, 0 };
+	float32 penetration = 0.f;
+	Vector2f orientation{ 0.f, 0.f };
 };
 
 enum class RepulseTypes {
@@ -57,15 +57,8 @@ private:
 	void RepulseRectCircle(gcle::Shape* a, gcle::Shape* b);
 	void RepulseCircleRect(gcle::Shape* a, gcle::Shape* b);
 
-	void RepulseAABBOBB(gcle::Shape* a, gcle::Shape* b);
-	void RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b);
-
-	void RepulseOBBCircle(gcle::Shape* a, gcle::Shape* b);
-
-	void RepulseCircleOBB(gcle::Shape* a, gcle::Shape* b);
-
-	void RepulseOBBOBB(gcle::Shape* a, gcle::Shape* b);
-
+	void RepulseOBB(gcle::Shape* a, gcle::Shape* b);
+	
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
 private:
