@@ -40,6 +40,7 @@ public:
 	
 	Window* GetWindow() { return mp_window; };
 
+	std::vector<Entity*> GetActiveEntities(const std::string& scene);
 private:
 	void UpdateEntitySystem();
 
@@ -60,6 +61,7 @@ private:
 	std::vector <Entity*> m_entitiesToCreate;
 	
 	int m_loopTour = 0; 
+
 
 private:
 	friend class Scene;

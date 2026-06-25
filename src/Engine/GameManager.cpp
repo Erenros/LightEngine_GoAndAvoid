@@ -118,6 +118,18 @@ void GameManager::Close()
 
 }
 
+std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
+{
+	std::vector<Entity*> results;
+	for (auto entities : m_entities) {
+		for (auto e : entities) {
+			if (e->IsActiveIn(scene))
+				results.push_back(e);
+		}
+	}
+	return results;
+}
+
 void GameManager::UpdateEntitySystem()
 {
 	for (int i = 0; i < m_entities.size(); i++)

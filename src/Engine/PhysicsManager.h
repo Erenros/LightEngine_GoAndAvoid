@@ -2,7 +2,7 @@
 #include "include.h"
 #include "Entity.h"
 #include "Shape.h"
-
+#include "QuadTree.h"
 #include <vector>
 
 struct EntityInfo
@@ -72,6 +72,21 @@ private:
 	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
 
 private:
-	CollisionInfo colDatas;
+	CollisionInfo m_colDatas;
+
+private:
+	bool m_activateQuadTree = true;
+	bool m_dynamicQuadTreeSize = false;
+	
+	Vector2f m_quadTreePos1{ -50000, -50000 };
+	Vector2f m_quadTreePos2{50000, 50000};
+
+	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
+
+public:
+	void SetActivateQuadTree(bool activate);
+	void SetDynamicQuadTreeSize(bool activate);
+	void SetQuadTreePos1(Vector2f pos1);
+	void SetQuadTreePos2(Vector2f pos2);
 };
 

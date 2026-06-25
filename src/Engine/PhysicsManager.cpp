@@ -62,44 +62,128 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 void PhysicsManager::Update(float64 deltaTime)
 {
 
-	//Collision
-	for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
-	{
-		auto it2 = it1;
-		++it2;
-		for (; it2 != m_EntitiesToUpdate.end(); ++it2)
-		{
-			Entity* entity = (*it1).pEntity;
-			Entity* otherEntity = (*it2).pEntity;
+	if (m_activateQuadTree == true) {
+		std::vector<Entity*> activeEntities = GameManager::GetInstance().GetActiveEntities(SceneManager::GetInstance().GetCurrentSceneTag());
 
-			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()) && otherEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
-			{
-				if (entity->IsColliding(otherEntity))
+		if (m_dynamicQuadTreeSize) {
+			delete m_quadTree;
+			Vector2f min = activeEntities[0]->GetPosition();
+			Vector2f max = activeEntities[1]->GetPosition();
+
+			Vector2f pos1;
+			Vector2f pos2;
+			if (entity->GetShape()->GetShape() == gcle::Shapes::Rectangle) {
+				Vector2f pos1 = entity->GetPosition(0.f, 0.f);
+				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+				aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+			}
+			else if (entity->GetShape()->GetShape() == gcle::Shapes::Circle) {
+				Vector2f pos1 = entity->GetPosition(0, 0);
+				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+				aabb = { pos1.x, pos1.y, pos2.x, pos2.y };
+			}
+			for (auto& e : activeEntities) {
+				
+			}
+
+		}
+
+		m_quadTree->Clear();
+		for (auto& entity : activeEntities) {
+			m_quadTree->Insert(entity);
+		}
+
+		std::vector<std::pair<Entity*, Entity*>> pairs;
+		for (auto& entity : activeEntities) {
+			AABB aabb;
+			if (entity->GetShape()->GetShape() == gcle::Shapes::Rectangle) {
+				Vector2f pos1 = entity->GetPosition(0.f, 0.f);
+				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+				aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+			}
+			else if (entity->GetShape()->GetShape() == gcle::Shapes::Circle) {
+				Vector2f pos1 = entity->GetPosition(0, 0);
+				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+				aabb = { pos1.x, pos1.y, pos2.x, pos2.y };
+			}
+			ColliderEntry e{ aabb, entity };
+			auto candidates = m_quadTree->Query(e);
+			for (auto& c : candidates) {
+				if (std::find(candidates.begin(), candidates.end(), c.entity) != candidates.end())
+					pairs.push_back({ entity, c.entity });
+			}
+			for (auto& entities : pairs) {
+				if (entities.first->IsColliding(entities.second))
 				{
-					if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+					if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
 					{
-						Repulse(entity, otherEntity);
+						Repulse(entities.first, entities.second);
 					}
 
-					if (entity->m_OnCollisionEnter)
+					if (entities.first->m_OnCollisionEnter)
 					{
-						entity->OnCollisionEnter(otherEntity);
-						entity->m_OnCollisionEnter = false;
+						entities.first->OnCollisionEnter(entities.second);
+						entities.first->m_OnCollisionEnter = false;
 					}
-					if (otherEntity->m_OnCollisionEnter)
+					if (entities.second->m_OnCollisionEnter)
 					{
-						otherEntity->OnCollisionEnter(entity);
-						otherEntity->m_OnCollisionEnter = false;
+						entities.second->OnCollisionEnter(entity);
+						entities.second->m_OnCollisionEnter = false;
 					}
 
-					entity->OnCollision(otherEntity);
-					entity->m_WasOnCollision = true;
-					otherEntity->OnCollision(entity);
-					otherEntity->m_WasOnCollision = true;
+					entities.first->OnCollision(entities.second);
+					entities.first->m_WasOnCollision = true;
+					entities.second->OnCollision(entity);
+					entities.second->m_WasOnCollision = true;
+				}
+			}
+
+		}
+	}
+	
+
+	else {
+		for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
+		{
+			auto it2 = it1;
+			++it2;
+			for (; it2 != m_EntitiesToUpdate.end(); ++it2)
+			{
+				Entity* entity = (*it1).pEntity;
+				Entity* otherEntity = (*it2).pEntity;
+
+				if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()) && otherEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+				{
+					if (entity->IsColliding(otherEntity))
+					{
+						if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+						{
+							Repulse(entity, otherEntity);
+						}
+
+						if (entity->m_OnCollisionEnter)
+						{
+							entity->OnCollisionEnter(otherEntity);
+							entity->m_OnCollisionEnter = false;
+						}
+						if (otherEntity->m_OnCollisionEnter)
+						{
+							otherEntity->OnCollisionEnter(entity);
+							otherEntity->m_OnCollisionEnter = false;
+						}
+
+						entity->OnCollision(otherEntity);
+						entity->m_WasOnCollision = true;
+						otherEntity->OnCollision(entity);
+						otherEntity->m_WasOnCollision = true;
+					}
 				}
 			}
 		}
 	}
+	
+
+	
 
 
 	//Erase
@@ -760,4 +844,20 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Sha
 		return 0.5;
 	else
 		return 1.0;
+}
+
+void PhysicsManager::SetActivateQuadTree(bool activate){
+	m_activateQuadTree = activate;
+}
+
+void PhysicsManager::SetDynamicQuadTreeSize(bool activate){
+	m_dynamicQuadTreeSize = activate;
+}
+
+void PhysicsManager::SetQuadTreePos1(Vector2f pos1){
+	m_quadTreePos1 = pos1;
+}
+
+void PhysicsManager::SetQuadTreePos2(Vector2f pos2){
+	m_quadTreePos2 = pos2;
 }
