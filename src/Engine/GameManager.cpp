@@ -16,13 +16,21 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
-		//PROFILER_START("Colliders", "Colliders Update");
-		if (m_loopTour < 1)
-			m_loopTour++;
-		else
-			PhysicsManager::GetInstance().Update(0.016f);
-		//PROFILER_END("Colliders");
-    
+		int32 exec = 0;
+		accDt += time.GetDeltaTime();
+		while (accDt >= fixedUpdateDT) {
+			accDt -= fixedUpdateDT;
+			//PROFILER_START("Colliders", "Colliders Update");
+			if (m_loopTour < 1)
+				m_loopTour++;
+			else
+				PhysicsManager::GetInstance().Update(time.GetDeltaTime());
+			//PROFILER_END("Colliders");
+			exec += 1;
+		}
+		DEBUG_INFO << "Fixed update execution : " << exec << ENDL
+
+
 		//PROFILER_START("time", "Timer Update");
 		m_Time.Update();
 		//PROFILER_END("time");
@@ -59,7 +67,7 @@ void GameManager::Loop()
 			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
 		}
 		//PROFILER_END("SceneD");
-    
+	
 		mp_window->Present();
 
 		if (Event::WindowEvent())
@@ -69,6 +77,14 @@ void GameManager::Loop()
 
 		//system("CLS");
 
+		fpsTimer += time.GetDeltaTime();
+		if (fpsTimer >= 1.f) {
+			fpsTimer -= 1.f;
+			fpsCount = static_cast<int16>(1.f / time.GetDeltaTime());
+		}
+		DEBUG_INFO << "FPS : " << fpsCount << std::endl;
+
+		
 	}
 
 	isRunning = false;
@@ -95,6 +111,9 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 
 	RessourceManager::GetInstance().Init(mp_window);
 
+	for (int i = 0; i < 32; i++)
+		m_entities.push_back({});
+
 	return true;
 }
 
@@ -109,17 +128,26 @@ void GameManager::Close()
 
 void GameManager::UpdateEntitySystem()
 {
-	for (auto it = m_entities.begin(); it != m_entities.end(); )
+	for (int i = 0; i < m_entities.size(); i++)
 	{
-		Entity* entity = *it;
-
-		if (entity->ToDestroy())
+		for (auto it = m_entities[i].begin(); it != m_entities[i].end(); )
 		{
-			m_entitiesToDestroy.push_back(entity);
-			it = m_entities.erase(it);
-		}
+			Entity* entity = *it;
 
-		++it;		
+			if (entity->ToDestroy())
+			{
+				m_entitiesToDestroy.push_back(entity);
+				it = m_entities[i].erase(it);
+			}
+
+			else if (entity->GetLayer() != i)
+			{
+				m_entitiesToCreate.push_back(entity);
+				it = m_entities[i].erase(it);
+			}
+
+			++it;
+		}
 	}
 
 	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
@@ -131,7 +159,8 @@ void GameManager::UpdateEntitySystem()
 
 	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
 	{
-		m_entities.push_back(*it);
+		Entity* e= *it;
+		m_entities[e->GetLayer()].push_back(*it);
 	}
 
 	m_entitiesToCreate.clear();

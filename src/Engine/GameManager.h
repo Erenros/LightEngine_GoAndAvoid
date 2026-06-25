@@ -11,6 +11,8 @@
 class Entity;
 class Scene;
 
+#define FixedUpdateExecution 180;
+#define FPS 60;
 
 class GameManager
 {
@@ -21,6 +23,11 @@ public:
 		return instance;
 	}
 
+	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
+	float32 accDt = 0.f;
+
+	int16 fpsCount = 0.f;
+	float32 fpsTimer = 0.f;
 
 	GameManager() = default;
 
@@ -56,7 +63,7 @@ private:
 
 	int32 m_WindW = 0, m_WindH = 0;
 
-	std::vector <Entity*> m_entities;
+	std::vector <std::vector<Entity*>> m_entities;
 	std::vector <Entity*> m_entitiesToDestroy;
 	std::vector <Entity*> m_entitiesToCreate;
 	

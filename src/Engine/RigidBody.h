@@ -59,7 +59,7 @@ private:
 	Vector2f m_Velocity;
 	Vector2f m_TempVelocity;
 	float32 m_Mass = 1.0f;
-	Vector2f m_Friction = {0.1f, 0.1};
+	Vector2f m_Friction = {0.1f, 0.1f};
 
 	float32 m_MaxSpeed = 500.0f;
 
