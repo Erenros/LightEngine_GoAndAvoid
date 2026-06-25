@@ -8,6 +8,8 @@
 #include "Render/Sprite.h"
 #include "RigidBody.h"
 
+class Collider;
+
 struct Target
 {
 	Vector2f position;
@@ -22,7 +24,7 @@ public:
 	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
 	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
-public: 
+public:
 	gcle::Shape* GetShape() { return mp_Shape; }
 	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
 	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
@@ -44,11 +46,11 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
-	 
+
 	void SetScale(Vector2f scale);
 	void SetScale(float32 scale) { SetScale({ scale, scale }); }
 	void ScaleBy(Vector2f factor);
-	 
+
 	void SetRotation(Degrees angle);
 	void Rotate(Degrees delta);
 
@@ -64,13 +66,19 @@ public:
 	bool IsColliding(Entity* other);
 	bool IsInside(Vector2f position);
 
+public:
+	void AddCollider(Collider* pCollider);
+	void RemoveCollider(Collider* pCollider);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive);
+	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
+
 protected:
 	Entity() = default;
 	~Entity();
 
 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
+	virtual void OnCollisionEnter(Entity* collidedWith) { DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
 	virtual void OnCollision(Entity* collidedWith) { DEBUG_INFO << "stay" << collidedWith->GetId() << ENDL };
 	virtual void OnCollisionExit(Entity* collidedWith) { DEBUG_INFO << "exit" << collidedWith->GetId() << ENDL };
 	virtual void OnInitialize() {};
@@ -97,14 +105,13 @@ protected:
 	int32			m_Tag = -1;
 	Target			m_Target;
 
-
 private:
-	gcle::Shape*	mp_Shape = nullptr;
-	gcle::Shape*	mp_RenderShape = nullptr;
+	gcle::Shape* mp_Shape = nullptr;
+	gcle::Shape* mp_RenderShape = nullptr;
 	RigidBody2D		m_RigidBody;
 
 private:
-	std::unordered_set<int64> CollidingEntity;
+	std::unordered_map<int64, Entity*> CollidingEntity;
 	std::unordered_set<Collider*> mp_Colliders;
 	std::vector<std::string> m_activeScenes;
 
@@ -113,6 +120,6 @@ private:
 	friend class Scene;
 	friend class GameManager;
 	friend class Camera;
-	friend class PhysicsManager; 
+	friend class PhysicsManager;
 
 };

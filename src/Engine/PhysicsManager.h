@@ -1,6 +1,7 @@
 #pragma once 
 #include "include.h"
 #include "Entity.h"
+#include "Collider.h"
 #include "Shape.h"
 
 #include <vector>
@@ -33,9 +34,11 @@ public:
 	void AddEntity(Entity* pEntity);
 	void RemoveEntity(Entity* pEntity);
 	void Update(float64 deltaTime);
-	bool IsColliding(Entity* pEntity1, Entity* pEntity2);
+	bool IsColliding(Collider* pCollider1, Collider* pCollider2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
-	void Repulse(Entity* pEntity1, Entity* pEntity2);
+	void Repulse(Collider* pCollider1, Collider* pCollider2);
+
+	//Entity* GetEntityById(int64 id);
 
 private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
@@ -73,12 +76,14 @@ private:
 
 private:
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) -1][static_cast<int32>(gcle::Shapes::Count) - 1];
+	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
 
 	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
 	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
 
 private:
 	CollisionInfo colDatas;
-};
 
+	Collider* m_pCurrentColliderA = nullptr;
+	Collider* m_pCurrentColliderB = nullptr;
+};

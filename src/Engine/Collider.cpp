@@ -1,5 +1,9 @@
 #include "Collider.h"
 
+Collider::Collider(Shape* shape) : m_shape(shape)
+{
+}
+
 void Collider::CollidingOn(Vector2f direction)
 {
     m_CollisionDirection.IsCollidingOnRight = direction.x > 0;

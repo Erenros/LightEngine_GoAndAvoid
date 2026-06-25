@@ -3,12 +3,13 @@
 #include "RessourceManager.h"
 #include "PhysicsManager.h"
 #include "SceneManager.h"
+#include "Collider.h"
 
 
 static int64 sId = 0;
 
 void Entity::Initialize(gcle::Shapes shape)
-{ 
+{
 	m_Direction = { 0.0f, 0.0f };
 	m_Speed = 0.f;
 	m_ToDestroy = false;
@@ -16,8 +17,9 @@ void Entity::Initialize(gcle::Shapes shape)
 	m_Target;
 
 
-	mp_Shape = GetBaseShape(shape); 
+	mp_Shape = GetBaseShape(shape);
 	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+
 
 	m_RigidBody.Initialize(&mp_Shape->GetTransform());
 	m_RigidBody.SetActive(true);
@@ -65,7 +67,7 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 void Entity::Update(Clock& timer)
 {
 	float32 dt = static_cast<float32>(timer.GetTimeScale());
-	
+
 	if (IsRigidBody())
 		m_RigidBody.Update(timer);
 
@@ -100,6 +102,32 @@ void Entity::Update(Clock& timer)
 	OnUpdate();
 }
 
+void Entity::AddCollider(Collider* pCollider)
+{
+	if (pCollider == nullptr)
+		return;
+
+	pCollider->SetOwner(this);
+	mp_Colliders.insert(pCollider);
+}
+
+void Entity::RemoveCollider(Collider* pCollider)
+{
+	if (pCollider == nullptr)
+		return;
+
+	mp_Colliders.erase(pCollider);
+}
+
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive)
+{
+	Collider* collider = new Collider(GetBaseShape(shape));
+	AddCollider(collider);
+	collider->SetActive(isActive);
+	return collider;
+}
+
+
 void Entity::Destroy()
 {
 	m_ToDestroy = true;
@@ -114,8 +142,8 @@ bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
 
 	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
 
-	m_Target.position = { x, y }; 
-	m_Target.distance = position.GetDistance({ x, y }); 
+	m_Target.position = { x, y };
+	m_Target.distance = position.GetDistance({ x, y });
 	m_Target.isSet = true;
 
 	return true;
@@ -131,8 +159,8 @@ bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 	SetDirection(direction.x, direction.y, speed);
 
 	return true;
-} 
- 
+}
+
 Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
 {
 	return mp_Shape->GetPosition(ratioX, ratioY);
@@ -188,10 +216,10 @@ void Entity::Rotate(Degrees delta)
 	mp_Shape->Rotate(delta);
 }
 
-void Entity::SetTexture(const std::string& id){
+void Entity::SetTexture(const std::string& id) {
 	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
-		for(auto& sId : m_activeScenes)
+		for (auto& sId : m_activeScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
 		if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
 			std::string path = "../../assets/textures/" + id + ".png";
@@ -214,8 +242,8 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 {
 	if (shapeType == 0)
 	{
-		
-		
+
+
 		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
 
 
@@ -249,7 +277,22 @@ Vector2f Entity::GetRenderPosition()
 
 bool Entity::IsColliding(Entity* other)
 {
-	return PhysicsManager::GetInstance().IsColliding(this, other);
+	for (Collider* pCollider : mp_Colliders)
+	{
+		if (!pCollider->IsActive())
+			continue;
+
+		for (Collider* pOtherCollider : other->mp_Colliders)
+		{
+			if (!pOtherCollider->IsActive())
+				continue;
+
+			if (PhysicsManager::GetInstance().IsColliding(pCollider, pOtherCollider))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 bool Entity::IsInside(Vector2f position)
@@ -257,7 +300,7 @@ bool Entity::IsInside(Vector2f position)
 	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 
-Entity::~Entity(){
+Entity::~Entity() {
 	delete mp_Shape;
 	delete mp_RenderShape;
 }
