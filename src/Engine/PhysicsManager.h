@@ -17,6 +17,14 @@ struct CollisionInfo {
 	Vector2f orientation{ 0, 0 };
 };
 
+enum class RepulseTypes {
+	AABB,
+	Circle,
+	OOB,
+
+	Count
+};
+
 class PhysicsManager
 {
 public:
@@ -49,7 +57,14 @@ private:
 	void RepulseRectCircle(gcle::Shape* a, gcle::Shape* b);
 	void RepulseCircleRect(gcle::Shape* a, gcle::Shape* b);
 
+	void RepulseAABBOBB(gcle::Shape* a, gcle::Shape* b);
 	void RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b);
+
+	void RepulseOBBCircle(gcle::Shape* a, gcle::Shape* b);
+
+	void RepulseCircleOBB(gcle::Shape* a, gcle::Shape* b);
+
+	void RepulseOBBOBB(gcle::Shape* a, gcle::Shape* b);
 
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
@@ -61,7 +76,7 @@ private:
 	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) -1][static_cast<int32>(gcle::Shapes::Count) - 1];
 
 	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-	static RepulseFn repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
 
 private:
 	CollisionInfo colDatas;

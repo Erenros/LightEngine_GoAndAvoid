@@ -17,15 +17,22 @@ PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gc
 	}
 };
 
-PhysicsManager::RepulseFn PhysicsManager::repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
+PhysicsManager::RepulseFn PhysicsManager::repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)]
 {
 	{
 		&PhysicsManager::RepulseRectRect,
 		&PhysicsManager::RepulseRectCircle,
+		&PhysicsManager::RepulseAABBOBB,
 	},
 	{
 		&PhysicsManager::RepulseCircleRect,
 		&PhysicsManager::RepulseCircleCircle,
+		&PhysicsManager::RepulseCircleOBB,
+	},
+	{
+		&PhysicsManager::RepulseOBBAABB,
+		&PhysicsManager::RepulseOBBCircle,
+		&PhysicsManager::RepulseOBBOBB,
 	}
 };
 
@@ -156,15 +163,41 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 	auto* shapeA = pEntity1->GetShape();
 	auto* shapeB = pEntity2->GetShape();
 
-	if (shapeA->GetShape() == gcle::Shapes::Triangle || shapeB->GetShape() == gcle::Shapes::Triangle)
-	{
+	RepulseTypes typeA;
+	RepulseTypes typeB;
+
+	switch (shapeA->GetShape()) {
+	case gcle::Shapes::Circle:
+		typeA = RepulseTypes::Circle;
+		break;
+	case gcle::Shapes::Rectangle:
+		if (static_cast<int32>(shapeA->GetTransform().GetDegAngle()) % 180 != 0) 
+			typeA = RepulseTypes::OOB;
+		else
+			typeA = RepulseTypes::AABB;
+		break;
+	case gcle::Shapes::Triangle:
 		return;
+		break;
 	}
 
-	int32 typeA = static_cast<int32>(shapeA->GetShape()) - 1;
-	int32 typeB = static_cast<int32>(shapeB->GetShape()) - 1;
+	switch (shapeB->GetShape()) {
+	case gcle::Shapes::Circle:
+		typeB = RepulseTypes::Circle;
+		break;
+	case gcle::Shapes::Rectangle:
+		if (static_cast<int32>(shapeB->GetTransform().GetDegAngle()) % 180 != 0) 
+			typeB = RepulseTypes::OOB;
+		else
+			typeB = RepulseTypes::AABB;
+		break;
+	case gcle::Shapes::Triangle:
+		return;
+		break;
+	}
 
-	(this->*repulseTable[typeA][typeB])(shapeA, shapeB);
+
+	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(shapeA, shapeB);
 }
 
 
@@ -651,6 +684,10 @@ void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
 	RepulseRectCircle(b, a);
 }
 
+void PhysicsManager::RepulseAABBOBB(gcle::Shape* a, gcle::Shape* b) {
+	RepulseOBBAABB(b, a);
+}
+
 void PhysicsManager::RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b) {
 	if (a->IsKinematic() == false) {
 	
@@ -666,6 +703,20 @@ void PhysicsManager::RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b) {
 	}
 
 }
+
+void PhysicsManager::RepulseOBBCircle(gcle::Shape* a, gcle::Shape* b){
+
+}
+
+void PhysicsManager::RepulseCircleOBB(gcle::Shape* a, gcle::Shape* b){
+	RepulseOBBCircle(b, a);
+}
+
+void PhysicsManager::RepulseOBBOBB(gcle::Shape* a, gcle::Shape* b){
+
+}
+
+
 
 float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
 {
