@@ -510,7 +510,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	return false;
 
 }
-	
+
 
 bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
@@ -601,8 +601,10 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 			pos2.x -= correction * b->IsKinematic();
 		}
 
-		a->GetOwner()->GetRigidBody().ZeroVelocityX();
-		b->GetOwner()->GetRigidBody().ZeroVelocityX();
+		if (a->IsKinematic())
+			a->GetOwner()->GetRigidBody().ZeroVelocityX();
+		if (b->IsKinematic())
+			b->GetOwner()->GetRigidBody().ZeroVelocityX();
 
 	}
 	else

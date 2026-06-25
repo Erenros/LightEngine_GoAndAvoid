@@ -19,6 +19,12 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
+		fixedUpdateTime += time.GetDeltaTime();
+		if (fixedUpdateTime >= 1.f)
+			fixedUpdateTime -= 1.f;
+
+
+
 		//PROFILER_START("Colliders", "Colliders Update");
 		if (m_loopTour < 1)
 			m_loopTour++;
