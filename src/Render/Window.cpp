@@ -51,6 +51,12 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 	}
 }
 
+void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	SDL_SetRenderDrawColor(mp_Renderer, r, g, b, a);
+	SDL_RenderFillRect(mp_Renderer, nullptr);
+}
+
 void Window::End(){
 	SDL_DestroyRenderer(mp_Renderer);
 	SDL_DestroyWindow(mp_Window);

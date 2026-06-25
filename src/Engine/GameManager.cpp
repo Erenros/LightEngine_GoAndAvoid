@@ -50,6 +50,7 @@ void GameManager::Loop()
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		//PROFILER_END("SceneD");
     
+		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Present();
 
 		if (Event::WindowEvent())

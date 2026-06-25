@@ -39,6 +39,6 @@ void SampleScene2::OnUpdate(Clock& time)
 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		pEntity->Destroy();
+		GameManager::GetInstance().SetWindowClearColor(Color{ 0, 0, 0, 255 });
 	}
 } 

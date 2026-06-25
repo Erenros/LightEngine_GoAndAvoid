@@ -51,6 +51,8 @@ public:
 		int32 y = 0
 	);
 
+	void ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a);
+
 	void Present();
 	void Clear();
 	
