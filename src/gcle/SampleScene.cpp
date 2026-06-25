@@ -11,7 +11,7 @@ void SampleScene::OnInitialize()
 	pEntity->SetScale(0.5f);
 	pEntity->SetRigidBody(true);*/
 	 
-	std::string text = "Test";
+	/*std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
@@ -33,14 +33,14 @@ void SampleScene::OnInitialize()
 	entity3->SetScale({ 10, 1 });
 	entity3->SetRigidBody(true);
 	entity3->GetRigidBody().SetGravity(false);
-	entity3->GetShape()->SetIsKinematic(false);
+	entity3->GetShape()->SetIsKinematic(false);*/
 	
 }
 
 void SampleScene::OnUpdate(Clock& time)
 {
 
-	if (InputManager::GetInstance().IsDown(Space))
+	/*if (InputManager::GetInstance().IsDown(Space))
 	{
 		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
 	}
@@ -48,5 +48,5 @@ void SampleScene::OnUpdate(Clock& time)
 	if (InputManager::GetInstance().IsDown('A'))
 	{
 		pEntity->Destroy();
-	}
+	}*/
 } 

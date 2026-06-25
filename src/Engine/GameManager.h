@@ -46,11 +46,13 @@ private:
 	Camera m_Cam;
 	Window* mp_window = nullptr;
 
-	Color m_ClearColor = { 255, 255, 255, 255 };
+	Color m_ClearColor = { 0, 0, 0, 255 };
 
 	Clock m_Time;
 
 	bool isRunning = false;
+
+	bool m_isVisualDebugActive = false;
 
 	int32 m_WindW = 0, m_WindH = 0;
 

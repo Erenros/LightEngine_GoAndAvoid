@@ -31,6 +31,10 @@ void GameManager::Loop()
 		UpdateEntitySystem();
 		//PROFILER_END("Entity");
 
+		if (InputManager::GetInstance().IsDown(F1))
+		{
+			m_isVisualDebugActive = !m_isVisualDebugActive;
+		}
 
 		//PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
@@ -44,13 +48,18 @@ void GameManager::Loop()
 		m_Cam.Update(m_Time, m_entities);
 		//PROFILER_END("Camera");
 	
+		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
 
 		//PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
+		 
+		if (m_isVisualDebugActive)
+		{
+			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
+		}
 		//PROFILER_END("SceneD");
     
-		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Present();
 
 		if (Event::WindowEvent())

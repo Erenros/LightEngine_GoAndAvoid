@@ -17,7 +17,7 @@ void Entity::Initialize(gcle::Shapes shape)
 
 
 	mp_Shape = GetBaseShape(shape); 
-	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+	mp_RenderShape = mp_Shape->Clone(); 
 
 	m_RigidBody.Initialize(&mp_Shape->GetTransform());
 	m_RigidBody.SetActive(true);

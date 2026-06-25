@@ -65,6 +65,7 @@ public:
 	void DrawTextOnRenderer(Text* text);
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
+	void DrawDebug(gcle::Shape* pShape);
 
 public:
 	uint32 GetWidth() { return m_width; }

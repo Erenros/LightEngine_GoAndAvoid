@@ -9,36 +9,29 @@ void SampleScene2::OnInitialize()
 	pEntity->SetScale(0.5f);
 	pEntity->SetRigidBody(true);*/
 	 
-	
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+ 	entity1->SetPosition(0, -100);
+	/*entity1->SetRigidBody(true);
+	entity1->GetShape()->SetIsKinematic(true);*/
+	 
+	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(10, 100); 
 
-	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
-	 
-	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Circle);
- 	entity1->SetPosition(10, -200);
-	entity1->SetRigidBody(true);
-	entity1->GetShape()->SetIsKinematic(true);
-	 
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(10, 100);
-	entity2->SetRigidBody(true);
+	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity3->SetPosition(110, -100);
+	/*entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
 	entity2->SetTexture("test");
 	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32);
-	entity2->PlayAnimation("anim1");
+	entity2->PlayAnimation("anim1");*/
 }
 
 void SampleScene2::OnUpdate(Clock& time)
 {
-	//pEntity->Rotate(1);
-
 	if (InputManager::GetInstance().IsDown(Space))
 	{
-		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
+		GameManager::GetInstance().SetWindowClearColor({ 255, 255, 255, 255 });
 	}
 
-	if (InputManager::GetInstance().IsDown('A'))
-	{
-		GameManager::GetInstance().SetWindowClearColor(Color{ 0, 0, 0, 255 });
-	}
 } 
