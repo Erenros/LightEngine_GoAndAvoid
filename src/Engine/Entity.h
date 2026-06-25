@@ -7,12 +7,13 @@
 #include "Render/Texture.h"
 #include "Render/Sprite.h"
 #include "RigidBody.h"
+#include <cmath>
 
 struct Target
 {
 	Vector2f position;
-	float distance;
-	bool isSet;
+	float distance = 0.f;
+	bool isSet = false;
 };
 
 class Entity
@@ -57,6 +58,9 @@ public:
 	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
 	void PlayAnimation(const std::string& id, int32 mode = 0);
 
+	int32 GetLayer() { return m_layer; };
+	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };
+
 public:
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 	bool ToDestroy() const { return m_ToDestroy; }
@@ -70,9 +74,9 @@ protected:
 
 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
-	virtual void OnCollision(Entity* collidedWith) { DEBUG_INFO << "stay" << collidedWith->GetId() << ENDL };
-	virtual void OnCollisionExit(Entity* collidedWith) { DEBUG_INFO << "exit" << collidedWith->GetId() << ENDL };
+	virtual void OnCollisionEnter(Entity* collidedWith) {};
+	virtual void OnCollision(Entity* collidedWith) {};
+	virtual void OnCollisionExit(Entity* collidedWith) {};
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 
@@ -107,8 +111,12 @@ private:
 	std::unordered_set<int64> CollidingEntity;
 	std::vector<Collider*> mp_Colliders;
 	std::vector<std::string> m_activeScenes;
+	
+	int32 m_layer = 0;
 
 private:
+
+	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
 
 	friend class Scene;
 	friend class GameManager;

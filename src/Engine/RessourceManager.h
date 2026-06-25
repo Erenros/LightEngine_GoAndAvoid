@@ -112,7 +112,7 @@ public:
 
 	void SetFontSize(const std::string& id, int size);
 
-	void SetMusicVolume(int volume) { Audio::SetMusicVolume(volume); };
+	void SetMusicVolume(int32 volume) { Audio::SetMusicVolume(volume); };
 
 	void StopMusic() { Audio::StopMusic(); };
 	void PauseMusic() { Audio::PauseMusic(); };

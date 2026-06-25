@@ -152,3 +152,25 @@ public:
 };
 
 std::ostream& operator<< (std::ostream& stream, const Matrix3x3& mat);
+
+class Matrix
+{
+	public:
+		std::vector<std::vector<float>> m_matrix;
+
+		int m_width;
+		int m_height;
+
+		Matrix() = default;
+
+		Matrix(int width, int height);
+
+		void InitSize();
+		void InitMatrix(int width, int height);
+
+		void PrintMatrix();
+
+		Matrix operator*(Matrix& matrix2);
+
+
+};

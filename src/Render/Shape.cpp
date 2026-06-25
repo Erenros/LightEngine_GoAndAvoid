@@ -13,6 +13,18 @@ namespace gcle
 				delete vertex;
 			}
 		}
+
+		m_verticies.clear();
+
+		for (auto* hollow : m_hollowPoints)
+		{
+			if (hollow != nullptr)
+			{
+				delete hollow;
+			}
+		}
+
+		m_hollowPoints.clear();
 	}
 
 	Shape::Shape(Entity* owner) : mp_Owner(owner), m_IsKinematic(false)
@@ -117,16 +129,25 @@ namespace gcle
 			Vector2f world = mat.TransformPoint(m_localPositions[i]);
 			m_verticies[i]->position.x = world.x;
 			m_verticies[i]->position.y = world.y;
+
+			m_hollowPoints[i]->x = world.x;
+			m_hollowPoints[i]->y = world.y;
 		}
 
 		m_Transform.ClearDirty();
+	}
+
+	std::vector<SDL_FPoint*>& Shape::GetHollow()
+	{
+		UpdateRenderVertices();
+		return m_hollowPoints;
 	}
 
 	std::vector<SDL_Vertex*>& Shape::GetVerticies()
 	{
 		UpdateRenderVertices();
 		return m_verticies;
-	}
+	} 
 
 	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner) : Shape(owner)
 	{
@@ -134,6 +155,8 @@ namespace gcle
 			m_shape = Shapes::Rectangle;
 
 			m_verticies.resize(4);
+			m_hollowPoints.resize(4);
+
 			m_indicies.resize(6);
 
 			m_height = height;
@@ -145,6 +168,11 @@ namespace gcle
 			m_verticies[1] = new SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
 			m_verticies[2] = new SDL_Vertex{ {x, y + m_height}, sdl_color, {0.f, 1.f} };
 			m_verticies[3] = new SDL_Vertex{ {x + m_width, y + m_height}, sdl_color, {1.f, 1.f} };
+
+			for (int32 i = 0; i < static_cast<int32>(m_verticies.size()); i++)
+			{
+				m_hollowPoints[i] = new SDL_FPoint{ m_verticies[i]->position.x, m_verticies[i]->position.y };
+			}
 
 			m_indicies = {
 				0, 1, 2,
@@ -165,6 +193,22 @@ namespace gcle
 
 			m_Transform.SetDirty();
 		}
+	}
+
+	std::vector<SDL_FPoint*>& Rectangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_debugContour.size() != 5)
+			m_debugContour.resize(5);
+
+		m_debugContour[0] = m_hollowPoints[0];
+		m_debugContour[1] = m_hollowPoints[1];
+		m_debugContour[2] = m_hollowPoints[3];
+		m_debugContour[3] = m_hollowPoints[2];
+		m_debugContour[4] = m_hollowPoints[0];
+
+		return m_debugContour;
 	}
 
 	void Rectangle::SetHeight(float32 height)
@@ -195,13 +239,13 @@ namespace gcle
 	{
 		m_trianglepoints.push_back({ x1, y1 });
 		m_trianglepoints.push_back({ x2, y2 });
-		m_trianglepoints.push_back({ x2, y2 });
 		m_trianglepoints.push_back({ x3, y3 });
 
 
 		m_shape = Shapes::Triangle;
 
 		m_verticies.resize(3);
+		m_hollowPoints.resize(3);
 		m_indicies.resize(3);
 
 		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
@@ -209,6 +253,12 @@ namespace gcle
 		m_verticies[0] = new SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
 		m_verticies[1] = new SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
 		m_verticies[2] = new SDL_Vertex{ {x3, y3}, sdl_color, {1.f, 1.f} };
+
+
+		for (int i = 0; i < 3; ++i)
+		{
+			m_hollowPoints[i] = new SDL_FPoint{};
+		}
 
 		m_indicies = { 0, 1, 2 };
 
@@ -257,6 +307,21 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
+	std::vector<SDL_FPoint*>& Triangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_debugContour.size() != 4)
+			m_debugContour.resize(4);
+
+		m_debugContour[0] = m_hollowPoints[0];
+		m_debugContour[1] = m_hollowPoints[1];
+		m_debugContour[2] = m_hollowPoints[2];
+		m_debugContour[3] = m_hollowPoints[0]; 
+
+		return m_debugContour;
+	}
+
 	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner) : Shape(owner)
 	{
 		if (_smoothness < 3) {
@@ -273,6 +338,7 @@ namespace gcle
 		m_shape = Shapes::Circle;
 
 		m_verticies.resize(_smoothness + 1);
+		m_hollowPoints.resize(_smoothness + 1);
 		m_indicies.resize(_smoothness * 3);
 
 		m_origin = { x, y };
@@ -300,7 +366,30 @@ namespace gcle
 			m_indicies[i * 3 + 2] = (i + 1) % _smoothness + 1;
 		}
 
+
+		for (int i = 0; i < _smoothness + 1; ++i)
+		{
+			m_hollowPoints[i] = new SDL_FPoint{};
+		}
+
 		m_Transform.SetDirty();
+	}
+
+	std::vector<SDL_FPoint*>& Circle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		int32 count = m_smoothness + 1; 
+
+		if (static_cast<int32>(m_debugContour.size()) != count)
+			m_debugContour.resize(count);
+
+		for (int32 i = 0; i < m_smoothness; i++)
+			m_debugContour[i] = m_hollowPoints[i + 1]; 
+
+		m_debugContour[m_smoothness] = m_hollowPoints[1]; 
+
+		return m_debugContour;
 	}
 
 	void Circle::SetRadius(float32 radius)

@@ -25,7 +25,7 @@ class Camera
 		void SetPosition(Vector2f v);
 		Vector2f GetPosition();
 
-		void Update(Clock& time, std::vector<Entity*>& entities);
+		void Update(Clock& time, std::vector<std::vector<Entity*>>& entities);
 
 		void SetZoom(float32 zoom);
 		float32 GetZoom();

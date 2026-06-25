@@ -11,6 +11,20 @@ struct EntityInfo
 	bool toRemove = false;
 };
 
+
+struct CollisionInfo {
+	float32 penetration = 0.f;
+	Vector2f orientation{ 0.f, 0.f };
+};
+
+enum class RepulseTypes {
+	AABB,
+	Circle,
+	OOB,
+
+	Count
+};
+
 class PhysicsManager
 {
 public:
@@ -27,6 +41,9 @@ private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
 	bool CheckAABBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle);
 	bool CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Circle* pCircle2);
+	bool CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
+	bool CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
+	bool CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle);
 
 private:
 	bool CheckRectRect(gcle::Shape* a, gcle::Shape* b);
@@ -40,16 +57,23 @@ private:
 	void RepulseRectCircle(gcle::Shape* a, gcle::Shape* b);
 	void RepulseCircleRect(gcle::Shape* a, gcle::Shape* b);
 
+	void RepulseOBB(gcle::Shape* a, gcle::Shape* b);
+	
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
-private:
+private: 
+	std::vector<EntityInfo> m_EntitiesToAdd;
 	std::vector<EntityInfo> m_EntitiesToUpdate;
+	std::vector<EntityInfo> m_EntitiesToRemove;
 
 private:
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) -1][static_cast<int32>(gcle::Shapes::Count) - 1];
 
 	using RepulseFn = void(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-	static RepulseFn repulseTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
+
+private:
+	CollisionInfo colDatas;
 };
 

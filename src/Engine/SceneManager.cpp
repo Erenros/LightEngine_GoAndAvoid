@@ -104,6 +104,13 @@ void SceneManager::DrawCurrentScene(Window* pWindow) {
     }
 }
 
+void SceneManager::DrawCurrentSceneDebug(Window* pWindow)
+{
+    if (m_CurrentSceneTag != "") {
+        m_Scenes[m_CurrentSceneTag]->DrawDebug(pWindow);
+    }
+}
+
 void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
     Scene* currentScene = m_Scenes[m_CurrentSceneTag];
     Scene* newScene = m_Scenes[newSceneId];
