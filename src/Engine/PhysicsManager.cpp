@@ -61,6 +61,22 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 
 void PhysicsManager::Update(float64 deltaTime)
 {
+	for (EntityInfo entity : m_EntitiesToRemove) {
+		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
+		{
+			if (m_EntitiesToUpdate[i].pEntity == entity.pEntity) {
+				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+			}
+
+		}
+	}
+
+	for (EntityInfo entity : m_EntitiesToAdd) {
+		m_EntitiesToUpdate.push_back(entity);
+	}
+
+	m_EntitiesToAdd.clear();
+	m_EntitiesToRemove.clear();
 
 	//Collision
 	for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)

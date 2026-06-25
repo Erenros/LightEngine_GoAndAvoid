@@ -74,9 +74,9 @@ protected:
 
 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
-	virtual void OnCollision(Entity* collidedWith) { DEBUG_INFO << "stay" << collidedWith->GetId() << ENDL };
-	virtual void OnCollisionExit(Entity* collidedWith) { DEBUG_INFO << "exit" << collidedWith->GetId() << ENDL };
+	virtual void OnCollisionEnter(Entity* collidedWith) {};
+	virtual void OnCollision(Entity* collidedWith) {};
+	virtual void OnCollisionExit(Entity* collidedWith) {};
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 

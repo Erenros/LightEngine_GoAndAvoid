@@ -2,17 +2,10 @@
 #include "Player.h"
 
 void SampleScene2::OnInitialize()
-{
-	 
-	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	pEntity->SetTexture(tex);
-	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);*/
+{ 
 	 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
- 	entity1->SetPosition(0, -100);
-	/*entity1->SetRigidBody(true);
-	entity1->GetShape()->SetIsKinematic(true);*/
+ 	entity1->SetPosition(0, -100); 
 	 
 	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100); 

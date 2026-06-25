@@ -17,18 +17,17 @@ void GameManager::Loop()
 	while (isRunning == true)
 	{
 		int32 exec = 0;
-		accDt += time.GetDeltaTime();
+		accDt += m_Time.GetDeltaTime();
 		while (accDt >= fixedUpdateDT) {
 			accDt -= fixedUpdateDT;
 			//PROFILER_START("Colliders", "Colliders Update");
 			if (m_loopTour < 1)
 				m_loopTour++;
 			else
-				PhysicsManager::GetInstance().Update(time.GetDeltaTime());
+				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
 			//PROFILER_END("Colliders");
 			exec += 1;
 		}
-		DEBUG_INFO << "Fixed update execution : " << exec << ENDL
 
 
 		//PROFILER_START("time", "Timer Update");
@@ -77,10 +76,10 @@ void GameManager::Loop()
 
 		//system("CLS");
 
-		fpsTimer += time.GetDeltaTime();
+		fpsTimer += m_Time.GetDeltaTime();
 		if (fpsTimer >= 1.f) {
 			fpsTimer -= 1.f;
-			fpsCount = static_cast<int16>(1.f / time.GetDeltaTime());
+			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
 		}
 		DEBUG_INFO << "FPS : " << fpsCount << std::endl;
 

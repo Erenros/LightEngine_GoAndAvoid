@@ -3,17 +3,20 @@
 
 void Scene::DrawDebug(Window* window)
 {
-	for (Entity* e : GameManager::GetInstance().m_entities) {
-		if (e->IsActiveIn(m_tag)) {
-			if (e->CollidingEntity.empty())
-			{
-				GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+	for (auto layer : GameManager::GetInstance().m_entities) {
+		for(Entity* e : layer)
+		{
+			if (e->IsActiveIn(m_tag)) {
+				if (e->CollidingEntity.empty())
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+				}
+				else
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
+				}
+				GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
 			}
-			else
-			{
-				GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
-			}
-			GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
 		}
 	}
 }
