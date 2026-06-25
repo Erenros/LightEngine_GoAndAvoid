@@ -11,8 +11,8 @@
 class Entity;
 class Scene;
 
-#define FixedUpdateExecution 120;
-
+#define FixedUpdateExecution 180;
+#define FPS 60;
 
 class GameManager
 {
@@ -23,8 +23,11 @@ public:
 		return instance;
 	}
 
-	float32 fixedUpdateDT = 1 / FixedUpdateExecution;
-	float32 fixedUpdateTime = 0.f;
+	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
+	float32 accDt = 0.f;
+
+	int16 fpsCount = 0.f;
+	float32 fpsTimer = 0.f;
 
 	GameManager() = default;
 
