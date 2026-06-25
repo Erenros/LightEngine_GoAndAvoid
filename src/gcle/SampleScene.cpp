@@ -20,14 +20,15 @@ void SampleScene::OnInitialize()
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(true);
 	entity1->GetShape()->SetIsKinematic(true);
+	entity1->SetLayer(2);
 	 
 	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
-	entity2->SetRigidBody(true);
+	entity2->SetRigidBody(false);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->GetShape()->SetIsKinematic(false);
 	entity2->SetTexture("images");
-
+	entity2->SetLayer(1);
 
 
 	AudioEmitter test;

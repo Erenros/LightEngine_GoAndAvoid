@@ -1,46 +1,46 @@
-#include "AudioListener.h"
+#include "AudioEmitter.h"
 
-void AudioListener::SetMusicVolume(int32 volume)
+void AudioEmitter::SetMusicVolume(int32 volume)
 {
 	RessourceManager::GetInstance().SetMusicVolume(volume);
 }
 
-void AudioListener::StopMusic()
+void AudioEmitter::StopMusic()
 {
 	RessourceManager::GetInstance().StopMusic();
 }
 
-void AudioListener::PauseMusic()
+void AudioEmitter::PauseMusic()
 {
 	RessourceManager::GetInstance().PauseMusic();
 }
 
-void AudioListener::ResumeMusic()
+void AudioEmitter::ResumeMusic()
 {
 	RessourceManager::GetInstance().ResumeMusic();
 }
 
-void AudioListener::StopAllSound()
+void AudioEmitter::StopAllSound()
 {
 	RessourceManager::GetInstance().StopAllSound();
 }
 
-bool AudioListener::IsMusicPlaying()
+bool AudioEmitter::IsMusicPlaying()
 {
 	return RessourceManager::GetInstance().isMusicPlaying();
 }
 
-bool AudioListener::IsMusicPaused()
+bool AudioEmitter::IsMusicPaused()
 {
 	return RessourceManager::GetInstance().IsMusicPaused();
 }
 
-void AudioListener::PlayMusic(const std::string& id, int32 mode)
+void AudioEmitter::PlayMusic(const std::string& id, int32 mode)
 {
 	RessourceManager::GetInstance().PlayMusic(id, mode);
 }
 
-void AudioListener::PlaySoundEffect(const std::string& id, int32 mode, int32 volume)
+void AudioEmitter::PlaySoundEffect(const std::string& id, int32 mode, int32 volume)
 {
 	RessourceManager::GetInstance().PlaySoundEffect(id, mode, volume);
 }

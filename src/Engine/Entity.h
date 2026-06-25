@@ -6,12 +6,13 @@
 #include "Render/Texture.h"
 #include "Render/Sprite.h"
 #include "RigidBody.h"
+#include <cmath>
 
 struct Target
 {
 	Vector2f position;
-	float distance;
-	bool isSet;
+	float distance = 0.f;
+	bool isSet = false;
 };
 
 
@@ -58,6 +59,7 @@ public:
 	void PlayAnimation(const std::string& id, int32 mode = 0);
 
 	int32 GetLayer() { return m_layer; };
+	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };
 
 public:
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
@@ -116,6 +118,8 @@ private:
 	int32 m_layer = 0;
 
 private:
+
+	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
 
 	friend class Scene;
 	friend class GameManager;
