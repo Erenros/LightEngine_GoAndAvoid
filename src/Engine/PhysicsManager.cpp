@@ -608,8 +608,11 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta1.x -= correction * a->GetOwner()->IsKinematic();
 			delta2.x += correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
-			b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic())
+			{
+				a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+				b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			}
 
 			if (a->GetOwner()->IsKinematic())
 				m_pCurrentColliderA->CollidingOnX(-correction);
@@ -621,8 +624,11 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta1.x += correction * a->GetOwner()->IsKinematic();
 			delta2.x -= correction * b->GetOwner()->IsKinematic();
 
-			b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
-			a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+			if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic())
+			{
+				b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+				a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+			}
 
 			if (a->GetOwner()->IsKinematic())
 				m_pCurrentColliderA->CollidingOnX(correction);
@@ -639,8 +645,11 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta1.y -= correction * a->GetOwner()->IsKinematic();
 			delta2.y += correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
-			b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+			if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic())
+			{
+				a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+				b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+			}
 
 			if (a->GetOwner()->IsKinematic())
 				m_pCurrentColliderA->CollidingOnY(-correction);
@@ -652,8 +661,11 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta1.y += correction * a->GetOwner()->IsKinematic();
 			delta2.y -= correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
-			b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+			if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic())
+			{
+				a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+				b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+			}
 
 			if (a->GetOwner()->IsKinematic())
 				m_pCurrentColliderA->CollidingOnY(correction);
