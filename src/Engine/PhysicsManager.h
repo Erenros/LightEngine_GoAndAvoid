@@ -15,7 +15,7 @@ struct EntityInfo
 
 
 struct CollisionInfo {
-	int32 penetration = 0;
+	float32 penetration = 0.0f;
 	Vector2f orientation{ 0, 0 };
 };
 
@@ -72,9 +72,6 @@ private:
 
 	float32 GetRepulseCorrectionMultiplyer(Collider* a, Collider* b);
 
-	// Accumule une correction de position pour une entite plutot que de l'appliquer
-	// immediatement, pour que plusieurs colliders d'une meme entite ne se marchent
-	// pas dessus pendant une seule frame. Applique une seule fois en fin d'Update.
 	void AccumulateCorrection(Entity* pEntity, Vector2f delta);
 
 private:

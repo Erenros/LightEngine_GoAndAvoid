@@ -11,22 +11,31 @@ void Collider::Initialize(Shape* shape, Vector2f position, Entity* owner)
 
 void Collider::CollidingOn(Vector2f direction)
 {
-    m_CollisionDirection.IsCollidingOnRight = direction.x > 0;
-    m_CollisionDirection.IsCollidingOnLeft = direction.x < 0;
-    m_CollisionDirection.IsCollidingOnTop = direction.y > 0;
-    m_CollisionDirection.IsCollidingOnBottom = direction.y < 0;
+    if (direction.x < 0.0f)
+        m_CollisionDirection.IsCollidingOnRight = true;
+    else if (direction.x > 0.0f)
+        m_CollisionDirection.IsCollidingOnLeft = true;
+
+    if (direction.y > 0.0f)
+        m_CollisionDirection.IsCollidingOnTop = true;
+    else if (direction.y < 0.0f)
+        m_CollisionDirection.IsCollidingOnBottom = true;
 }
 
 void Collider::CollidingOnX(float32 direction)
 {
-    m_CollisionDirection.IsCollidingOnRight = direction > 0;
-    m_CollisionDirection.IsCollidingOnLeft = direction < 0;
+    if (direction < 0.0f)
+        m_CollisionDirection.IsCollidingOnRight = true;
+    else if (direction > 0.0f)
+        m_CollisionDirection.IsCollidingOnLeft = true;
 }
 
 void Collider::CollidingOnY(float32 direction)
 {
-    m_CollisionDirection.IsCollidingOnTop = direction > 0;
-    m_CollisionDirection.IsCollidingOnBottom = direction < 0;
+    if (direction > 0.0f)
+        m_CollisionDirection.IsCollidingOnTop = true;
+    else if (direction < 0.0f)
+        m_CollisionDirection.IsCollidingOnBottom = true;
 }
 
 void Collider::StoppedColliding()
