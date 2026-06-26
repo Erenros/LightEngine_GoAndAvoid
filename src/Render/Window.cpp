@@ -60,6 +60,7 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 	// Create a Render Target
 
 	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, 1920, 1080);
+	SDL_SetTextureScaleMode(mp_RenderTarget, SDL_ScaleModeLinear);
 
 	if (!mp_RenderTarget)
 	{
@@ -86,9 +87,9 @@ void Window::InitImGUI()
 	IMGUI_CHECKVERSION();
 
 	ImGui::CreateContext();
-
+	 
 	ImGuiIO& io = ImGui::GetIO();
-	(void)io; 
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	ImGui::StyleColorsDark();
 
@@ -105,83 +106,81 @@ void Window::StartImGUIFrame()
 }
 
 void Window::ImGUIUpdate()
-{  
+{
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 	ImGui::SetNextWindowViewport(viewport->ID);
 
-	ImGui::Begin("DockRoot", nullptr,
+	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoMove
-	);
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_MenuBar;
 
-	ImGuiID dockspace_id = ImGui::GetID("DockRoot");
-
-	static bool init = false;
-
-	if (!init)
-	{
-		init = true; 
-		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
-
-		ImGuiID scene_id = dockspace_id;
-
-		ImGui::DockBuilderDockWindow("Scene", scene_id);
-
-		ImGui::DockBuilderFinish(dockspace_id);
-	}
-
-	ImGui::DockSpace(dockspace_id);
-	ImGui::End();
-
+	ImGui::Begin("DockRoot", nullptr, flags);
+	 
 	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("Debug"))
 		{
 			if (ImGui::MenuItem("Gizmo"))
-			{
 				GameManager::GetInstance().SetGizmoVisualState();
-			}
 
 			ImGui::EndMenu();
 		}
-
 		ImGui::EndMenuBar();
 	}
+	 
+	ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+	ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
 
-
-	ImGui::Begin("Scene");
-
-	ImVec2 avail = ImGui::GetContentRegionAvail();
-
-	const float aspect = 1920.0f / 1080.0f;
-
-	float width = avail.x;
-	float height = width / aspect;
-
-	if (height > avail.y)
+	static bool init = false;
+	if (!init)
 	{
-		height = avail.y;
-		width = height * aspect;
+		init = true;
+		ImGui::DockBuilderRemoveNode(dockspace_id);
+		ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+		ImGuiID center = dockspace_id;
+
+		ImGui::DockBuilderDockWindow("Scene", center);
+
+		ImGui::DockBuilderFinish(dockspace_id);
+	}
+	 
+	ImGui::End();
+
+
+	if (ImGui::Begin("Scene"))
+	{
+		ImVec2 avail = ImGui::GetContentRegionAvail();
+
+		const float aspect = 1920.0f / 1080.0f;
+
+		float width = avail.x;
+		float height = width / aspect;
+
+		if (height > avail.y)
+		{
+			height = avail.y;
+			width = height * aspect;
+		}
+
+		ImVec2 cursor = ImGui::GetCursorPos();
+
+		ImGui::SetCursorPos(ImVec2(
+			cursor.x + (avail.x - width) * 0.5f,
+			cursor.y + (avail.y - height) * 0.5f
+		));
+
+		ImGui::Image((ImTextureID)mp_RenderTarget, ImVec2(width, height));
 	}
 
-	ImVec2 cursor = ImGui::GetCursorPos();
-
-	ImGui::SetCursorPos(ImVec2(
-		cursor.x + (avail.x - width) * 0.5f,
-		cursor.y + (avail.y - height) * 0.5f
-	));
-
-	ImGui::Image(
-		(ImTextureID)mp_RenderTarget,
-		ImVec2(width, height)
-	);
-
-	ImGui::End(); 
+	ImGui::End();
 
 	ImGui::Render();
 }
