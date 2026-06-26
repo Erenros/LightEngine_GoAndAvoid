@@ -51,6 +51,11 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 	}
 }
 
+void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	SDL_SetRenderDrawColor(mp_Renderer, r, g, b, a); 
+}
+
 void Window::End(){
 	SDL_DestroyRenderer(mp_Renderer);
 	SDL_DestroyWindow(mp_Window);
@@ -95,11 +100,52 @@ void Window::Draw(gcle::Shape* pShape)
 		vertices.push_back(*v);
 	}
 
+
+	
+
+
 	if (pShape->GetTexture() == nullptr)
 		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	else {
 		Texture* text = pShape->GetTexture();
 		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
-
 	}
+}
+
+void Window::DrawDebug(gcle::Shape* pShape)
+{
+	std::vector<SDL_FPoint*> pointsPtr;
+
+	switch (pShape->GetShape())
+	{
+	case gcle::Shapes::Rectangle:
+	{
+		auto pSh = static_cast<gcle::Rectangle*>(pShape);
+		pointsPtr = pSh->GetHollow();
+		break;
+	} 
+	case gcle::Shapes::Circle:
+	{
+		pointsPtr = (static_cast<gcle::Circle*>(pShape))->GetHollow();
+		break;
+	} 
+	case gcle::Shapes::Triangle:
+	{
+		pointsPtr = (static_cast<gcle::Triangle*>(pShape))->GetHollow();
+		break;
+	}
+
+	default:
+		break;
+	}
+
+
+	std::vector<SDL_FPoint> points;
+	points.reserve(pointsPtr.size());
+	for (SDL_FPoint* p : pointsPtr)
+	{
+		points.push_back(*p);
+	}
+
+	SDL_RenderDrawLinesF(mp_Renderer, points.data(), static_cast<int32>(points.size()));
 }

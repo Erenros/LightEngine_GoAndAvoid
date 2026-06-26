@@ -1,11 +1,34 @@
 #include "Scene.h"
 #include "Render/Text.h"
 
+void Scene::DrawDebug(Window* window)
+{
+	for (auto layer : GameManager::GetInstance().m_entities) {
+		for(Entity* e : layer)
+		{
+			if (e->IsActiveIn(m_tag)) {
+				if (e->CollidingEntity.empty())
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+				}
+				else
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
+				}
+				GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+			}
+		}
+	}
+}
+
 
 void Scene::Draw(Window* window) {
-	for (Entity* e : GameManager::GetInstance().m_entities) {
-		if(e->IsActiveIn(m_tag)){
-			GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+	for (auto layer : GameManager::GetInstance().m_entities) {
+		for(Entity* e : layer)
+		{
+			if(e->IsActiveIn(m_tag))
+				GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+			
 		}
 	}
 
@@ -52,9 +75,12 @@ bool Scene::isDrawn(const std::string& tag){
 }
 
 void Scene::Update(Clock& time){
-	for (Entity* e : GameManager::GetInstance().m_entities) {
-		if (e->IsActiveIn(m_tag)) {
-			e->Update(time);
+	for (auto layer : GameManager::GetInstance().m_entities) 
+	{
+		for(Entity* e : layer)
+		{
+			if (e->IsActiveIn(m_tag))
+				e->Update(time);
 		}
 	}
-} 
+}

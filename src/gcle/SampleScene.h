@@ -4,6 +4,9 @@
 class SampleScene : public Scene
 {
 public:
+	
+	Text* test = nullptr;
+
 	void OnInitialize() override;
 	void OnUpdate(Clock& time) override;
 

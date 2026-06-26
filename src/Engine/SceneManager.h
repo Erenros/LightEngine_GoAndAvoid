@@ -22,7 +22,8 @@ class SceneManager {
 	void UpdateCurrentScene(Clock& time);
 
 	//Draw
-	void DrawCurrentScene(Window* window);
+	void DrawCurrentScene(Window* pWindow);
+	void DrawCurrentSceneDebug(Window* pWindow);
 
 
 	friend class GameManager;

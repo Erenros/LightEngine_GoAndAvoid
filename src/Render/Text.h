@@ -21,6 +21,7 @@ private:
 	SDL_Color* mp_color = nullptr;
 	SDL_Rect* mp_rect = nullptr;
 	
+	bool m_needToChange = false;
 
 public:
 

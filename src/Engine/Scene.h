@@ -22,6 +22,7 @@ private:
 	std::vector<Text*> m_texts;
 
 	void Update(Clock& time);
+	void DrawDebug(Window* window);
 	void Draw(Window* window);
 
 	std::vector<std::string> m_activeTextures;

@@ -17,16 +17,13 @@ void Entity::Initialize(gcle::Shapes shape)
 
 
 	mp_Shape = GetBaseShape(shape); 
-	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+	mp_RenderShape = mp_Shape->Clone(); 
 
-	m_RigidBody.Initialize(&mp_Shape->GetTransform());
-	m_RigidBody.SetActive(true);
+	m_RigidBody.Initialize(&mp_Shape->GetTransform()); 
 
 	m_Target.isSet = false;
 
 	m_Id = sId++;
-
-	PhysicsManager::GetInstance().AddEntity(this);
 
 	OnInitialize();
 }
@@ -151,6 +148,12 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
 void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
+
+	if (isRigidBody)
+		PhysicsManager::GetInstance().AddEntity(this);
+
+	if (!isRigidBody)
+		PhysicsManager::GetInstance().RemoveEntity(this);
 }
 
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
