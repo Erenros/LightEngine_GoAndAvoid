@@ -63,8 +63,10 @@ private:
 	
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
-private:
+private: 
+	std::vector<EntityInfo> m_EntitiesToAdd;
 	std::vector<EntityInfo> m_EntitiesToUpdate;
+	std::vector<EntityInfo> m_EntitiesToRemove;
 
 private:
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);

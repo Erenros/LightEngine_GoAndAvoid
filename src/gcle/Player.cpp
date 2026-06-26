@@ -1,22 +1,30 @@
 #include "Player.h"
 #include "GameManager.h"
 
-
 void Player::OnUpdate() {
     InputManager& im = InputManager::GetInstance();
     RigidBody2D rb = GetRigidBody();
-
+    Seconds dt = GameManager::GetInstance().GetTime()->GetDeltaTime();
+    
 
     if (im.IsHeld('Q')) {
-        GetRigidBody().AddForce({ -1.f, 0.f }, 600.f, 0.006f);
+        GetRigidBody().AddForce({ -1, 0 }, 100, dt);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody().AddForce({ 1.f, 0.f }, 600.f, 0.006f);
+        GetRigidBody().AddForce({ 1, 0 }, 100, dt);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody().AddForce({ 0.f, 1.f }, 600.f, 0.006f);
+        GetRigidBody().AddForce({ 0, 1 }, 100, dt);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody().AddForce({ 0.f, -1.f }, 600.f, 0.006f);
+        GetRigidBody().AddForce({ 0, -1 }, 100, dt);
     }
+    if (im.IsHeld('B')) {
+        GetRigidBody().AddImpulse({ 0, -1 }, 500);
+    }
+}
+
+void Player::OnInitialize() {
+    RigidBody2D rb = GetRigidBody();
+    rb.SetDampingStrenght(1000);
 }

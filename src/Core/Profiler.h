@@ -3,11 +3,14 @@
 
 #include <chrono>
 #include <string>
-#include <unordered_map>
-
+#include <unordered_map> 
 #include "Utils.h"
+#include "Debugger.h"
 
-#ifdef _DEBUG
+#define PROFILER
+
+#if defined(_DEBUG) && defined(PROFILER)
+
 #define PROFILER_START(name, message) gcle::Profiler::NewTask(name, message)
 #define PROFILER_END(name) gcle::Profiler::EndTask(name)
 #define PROFILER_CLEAR(name) gcle::Profiler::Clear()

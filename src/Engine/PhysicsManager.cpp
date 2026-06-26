@@ -59,28 +59,33 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 	}
 }
 
-void PhysicsManager::Update(float64 deltaTime){
+void PhysicsManager::Update(float64 deltaTime)
+{
+	for (EntityInfo entity : m_EntitiesToRemove) {
+		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
+		{
+			if (m_EntitiesToUpdate[i].pEntity == entity.pEntity) {
+				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+			}
+
+		}
+	}
+
+	for (EntityInfo entity : m_EntitiesToAdd) {
+		m_EntitiesToUpdate.push_back(entity);
+	}
+
+	m_EntitiesToAdd.clear();
+	m_EntitiesToRemove.clear();
+
+
 	int32 nbrTest = 0;
 	if (m_activateQuadTree == true) {
-		std::vector<Entity*> activeEntities = GameManager::GetInstance().GetActiveEntities(SceneManager::GetInstance().GetCurrentSceneTag());
-		/*if (m_dynamicQuadTreeSize) {
-			delete m_quadTree;
-			Vector2f min = activeEntities[0]->GetPosition();
-			Vector2f max = activeEntities[1]->GetPosition();
-
-			for (auto& e : activeEntities) {
-				Vector2f pos1 = e->GetPosition(0.f, 0.f);
-				Vector2f pos2 = e->GetPosition(1.f, 1.f);
-					
-				min.x = std::min(min.x, pos1.x);
-				min.y = std::min(min.y, pos1.y);
-				max.x = std::min(max.x, pos2.x);
-				max.y = std::min(max.y, pos2.y);
-
-			}
-			m_quadTree = new QuadTree(min.x, min.y, max.x, max.y);
-		}*/
-
+		std::vector<Entity*> activeEntities; 
+		for(auto& e : m_EntitiesToUpdate){
+			if(e.IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+			activeEntities.push_back(e);
+		}
 		m_timeBetweenRegeneration += 1;
 		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
 			m_timeBetweenRegeneration = 0;
@@ -89,7 +94,6 @@ void PhysicsManager::Update(float64 deltaTime){
 				m_quadTree->Insert(entity);
 			}
 		}
-
 
 		for (auto& entity : activeEntities) {
 			AABB aabb;
@@ -115,21 +119,31 @@ void PhysicsManager::Update(float64 deltaTime){
 					Repulse(entities.first, entities.second);
 				}
 
-				if (entities.first->m_OnCollisionEnter)
-				{
-					entities.first->OnCollisionEnter(entities.second);
-					entities.first->m_OnCollisionEnter = false;
-				}
-				if (entities.second->m_OnCollisionEnter)
-				{
-					entities.second->OnCollisionEnter(entities.first);
-					entities.second->m_OnCollisionEnter = false;
-				}
+				if (!entity.first->CollidingEntity.contains(entity.second->GetId()))
+						{
+							entity.first->OnCollisionEnter(entity.second);
+							entity.first->CollidingEntity.insert(entity.second->GetId());
 
-				entities.first->OnCollision(entities.second);
-				entities.first->m_WasOnCollision = true;
-				entities.second->OnCollision(entities.first);
-				entities.second->m_WasOnCollision = true;
+							entity.second->OnCollisionEnter(entity.first);
+							entity.second->CollidingEntity.insert(entity.first->GetId());
+						}
+
+						else
+						{
+							entity.first->OnCollision(entity.second);
+							entity.second->OnCollision(entity.first);
+						}
+					}
+					else 
+					{
+						if (entity.first->CollidingEntity.contains(entity.second->GetId())) 
+						{
+							entity.first->OnCollisionExit(entity.second);
+							entity.first->CollidingEntity.erase(entity.second->GetId());
+							entity.second->OnCollisionExit(entity.first);
+							entity.second->CollidingEntity.erase(entity.first->GetId());
+						}
+					}
 			}
 		}
 		m_pairs.clear();
@@ -153,28 +167,36 @@ void PhysicsManager::Update(float64 deltaTime){
 						{
 							Repulse(entity, otherEntity);
 						}
-
-						if (entity->m_OnCollisionEnter)
+						if (!entity->CollidingEntity.contains(otherEntity->GetId()))
 						{
 							entity->OnCollisionEnter(otherEntity);
-							entity->m_OnCollisionEnter = false;
-						}
-						if (otherEntity->m_OnCollisionEnter)
-						{
+							entity->CollidingEntity.insert(otherEntity->GetId());
+
 							otherEntity->OnCollisionEnter(entity);
-							otherEntity->m_OnCollisionEnter = false;
+							otherEntity->CollidingEntity.insert(entity->GetId());
 						}
 
-						entity->OnCollision(otherEntity);
-						entity->m_WasOnCollision = true;
-						otherEntity->OnCollision(entity);
-						otherEntity->m_WasOnCollision = true;
+						else
+						{
+							entity->OnCollision(otherEntity);
+							otherEntity->OnCollision(entity);
+						}
+					}
+					else 
+					{
+						if (entity->CollidingEntity.contains(otherEntity->GetId())) 
+						{
+							entity->OnCollisionExit(otherEntity);
+							entity->CollidingEntity.erase(otherEntity->GetId());
+							otherEntity->OnCollisionExit(entity);
+							otherEntity->CollidingEntity.erase(entity->GetId());
+						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	//DEBUG_INFO << nbrTest << ENDL
 
 	
@@ -677,11 +699,23 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 		{
 			pos1.x -= correction * a->IsKinematic();
 			pos2.x += correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
+			
+			a->GetCollider()->CollidingOnX(-correction);
+			b->GetCollider()->CollidingOnX(correction);
 		}
 		else
 		{
 			pos1.x += correction * a->IsKinematic();
 			pos2.x -= correction * b->IsKinematic();
+
+			b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+			a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
+
+			a->GetCollider()->CollidingOnX(correction);
+			b->GetCollider()->CollidingOnX(-correction);
 		}
 
 		if (a->IsKinematic())
@@ -698,12 +732,25 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 		{
 			pos1.y -= correction * a->IsKinematic();
 			pos2.y += correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+			b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
+
+			a->GetCollider()->CollidingOnY(-correction);
+			b->GetCollider()->CollidingOnY(correction);
 		}
 		else
 		{
 			pos1.y += correction * a->IsKinematic();
 			pos2.y -= correction * b->IsKinematic();
+
+			a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+			b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
+
+			a->GetCollider()->CollidingOnY(correction);
+			b->GetCollider()->CollidingOnY(-correction);
 		}
+		
 		if(a->IsKinematic())
 			a->GetOwner()->GetRigidBody().ZeroVelocityY();
 		if(b->IsKinematic())
@@ -791,7 +838,6 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
 		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
 
-
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		if (!a->IsKinematic() || !b->IsKinematic()) {
@@ -816,6 +862,9 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 	}
+
+	a->GetCollider()->CollidingOn(normal);
+	b->GetCollider()->CollidingOn(normal);
 }
 
 void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)

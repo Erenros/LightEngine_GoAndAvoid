@@ -17,16 +17,13 @@ void Entity::Initialize(gcle::Shapes shape)
 
 
 	mp_Shape = GetBaseShape(shape); 
-	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+	mp_RenderShape = mp_Shape->Clone(); 
 
-	m_RigidBody.Initialize(&mp_Shape->GetTransform());
-	m_RigidBody.SetActive(true);
+	m_RigidBody.Initialize(&mp_Shape->GetTransform()); 
 
 	m_Target.isSet = false;
 
 	m_Id = sId++;
-
-	PhysicsManager::GetInstance().AddEntity(this);
 
 	OnInitialize();
 }
@@ -37,19 +34,19 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	{
 	case gcle::Shapes::Rectangle:
 	{
-		gcle::Rectangle* pRect = new gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Rectangle* pRect = GCLE_NEW gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pRect;
 		break;
 	}
 	case gcle::Shapes::Circle:
 	{
-		gcle::Circle* pCircle = new gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
+		gcle::Circle* pCircle = GCLE_NEW gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
 		return pCircle;
 		break;
 	}
 	case gcle::Shapes::Triangle:
 	{
-		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Triangle* pTriangle = GCLE_NEW gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pTriangle;
 		break;
 	}
@@ -64,9 +61,10 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 
 void Entity::Update(Clock& timer)
 {
-	float32 dt = static_cast<float32>(timer.GetDeltaTime());
-
-	m_RigidBody.Update(timer);
+	float32 dt = static_cast<float32>(timer.GetTimeScale());
+	
+	if (IsRigidBody())
+		m_RigidBody.Update(timer);
 
 	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;
@@ -150,6 +148,12 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
 void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
+
+	if (isRigidBody)
+		PhysicsManager::GetInstance().AddEntity(this);
+
+	if (!isRigidBody)
+		PhysicsManager::GetInstance().RemoveEntity(this);
 }
 
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
@@ -291,7 +295,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 
@@ -303,7 +307,7 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 

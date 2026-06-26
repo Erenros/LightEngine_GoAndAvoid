@@ -14,13 +14,13 @@ Sprite::Sprite(Window* window, const std::string& path)
 		return;
 
 	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	DEBUG_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
+	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
 }
 
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
-	m_animationMap[id] = new Animation(firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
+	m_animationMap[id] = GCLE_NEW Animation(firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
 }
 
 
@@ -28,7 +28,7 @@ void Sprite::PlayAnimation(const std::string& id)
 {
 	if (!m_animationMap.contains(id))
 	{
-		DEBUG_WARN << "No animation with id : " << id << ENDL;
+		GCLE_WARN << "No animation with id : " << id << ENDL;
 		return;
 	}
 

@@ -20,8 +20,7 @@ void SampleScene::OnInitialize()
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(10, -200);
 	entity1->SetRotation(45);
-	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(false);
+	entity1->SetRigidBody(true); 
 	entity1->GetShape()->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
 
@@ -64,7 +63,7 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 
-	if (InputManager::GetInstance().IsDown(Space))
+	/*if (InputManager::GetInstance().IsDown(Space))
 	{
 		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
 	}
@@ -72,5 +71,5 @@ void SampleScene::OnUpdate(Clock& time)
 	if (InputManager::GetInstance().IsDown('A'))
 	{
 		pEntity->Destroy();
-	}
+	}*/
 } 

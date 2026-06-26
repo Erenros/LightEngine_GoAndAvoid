@@ -34,9 +34,13 @@ public:
 	float32 GetSpeed() const;
 	Vector2f GetVelocity() const;
 
-	void SetVelocity(Vector2f velocity) { m_Velocity = velocity; }
-	void ZeroVelocityX() { m_Velocity.x = 0.f; }
-	void ZeroVelocityY() { m_Velocity.y = 0.f; }
+	void SetVelocity(Vector2f velocity) { m_TempVelocity = velocity; m_TempVelHasChanged = true; }
+
+	void ZeroVelocityX(bool right);
+	void ZeroVelocityY(bool down);
+
+	void ZeroVelocityX() { m_TempVelocity.x = 0; m_TempVelHasChanged = true; }
+	void ZeroVelocityY() { m_TempVelocity.x = 0; m_TempVelHasChanged = true; }
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
@@ -53,21 +57,25 @@ private:
 	Vector2f m_Position;
 	Vector2f m_Direction;
 	Vector2f m_Velocity;
+	Vector2f m_TempVelocity;
 	float32 m_Mass = 1.0f;
 	Vector2f m_Friction = {0.1f, 0.1f};
 
 	float32 m_MaxSpeed = 500.0f;
 
 	float32 m_Gravity = GRAVITY;
-	bool m_UseGravity = true;
+	bool m_UseGravity = false;
 
 	float32 m_Restitution = 0.5f;
 
-	bool IsRigidBody = true;
+	bool IsRigidBody = false;
+
+	bool m_TempVelHasChanged = false;
 
 	Transform2D* mp_Transform = nullptr;
 
 	float64 dt = 0.0f;
+
 };
 
 

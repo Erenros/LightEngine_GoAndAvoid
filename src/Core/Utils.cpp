@@ -76,9 +76,7 @@ std::string RemoveZeroes(long double value)
 
 std::string ChangeUnit(std::string string, int32 precision)
 {
-	string = RemoveZeroes(string);
-
-	std::cout << string << std::endl;
+	string = RemoveZeroes(string); 
 
 	int amountOfDigits = 0;
 	int amountOfDigitsAfterDot = 0;
