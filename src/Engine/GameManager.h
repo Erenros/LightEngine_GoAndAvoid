@@ -11,7 +11,7 @@
 class Entity;
 class Scene;
 
-#define FixedUpdateExecution 180;
+#define FixedUpdateExecution 60;
 #define FPS 60;
 
 class GameManager

@@ -19,6 +19,8 @@ struct CollisionInfo {
 	Vector2f orientation{ 0.f, 0.f };
 };
 
+struct ColliderEntry;
+
 enum class RepulseTypes {
 	AABB,
 	Circle,

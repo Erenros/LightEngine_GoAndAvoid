@@ -1,7 +1,5 @@
 #pragma once
 #include <vector>
-#include <memory>
-#include <array>
 #include "include.h"
 #include <unordered_set>
 

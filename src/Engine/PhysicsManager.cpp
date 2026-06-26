@@ -61,6 +61,7 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 
 void PhysicsManager::Update(float64 deltaTime)
 {
+	//PROFILER_START("RemoveEntity", "RemoveEntities");
 	for (EntityInfo entity : m_EntitiesToRemove) {
 		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
 		{
@@ -70,10 +71,13 @@ void PhysicsManager::Update(float64 deltaTime)
 
 		}
 	}
+	//PROFILER_END("RemoveEntity");
 
+	//PROFILER_START("AddEntity", "AddEntity");
 	for (EntityInfo entity : m_EntitiesToAdd) {
 		m_EntitiesToUpdate.push_back(entity);
 	}
+	//PROFILER_END("AddEntity");
 
 	m_EntitiesToAdd.clear();
 	m_EntitiesToRemove.clear();
@@ -83,9 +87,10 @@ void PhysicsManager::Update(float64 deltaTime)
 	if (m_activateQuadTree == true) {
 		std::vector<Entity*> activeEntities; 
 		for(auto& e : m_EntitiesToUpdate){
-			if(e.IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
-			activeEntities.push_back(e);
+			if(e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+			activeEntities.push_back(e.pEntity);
 		}
+		//PROFILER_START("QuadTreeRegeneration", "QuadTreeRegeneration");
 		m_timeBetweenRegeneration += 1;
 		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
 			m_timeBetweenRegeneration = 0;
@@ -94,7 +99,9 @@ void PhysicsManager::Update(float64 deltaTime)
 				m_quadTree->Insert(entity);
 			}
 		}
+		//PROFILER_END("QuadTreeRegeneration");
 
+		//PROFILER_START("Query", "Query");
 		for (auto& entity : activeEntities) {
 			AABB aabb;
 			Vector2f pos1 = entity->GetPosition(0.f, 0.f);
@@ -110,43 +117,47 @@ void PhysicsManager::Update(float64 deltaTime)
 				}
 			}
 		}
+		//PROFILER_END("Query");
 
+		//PROFILER_START("collisionLoop", "collisionLoop");
 		for (auto& entities : m_pairs) {
 			nbrTest += 1;
-			if (entities.first->IsColliding(entities.second)){
+			if (entities.first->IsColliding(entities.second)) {
 				if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
 				{
 					Repulse(entities.first, entities.second);
 				}
 
-				if (!entity.first->CollidingEntity.contains(entity.second->GetId()))
-						{
-							entity.first->OnCollisionEnter(entity.second);
-							entity.first->CollidingEntity.insert(entity.second->GetId());
+				if (!entities.first->CollidingEntity.contains(entities.second->GetId()))
+				{
+					entities.first->OnCollisionEnter(entities.second);
+					entities.first->CollidingEntity.insert(entities.second->GetId());
 
-							entity.second->OnCollisionEnter(entity.first);
-							entity.second->CollidingEntity.insert(entity.first->GetId());
-						}
+					entities.second->OnCollisionEnter(entities.first);
+					entities.second->CollidingEntity.insert(entities.first->GetId());
+				}
 
-						else
-						{
-							entity.first->OnCollision(entity.second);
-							entity.second->OnCollision(entity.first);
-						}
-					}
-					else 
-					{
-						if (entity.first->CollidingEntity.contains(entity.second->GetId())) 
-						{
-							entity.first->OnCollisionExit(entity.second);
-							entity.first->CollidingEntity.erase(entity.second->GetId());
-							entity.second->OnCollisionExit(entity.first);
-							entity.second->CollidingEntity.erase(entity.first->GetId());
-						}
-					}
+				else
+				{
+					entities.first->OnCollision(entities.second);
+					entities.second->OnCollision(entities.first);
+				}
+			}
+			else
+			{
+				if (entities.first->CollidingEntity.contains(entities.second->GetId()))
+				{
+					entities.first->OnCollisionExit(entities.second);
+					entities.first->CollidingEntity.erase(entities.second->GetId());
+					entities.second->OnCollisionExit(entities.first);
+					entities.second->CollidingEntity.erase(entities.first->GetId());
+				}
 			}
 		}
 		m_pairs.clear();
+
+		//PROFILER_END("collisionLoop");
+		//GCLE_INFO << "Loop end" << ENDL;
 	}
 	
 	else {
@@ -197,7 +208,7 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 	}
 
-	//DEBUG_INFO << nbrTest << ENDL
+	//GCLE_INFO << nbrTest << ENDL;
 
 	
 
