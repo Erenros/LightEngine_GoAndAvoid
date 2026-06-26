@@ -63,6 +63,7 @@ public:
 	void DrawTextOnRenderer(Text* text);
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
+	
 
 public:
 	uint32 GetWidth() { return m_width; }
@@ -72,4 +73,8 @@ private:
 	SDL_Window* mp_Window = nullptr;
 	SDL_Renderer* mp_Renderer = nullptr;
 	uint32 m_width, m_height = 0;
+
+public:
+
+	bool IsInsideWindow(Entity* entity);
 };

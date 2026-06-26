@@ -4,6 +4,7 @@
 #include "Render/Text.h"
 #include "AudioEmitter.h"
 #include "include.h"
+#include "PhysicsManager.h"
 
 void SampleScene::OnInitialize()
 {
@@ -46,13 +47,18 @@ void SampleScene::OnInitialize()
 	entity4->GetRigidBody().SetGravity(false);
 	entity4->GetShape()->SetIsKinematic(true);*/
 
-	for (int i = 0; i < 400; i++) {
+	for (int i = 0; i < 300; i++) {
 		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-		entity->SetPosition(-45000 + (i * 200), -45000 + (i * 200));
+		entity->SetPosition(-20000 + (i * 100), -20000 + (i * 100));
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
 		entity->GetShape()->SetIsKinematic(true);
 	}
+
+	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
+	PhysicsManager::GetInstance().SetActivateQuadTree(true);
+	PhysicsManager::GetInstance().SetQuadTreePos1({-50000, -50000});
+	PhysicsManager::GetInstance().SetQuadTreePos2({50000, 50000});
 }
 
 void SampleScene::OnUpdate(Clock& time)

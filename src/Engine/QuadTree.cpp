@@ -10,16 +10,14 @@ void QuadTree::Insert(Entity* entry){
 }
 
 std::vector<ColliderEntry>& QuadTree::Query(ColliderEntry& entry){
-	root.Query(entry.aabb, m_queryResult, m_querySeen);
+	m_queryResult.clear();
+	m_querySeen.clear();
+	m_querySeen.insert(entry.entity);
 
-	int16 i = 0;
-	for (auto& r : m_queryResult) {
-		if (r.entity == entry.entity) {
-			m_queryResult.erase(m_queryResult.begin() + i);
-			return m_queryResult;
-		}
-		i++;
-	}
+	float32 margin = 1.f;
+	AABB marginAABB = { entry.aabb.minX - margin, entry.aabb.minY - margin, entry.aabb.maxX + margin, entry.aabb.maxY + margin };
+	root.Query(marginAABB, m_queryResult, m_querySeen);
+	
 	return m_queryResult;
 }
 

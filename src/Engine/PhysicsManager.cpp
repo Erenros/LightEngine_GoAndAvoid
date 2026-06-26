@@ -81,10 +81,15 @@ void PhysicsManager::Update(float64 deltaTime){
 			m_quadTree = new QuadTree(min.x, min.y, max.x, max.y);
 		}*/
 
-		m_quadTree->Clear();
-		for (auto& entity : activeEntities) {
-			m_quadTree->Insert(entity);
+		m_timeBetweenRegeneration += 1;
+		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
+			m_timeBetweenRegeneration = 0;
+			m_quadTree->Clear();
+			for (auto& entity : activeEntities) {
+				m_quadTree->Insert(entity);
+			}
 		}
+
 
 		for (auto& entity : activeEntities) {
 			AABB aabb;
@@ -840,7 +845,6 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Sha
 		return 1.0;
 }
 
-
 void PhysicsManager::SetActivateQuadTree(bool activate){
 	m_activateQuadTree = activate;
 }
@@ -855,6 +859,10 @@ void PhysicsManager::SetQuadTreePos1(Vector2f pos1){
 
 void PhysicsManager::SetQuadTreePos2(Vector2f pos2){
 	m_quadTreePos2 = pos2;
+}
+
+void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame){
+	m_frameBetweenQuadTreeRegenerations = nbrFrame;
 }
 
 PhysicsManager::~PhysicsManager(){

@@ -3,15 +3,18 @@
 
 
 void Scene::Draw(Window* window) {
+	int i = 0;
 	for (auto layer : GameManager::GetInstance().m_entities) {
-		for(Entity* e : layer)
-		{
-			if(e->IsActiveIn(m_tag))
-				GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
-			
+		for(Entity* e : layer){
+			if (window->IsInsideWindow(e)) {
+				if (e->IsActiveIn(m_tag)) {
+					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					i++;
+				}
+			}
 		}
 	}
-
+	DEBUG_INFO<< i << ENDL
 	for (Text* t : m_texts)
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
 }

@@ -1,7 +1,7 @@
 #pragma once 
 #include "include.h"
 #include "Entity.h"
-#include "Shape.h"
+#include "Render/Shape.h"
 #include "QuadTree.h"
 #include <vector>
 #include <unordered_set>
@@ -85,6 +85,9 @@ private:
 
 	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
 
+	int8 m_frameBetweenQuadTreeRegenerations = 1;
+	int8 m_timeBetweenRegeneration = 0;
+
 	std::vector<std::pair<Entity*, Entity*>> m_pairs;
 	std::vector<ColliderEntry> m_queryResult;
 
@@ -93,6 +96,8 @@ public:
 	void SetDynamicQuadTreeSize(bool activate);
 	void SetQuadTreePos1(Vector2f pos1);
 	void SetQuadTreePos2(Vector2f pos2);
+	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
+
 
 public : 
 	~PhysicsManager();

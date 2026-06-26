@@ -36,7 +36,7 @@ class QuadNode {
 	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
 
 	QuadNode() = default;
-	QuadNode(float32 x, float32 y, float32 w, float32 h, int8 d);
+	QuadNode(float32 x, float32 y, float32 w, float32 h, int32 d);
 
 	~QuadNode();
 

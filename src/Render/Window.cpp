@@ -8,7 +8,9 @@
 #include "SDL_image.h"
 #include "Render/Text.h"
 #include "Texture.h"
-
+#include "Engine/Entity.h"
+#include "Shape.h"
+#include "Engine/GameManager.h"
 
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
@@ -102,4 +104,23 @@ void Window::Draw(gcle::Shape* pShape)
 		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 
 	}
+}
+
+bool Window::IsInsideWindow(Entity* entity){
+	int32 w;
+	int32 h;
+	SDL_GetWindowSize(mp_Window, &w, &h);
+	Vector2f camCenter = GameManager::GetInstance().m_Cam.GetPosition();
+	float32 margin = 100.f;
+
+	Vector2f camPos1 = { camCenter.x - margin , camCenter.y - margin };
+	Vector2f camPos2 = { camCenter.x + w + margin, camCenter.y + h + margin};
+
+
+	gcle::Shape* shape = entity->GetRenderShape();
+
+	Vector2f pos1 = shape->GetPosition(0.f, 0.f);
+	Vector2f pos2 = shape->GetPosition(1.f, 1.f);
+
+	return pos1.x < camPos2.x && pos1.y < camPos2.y && pos2.x > camPos1.x && pos2.y > camPos1.y;
 }
