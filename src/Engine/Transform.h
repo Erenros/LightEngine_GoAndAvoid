@@ -16,6 +16,7 @@ public:
     void Forward();
 
     void UpdatePositionWithParentPosition();
+    void UpdateChildPosition();
 
 public:
     void SetPosition(Vector2f);

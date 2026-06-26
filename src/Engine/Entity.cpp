@@ -21,7 +21,7 @@ void Entity::Initialize(gcle::Shapes shape)
 	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
 
 
-	m_RigidBody.Initialize(&mp_Shape->GetTransform());
+	m_RigidBody.Initialize(mp_Shape->GetTransform());
 	m_RigidBody.SetActive(true);
 
 	m_Target.isSet = false;
@@ -119,9 +119,10 @@ void Entity::RemoveCollider(Collider* pCollider)
 	mp_Colliders.erase(pCollider);
 }
 
-Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive)
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position)
 {
-	Collider* collider = new Collider(GetBaseShape(shape));
+	Collider* collider = new Collider();
+	collider->Initialize(GetBaseShape(shape), position, this);
 	AddCollider(collider);
 	collider->SetActive(isActive);
 	return collider;

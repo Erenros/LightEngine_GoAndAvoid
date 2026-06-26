@@ -2,6 +2,8 @@
 #include "Player.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
+#include "Engine/Collider.h"
+//#include "Render/Shape.h"
 
 void DebugScene::OnInitialize()
 {
@@ -14,13 +16,13 @@ void DebugScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
 	entity1->SetPosition(50, -200);
 	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(true);
-	entity1->GetShape()->SetIsKinematic(true);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true);
+	entity1->GetRigidBody().SetGravity(false);
+	entity1->SetIsKinematic(true);
+	Collider* collider = entity1->CreateCollider(gcle::Shapes::Circle, true, { 50, -200 });
+	collider->GetShape()->SetScale({ 1, 1 });
 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(320, 150);
@@ -28,16 +30,19 @@ void DebugScene::OnInitialize()
 	entity2->Rotate(180);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->GetShape()->SetIsKinematic(false);
-	entity2->CreateCollider(gcle::Shapes::Rectangle, true);
+	entity2->SetIsKinematic(true);
+	collider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 320, 150 });
+	collider->GetShape()->SetScale({2, 1});
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(320, 300);
 	entity3->SetScale({ 10, 1 });
 	entity3->SetRigidBody(true);
 	entity3->GetRigidBody().SetGravity(false);
-	entity3->GetShape()->SetIsKinematic(false);
-	entity3->CreateCollider(gcle::Shapes::Rectangle, true);
+	entity3->SetIsKinematic(false);
+	collider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 320, 300 });
+	collider->GetShape()->SetScale({ 10, 1 });
+
 
 }
 

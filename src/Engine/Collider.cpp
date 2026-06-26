@@ -1,7 +1,12 @@
 #include "Collider.h"
+#include "Entity.h"
 
-Collider::Collider(Shape* shape) : m_shape(shape)
+void Collider::Initialize(Shape* shape, Vector2f position, Entity* owner)
 {
+    m_shape = shape;
+    mp_Owner = owner;
+    m_shape->SetPosition(position.x, position.y);
+    m_shape->GetTransform()->SetParent(mp_Owner->GetShape()->GetTransform());
 }
 
 void Collider::CollidingOn(Vector2f direction)
@@ -10,8 +15,6 @@ void Collider::CollidingOn(Vector2f direction)
     m_CollisionDirection.IsCollidingOnLeft = direction.x < 0;
     m_CollisionDirection.IsCollidingOnTop = direction.y > 0;
     m_CollisionDirection.IsCollidingOnBottom = direction.y < 0;
-
-    std::cout << "colliding" << direction.x << " : " << direction.y << std::endl;
 }
 
 void Collider::CollidingOnX(float32 direction)

@@ -35,6 +35,10 @@ void RigidBody2D::Update(Clock& timer)
 	ApplyVelocity(dt);
 
 	m_TempVelocity = m_Velocity;
+
+	mp_Transform->UpdateChildPosition();
+
+	//std::cout << m_Velocity.x << " : " << m_Velocity.y << std::endl;
 }
 
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
@@ -79,22 +83,18 @@ Vector2f RigidBody2D::GetVelocity() const
 
 void RigidBody2D::ZeroVelocityX(bool right)
 {
-	if (right && m_TempVelocity.x < 0)
-		m_TempVelocity.x = 0;
-	if (!right && m_TempVelocity.x > 0)
-		m_TempVelocity.x = 0;
-
-	m_TempVelHasChanged = true;
+	if (right && m_Velocity.x < 0)
+		m_Velocity.x = 0;
+	if (!right && m_Velocity.x > 0)
+		m_Velocity.x = 0;
 }
 
 void RigidBody2D::ZeroVelocityY(bool down)
 {
-	if (down && m_TempVelocity.y < 0)
-		m_TempVelocity.y = 0;
-	if (!down && m_TempVelocity.y > 0)
-		m_TempVelocity.y = 0;
-
-	m_TempVelHasChanged = true;
+	if (down && m_Velocity.y < 0)
+		m_Velocity.y = 0;
+	if (!down && m_Velocity.y > 0)
+		m_Velocity.y = 0;
 }
 
 void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
@@ -106,15 +106,12 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 
 	Vector2f n = normal / std::sqrt(lengthSq);
 
-	float32 dot = m_TempVelocity.Dot(n);
+	float32 dot = m_Velocity.Dot(n);
 
 	if (dot < 0.0f)
 	{
-		m_TempVelocity -= n * dot;
+		m_Velocity -= n * dot;
 	}
-
-	m_TempVelHasChanged = true;
-
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)

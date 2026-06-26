@@ -69,7 +69,7 @@ void PhysicsManager::Update(float64 deltaTime)
 			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
 		};
 
-	// 1) Collecte des colliders actifs des entités actives dans la scène courante.
+	// 1) Collecte des colliders actifs des entit?s actives dans la sc?ne courante.
 	std::vector<Collider*> activeColliders;
 	for (auto& info : m_EntitiesToUpdate)
 	{
@@ -79,12 +79,13 @@ void PhysicsManager::Update(float64 deltaTime)
 
 		for (Collider* pCollider : entity->GetColliders())
 		{
-			if (pCollider->IsActive())
+			if (pCollider->IsActive()) {
 				activeColliders.push_back(pCollider);
+			}
 		}
 	}
 
-	// 2) Test de chaque paire de colliders, déduplique par paire d'ENTITÉS.
+	// 2) Test de chaque paire de colliders, d?duplique par paire d'ENTIT?S.
 	std::unordered_set<uint64> collidingPairsThisFrame;
 
 	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
@@ -124,7 +125,19 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 	}
 
-	// 3) Sortie de collision : une paire d'entités ne "sort" que si plus aucun
+	// 3) Application des corrections de position accumulees : une seule fois par
+	//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
+	for (auto& pair : m_PendingCorrections)
+	{
+		Entity* pEntity = pair.first;
+		Vector2f delta = pair.second;
+
+		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
+		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
+	}
+	m_PendingCorrections.clear();
+
+	// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
 	//    de leurs colliders ne se touche cette frame.
 	for (auto& info : m_EntitiesToUpdate)
 	{
@@ -146,12 +159,17 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 	}
 
-	// 4) Suppression des entités marquées à retirer.
+	// 5) Suppression des entites marquees a retirer.
 	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
 	{
 		if (m_EntitiesToUpdate[i].toRemove)
 			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 	}
+}
+
+void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
+{
+	m_PendingCorrections[pEntity] += delta;
 }
 
 bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
@@ -215,7 +233,7 @@ void PhysicsManager::Repulse(Collider* pCollider1, Collider* pCollider2)
 		typeA = RepulseTypes::Circle;
 		break;
 	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeA->GetTransform().GetDegAngle()) % 180 != 0)
+		if (static_cast<int32>(shapeA->GetTransform()->GetDegAngle()) % 180 != 0)
 			typeA = RepulseTypes::OOB;
 		else
 			typeA = RepulseTypes::AABB;
@@ -230,7 +248,7 @@ void PhysicsManager::Repulse(Collider* pCollider1, Collider* pCollider2)
 		typeB = RepulseTypes::Circle;
 		break;
 	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeB->GetTransform().GetDegAngle()) % 180 != 0)
+		if (static_cast<int32>(shapeB->GetTransform()->GetDegAngle()) % 180 != 0)
 			typeB = RepulseTypes::OOB;
 		else
 			typeB = RepulseTypes::AABB;
@@ -241,7 +259,7 @@ void PhysicsManager::Repulse(Collider* pCollider1, Collider* pCollider2)
 	}
 
 
-	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(shapeA, shapeB);
+	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(pCollider1, pCollider2);
 }
 
 
@@ -309,12 +327,12 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 
 	Vector2f axes[2];
 
-	float32 radRotation = pRect1->GetTransform().GetRadAngle();
+	float32 radRotation = pRect1->GetTransform()->GetRadAngle();
 	axes[0] = { std::cos(radRotation), std::sin(radRotation) };
 	axes[1] = { -std::sin(radRotation), std::cos(radRotation) };
 
 
-	Matrix3x3 rotation = pRect1->GetTransform().GetMatrix();
+	Matrix3x3 rotation = pRect1->GetTransform()->GetMatrix();
 
 	//OBB values
 	Vector2f obbExtents{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
@@ -413,8 +431,8 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	Vector2f axes1[2];
 	Vector2f axes2[2];
 
-	float32 radRotation1 = pRect1->GetTransform().GetRadAngle();
-	float32 radRotation2 = pRect2->GetTransform().GetRadAngle();
+	float32 radRotation1 = pRect1->GetTransform()->GetRadAngle();
+	float32 radRotation2 = pRect2->GetTransform()->GetRadAngle();
 
 	axes1[0] = { std::cos(radRotation1), std::sin(radRotation1) };
 	axes1[1] = { -std::sin(radRotation1), std::cos(radRotation1) };
@@ -422,8 +440,8 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	axes2[0] = { std::cos(radRotation2), std::sin(radRotation2) };
 	axes2[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
 
-	/*Matrix3x3 rotation1 = pRect1->GetTransform().GetMatrix();
-	Matrix3x3 rotation2 = pRect2->GetTransform().GetMatrix();*/
+	/*Matrix3x3 rotation1 = pRect1->GetTransform()->GetMatrix();
+	Matrix3x3 rotation2 = pRect2->GetTransform()->GetMatrix();*/
 
 	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
 	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
@@ -478,7 +496,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 	Vector2f rectPos = pRect->GetPosition();
 	Vector2f extents{ pRect->GetWidth() / 2 , pRect->GetHeight() / 2 };
-	float32 angle = pRect->GetTransform().GetRadAngle();
+	float32 angle = pRect->GetTransform()->GetRadAngle();
 
 	Vector2f circlePos = pCircle->GetPosition();
 	float32 radius = pCircle->GetRadius();
@@ -512,8 +530,8 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angleA = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
-	int16 angleB = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+	int16 angleA = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
+	int16 angleB = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
 
 	if (angleA != 0) {
 		if (angleB != 0)
@@ -534,7 +552,7 @@ bool PhysicsManager::CheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
 
 bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angle = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
+	int16 angle = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
 	if (angle != 0) {
 		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 	}
@@ -544,7 +562,7 @@ bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angle = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
 	if (angle != 0) {
 		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 	}
@@ -552,8 +570,11 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 }
 
 
-void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 {
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
 	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(a);
 	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(b);
 
@@ -573,10 +594,10 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 	if (overlapX <= 0.0f || overlapY <= 0.0f)
 		return;
 
-	Vector2f pos1 = a->GetPosition(0.5f, 0.5f);
-	Vector2f pos2 = b->GetPosition(0.5f, 0.5f);
+	Vector2f delta1 = { 0.f, 0.f };
+	Vector2f delta2 = { 0.f, 0.f };
 
-	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(colA, colB);
 
 	if (overlapX < overlapY)
 	{
@@ -584,25 +605,29 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 
 		if (x1 < x2)
 		{
-			pos1.x -= correction * a->IsKinematic();
-			pos2.x += correction * b->IsKinematic();
+			delta1.x -= correction * a->GetOwner()->IsKinematic();
+			delta2.x += correction * b->GetOwner()->IsKinematic();
 
 			a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
 			b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
 
-			m_pCurrentColliderA->CollidingOnX(-correction);
-			m_pCurrentColliderB->CollidingOnX(correction);
+			if (a->GetOwner()->IsKinematic())
+				m_pCurrentColliderA->CollidingOnX(-correction);
+			if (b->GetOwner()->IsKinematic())
+				m_pCurrentColliderB->CollidingOnX(correction);
 		}
 		else
 		{
-			pos1.x += correction * a->IsKinematic();
-			pos2.x -= correction * b->IsKinematic();
+			delta1.x += correction * a->GetOwner()->IsKinematic();
+			delta2.x -= correction * b->GetOwner()->IsKinematic();
 
 			b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
 			a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
 
-			m_pCurrentColliderA->CollidingOnX(correction);
-			m_pCurrentColliderB->CollidingOnX(-correction);
+			if (a->GetOwner()->IsKinematic())
+				m_pCurrentColliderA->CollidingOnX(correction);
+			if (b->GetOwner()->IsKinematic())
+				m_pCurrentColliderB->CollidingOnX(-correction);
 		}
 	}
 	else
@@ -611,35 +636,42 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 
 		if (y1 < y2)
 		{
-			pos1.y -= correction * a->IsKinematic();
-			pos2.y += correction * b->IsKinematic();
+			delta1.y -= correction * a->GetOwner()->IsKinematic();
+			delta2.y += correction * b->GetOwner()->IsKinematic();
 
 			a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
 			b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
 
-			m_pCurrentColliderA->CollidingOnY(-correction);
-			m_pCurrentColliderB->CollidingOnY(correction);
+			if (a->GetOwner()->IsKinematic())
+				m_pCurrentColliderA->CollidingOnY(-correction);
+			if (b->GetOwner()->IsKinematic())
+				m_pCurrentColliderB->CollidingOnY(correction);
 		}
 		else
 		{
-			pos1.y += correction * a->IsKinematic();
-			pos2.y -= correction * b->IsKinematic();
+			delta1.y += correction * a->GetOwner()->IsKinematic();
+			delta2.y -= correction * b->GetOwner()->IsKinematic();
 
 			a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
 			b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
 
-			m_pCurrentColliderA->CollidingOnY(correction);
-			m_pCurrentColliderB->CollidingOnY(-correction);
+			if (a->GetOwner()->IsKinematic())
+				m_pCurrentColliderA->CollidingOnY(correction);
+			if (b->GetOwner()->IsKinematic())
+				m_pCurrentColliderB->CollidingOnY(-correction);
 		}
 	}
 
-	a->SetPosition(pos1.x, pos1.y, 0.5f, 0.5f);
-	b->SetPosition(pos2.x, pos2.y, 0.5f, 0.5f);
+	AccumulateCorrection(a->GetOwner(), delta1);
+	AccumulateCorrection(b->GetOwner(), delta2);
 
 }
 
-void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseCircleCircle(Collider* colA, Collider* colB)
 {
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
 	Vector2f distance = a->GetPosition(0.5f, 0.5f) - b->GetPosition(0.5f, 0.5f);
 
 	float32 sqrLength = (distance.x * distance.x) + (distance.y * distance.y);
@@ -648,28 +680,31 @@ void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
 	float32 radius1 = a->GetRadius();
 	float32 radius2 = b->GetRadius();
 
-	float32 overlap = (length - (radius1 + radius2)) * GetRepulseCorrectionMultiplyer(a, b);
+	float32 overlap = (length - (radius1 + radius2)) * GetRepulseCorrectionMultiplyer(colA, colB);
 
 	Vector2f normal = distance / length;
 
 	Vector2f translation = normal * overlap;
 
-	Vector2f position1 = a->GetPosition(0.5f, 0.5f) - translation * a->IsKinematic();
-	Vector2f position2 = b->GetPosition(0.5f, 0.5f) + translation * b->IsKinematic();
+	Vector2f delta1 = -translation * a->GetOwner()->IsKinematic();
+	Vector2f delta2 = translation * b->GetOwner()->IsKinematic();
 
-	a->SetPosition(position1.x, position1.y, 0.5f, 0.5f);
-	b->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
+	AccumulateCorrection(a->GetOwner(), delta1);
+	AccumulateCorrection(b->GetOwner(), delta2);
 
 	//gestion de la velocity
 
-	if (!a->IsKinematic() || !b->IsKinematic()) {
+	if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic()) {
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 	}
 }
 
-void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseRectCircle(Collider* colA, Collider* colB)
 {
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
 	gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(a);
 	gcle::Circle* pCircle = static_cast<gcle::Circle*>(b);
 
@@ -688,7 +723,7 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	Vector2f delta = circlePos - nearest;
 	float32 dist = delta.x * delta.x + delta.y * delta.y;
 
-	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(colA, colB);
 
 	if (dist == 0.0f)
 	{
@@ -708,16 +743,11 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
 
-		Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
-		pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
-
-		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
-		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
+		AccumulateCorrection(b->GetOwner(), translation * b->GetOwner()->IsKinematic());
+		AccumulateCorrection(a->GetOwner(), -translation * a->GetOwner()->IsKinematic());
 
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-		if (!a->IsKinematic() || !b->IsKinematic()) {
-		}
 
 		return;
 	}
@@ -728,13 +758,10 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 
 	Vector2f translation = normal * overlap;
 
-	Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
-	pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+	AccumulateCorrection(b->GetOwner(), translation * b->GetOwner()->IsKinematic());
+	AccumulateCorrection(a->GetOwner(), -translation * a->GetOwner()->IsKinematic());
 
-	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
-	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
-
-	if (!a->IsKinematic() || !b->IsKinematic()) {
+	if (!a->GetOwner()->IsKinematic() || !b->GetOwner()->IsKinematic()) {
 		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
 		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
 	}
@@ -743,49 +770,55 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	m_pCurrentColliderB->CollidingOn(normal);
 }
 
-void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseCircleRect(Collider* colA, Collider* colB)
 {
 	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
-	RepulseRectCircle(b, a);
+	RepulseRectCircle(colA, colB);
 }
 
-void PhysicsManager::RepulseAABBOBB(gcle::Shape* a, gcle::Shape* b) {
-	RepulseOBBAABB(b, a);
-}
-
-void PhysicsManager::RepulseOBBAABB(gcle::Shape* a, gcle::Shape* b) {
-	if (a->IsKinematic() == false) {
-
-		Vector2f actualPosition = a->GetPosition();
-		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
-		a->SetPosition(pos.x, pos.y);
-	}
-	if (b->IsKinematic() == false) {
-
-		Vector2f actualPosition = b->GetPosition();
-		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
-		b->SetPosition(pos.x, pos.y);
-	}
-
-}
-
-void PhysicsManager::RepulseOBBCircle(gcle::Shape* a, gcle::Shape* b) {
-
-}
-
-void PhysicsManager::RepulseCircleOBB(gcle::Shape* a, gcle::Shape* b) {
-	RepulseOBBCircle(b, a);
-}
-
-void PhysicsManager::RepulseOBBOBB(gcle::Shape* a, gcle::Shape* b) {
-
-}
-
-
-
-float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseAABBOBB(Collider* colA, Collider* colB)
 {
-	if (a->IsKinematic() && b->IsKinematic())
+	RepulseOBBAABB(colA, colB);
+}
+
+void PhysicsManager::RepulseOBBAABB(Collider* colA, Collider* colB)
+{
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
+	if (a->GetOwner()->IsKinematic() == false) {
+
+		Vector2f delta = (colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(colA, colB);
+		AccumulateCorrection(a->GetOwner(), delta);
+	}
+	if (b->GetOwner()->IsKinematic() == false) {
+
+		Vector2f delta = (colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(colA, colB);
+		AccumulateCorrection(b->GetOwner(), delta);
+	}
+
+}
+
+void PhysicsManager::RepulseOBBCircle(Collider* colA, Collider* colB) {
+
+}
+
+void PhysicsManager::RepulseCircleOBB(Collider* colA, Collider* colB) {
+	RepulseOBBCircle(colA, colB);
+}
+
+void PhysicsManager::RepulseOBBOBB(Collider* colA, Collider* colB) {
+
+}
+
+
+
+float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider* colB)
+{
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
+	if (a->GetOwner()->IsKinematic() && b->GetOwner()->IsKinematic())
 		return 0.5;
 	else
 		return 1.0;

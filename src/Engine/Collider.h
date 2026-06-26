@@ -18,8 +18,10 @@ struct CollisionDirection
 class Collider
 {
 public:
-	Collider(Shape* shape);
+	Collider() = default;
 	~Collider() = default;
+
+	void Initialize(Shape* shape, Vector2f position, Entity* owner);
 
 	void CollidingOn(Vector2f direction);
 	void CollidingOnX(float32 direction);
@@ -35,16 +37,15 @@ public:
 
 	const CollisionDirection& GetCollisionDirection() const { return m_CollisionDirection; }
 
-	Entity* GetOwner() const { return m_pOwner; }
-	void SetOwner(Entity* pOwner) { m_pOwner = pOwner; }
+	Entity* GetOwner() const { return mp_Owner; }
+	void SetOwner(Entity* pOwner) { mp_Owner = pOwner; }
 
 private:
 	Shape* m_shape;
 
-	Entity* m_pOwner = nullptr;
+	Entity* mp_Owner = nullptr;
 
 	bool m_IsActive = false;
 
-	bool IsColliding = false;
 	CollisionDirection m_CollisionDirection;
 };

@@ -15,7 +15,7 @@ namespace gcle
 		}
 	}
 
-	Shape::Shape(Entity* owner) : mp_Owner(owner), m_IsKinematic(false)
+	Shape::Shape(Entity* owner) : mp_Owner(owner)
 	{
 	}
 

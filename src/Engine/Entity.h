@@ -46,6 +46,8 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
+	bool IsKinematic() { return m_IsKinematic; }
+	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
 
 	void SetScale(Vector2f scale);
 	void SetScale(float32 scale) { SetScale({ scale, scale }); }
@@ -69,7 +71,7 @@ public:
 public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider);
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position);
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
 
 protected:
@@ -78,9 +80,9 @@ protected:
 
 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) { DEBUG_INFO << "enter" << collidedWith->GetId() << ENDL };
-	virtual void OnCollision(Entity* collidedWith) { DEBUG_INFO << "stay" << collidedWith->GetId() << ENDL };
-	virtual void OnCollisionExit(Entity* collidedWith) { DEBUG_INFO << "exit" << collidedWith->GetId() << ENDL };
+	virtual void OnCollisionEnter(Entity* collidedWith) {};
+	virtual void OnCollision(Entity* collidedWith) {};
+	virtual void OnCollisionExit(Entity* collidedWith) {};
 	virtual void OnInitialize() {};
 	virtual void OnDestroy() {};
 
@@ -102,6 +104,7 @@ protected:
 	Vector2f		m_Direction = { 0.0f, 0.0f };
 	float32			m_Speed = 0.f;
 	bool			m_ToDestroy = false;
+	bool			m_IsKinematic = true;
 	int32			m_Tag = -1;
 	Target			m_Target;
 

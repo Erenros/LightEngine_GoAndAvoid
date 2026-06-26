@@ -100,8 +100,11 @@ void Transform2D::SetParent(Transform2D* pParent) {
 
 void Transform2D::SetPosition(Vector2f position)
 {
-    m_Position = position;
-    SetDirty();
+    if (position != m_Position) 
+    {
+        m_Position = position;
+        SetDirty();
+    }
 }
 
 void Transform2D::SetScale(Vector2f scale)
@@ -201,19 +204,40 @@ void Transform2D::Forward()
 
 void Transform2D::UpdatePositionWithParentPosition()
 {
-    if (mp_Parent == nullptr) {
-        //DEBUG_WARN << "this transform has no parent" << ENDL;
+    if (mp_Parent == nullptr || !m_IsDirty) {
         return;
     }
-     
+
     Radians currentParentAngle = mp_Parent->GetRadAngle(); 
 
     m_Position.x = mp_Parent->GetPosition().x + m_DistanceFromParent * std::cos(currentParentAngle + m_OffsetAngle);
     m_Position.y = mp_Parent->GetPosition().y + m_DistanceFromParent * std::sin(currentParentAngle + m_OffsetAngle);
 
     m_RadAngle = mp_Parent->GetRadAngle() + m_AngleDifferenceToParent; 
-    m_DegAngle = MathGC::RadToDeg(m_RadAngle); 
+    m_DegAngle = MathGC::RadToDeg(m_RadAngle);
+
 }
 
+void Transform2D::UpdateChildPosition()
+{
+    if (mp_Childs.empty())
+        return;
+
+    for (Transform2D* child : mp_Childs)
+    {
+        child->m_Position.x =
+            m_Position.x +
+            child->m_DistanceFromParent * std::cos(m_RadAngle + child->m_OffsetAngle);
+
+        child->m_Position.y =
+            m_Position.y +
+            child->m_DistanceFromParent * std::sin(m_RadAngle + child->m_OffsetAngle);
+
+        child->m_RadAngle = m_RadAngle + child->m_AngleDifferenceToParent;
+        child->m_DegAngle = MathGC::RadToDeg(child->m_RadAngle);
+
+        child->UpdateChildPosition();
+    }
+}
 
 #pragma endregion
