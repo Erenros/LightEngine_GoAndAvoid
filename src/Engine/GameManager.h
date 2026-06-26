@@ -45,6 +45,8 @@ public:
 	
 	Window* GetWindow() { return mp_window; };
 
+	void SetGizmoVisualState();
+
 private:
 	void UpdateEntitySystem();
 

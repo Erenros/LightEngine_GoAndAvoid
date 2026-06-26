@@ -8,6 +8,8 @@
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
 
+
+
 void GameManager::Loop()
 {
 #ifndef NDEBUG
@@ -42,12 +44,7 @@ void GameManager::Loop()
 	
 		//PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
-		//PROFILER_END("Entity");
-
-		if (InputManager::GetInstance().IsDown(F1))
-		{
-			m_isVisualDebugActive = !m_isVisualDebugActive;
-		}
+		//PROFILER_END("Entity"); 
 
 		//PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
@@ -72,6 +69,10 @@ void GameManager::Loop()
 			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
 		}
 		//PROFILER_END("SceneD");
+
+		//ImGUI
+		mp_window->StartImGUIFrame();
+		mp_window->ImGUIUpdate();
 	
 		mp_window->Present();
 
@@ -80,14 +81,14 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
-		system("CLS");
+		//system("CLS");
 
 		fpsTimer += m_Time.GetDeltaTime();
 		if (fpsTimer >= 1.f) {
 			fpsTimer -= 1.f;
 			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
 		}
-		GCLE_INFO << "FPS : " << fpsCount << ENDL;
+		//GCLE_INFO << "FPS : " << fpsCount << ENDL;
 
 		
 	}
@@ -183,4 +184,9 @@ void GameManager::UpdateEntitySystem()
 	}
 
 	m_entitiesToCreate.clear();
+}
+
+void GameManager::SetGizmoVisualState()
+{
+	m_isVisualDebugActive = !m_isVisualDebugActive;
 }

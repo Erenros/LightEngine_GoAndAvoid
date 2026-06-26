@@ -2,6 +2,9 @@
 
 #include <SDL.h>
 
+#include <imgui.h>
+#include <backends/imgui_impl_sdl2.h> 
+
 bool Event::WindowEvent()
 {
 	SDL_Event event;
@@ -12,6 +15,8 @@ bool Event::WindowEvent()
 		{
 			return true;
 		}
+
+		ImGui_ImplSDL2_ProcessEvent(&event);
 	}
 	return false;
 }

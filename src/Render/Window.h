@@ -2,7 +2,10 @@
 #include "Render/Shape.h"
 #include "Core/include.h"
 
+#define IMGUI_ENABLE_DOCKING
+
 struct SDL_Renderer;
+struct SDL_Texture;
 struct SDL_Window;
 struct SDL_Rect;
 
@@ -51,6 +54,9 @@ public:
 		int32 y = 0
 	);
 
+	void StartImGUIFrame();
+	void ImGUIUpdate();
+
 	void ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a);
 
 	void Present();
@@ -70,9 +76,13 @@ public:
 public:
 	uint32 GetWidth() { return m_width; }
 	uint32 GetHeight() { return m_height; }
+	
+private:
+	void InitImGUI();
 
 private:
 	SDL_Window* mp_Window = nullptr;
 	SDL_Renderer* mp_Renderer = nullptr;
+	SDL_Texture* mp_RenderTarget = nullptr;
 	uint32 m_width, m_height = 0;
 };

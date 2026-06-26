@@ -8,6 +8,13 @@
 #include "SDL_image.h"
 #include "Render/Text.h"
 #include "Texture.h"
+ 
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <backends/imgui_impl_sdl2.h> 
+#include <backends/imgui_impl_sdlrenderer2.h>
+
+#include "Engine/GameManager.h"
 
 
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
@@ -49,6 +56,134 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 		std::cout << "[Initialisation] : Font Error" << std::endl;
 		return;
 	}
+
+	// Create a Render Target
+
+	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, 1920, 1080);
+
+	if (!mp_RenderTarget)
+	{
+		std::cout << "CreateTexture failed: " << SDL_GetError() << '\n';
+	}
+
+	if (SDL_SetRenderTarget(mp_Renderer, mp_RenderTarget) != 0)
+	{
+		std::cout << "SetRenderTarget failed: " << SDL_GetError() << '\n';
+	}
+
+	SDL_SetRenderDrawColor(mp_Renderer, 255, 0, 0, 255);
+
+	SDL_RenderClear(mp_Renderer);
+
+	SDL_SetRenderTarget(mp_Renderer, NULL);
+
+
+	InitImGUI();
+}
+
+void Window::InitImGUI()
+{
+	IMGUI_CHECKVERSION();
+
+	ImGui::CreateContext();
+
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io; 
+
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplSDL2_InitForSDLRenderer(mp_Window, mp_Renderer);
+	ImGui_ImplSDLRenderer2_Init(mp_Renderer);
+}
+
+void Window::StartImGUIFrame()
+{
+	ImGui_ImplSDLRenderer2_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+
+	ImGui::NewFrame();
+}
+
+void Window::ImGUIUpdate()
+{  
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	ImGui::Begin("DockRoot", nullptr,
+		ImGuiWindowFlags_NoDocking |
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove
+	);
+
+	ImGuiID dockspace_id = ImGui::GetID("DockRoot");
+
+	static bool init = false;
+
+	if (!init)
+	{
+		init = true; 
+		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+		ImGuiID scene_id = dockspace_id;
+
+		ImGui::DockBuilderDockWindow("Scene", scene_id);
+
+		ImGui::DockBuilderFinish(dockspace_id);
+	}
+
+	ImGui::DockSpace(dockspace_id);
+	ImGui::End();
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("Debug"))
+		{
+			if (ImGui::MenuItem("Gizmo"))
+			{
+				GameManager::GetInstance().SetGizmoVisualState();
+			}
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMenuBar();
+	}
+
+
+	ImGui::Begin("Scene");
+
+	ImVec2 avail = ImGui::GetContentRegionAvail();
+
+	const float aspect = 1920.0f / 1080.0f;
+
+	float width = avail.x;
+	float height = width / aspect;
+
+	if (height > avail.y)
+	{
+		height = avail.y;
+		width = height * aspect;
+	}
+
+	ImVec2 cursor = ImGui::GetCursorPos();
+
+	ImGui::SetCursorPos(ImVec2(
+		cursor.x + (avail.x - width) * 0.5f,
+		cursor.y + (avail.y - height) * 0.5f
+	));
+
+	ImGui::Image(
+		(ImTextureID)mp_RenderTarget,
+		ImVec2(width, height)
+	);
+
+	ImGui::End(); 
+
+	ImGui::Render();
 }
 
 void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
@@ -57,6 +192,13 @@ void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
 }
 
 void Window::End(){
+
+	//ImGui_ImplSDLRenderer2_Shutdown();
+	//ImGui_ImplSDL2_Shutdown();
+	//ImGui::DestroyContext();
+
+
+	SDL_DestroyTexture(mp_RenderTarget);
 	SDL_DestroyRenderer(mp_Renderer);
 	SDL_DestroyWindow(mp_Window);
 
@@ -68,11 +210,22 @@ void Window::End(){
 
 void Window::Present()
 {
+	SDL_SetRenderTarget(mp_Renderer, nullptr);
+
+	SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
+	SDL_RenderClear(mp_Renderer);
+
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mp_Renderer);
+
 	SDL_RenderPresent(mp_Renderer);
 }
 
 void Window::Clear()
 {
+	SDL_SetRenderTarget(mp_Renderer, mp_RenderTarget);
+
+	SDL_SetRenderDrawColor(mp_Renderer, 30, 30, 30, 255);
+
 	SDL_RenderClear(mp_Renderer);
 }
 
@@ -90,7 +243,8 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* 
 }
 
 void Window::Draw(gcle::Shape* pShape)
-{
+{ 
+
 	const std::vector<SDL_Vertex*>& verticesPtr = pShape->GetVerticies();
 
 	std::vector<SDL_Vertex> vertices;
@@ -138,6 +292,7 @@ void Window::DrawDebug(gcle::Shape* pShape)
 	default:
 		break;
 	}
+
 
 
 	std::vector<SDL_FPoint> points;
