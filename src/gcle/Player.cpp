@@ -8,15 +8,15 @@ void Player::OnUpdate() {
 
 
     if (im.IsHeld('Q')) {
-        GetRigidBody().AddForce({ -1, 0 }, 600, 0.006);
+        GetRigidBody().AddForce({ -1.f, 0.f }, 600.f, 0.006f);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody().AddForce({ 1, 0 }, 600, 0.006);
+        GetRigidBody().AddForce({ 1.f, 0.f }, 600.f, 0.006f);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody().AddForce({ 0, 1 }, 600, 0.006);
+        GetRigidBody().AddForce({ 0.f, 1.f }, 600.f, 0.006f);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody().AddForce({ 0, -1 }, 600, 0.006);
+        GetRigidBody().AddForce({ 0.f, -1.f }, 600.f, 0.006f);
     }
 }

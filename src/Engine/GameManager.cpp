@@ -31,7 +31,7 @@ void GameManager::Loop()
 			//PROFILER_END("Colliders");
 			exec += 1;
 		}
-		DEBUG_INFO << "Fixed update execution : " << exec << ENDL
+		//DEBUG_INFO << "Fixed update execution : " << exec << ENDL
 
 
 		//PROFILER_START("time", "Timer Update");
@@ -74,7 +74,7 @@ void GameManager::Loop()
 			fpsTimer -= 1.f;
 			fpsCount = static_cast<int16>(1.f / time.GetDeltaTime());
 		}
-		DEBUG_INFO << "FPS : " << fpsCount << std::endl;
+		//DEBUG_INFO << "FPS : " << fpsCount << std::endl;
 
 		
 	}

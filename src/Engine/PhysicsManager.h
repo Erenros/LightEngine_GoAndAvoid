@@ -4,6 +4,8 @@
 #include "Shape.h"
 #include "QuadTree.h"
 #include <vector>
+#include <unordered_set>
+
 
 struct EntityInfo
 {
@@ -83,10 +85,16 @@ private:
 
 	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
 
+	std::vector<std::pair<Entity*, Entity*>> m_pairs;
+	std::vector<ColliderEntry> m_queryResult;
+
 public:
 	void SetActivateQuadTree(bool activate);
 	void SetDynamicQuadTreeSize(bool activate);
 	void SetQuadTreePos1(Vector2f pos1);
 	void SetQuadTreePos2(Vector2f pos2);
+
+public : 
+	~PhysicsManager();
 };
 

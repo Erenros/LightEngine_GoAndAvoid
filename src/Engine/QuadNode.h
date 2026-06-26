@@ -3,9 +3,10 @@
 #include <memory>
 #include <array>
 #include "include.h"
+#include <unordered_set>
 
 #define maxEntities 8
-#define maxDepth 7
+#define maxDepth 9
 
 
 class Entity;
@@ -29,16 +30,13 @@ struct ColliderEntry{
 
 class QuadNode {
 	AABB m_bounds;
-	int depth = 0;
+	int32 depth = 0;
 
 	std::vector<ColliderEntry> m_entities;  //if a leaf
-	QuadNode* m_childs[4];   //if had children
-
-	Vector2f GetPosition();
-	Vector2f GetSize();
+	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
 
 	QuadNode() = default;
-	QuadNode(float32 x, float32 y, float32 w, float32 h);
+	QuadNode(float32 x, float32 y, float32 w, float32 h, int8 d);
 
 	~QuadNode();
 
@@ -46,10 +44,12 @@ class QuadNode {
 	bool IsLeaf();
 
 	void Insert(Entity* entity);
-	void Query(AABB& range, std::vector<ColliderEntry>& results);
+	void Query(AABB& range, std::vector<ColliderEntry>& results, std::unordered_set<Entity*>& seen);
 
 	void Clear();
 
 
 	friend class QuadTree;
+	friend class PhysicsManager;
+
 };

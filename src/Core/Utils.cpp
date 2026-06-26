@@ -1,7 +1,10 @@
 #include "Utils.h"
 #include <string>
 
-int8 GenerateRandomNumer(int8 min, int8 max){
+int8 GenerateRandomNumber(int8 min, int8 max){
+	if (max == 0) {
+		max += 1;
+	}
 	return (rand() % max) + min;
 }
  
@@ -59,6 +62,11 @@ std::string RemoveZeroes(std::string string)
 	string;
 
 	return string;
+}
+
+std::string RemoveZeroes(float64 value)
+{
+	return std::string();
 }
 
 std::string RemoveZeroes(long double value)

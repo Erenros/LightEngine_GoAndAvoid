@@ -48,7 +48,7 @@ Matrix::Matrix(int width, int height)
 
 void Matrix::InitSize()
 {
-	m_height = m_matrix.size();
+	m_height = static_cast<int32>(m_matrix.size());
 
 
 	if (m_height == 0)
@@ -58,7 +58,7 @@ void Matrix::InitSize()
 
 	else
 	{
-		m_width = m_matrix[0].size();
+		m_width = static_cast<int32>(m_matrix[0].size());
 	}
 
 

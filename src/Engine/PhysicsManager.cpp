@@ -59,89 +59,77 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 	}
 }
 
-void PhysicsManager::Update(float64 deltaTime)
-{
-
+void PhysicsManager::Update(float64 deltaTime){
+	int32 nbrTest = 0;
 	if (m_activateQuadTree == true) {
 		std::vector<Entity*> activeEntities = GameManager::GetInstance().GetActiveEntities(SceneManager::GetInstance().GetCurrentSceneTag());
-
-		if (m_dynamicQuadTreeSize) {
+		/*if (m_dynamicQuadTreeSize) {
 			delete m_quadTree;
 			Vector2f min = activeEntities[0]->GetPosition();
 			Vector2f max = activeEntities[1]->GetPosition();
 
-			Vector2f pos1;
-			Vector2f pos2;
-			if (entity->GetShape()->GetShape() == gcle::Shapes::Rectangle) {
-				Vector2f pos1 = entity->GetPosition(0.f, 0.f);
-				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
-				aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
-			}
-			else if (entity->GetShape()->GetShape() == gcle::Shapes::Circle) {
-				Vector2f pos1 = entity->GetPosition(0, 0);
-				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
-				aabb = { pos1.x, pos1.y, pos2.x, pos2.y };
-			}
 			for (auto& e : activeEntities) {
-				
-			}
+				Vector2f pos1 = e->GetPosition(0.f, 0.f);
+				Vector2f pos2 = e->GetPosition(1.f, 1.f);
+					
+				min.x = std::min(min.x, pos1.x);
+				min.y = std::min(min.y, pos1.y);
+				max.x = std::min(max.x, pos2.x);
+				max.y = std::min(max.y, pos2.y);
 
-		}
+			}
+			m_quadTree = new QuadTree(min.x, min.y, max.x, max.y);
+		}*/
 
 		m_quadTree->Clear();
 		for (auto& entity : activeEntities) {
 			m_quadTree->Insert(entity);
 		}
 
-		std::vector<std::pair<Entity*, Entity*>> pairs;
 		for (auto& entity : activeEntities) {
 			AABB aabb;
-			if (entity->GetShape()->GetShape() == gcle::Shapes::Rectangle) {
-				Vector2f pos1 = entity->GetPosition(0.f, 0.f);
-				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
-				aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
-			}
-			else if (entity->GetShape()->GetShape() == gcle::Shapes::Circle) {
-				Vector2f pos1 = entity->GetPosition(0, 0);
-				Vector2f pos2 = entity->GetPosition(1.f, 1.f);
-				aabb = { pos1.x, pos1.y, pos2.x, pos2.y };
-			}
+			Vector2f pos1 = entity->GetPosition(0.f, 0.f);
+			Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+			aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+
+			bool present = false;
 			ColliderEntry e{ aabb, entity };
-			auto candidates = m_quadTree->Query(e);
-			for (auto& c : candidates) {
-				if (std::find(candidates.begin(), candidates.end(), c.entity) != candidates.end())
-					pairs.push_back({ entity, c.entity });
-			}
-			for (auto& entities : pairs) {
-				if (entities.first->IsColliding(entities.second))
-				{
-					if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
-					{
-						Repulse(entities.first, entities.second);
-					}
-
-					if (entities.first->m_OnCollisionEnter)
-					{
-						entities.first->OnCollisionEnter(entities.second);
-						entities.first->m_OnCollisionEnter = false;
-					}
-					if (entities.second->m_OnCollisionEnter)
-					{
-						entities.second->OnCollisionEnter(entity);
-						entities.second->m_OnCollisionEnter = false;
-					}
-
-					entities.first->OnCollision(entities.second);
-					entities.first->m_WasOnCollision = true;
-					entities.second->OnCollision(entity);
-					entities.second->m_WasOnCollision = true;
+			m_queryResult = m_quadTree->Query(e);
+			for (auto& c : m_queryResult) {
+				if (entity < c.entity) {
+					m_pairs.push_back({ entity, c.entity });
 				}
 			}
-
 		}
+
+		for (auto& entities : m_pairs) {
+			nbrTest += 1;
+			if (entities.first->IsColliding(entities.second)){
+				if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
+				{
+					Repulse(entities.first, entities.second);
+				}
+
+				if (entities.first->m_OnCollisionEnter)
+				{
+					entities.first->OnCollisionEnter(entities.second);
+					entities.first->m_OnCollisionEnter = false;
+				}
+				if (entities.second->m_OnCollisionEnter)
+				{
+					entities.second->OnCollisionEnter(entities.first);
+					entities.second->m_OnCollisionEnter = false;
+				}
+
+				entities.first->OnCollision(entities.second);
+				entities.first->m_WasOnCollision = true;
+				entities.second->OnCollision(entities.first);
+				entities.second->m_WasOnCollision = true;
+			}
+		}
+		m_pairs.clear();
 	}
 	
-
 	else {
 		for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
 		{
@@ -182,6 +170,7 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 	}
 	
+	//DEBUG_INFO << nbrTest << ENDL
 
 	
 
@@ -435,8 +424,8 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 		collisionNormal = { axes[1].x * sign, axes[1].y * sign };
 	}
 	
-	colDatas.orientation = collisionNormal;
-	colDatas.penetration = minOverlap;
+	m_colDatas.orientation = collisionNormal;
+	m_colDatas.penetration = minOverlap;
 
 	return true;
 }
@@ -534,8 +523,8 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 		collisionNormal = { axes2[1].x * sign, axes2[1].y * sign };
 	}
 
-	colDatas.penetration = minOverlap;
-	colDatas.orientation = collisionNormal;
+	m_colDatas.penetration = minOverlap;
+	m_colDatas.orientation = collisionNormal;
 
 	return true;
 }
@@ -572,11 +561,11 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 	float32 distance = (distanceCarree == 0.f) ? 0.f :std::sqrt(distanceCarree) ;
 	Vector2f localNormal;
-	colDatas.penetration = radius - distance;
+	m_colDatas.penetration = radius - distance;
 
 	if (distance == 0.f) {
 		localNormal = { 1.f, 1.f };
-		colDatas.penetration = radius;
+		m_colDatas.penetration = radius;
 	}
 	else {
 		localNormal = { deltaX / distance, deltaY / distance };
@@ -586,7 +575,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	worldNormal.x = localNormal.x * cos - localNormal.y * sin;
 	worldNormal.y = localNormal.x * sin + localNormal.y * cos;
 
-	colDatas.orientation = worldNormal;
+	m_colDatas.orientation = worldNormal;
 
 	if (distanceCarree <= (radius * radius)) {
 		return true;
@@ -610,7 +599,7 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 	else if (angleB != 0) {
 		bool hit =  CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
 		if (hit) {
-			colDatas.orientation = -colDatas.orientation;
+			m_colDatas.orientation = -m_colDatas.orientation;
 		}
 		return hit;
 	}
@@ -638,7 +627,11 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	int16 angle = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
 	if (angle != 0) {
-		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		bool hit =CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		if (hit)
+			m_colDatas.orientation = -m_colDatas.orientation;
+		return hit;
+
 	}
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
@@ -646,6 +639,7 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 
 void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 {
+	//DEBUG_INFO << "repulse rect " << ENDL
 	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(a);
 	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(b);
 
@@ -827,12 +821,12 @@ void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
 void PhysicsManager::RepulseOBB(gcle::Shape* a, gcle::Shape* b) {
 	if (a->IsKinematic() == true) {
 		Vector2f actualPosition= a->GetPosition();
-		Vector2f pos = actualPosition - ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		Vector2f pos = actualPosition - ((m_colDatas.orientation * m_colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
 		a->SetPosition(pos.x, pos.y);
 	}
 	if (b->IsKinematic() == true) {
 		Vector2f actualPosition = b->GetPosition();
-		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		Vector2f pos = actualPosition + ((m_colDatas.orientation * m_colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
 		b->SetPosition(pos.x, pos.y);
 	}
 
@@ -845,6 +839,7 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Sha
 	else
 		return 1.0;
 }
+
 
 void PhysicsManager::SetActivateQuadTree(bool activate){
 	m_activateQuadTree = activate;
@@ -860,4 +855,8 @@ void PhysicsManager::SetQuadTreePos1(Vector2f pos1){
 
 void PhysicsManager::SetQuadTreePos2(Vector2f pos2){
 	m_quadTreePos2 = pos2;
+}
+
+PhysicsManager::~PhysicsManager(){
+	delete m_quadTree;
 }

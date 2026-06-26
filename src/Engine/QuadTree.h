@@ -6,7 +6,8 @@
 class QuadTree {
 
 	QuadNode root;
-
+	std::vector<ColliderEntry> m_queryResult;
+	std::unordered_set<Entity*> m_querySeen;
 
 public:
 
@@ -21,6 +22,6 @@ public:
 
 	void Clear();
 
-	std::vector<ColliderEntry> Query(ColliderEntry& entry);
-	
+	std::vector<ColliderEntry>& Query(ColliderEntry& entry);
+	friend class PhysicsManager;
 };

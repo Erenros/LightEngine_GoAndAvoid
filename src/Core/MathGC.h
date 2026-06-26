@@ -158,8 +158,8 @@ class Matrix
 	public:
 		std::vector<std::vector<float>> m_matrix;
 
-		int m_width;
-		int m_height;
+		int16 m_width = 0;
+		int16 m_height = 0;
 
 		Matrix() = default;
 
