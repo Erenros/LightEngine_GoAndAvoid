@@ -16,7 +16,7 @@ void DebugScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Circle);
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(50, -200);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(false);
@@ -30,7 +30,7 @@ void DebugScene::OnInitialize()
 	entity2->Rotate(180);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->SetIsKinematic(true);
+	entity2->SetIsKinematic(false);
 	collider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 320, 150 });
 	collider->GetShape()->SetScale({2, 1});
 
