@@ -67,7 +67,6 @@ ScaffoldingReadMe.txt
 # StyleCop
 StyleCopReport.xml
 
-
 # Files built by Visual Studio
 *_i.c
 *_p.c
@@ -362,4 +361,3 @@ MigrationBackup/
 FodyWeavers.xsd 
 
 ide 
-claude
