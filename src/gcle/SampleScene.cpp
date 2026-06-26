@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
+#include "InputManager.h"
 #include "AudioEmitter.h"
 
 void SampleScene::OnInitialize()
@@ -13,7 +14,7 @@ void SampleScene::OnInitialize()
 	pEntity->SetRigidBody(true);*/
 	 
 	std::string text = "Test";
-	CreateText(text, 40, 40, 20, 20);
+	test = CreateText(text, 40, 40, 100, 60);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(10, -200);
@@ -47,13 +48,19 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 
-	/*if (InputManager::GetInstance().IsDown(Space))
-	{
-		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
-	}
 
+
+	if (InputManager::GetInstance().IsDown(Space))
+	{
+		test->SetText("BONJOUR");
+	}
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		pEntity->Destroy();
-	}*/
+		test->SetText("Test");
+	}
+
+	//if (InputManager::GetInstance().IsDown('A'))
+	//{
+	//	pEntity->Destroy();
+	//}
 } 
