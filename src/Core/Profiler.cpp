@@ -3,7 +3,7 @@
 
 namespace gcle
 {
-	std::unordered_map<std::string, Task>* Profiler::m_tasks = new std::unordered_map<std::string, Task>();
+	std::unordered_map<std::string, Task>* Profiler::m_tasks = GCLE_NEW std::unordered_map<std::string, Task>();
 
 	void Profiler::Clear()
 	{

@@ -2,6 +2,17 @@
 #include "Scene.h"
 
 
+SceneManager::~SceneManager()
+{
+    for (auto& scene : m_Scenes)
+    {
+        delete scene.second;
+        scene.second = nullptr;
+    }
+
+    m_Scenes.clear();
+}
+
 Scene* SceneManager::GetCurrentScene() {
     return m_Scenes[m_CurrentSceneTag];
 }

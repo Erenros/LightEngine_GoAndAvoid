@@ -52,7 +52,7 @@ Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byt
 		return nullptr;
 	}
 
-	Text* new_text = new Text(font,text, x, y, w, h, r, g, b);
+	Text* new_text = GCLE_NEW Text(font,text, x, y, w, h, r, g, b);
 	m_texts.push_back(new_text);
 	return new_text;
 }

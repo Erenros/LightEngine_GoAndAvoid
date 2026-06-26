@@ -76,9 +76,9 @@ public:
 
 /*
 Dans l'id�e �a donnera un truc du style 
-	Entity* e = CreateEntity.... ect
+	EntityPtr* e = CreateEntity.... ect
 		
-	e->AddSprite(new Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
+	e->AddSprite(GCLE_NEW Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
 */
 
 

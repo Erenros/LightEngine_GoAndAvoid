@@ -30,6 +30,7 @@ public:
 	float32 fpsTimer = 0.f;
 
 	GameManager() = default;
+	~GameManager();
 
 
 	bool Init(int32 windowWidth, int32 windowHeight);

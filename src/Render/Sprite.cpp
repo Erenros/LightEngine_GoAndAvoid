@@ -20,7 +20,7 @@ Sprite::Sprite(Window* window, const std::string& path)
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
-	m_animationMap[id] = new Animation(firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
+	m_animationMap[id] = GCLE_NEW Animation(firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
 }
 
 

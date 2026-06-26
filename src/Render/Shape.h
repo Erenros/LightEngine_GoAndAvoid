@@ -67,8 +67,8 @@ namespace gcle
 		//Constructors 
 
 		Shape(Entity* owner);
-		Shape(Shape* pShape);
-
+		Shape(const Shape& pShape);
+		Shape& operator=(const Shape&) = delete;
 
 	public:
 		virtual ~Shape();
@@ -141,7 +141,7 @@ namespace gcle
 	public:
 		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner);
 	
-		Shape* Clone() const override { return new Rectangle(*this); }
+		Shape* Clone() const override { return GCLE_NEW Rectangle(*this); }
 
 		//Getters
 		 
@@ -171,7 +171,7 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner);
 
-		Shape* Clone() const override { return new Triangle(*this); }
+		Shape* Clone() const override { return GCLE_NEW Triangle(*this); }
 
 		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
@@ -186,7 +186,7 @@ namespace gcle
 
 		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner);
 
-		Shape* Clone() const override { return new Circle(*this); }
+		Shape* Clone() const override { return GCLE_NEW Circle(*this); }
 
 		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
 		int32 GetSmoothness() override { return m_smoothness; };

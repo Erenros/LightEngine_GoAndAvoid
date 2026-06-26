@@ -95,6 +95,26 @@ void GameManager::Loop()
 	isRunning = false;
 }
 
+GameManager::~GameManager()
+{
+	UpdateEntitySystem();
+
+	for (auto& layer : m_entities)
+	{
+		if (layer.empty())
+			continue;
+
+		for (auto& entity : layer)
+		{
+			delete entity;
+		}
+
+		layer.clear();
+	}
+
+	m_entities.clear();
+}
+
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
 	srand(static_cast<int32>(m_Time.GetTime()));
@@ -106,7 +126,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC;
 
 
-	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
+	mp_window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
 
 	if (!mp_window)
 	{
@@ -142,12 +162,6 @@ void GameManager::UpdateEntitySystem()
 			if (entity->ToDestroy())
 			{
 				m_entitiesToDestroy.push_back(entity);
-				it = m_entities[i].erase(it);
-			}
-
-			else if (entity->GetLayer() != i)
-			{
-				m_entitiesToCreate.push_back(entity);
 				it = m_entities[i].erase(it);
 			}
 

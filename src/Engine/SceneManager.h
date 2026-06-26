@@ -41,7 +41,7 @@ public:
 
 	//Destructors
 
-	~SceneManager() = default;
+	~SceneManager();
 
 	//Getter
 
