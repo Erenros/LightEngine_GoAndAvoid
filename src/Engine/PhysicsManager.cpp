@@ -508,47 +508,34 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 	return true;
 }
 
-bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
-{
+bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2) {
+	Vector2f axes1[2];
+	Vector2f axes2[2];
+
 	float32 radRotation1 = pRect1->GetTransform()->GetRadAngle();
 	float32 radRotation2 = pRect2->GetTransform()->GetRadAngle();
 
-	Vector2f axes1[2] =
-	{
-		{ std::cos(radRotation1), std::sin(radRotation1) },
-		{ -std::sin(radRotation1), std::cos(radRotation1) }
-	};
+	axes1[0] = { std::cos(radRotation1), std::sin(radRotation1) };
+	axes1[1] = { -std::sin(radRotation1), std::cos(radRotation1) };
 
-	Vector2f axes2[2] =
-	{
-		{ std::cos(radRotation2), std::sin(radRotation2) },
-		{ -std::sin(radRotation2), std::cos(radRotation2) }
-	};
+	axes2[0] = { std::cos(radRotation2), std::sin(radRotation2) };
+	axes2[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
 
-	
+
 	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
 	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
 
-	float32 minOverlap = std::numeric_limits<float32>::max();
-	Vector2f collisionNormal{ 1.0f, 0.0f };
+	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
 
-	for (const Vector2f& axis : axesToTest)
-	{
-		float32 distance = std::abs(Dot(centerDelta, axis));
-		float32 radius1 = extents1.x * std::abs(Dot(axes1[0], axis)) +
-			extents1.y * std::abs(Dot(axes1[1], axis));
-		float32 radius2 = extents2.x * std::abs(Dot(axes2[0], axis)) +
-			extents2.y * std::abs(Dot(axes2[1], axis));
+	Matrix relativeRotation(2, 2);
+	Matrix absoluteRotation(2, 2);
 
-		float32 overlap = (radius1 + radius2) - distance;
-		if (overlap <= 0.0f)
-			return false;
+	const float64 Epsilon = 1e-16;
 
-		if (overlap < minOverlap)
-		{
-			minOverlap = overlap;
-			float32 sign = Dot(centerDelta, axis) >= 0.0f ? 1.0f : -1.0f;
-			collisionNormal = axis * sign; // direction rect1 -> rect2
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			relativeRotation.m_matrix[j][i] = axes1[i].x * axes2[j].x + axes1[i].y * axes2[j].y;
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + static_cast<float32>(Epsilon);
 		}
 	}
 
