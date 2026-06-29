@@ -34,67 +34,70 @@ Vector2f Camera::GetPosition()
 
 
 
-void Camera::Update(Clock& time, std::vector<Entity*>& entities)
+void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 {
 	if (followingEntity != nullptr)
 		t.SetPosition(followingEntity->GetPosition());
 	
-	for (int i = 0; i < entities.size(); i++)
+	for (auto layer : entities)
 	{
-		//entities[i]->Update(time);
-
-		gcle::Shape* realShape = entities[i]->GetShape();
-
-		entities[i]->SetRenderPosition((realShape->GetPosition() - GetPosition()) * static_cast<float32>(GetZoom()) + screenMiddle);
-
-		Vector2f realScale = entities[i]->GetScale();
-		entities[i]->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
-		entities[i]->GetRenderShape()->SetRotation(entities[i]->GetRotation());
-
-		/*
-		if(i == 0)
+		for (Entity* e : layer)
 		{
-			std::cout << "Position X de realShape : " << realShape->GetPosition().x << std::endl;
-			std::cout << "Position X de RenderShape : " << m_entities[i]->GetRenderShape()->GetPosition().x << std::endl;
-		}
+			e->Update(time);
 
-		int mode = 0;
+			gcle::Shape* realShape = e->GetShape();
 
-		std::vector<float32> values;
+			e->SetRenderPosition((realShape->GetPosition() - GetPosition()) * static_cast<float32>(GetZoom()) + screenMiddle);
 
+			Vector2f realScale = e->GetScale();
+			e->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+			e->GetRenderShape()->SetRotation(e->GetRotation());
 
-		if (realShape->GetShape() == gcle::Shapes::Rectangle)
-		{
-			gcle::Rectangle* rect = static_cast<gcle::Rectangle*>(realShape);
-			values.push_back(rect->GetWidth());
-			values.push_back(rect->GetHeight());
-
-			mode = 0;
-		}
-
-		else if (realShape->GetShape() == gcle::Shapes::Circle)
-		{
-			gcle::Circle* circ = static_cast<gcle::Circle*>(realShape);
-			values.push_back(circ->GetRadius());
-
-			mode = 1;
-		}
-
-		else if (realShape->GetShape() == gcle::Shapes::Triangle)
-		{
-			gcle::Triangle* tri = static_cast<gcle::Triangle*>(realShape);
-
-			for(short i = 0; i < 3; i++)
+			/*
+			if(i == 0)
 			{
-				values.push_back(tri->GetTrianglePoints()[0].x);
-				values.push_back(tri->GetTrianglePoints()[0].y);
+				std::cout << "Position X de realShape : " << realShape->GetPosition().x << std::endl;
+				std::cout << "Position X de RenderShape : " << m_entities[i]->GetRenderShape()->GetPosition().x << std::endl;
 			}
 
-			mode = 2;
+			int mode = 0;
+
+			std::vector<float32> values;
+
+
+			if (realShape->GetShape() == gcle::Shapes::Rectangle)
+			{
+				gcle::Rectangle* rect = static_cast<gcle::Rectangle*>(realShape);
+				values.push_back(rect->GetWidth());
+				values.push_back(rect->GetHeight());
+
+				mode = 0;
+			}
+
+			else if (realShape->GetShape() == gcle::Shapes::Circle)
+			{
+				gcle::Circle* circ = static_cast<gcle::Circle*>(realShape);
+				values.push_back(circ->GetRadius());
+
+				mode = 1;
+			}
+
+			else if (realShape->GetShape() == gcle::Shapes::Triangle)
+			{
+				gcle::Triangle* tri = static_cast<gcle::Triangle*>(realShape);
+
+				for(short i = 0; i < 3; i++)
+				{
+					values.push_back(tri->GetTrianglePoints()[0].x);
+					values.push_back(tri->GetTrianglePoints()[0].y);
+				}
+
+				mode = 2;
+			}
+
+			m_entities[i]->SetRenderSize(mode, values);*/
+
 		}
-
-		m_entities[i]->SetRenderSize(mode, values);*/
-
 	}
 }
 

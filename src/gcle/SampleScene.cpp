@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
+#include "AudioEmitter.h"
 
 void SampleScene::OnInitialize()
 {
@@ -19,7 +20,7 @@ void SampleScene::OnInitialize()
 	entity1->SetRotation(45);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(false);
-	entity1->SetIsKinematic(true);
+	entity1->GetShape()->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
 
 	 
@@ -27,7 +28,7 @@ void SampleScene::OnInitialize()
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->SetIsKinematic(false);
+	entity2->GetShape()->SetIsKinematic(true);
 	entity2->SetTexture("images");
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -35,14 +36,14 @@ void SampleScene::OnInitialize()
 	entity3->SetRotation(45);
 	entity3->SetRigidBody(true);
 	entity3->GetRigidBody().SetGravity(false);
-	entity3->SetIsKinematic(false);
+	entity3->GetShape()->SetIsKinematic(true);
 	entity3->SetTexture("images");
 
 	Entity* entity4 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity4->SetPosition(-200, 100);
 	entity4->SetRigidBody(true);
 	entity4->GetRigidBody().SetGravity(false);
-	entity4->SetIsKinematic(false);
+	entity4->GetShape()->SetIsKinematic(true);
 
 
 }

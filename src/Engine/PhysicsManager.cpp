@@ -80,17 +80,17 @@ PhysicsManager::RepulseFn PhysicsManager::repulseTable[static_cast<int32>(Repuls
 	{
 		&PhysicsManager::RepulseRectRect,
 		&PhysicsManager::RepulseRectCircle,
-		&PhysicsManager::RepulseAABBOBB,
+		&PhysicsManager::RepulseOBB,
 	},
 	{
 		&PhysicsManager::RepulseCircleRect,
 		&PhysicsManager::RepulseCircleCircle,
-		&PhysicsManager::RepulseCircleOBB,
+		&PhysicsManager::RepulseOBB,
 	},
 	{
-		&PhysicsManager::RepulseOBBAABB,
-		&PhysicsManager::RepulseOBBCircle,
-		&PhysicsManager::RepulseOBBOBB,
+		&PhysicsManager::RepulseOBB,
+		&PhysicsManager::RepulseOBB,
+		&PhysicsManager::RepulseOBB
 	}
 };
 
@@ -420,33 +420,91 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 		obbAxes[1]
 	};
 
-	float32 minOverlap = std::numeric_limits<float32>::max();
-	Vector2f collisionNormal{ 1.0f, 0.0f };
-
-	for (const Vector2f& axis : axesToTest)
-	{
-		float32 distance = std::abs(Dot(centerDelta, axis));
-		float32 aabbRadius = aabbExtents.x * std::abs(Dot(worldAxes[0], axis)) +
-			aabbExtents.y * std::abs(Dot(worldAxes[1], axis));
-		float32 obbRadius = obbExtents.x * std::abs(Dot(obbAxes[0], axis)) +
-			obbExtents.y * std::abs(Dot(obbAxes[1], axis));
+	//OBB values
+	Vector2f obbExtents{pRect1->GetWidth() / 2, pRect1->GetHeight()/2};
 
 		float32 overlap = (aabbRadius + obbRadius) - distance;
 		if (overlap <= 0.0f)
 			return false;
 
-		if (overlap < minOverlap)
-		{
-			minOverlap = overlap;
-			float32 sign = Dot(centerDelta, axis) >= 0.0f ? 1.0f : -1.0f;
-			collisionNormal = axis * sign; // direction OBB -> AABB
+	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
+	
+	Matrix relativeRotation(2, 2);
+	Matrix absoluteRotation(2, 2);
+
+	
+	const float64 Epsilon = 1e-16;
+	
+	for (int i = 0; i < 2; i++) {
+		relativeRotation.m_matrix[0][i] = axes[i].x;
+		relativeRotation.m_matrix[1][i] = axes[i].y;
+
+		for (int j = 0; j < 2; j++) {
+			absoluteRotation.m_matrix[i][j] = std::abs(relativeRotation.m_matrix[j][i]) + static_cast<float32>(Epsilon);
 		}
 	}
 
-	colDatas.orientation = SafeNormal(collisionNormal, { 1.0f, 0.0f });
+
+	float ra = 0.f, rb = 0.f;
+
+	float32 minOverlap = std::numeric_limits<float32>::max();
+	Vector2f collisionNormal;
+
+
+	ra = aabbExtents.x;
+	rb = obbExtents.x * absoluteRotation.m_matrix[0][0] + obbExtents.y * absoluteRotation.m_matrix[0][1];
+	float32 overlapX = (ra + rb) - std::abs(T.x);
+	if (overlapX <= 0.f)
+		return false;
+
+	if (overlapX < minOverlap) {
+		minOverlap = overlapX;
+		collisionNormal = { (T.x > 0.f ? 1.f : -1.f), 0.f };
+	}
+
+	ra = aabbExtents.y;
+	rb = obbExtents.x * absoluteRotation.m_matrix[1][0] + obbExtents.y * absoluteRotation.m_matrix[1][1];
+	float32 overlapY = (ra + rb) - std::abs(T.y);
+	if (overlapY <= 0.f)
+		return false;
+
+	if (overlapY < minOverlap) {
+		minOverlap = overlapY;
+		collisionNormal = { 0.f, (T.y > 0.f ? 1.f : -1.f) };
+	}
+	
+	
+	
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
+	rb = obbExtents.x;
+	float32 t_obbX = T.x * relativeRotation.m_matrix[0][0] + T.y * relativeRotation.m_matrix[1][0];
+	float32 overlapObbX = (ra + rb) - std::abs(t_obbX);
+	if (overlapObbX <= 0.f)
+		return false;
+
+	if (overlapObbX < minOverlap) {
+		minOverlap = overlapObbX;
+		float32 sign = (t_obbX > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes[0].x * sign, axes[0].y * sign };
+	}
+
+	ra = aabbExtents.x * absoluteRotation.m_matrix[1][0] + aabbExtents.y * absoluteRotation.m_matrix[1][1];
+	rb = obbExtents.y;
+	float32 t_obbY = T.x * relativeRotation.m_matrix[0][1] + T.y * relativeRotation.m_matrix[1][1];
+	float32 overlapObbY = (ra + rb) - std::abs(t_obbY);
+	if (overlapObbY <= 0.f)
+		return false;
+
+	if (overlapObbY < minOverlap) {
+		minOverlap = overlapObbY;
+		float32 sign = (t_obbY > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes[1].x * sign, axes[1].y * sign };
+	}
+	
+	colDatas.orientation = collisionNormal;
 	colDatas.penetration = minOverlap;
 
-	DEBUG_INFO << "ca touche obb aabb" << ENDL;
 	return true;
 }
 
@@ -467,19 +525,9 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 		{ -std::sin(radRotation2), std::cos(radRotation2) }
 	};
 
-	Vector2f extents1{ pRect1->GetWidth() * 0.5f, pRect1->GetHeight() * 0.5f };
-	Vector2f extents2{ pRect2->GetWidth() * 0.5f, pRect2->GetHeight() * 0.5f };
-	Vector2f center1 = pRect1->GetPosition(0.5f, 0.5f);
-	Vector2f center2 = pRect2->GetPosition(0.5f, 0.5f);
-	Vector2f centerDelta = center2 - center1;
-
-	Vector2f axesToTest[4] =
-	{
-		axes1[0],
-		axes1[1],
-		axes2[0],
-		axes2[1]
-	};
+	
+	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
+	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
 
 	float32 minOverlap = std::numeric_limits<float32>::max();
 	Vector2f collisionNormal{ 1.0f, 0.0f };
@@ -504,10 +552,71 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 		}
 	}
 
-	colDatas.orientation = SafeNormal(collisionNormal, { 1.0f, 0.0f });
-	colDatas.penetration = minOverlap;
 
-	DEBUG_INFO << "ca touche obb obb" << ENDL;
+	float32 minOverlap = std::numeric_limits<float32>::max();
+	Vector2f collisionNormal;
+
+
+	float32 ra = 0.f, rb = 0.f;
+	float32 sign;
+
+
+	ra = extents1.x;
+	rb = extents2.x * absoluteRotation.m_matrix[0][0] + extents2.y * absoluteRotation.m_matrix[0][1];
+	float32 t1_X = T.x * axes1[0].x + T.y * axes1[0].y;
+	float32 overlap = (ra + rb) - std::abs(t1_X);
+	if (overlap <= 0.f)
+		return false;
+
+	if (overlap < minOverlap) {
+		minOverlap = overlap;
+		sign = (t1_X > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes1[0].x * sign, axes1[0].y * sign };
+	}
+
+	ra = extents1.y;
+	rb = extents2.x * absoluteRotation.m_matrix[1][0] + extents2.y * absoluteRotation.m_matrix[1][1];
+	float32 t1_Y = T.x * axes1[1].x + T.y * axes1[1].y;
+	overlap = (ra + rb) - std::abs(t1_Y);
+	if (overlap <= 0.f)
+		return false;
+
+	if (overlap < minOverlap) {
+		minOverlap = overlap;
+		sign = (t1_Y > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes1[1].x * sign, axes1[1].y * sign };
+	}
+
+	ra = extents1.x * absoluteRotation.m_matrix[0][0] + extents1.y * absoluteRotation.m_matrix[1][0];
+	rb = extents2.x;
+	float32 t2_X = T.x * axes2[0].x + T.y * axes2[0].y;
+	overlap = (ra + rb) - std::abs(t2_X);
+	if (overlap <= 0.f)
+		return false;
+
+	if (overlap < minOverlap) {
+		minOverlap = overlap;
+		sign = (t2_X > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes2[0].x * sign, axes2[0].y * sign };
+	}
+
+
+	ra = extents1.x * absoluteRotation.m_matrix[0][1] + extents1.y * absoluteRotation.m_matrix[1][1];
+	rb = extents2.y;
+	float32 t2_Y = T.x * axes2[1].x + T.y * axes2[1].y;
+	overlap = (ra + rb) - std::abs(t2_Y);
+	if (overlap <= 0.f)
+		return false;
+
+	if (overlap < minOverlap) {
+		minOverlap = overlap;
+		sign = (t2_Y > 0.f) ? 1.f : -1.f;
+		collisionNormal = { axes2[1].x * sign, axes2[1].y * sign };
+	}
+
+	colDatas.penetration = minOverlap;
+	colDatas.orientation = collisionNormal;
+
 	return true;
 }
 
@@ -577,9 +686,34 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	colDatas.orientation = SafeNormal(worldNormal, { 1.0f, 0.0f }); // direction OBB -> cercle
 	colDatas.penetration = penetration;
 
-	DEBUG_INFO << "ca touche obb circle" << ENDL;
-	return true;
+	if (distanceCarree > (radius * radius))
+		return false;
+
+	float32 distance = (distanceCarree == 0.f) ? 0.f :std::sqrt(distanceCarree) ;
+	Vector2f localNormal;
+	colDatas.penetration = radius - distance;
+
+	if (distance == 0.f) {
+		localNormal = { 1.f, 1.f };
+		colDatas.penetration = radius;
+	}
+	else {
+		localNormal = { deltaX / distance, deltaY / distance };
+	}
+
+	Vector2f worldNormal;
+	worldNormal.x = localNormal.x * cos - localNormal.y * sin;
+	worldNormal.y = localNormal.x * sin + localNormal.y * cos;
+
+	colDatas.orientation = worldNormal;
+
+	if (distanceCarree <= (radius * radius)) {
+		return true;
+	}
+	return false;
+
 }
+
 
 bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
@@ -592,8 +726,14 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 		else
 			return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 	}
-	else if (angleB != 0)
-		return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
+	else if (angleB != 0) {
+		bool hit =  CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
+		if (hit) {
+			colDatas.orientation = -colDatas.orientation;
+		}
+		return hit;
+	}
+
 
 	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 }
@@ -668,6 +808,12 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta2.x -= correction * b->GetOwner()->IsKinematic();
 
 		}
+
+		if (!a->IsKinematic() || !b->IsKinematic())
+		{
+			a->GetOwner()->GetRigidBody().ZeroVelocityX();
+			b->GetOwner()->GetRigidBody().ZeroVelocityX();
+		}
 	}
 	else
 	{
@@ -684,6 +830,11 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta1.y += correction * a->GetOwner()->IsKinematic();
 			delta2.y -= correction * b->GetOwner()->IsKinematic();
 
+		}
+		if (!a->IsKinematic() || !b->IsKinematic())
+		{
+			a->GetOwner()->GetRigidBody().ZeroVelocityX();
+			b->GetOwner()->GetRigidBody().ZeroVelocityX();
 		}
 	}
 
@@ -800,7 +951,21 @@ void PhysicsManager::RepulseCircleRect(Collider* colA, Collider* colB)
 	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
 }
 
-void PhysicsManager::RepulseAABBOBB(Collider* colA, Collider* colB)
+void PhysicsManager::RepulseOBB(gcle::Shape* a, gcle::Shape* b) {
+	if (a->IsKinematic() == true) {
+		Vector2f actualPosition= a->GetPosition();
+		Vector2f pos = actualPosition - ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		a->SetPosition(pos.x, pos.y);
+	}
+	if (b->IsKinematic() == true) {
+		Vector2f actualPosition = b->GetPosition();
+		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
+		b->SetPosition(pos.x, pos.y);
+	}
+
+}
+
+float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
 {
 	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
 	RepulseOBBAABB(colB, colA);

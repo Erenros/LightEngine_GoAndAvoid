@@ -15,8 +15,8 @@ struct EntityInfo
 
 
 struct CollisionInfo {
-	float32 penetration = 0.0f;
-	Vector2f orientation{ 0, 0 };
+	float32 penetration = 0.f;
+	Vector2f orientation{ 0.f, 0.f };
 };
 
 enum class RepulseTypes {
@@ -73,6 +73,9 @@ private:
 	float32 GetRepulseCorrectionMultiplyer(Collider* a, Collider* b);
 
 	void AccumulateCorrection(Entity* pEntity, Vector2f delta);
+	void RepulseOBB(gcle::Shape* a, gcle::Shape* b);
+	
+	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
 private:
 	std::vector<EntityInfo> m_EntitiesToUpdate;
