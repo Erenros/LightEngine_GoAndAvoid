@@ -10,13 +10,32 @@
 
 void GameManager::Loop()
 {
+#ifndef NDEBUG
+	GCLE::DebuggerDesc desc{};
+	desc.output = GCLE::DebuggerOutput::CONSOLE | GCLE::DebuggerOutput::LOGS;
+	GCLE::Debugger::Init(&desc); 
+#endif
+
 	isRunning = true;
 	 
 	m_Cam.Init(mp_window);
 
 	while (isRunning == true)
 	{
-    
+		int32 exec = 0;
+		accDt += m_Time.GetDeltaTime();
+		while (accDt >= fixedUpdateDT) {
+			accDt -= fixedUpdateDT;
+			//PROFILER_START("Colliders", "Colliders Update");
+			if (m_loopTour < 1)
+				m_loopTour++;
+			else
+				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
+			//PROFILER_END("Colliders");
+			exec += 1;
+		}
+
+
 		//PROFILER_START("time", "Timer Update");
 		m_Time.Update();
 		//PROFILER_END("time");
@@ -25,6 +44,10 @@ void GameManager::Loop()
 		UpdateEntitySystem();
 		//PROFILER_END("Entity");
 
+		if (InputManager::GetInstance().IsDown(F1))
+		{
+			m_isVisualDebugActive = !m_isVisualDebugActive;
+		}
 
 		//PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
@@ -49,12 +72,18 @@ void GameManager::Loop()
 		m_Cam.Update(m_Time, m_entities);
 		//PROFILER_END("Camera");
 	
+		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
 
 		//PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
+		 
+		if (m_isVisualDebugActive)
+		{
+			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
+		}
 		//PROFILER_END("SceneD");
-    
+	
 		mp_window->Present();
 
 		if (Event::WindowEvent())
@@ -62,11 +91,39 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
-		//system("CLS");
+		system("CLS");
 
+		fpsTimer += m_Time.GetDeltaTime();
+		if (fpsTimer >= 1.f) {
+			fpsTimer -= 1.f;
+			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
+		}
+		GCLE_INFO << "FPS : " << fpsCount << ENDL;
+
+		
 	}
 
 	isRunning = false;
+}
+
+GameManager::~GameManager()
+{
+	UpdateEntitySystem();
+
+	for (auto& layer : m_entities)
+	{
+		if (layer.empty())
+			continue;
+
+		for (auto& entity : layer)
+		{
+			delete entity;
+		}
+
+		layer.clear();
+	}
+
+	m_entities.clear();
 }
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
@@ -80,7 +137,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC;
 
 
-	mp_window = new Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
+	mp_window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
 
 	if (!mp_window)
 	{
@@ -116,12 +173,6 @@ void GameManager::UpdateEntitySystem()
 			if (entity->ToDestroy())
 			{
 				m_entitiesToDestroy.push_back(entity);
-				it = m_entities[i].erase(it);
-			}
-
-			else if (entity->GetLayer() != i)
-			{
-				m_entitiesToCreate.push_back(entity);
 				it = m_entities[i].erase(it);
 			}
 

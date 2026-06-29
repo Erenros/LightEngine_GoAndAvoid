@@ -9,7 +9,7 @@ T* Scene::CreateEntity(gcle::Shapes shape)
 {
 	static_assert(std::is_base_of<Entity, T>::value, "T must be derived from Entity");
 
-	T* new_entity = new T();
+	T* new_entity = GCLE_NEW T();
 	Entity* entity = new_entity;
 
 	entity->m_activeScenes.push_back(m_tag);

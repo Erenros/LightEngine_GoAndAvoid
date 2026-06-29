@@ -78,8 +78,10 @@ private:
 	
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
-private:
+private: 
+	std::vector<EntityInfo> m_EntitiesToAdd;
 	std::vector<EntityInfo> m_EntitiesToUpdate;
+	std::vector<EntityInfo> m_EntitiesToRemove;
 
 private:
 	std::unordered_map<Entity*, Vector2f> m_PendingCorrections;

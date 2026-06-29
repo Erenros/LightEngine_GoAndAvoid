@@ -153,7 +153,22 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 
 void PhysicsManager::Update(float64 deltaTime)
 {
-	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
+	for (EntityInfo entity : m_EntitiesToRemove) {
+		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
+		{
+			if (m_EntitiesToUpdate[i].pEntity == entity.pEntity) {
+				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+			}
+
+		}
+	}
+
+	for (EntityInfo entity : m_EntitiesToAdd) {
+		m_EntitiesToUpdate.push_back(entity);
+	}
+
+	m_EntitiesToAdd.clear();
+	m_EntitiesToRemove.clear();
 
 	auto MakePairKey = [](int64 idA, int64 idB) -> uint64
 		{

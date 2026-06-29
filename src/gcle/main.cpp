@@ -1,3 +1,7 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "GameManager.h"
 #include "include.h"
 
@@ -22,6 +26,8 @@ int main(int argc, char** argv)
     
     gm.Loop();
     gm.Close();
+
+    _CrtDumpMemoryLeaks();
 
     return 0;
 }

@@ -28,8 +28,6 @@ void Entity::Initialize(gcle::Shapes shape)
 
 	m_Id = sId++;
 
-	PhysicsManager::GetInstance().AddEntity(this);
-
 	OnInitialize();
 }
 
@@ -39,19 +37,19 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	{
 	case gcle::Shapes::Rectangle:
 	{
-		gcle::Rectangle* pRect = new gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Rectangle* pRect = GCLE_NEW gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pRect;
 		break;
 	}
 	case gcle::Shapes::Circle:
 	{
-		gcle::Circle* pCircle = new gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
+		gcle::Circle* pCircle = GCLE_NEW gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
 		return pCircle;
 		break;
 	}
 	case gcle::Shapes::Triangle:
 	{
-		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Triangle* pTriangle = GCLE_NEW gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pTriangle;
 		break;
 	}
@@ -181,6 +179,12 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
 void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
+
+	if (isRigidBody)
+		PhysicsManager::GetInstance().AddEntity(this);
+
+	if (!isRigidBody)
+		PhysicsManager::GetInstance().RemoveEntity(this);
 }
 
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
@@ -337,7 +341,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 
@@ -349,7 +353,7 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 

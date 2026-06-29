@@ -9,6 +9,7 @@
 
 class Entity;
 struct SDL_Vertex;
+struct SDL_FPoint;
 
 struct Color {
 	uint8 r;
@@ -53,17 +54,22 @@ namespace gcle
 
 		std::vector<SDL_Vertex*> m_verticies;
 		std::vector<int32> m_indicies;
+
+		std::vector<SDL_FPoint*> m_hollowPoints;
+		std::vector<SDL_FPoint*> m_debugContour;
 		 
 		void UpdateRenderVertices();
 
 		//Constructors 
 
 		Shape(Entity* owner);
-		Shape(Shape* pShape);
-
+		Shape(const Shape& pShape);
+		Shape& operator=(const Shape&) = delete;
 
 	public:
 		virtual ~Shape();
+
+	public:
 
 		//Getters 
 		Shapes GetShape() { return m_shape; };
@@ -87,6 +93,7 @@ namespace gcle
 		virtual int32 GetSmoothness() { return 0; };
 		virtual Entity* GetOwner() { return mp_Owner; };
 		virtual Vector2f GetCenter() { return { 0, 0 }; };
+		virtual std::vector<SDL_FPoint*>& GetHollow();
 		virtual std::vector<Vector2f> GetTrianglePoints() { return m_trianglepoints; };
 
 
@@ -116,6 +123,8 @@ namespace gcle
 		void Move(Vector2f translation);
 
 		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH);
+
+		virtual Shape* Clone() const = 0;
 	};
 
 
@@ -124,7 +133,7 @@ namespace gcle
 	public:
 		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner);
 	
-
+		Shape* Clone() const override { return GCLE_NEW Rectangle(*this); }
 
 		//Getters
 		 
@@ -135,6 +144,7 @@ namespace gcle
 			return m_width * m_Transform.GetScale().x;
 		}
 
+		std::vector<SDL_FPoint*>& GetHollow() override;
 
 
 		//Setters
@@ -153,8 +163,12 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner);
 
+		Shape* Clone() const override { return GCLE_NEW Triangle(*this); }
+
 		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
+
+		std::vector<SDL_FPoint*>& GetHollow() override;
 	};
 
 	class Circle : public Shape {
@@ -164,9 +178,13 @@ namespace gcle
 
 		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner);
 
+		Shape* Clone() const override { return GCLE_NEW Circle(*this); }
+
 		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
 		int32 GetSmoothness() override { return m_smoothness; };
 		Vector2f GetCenter() override { return m_center; };
+
+		std::vector<SDL_FPoint*>& GetHollow() override;
 
 		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetRadius(float32 radius) override;

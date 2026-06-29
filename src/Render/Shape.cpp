@@ -6,28 +6,53 @@ namespace gcle
 {
 	Shape::~Shape()
 	{
-		for (auto* vertex : m_verticies)
+		std::cout << "Destroy Shape : " << this << '\n';
+
+		for (SDL_Vertex* vertex : m_verticies)
 		{
-			if (vertex != nullptr)
-			{
-				delete vertex;
-			}
+			delete vertex;
 		}
+		m_verticies.clear();
+
+		for (SDL_FPoint* point : m_hollowPoints)
+		{
+			delete point;
+		}
+		m_hollowPoints.clear();
+
+		m_debugContour.clear();
+		m_localPositions.clear();
+		m_indicies.clear();
+		m_trianglepoints.clear();
 	}
 
 	Shape::Shape(Entity* owner) : mp_Owner(owner)
 	{
 	}
 
-	Shape::Shape(Shape* pShape) : mp_texture(pShape->mp_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
-		m_smoothness(pShape->m_smoothness), m_height(pShape->m_height), m_width(pShape->m_width), m_origin(pShape->m_origin), m_trianglepoints(pShape->m_trianglepoints),
-		m_shape(pShape->m_shape), m_localPositions(pShape->m_localPositions), m_indicies(pShape->m_indicies)
+	Shape::Shape(const Shape& pShape) : mp_texture(pShape.mp_texture), m_Transform(pShape.m_Transform), m_radius(pShape.m_radius), m_center(pShape.m_center),
+		m_smoothness(pShape.m_smoothness), m_height(pShape.m_height), m_width(pShape.m_width), m_origin(pShape.m_origin), m_trianglepoints(pShape.m_trianglepoints),
+		m_shape(pShape.m_shape), m_localPositions(pShape.m_localPositions), m_indicies(pShape.m_indicies), m_IsKinematic(pShape.m_IsKinematic), mp_Owner(pShape.mp_Owner)
 	{
-		m_verticies.resize(pShape->m_verticies.size());
-		for (size_t i = 0; i < m_verticies.size(); i++)
+
+		m_verticies.resize(pShape.m_verticies.size());
+		for (uint64 i = 0; i < pShape.m_verticies.size(); ++i)
 		{
-			m_verticies[i] = new SDL_Vertex(*pShape->m_verticies[i]);
+			if (pShape.m_verticies[i])
+				m_verticies[i] = GCLE_NEW SDL_Vertex(*pShape.m_verticies[i]);
+			else
+				m_verticies[i] = nullptr;
 		}
+
+		m_hollowPoints.resize(pShape.m_hollowPoints.size());
+		for (uint64 i = 0; i < pShape.m_hollowPoints.size(); ++i)
+		{
+			if (pShape.m_hollowPoints[i])
+				m_hollowPoints[i] = GCLE_NEW SDL_FPoint(*pShape.m_hollowPoints[i]);
+			else
+				m_hollowPoints[i] = nullptr;
+		}
+
 		m_Transform.SetDirty();
 	}
 
@@ -116,16 +141,25 @@ namespace gcle
 			Vector2f world = mat.TransformPoint(m_localPositions[i]);
 			m_verticies[i]->position.x = world.x;
 			m_verticies[i]->position.y = world.y;
+
+			m_hollowPoints[i]->x = world.x;
+			m_hollowPoints[i]->y = world.y;
 		}
 
 		m_Transform.ClearDirty();
+	}
+
+	std::vector<SDL_FPoint*>& Shape::GetHollow()
+	{
+		UpdateRenderVertices();
+		return m_hollowPoints;
 	}
 
 	std::vector<SDL_Vertex*>& Shape::GetVerticies()
 	{
 		UpdateRenderVertices();
 		return m_verticies;
-	}
+	} 
 
 	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner) : Shape(owner)
 	{
@@ -133,6 +167,8 @@ namespace gcle
 			m_shape = Shapes::Rectangle;
 
 			m_verticies.resize(4);
+			m_hollowPoints.resize(4);
+
 			m_indicies.resize(6);
 
 			m_height = height;
@@ -140,10 +176,15 @@ namespace gcle
 
 			SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
 
-			m_verticies[0] = new SDL_Vertex{ {x, y}, sdl_color, {0.f, 0.f} };
-			m_verticies[1] = new SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
-			m_verticies[2] = new SDL_Vertex{ {x, y + m_height}, sdl_color, {0.f, 1.f} };
-			m_verticies[3] = new SDL_Vertex{ {x + m_width, y + m_height}, sdl_color, {1.f, 1.f} };
+			m_verticies[0] = GCLE_NEW SDL_Vertex{ {x, y}, sdl_color, {0.f, 0.f} };
+			m_verticies[1] = GCLE_NEW SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
+			m_verticies[2] = GCLE_NEW SDL_Vertex{ {x, y + m_height}, sdl_color, {0.f, 1.f} };
+			m_verticies[3] = GCLE_NEW SDL_Vertex{ {x + m_width, y + m_height}, sdl_color, {1.f, 1.f} };
+
+			for (int32 i = 0; i < static_cast<int32>(m_verticies.size()); i++)
+			{
+				m_hollowPoints[i] = GCLE_NEW SDL_FPoint{ m_verticies[i]->position.x, m_verticies[i]->position.y };
+			}
 
 			m_indicies = {
 				0, 1, 2,
@@ -164,6 +205,22 @@ namespace gcle
 
 			m_Transform.SetDirty();
 		}
+	}
+
+	std::vector<SDL_FPoint*>& Rectangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_debugContour.size() != 5)
+			m_debugContour.resize(5);
+
+		m_debugContour[0] = m_hollowPoints[0];
+		m_debugContour[1] = m_hollowPoints[1];
+		m_debugContour[2] = m_hollowPoints[3];
+		m_debugContour[3] = m_hollowPoints[2];
+		m_debugContour[4] = m_hollowPoints[0];
+
+		return m_debugContour;
 	}
 
 	void Rectangle::SetHeight(float32 height)
@@ -194,20 +251,26 @@ namespace gcle
 	{
 		m_trianglepoints.push_back({ x1, y1 });
 		m_trianglepoints.push_back({ x2, y2 });
-		m_trianglepoints.push_back({ x2, y2 });
 		m_trianglepoints.push_back({ x3, y3 });
 
 
 		m_shape = Shapes::Triangle;
 
 		m_verticies.resize(3);
+		m_hollowPoints.resize(3);
 		m_indicies.resize(3);
 
 		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
 
-		m_verticies[0] = new SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
-		m_verticies[1] = new SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
-		m_verticies[2] = new SDL_Vertex{ {x3, y3}, sdl_color, {1.f, 1.f} };
+		m_verticies[0] = GCLE_NEW SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
+		m_verticies[1] = GCLE_NEW SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
+		m_verticies[2] = GCLE_NEW SDL_Vertex{ {x3, y3}, sdl_color, {1.f, 1.f} };
+
+
+		for (int i = 0; i < 3; ++i)
+		{
+			m_hollowPoints[i] = GCLE_NEW SDL_FPoint{};
+		}
 
 		m_indicies = { 0, 1, 2 };
 
@@ -256,6 +319,21 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
+	std::vector<SDL_FPoint*>& Triangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_debugContour.size() != 4)
+			m_debugContour.resize(4);
+
+		m_debugContour[0] = m_hollowPoints[0];
+		m_debugContour[1] = m_hollowPoints[1];
+		m_debugContour[2] = m_hollowPoints[2];
+		m_debugContour[3] = m_hollowPoints[0]; 
+
+		return m_debugContour;
+	}
+
 	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner) : Shape(owner)
 	{
 		if (_smoothness < 3) {
@@ -272,6 +350,7 @@ namespace gcle
 		m_shape = Shapes::Circle;
 
 		m_verticies.resize(_smoothness + 1);
+		m_hollowPoints.resize(_smoothness + 1);
 		m_indicies.resize(_smoothness * 3);
 
 		m_origin = { x, y };
@@ -282,7 +361,7 @@ namespace gcle
 
 		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
 
-		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {1, 1} };
+		m_verticies[0] = GCLE_NEW SDL_Vertex{ {x + radius, y + radius}, sdl_color, {1, 1} };
 		m_localPositions.push_back({ 0.f, 0.f });
 
 		for (int i = 0; i < _smoothness; i++) {
@@ -291,7 +370,7 @@ namespace gcle
 			float cx = sin(radian) * radius;
 			float cy = cos(radian) * radius;
 
-			m_verticies[i + 1] = new SDL_Vertex{ {x + radius + cx, y + radius + cy}, sdl_color, {1, 1} };
+			m_verticies[i + 1] = GCLE_NEW SDL_Vertex{ {x + radius + cx, y + radius + cy}, sdl_color, {1, 1} };
 			m_localPositions.push_back({ cx, cy });
 
 			m_indicies[i * 3] = 0;
@@ -299,7 +378,30 @@ namespace gcle
 			m_indicies[i * 3 + 2] = (i + 1) % _smoothness + 1;
 		}
 
+
+		for (int i = 0; i < _smoothness + 1; ++i)
+		{
+			m_hollowPoints[i] = GCLE_NEW SDL_FPoint{};
+		}
+
 		m_Transform.SetDirty();
+	}
+
+	std::vector<SDL_FPoint*>& Circle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		int32 count = m_smoothness + 1; 
+
+		if (static_cast<int32>(m_debugContour.size()) != count)
+			m_debugContour.resize(count);
+
+		for (int32 i = 0; i < m_smoothness; i++)
+			m_debugContour[i] = m_hollowPoints[i + 1]; 
+
+		m_debugContour[m_smoothness] = m_hollowPoints[1]; 
+
+		return m_debugContour;
 	}
 
 	void Circle::SetRadius(float32 radius)

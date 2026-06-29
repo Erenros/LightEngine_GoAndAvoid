@@ -1,6 +1,7 @@
 #pragma once
 #include "PrimitiveTypes.h"
 #include "Vector2.hpp"
+#include "Debugger.h"
 #include "Profiler.h"
 #include "Utils.h"
 #include "Timer.h"
@@ -13,3 +14,5 @@ constexpr float32 RAD_TO_DEG	= float32(180.0f / PI);
 constexpr float32 DEG_TO_RAD	= float32(PI / 180.0f);
 constexpr float32 GRAVITY		= 9.80665f;
 
+class Entity;
+using EntityPtr = SmartPtr<Entity>;

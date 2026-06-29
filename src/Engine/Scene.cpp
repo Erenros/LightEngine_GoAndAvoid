@@ -1,6 +1,26 @@
 #include "Scene.h"
 #include "Render/Text.h"
 
+void Scene::DrawDebug(Window* window)
+{
+	for (auto layer : GameManager::GetInstance().m_entities) {
+		for(Entity* e : layer)
+		{
+			if (e->IsActiveIn(m_tag)) {
+				if (e->CollidingEntity.empty())
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+				}
+				else
+				{
+					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
+				}
+				GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+			}
+		}
+	}
+}
+
 
 void Scene::Draw(Window* window) {
 	for (auto layer : GameManager::GetInstance().m_entities) {
@@ -28,11 +48,11 @@ Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byt
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	if (font == nullptr)
 	{
-		DEBUG_WARN << "Couldn't find the default font" << ENDL;
+		GCLE_WARN << "Couldn't find the default font" << ENDL;
 		return nullptr;
 	}
 
-	Text* new_text = new Text(font,text, x, y, w, h, r, g, b);
+	Text* new_text = GCLE_NEW Text(font,text, x, y, w, h, r, g, b);
 	m_texts.push_back(new_text);
 	return new_text;
 }
@@ -63,4 +83,4 @@ void Scene::Update(Clock& time){
 				e->Update(time);
 		}
 	}
-} 
+}

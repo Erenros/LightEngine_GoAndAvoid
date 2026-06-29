@@ -7,7 +7,7 @@ template <typename S>
 Scene* SceneManager::CreateScene(const std::string& tag) {
     if (m_validFlag.size() == 0) {
         std::cerr << "You can't create more than 32 scenes" << std::endl;
-        DEBUG_ERROR << "There is no more scene flag disponible" << ENDL;
+        GCLE_ERROR << "There is no more scene flag disponible" << ENDL;
         return nullptr;
     }
 
@@ -15,7 +15,7 @@ Scene* SceneManager::CreateScene(const std::string& tag) {
     static_assert(std::is_base_of<Scene, S>::value, "S must be derived from Scene");
 
     if (m_Scenes[tag] == nullptr) {
-        m_Scenes[tag] = new S();
+        m_Scenes[tag] = GCLE_NEW S();
         Scene* scene = m_Scenes[tag];
         scene->m_tag = tag;
         if (m_CurrentSceneTag == "") {

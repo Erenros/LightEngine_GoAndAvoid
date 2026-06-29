@@ -19,7 +19,7 @@ void Font::InitFont(const std::string& path, int size)
     TTF_Font* font = TTF_OpenFont(path.c_str(), size);
     if (font == NULL)
     {
-        DEBUG_WARN << "Couldn't initialize font with path" + path << ENDL;
+        GCLE_WARN << "Couldn't initialize font with path" + path << ENDL;
         return;
     }
     

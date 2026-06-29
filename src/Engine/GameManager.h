@@ -11,8 +11,8 @@
 class Entity;
 class Scene;
 
-#define FixedUpdateExecution 120;
-
+#define FixedUpdateExecution 180;
+#define FPS 60;
 
 class GameManager
 {
@@ -23,16 +23,23 @@ public:
 		return instance;
 	}
 
-	float32 fixedUpdateDT = 1 / FixedUpdateExecution;
-	float32 fixedUpdateTime = 0.f;
+	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
+	float32 accDt = 0.f;
+
+	int16 fpsCount = 0.f;
+	float32 fpsTimer = 0.f;
 
 	GameManager() = default;
+	~GameManager();
 
 
 	bool Init(int32 windowWidth, int32 windowHeight);
 	void Loop();
 	void Close();
+
 	Clock* GetTime() { return &m_Time; }
+
+	void SetWindowClearColor(Color color) { m_ClearColor = color; }
 
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
@@ -47,10 +54,13 @@ private:
 	Camera m_Cam;
 	Window* mp_window = nullptr;
 
+	Color m_ClearColor = { 0, 0, 0, 255 };
 
 	Clock m_Time;
 
 	bool isRunning = false;
+
+	bool m_isVisualDebugActive = false;
 
 	int32 m_WindW = 0, m_WindH = 0;
 
