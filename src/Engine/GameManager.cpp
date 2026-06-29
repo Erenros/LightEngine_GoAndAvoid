@@ -7,6 +7,7 @@
 #include "SceneManager.h"
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
+#include "AssetEngine.h"
 
 void GameManager::Loop()
 {
@@ -91,6 +92,8 @@ void GameManager::Loop()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
+	AssetEngine::GetInstance().LoadFile("../../test.gcle");
+
 	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
