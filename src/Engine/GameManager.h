@@ -52,8 +52,7 @@ private:
 
 private:
 
-	GameManager* mp_Instance = nullptr;
-	Camera m_Cam;
+	GameManager* mp_Instance = nullptr; 
 	Window* mp_window = nullptr;
 
 	Color m_ClearColor = { 0, 0, 0, 255 };
@@ -69,6 +68,8 @@ private:
 	std::vector <std::vector<Entity*>> m_entities;
 	std::vector <Entity*> m_entitiesToDestroy;
 	std::vector <Entity*> m_entitiesToCreate;
+
+	std::vector <Camera*> m_camera; 
 	
 	int m_loopTour = 0; 
 

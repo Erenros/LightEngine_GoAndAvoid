@@ -6,8 +6,6 @@ namespace gcle
 {
 	Shape::~Shape()
 	{
-		std::cout << "Destroy Shape : " << this << '\n';
-
 		for (SDL_Vertex* vertex : m_verticies)
 		{
 			delete vertex;

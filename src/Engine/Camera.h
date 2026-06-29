@@ -11,12 +11,6 @@
 class Camera
 {
 	public:
-		Transform2D t;
-
-		Entity* followingEntity = nullptr;
-
-		float32 m_zoom = 1;
-
 		void Init(Window* pWindow);
 
 		void SetFollowing(Entity* newEntity);
@@ -24,14 +18,26 @@ class Camera
 
 		void SetPosition(Vector2f v);
 		Vector2f GetPosition();
-
-		void Update(Clock& time, std::vector<std::vector<Entity*>>& entities);
-
+		 
 		void SetZoom(float32 zoom);
 		float32 GetZoom();
 
+		Vector2f GetMousePosition();
+		Vector2f GetMouseScreenToWorldPosition();
+
 private:
-	Window* mp_Window = nullptr;
-	Vector2f screenMiddle;
+		void Update(Clock& time, std::vector<std::vector<Entity*>>& entities);
+
+private:
+	Window*			mp_Window = nullptr;
+	Vector2f		screenMiddle;
+	float32			m_zoom = 1;
+	Transform2D		transform;
+	Entity*			m_followingEntity = nullptr;
+
+	uint64			m_Id = 0;
+
+private:
+	friend class GameManager;
 };
 

@@ -4,6 +4,8 @@
 #include "Include.h"
 #include "Transform.h"
 
+#undef max
+
 class RigidBody2D
 {
 public:
@@ -77,5 +79,3 @@ private:
 	float64 dt = 0.0f;
 
 };
-
-

@@ -162,18 +162,18 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	{
 	case gcle::Shapes::Rectangle:
 	{
-		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetShape());
+		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetRenderShape());
 		return
 		{
-			positionToCheck.x >= pRect->GetPosition().x &&
-			positionToCheck.x <= pRect->GetPosition().x + pRect->GetWidth() &&
-			positionToCheck.y >= pRect->GetPosition().y &&
-			positionToCheck.y <= pRect->GetPosition().y + pRect->GetHeight()
+			positionToCheck.x >= pRect->GetPosition().x - pRect->GetWidth()  * 0.5f &&
+			positionToCheck.x <= pRect->GetPosition().x + pRect->GetWidth()  * 0.5f &&
+			positionToCheck.y >= pRect->GetPosition().y - pRect->GetHeight() * 0.5f &&
+			positionToCheck.y <= pRect->GetPosition().y + pRect->GetHeight() * 0.5f
 		};
 	}
 	case gcle::Shapes::Circle:
 	{
-		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetShape());
+		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetRenderShape());
 		return pCircle->GetPosition().GetDistance(positionToCheck) <= pCircle->GetRadius();
 	}
 	default:
@@ -181,7 +181,7 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	}
 
 	return false;
-}
+} 
 
 void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 {

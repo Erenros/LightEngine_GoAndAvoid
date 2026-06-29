@@ -73,9 +73,10 @@ public:
 	void Draw(gcle::Shape* pShape);
 	void DrawDebug(gcle::Shape* pShape);
 
-public:
-	uint32 GetWidth() { return m_width; }
-	uint32 GetHeight() { return m_height; }
+public: 
+	Vector2u GetMousePosition();
+	Vector2f GetWindowSize();
+	Vector2f GetMousePositionOnRenderTarget();
 	
 private:
 	void InitImGUI();

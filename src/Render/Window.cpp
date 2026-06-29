@@ -79,7 +79,24 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 	SDL_SetRenderTarget(mp_Renderer, NULL);
 
 
-	InitImGUI();
+	//InitImGUI();
+}
+
+Vector2f Window::GetMousePositionOnRenderTarget()
+{
+	Vector2u mousePos = GetMousePosition(); 
+	Vector2f windowSize = GetWindowSize();  
+	 
+	constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
+	constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
+
+	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
+	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
+
+	return Vector2f{
+		static_cast<float32>(mousePos.x) * scaleX,
+		static_cast<float32>(mousePos.y) * scaleY
+	};
 }
 
 void Window::InitImGUI()
@@ -99,15 +116,15 @@ void Window::InitImGUI()
 
 void Window::StartImGUIFrame()
 {
-	ImGui_ImplSDLRenderer2_NewFrame();
+	/*ImGui_ImplSDLRenderer2_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 
-	ImGui::NewFrame();
+	ImGui::NewFrame();*/
 }
 
 void Window::ImGUIUpdate()
 {
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	/*ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
@@ -182,7 +199,7 @@ void Window::ImGUIUpdate()
 
 	ImGui::End();
 
-	ImGui::Render();
+	ImGui::Render();*/
 }
 
 void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
@@ -208,13 +225,17 @@ void Window::End(){
 }
 
 void Window::Present()
-{
-	SDL_SetRenderTarget(mp_Renderer, nullptr);
+{ 
+	//SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
+	//SDL_RenderClear(mp_Renderer);
 
+	//ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mp_Renderer);
+	SDL_SetRenderTarget(mp_Renderer, nullptr);
+	 
 	SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
 	SDL_RenderClear(mp_Renderer);
-
-	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mp_Renderer);
+	 
+	SDL_RenderCopy(mp_Renderer, mp_RenderTarget, nullptr, nullptr);
 
 	SDL_RenderPresent(mp_Renderer);
 }
@@ -302,4 +323,18 @@ void Window::DrawDebug(gcle::Shape* pShape)
 	}
 
 	SDL_RenderDrawLinesF(mp_Renderer, points.data(), static_cast<int32>(points.size()));
+}
+
+Vector2u Window::GetMousePosition()
+{
+	Vector2u pos;
+	SDL_GetMouseState(&pos.x, &pos.y);
+	return pos;
+}
+
+Vector2f Window::GetWindowSize()
+{
+	Vector2u size;
+	SDL_GetWindowSize(mp_Window, &size.x, &size.y);
+	return Vector2f{ static_cast<float32>(size.x), static_cast<float32>(size.y) };
 }

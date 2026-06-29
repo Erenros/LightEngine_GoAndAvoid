@@ -7,7 +7,7 @@
 #include "Utils.h"
 #include "Debugger.h"
 
-#define PROFILER
+//#define PROFILER
 
 #if defined(_DEBUG) && defined(PROFILER)
 

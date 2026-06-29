@@ -16,7 +16,7 @@ bool Event::WindowEvent()
 			return true;
 		}
 
-		ImGui_ImplSDL2_ProcessEvent(&event);
+		//ImGui_ImplSDL2_ProcessEvent(&event);
 	}
 	return false;
 }
