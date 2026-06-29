@@ -40,5 +40,5 @@ public:
 
 	bool ReadHeader(std::ifstream& file);
 	bool ReadEntry(std::ifstream& file, Entry& entry);
-
+	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
 };
