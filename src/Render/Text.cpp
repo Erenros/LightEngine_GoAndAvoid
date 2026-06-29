@@ -8,8 +8,11 @@
 
 SDL_Texture* Text::CreateTexture(Window* window)
 {
-	if (mp_texture != nullptr)
+	if (mp_texture != nullptr && !m_needToChange)
 		return mp_texture;
+	
+	m_needToChange = false;
+	SDL_DestroyTexture(mp_texture);
 
 	if (mp_font == nullptr || !mp_font->IsFontInit())
 	{
@@ -65,6 +68,7 @@ void Text::SetFont(const std::string& id)
 void Text::SetText(const std::string& text)
 {
 	m_text = text;
+	m_needToChange = true;
 }
 
 void Text::SetPosition(int x, int y)
