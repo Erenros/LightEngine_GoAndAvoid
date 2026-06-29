@@ -679,12 +679,19 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 		penetration = radius - distance;
 	}
 
+
+	float32 cos = std::cos(angle);
+	float32 sin = std::sin(angle);
+
+
 	Vector2f worldNormal;
 	worldNormal.x = localNormal.x * cosAngle - localNormal.y * sinAngle;
 	worldNormal.y = localNormal.x * sinAngle + localNormal.y * cosAngle;
 
 	colDatas.orientation = SafeNormal(worldNormal, { 1.0f, 0.0f }); // direction OBB -> cercle
 	colDatas.penetration = penetration;
+
+	float32 distanceCarree = (deltaX * deltaX) + (deltaY * deltaY);
 
 	if (distanceCarree > (radius * radius))
 		return false;
@@ -809,7 +816,7 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 
 		}
 
-		if (!a->IsKinematic() || !b->IsKinematic())
+		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
 		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityX();
 			b->GetOwner()->GetRigidBody().ZeroVelocityX();
@@ -831,7 +838,8 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 			delta2.y -= correction * b->GetOwner()->IsKinematic();
 
 		}
-		if (!a->IsKinematic() || !b->IsKinematic())
+
+		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
 		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityX();
 			b->GetOwner()->GetRigidBody().ZeroVelocityX();
@@ -951,13 +959,17 @@ void PhysicsManager::RepulseCircleRect(Collider* colA, Collider* colB)
 	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
 }
 
-void PhysicsManager::RepulseOBB(gcle::Shape* a, gcle::Shape* b) {
-	if (a->IsKinematic() == true) {
+void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB) {
+
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
+	if (colA->GetOwner()->IsKinematic() == true) {
 		Vector2f actualPosition= a->GetPosition();
 		Vector2f pos = actualPosition - ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
 		a->SetPosition(pos.x, pos.y);
 	}
-	if (b->IsKinematic() == true) {
+	if (colB->GetOwner()->IsKinematic() == true) {
 		Vector2f actualPosition = b->GetPosition();
 		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
 		b->SetPosition(pos.x, pos.y);
@@ -965,7 +977,7 @@ void PhysicsManager::RepulseOBB(gcle::Shape* a, gcle::Shape* b) {
 
 }
 
-float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
+float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider* colB)
 {
 	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
 	RepulseOBBAABB(colB, colA);

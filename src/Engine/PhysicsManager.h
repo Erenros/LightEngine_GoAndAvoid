@@ -73,7 +73,8 @@ private:
 	float32 GetRepulseCorrectionMultiplyer(Collider* a, Collider* b);
 
 	void AccumulateCorrection(Entity* pEntity, Vector2f delta);
-	void RepulseOBB(gcle::Shape* a, gcle::Shape* b);
+
+	void RepulseOBB(Collider* colA, Collider* colB);
 	
 	float32 GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b);
 
