@@ -620,83 +620,37 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	return true;
 }
 
-bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle)
-{
-	Vector2f rectCenter = pRect->GetPosition(0.5f, 0.5f);
-	Vector2f extents{ pRect->GetWidth() * 0.5f, pRect->GetHeight() * 0.5f };
+bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle) {
+
+	Vector2f rectPos = pRect->GetPosition();
+	Vector2f extents{ pRect->GetWidth() / 2 , pRect->GetHeight() / 2 };
 	float32 angle = pRect->GetTransform()->GetRadAngle();
 
-	Vector2f circleCenter = pCircle->GetPosition(0.5f, 0.5f);
+	Vector2f circlePos = pCircle->GetPosition();
 	float32 radius = pCircle->GetRadius();
 
-	Vector2f centerDelta = circleCenter - rectCenter;
+	Vector2f T = circlePos - rectPos;
 
-	float32 cosAngle = std::cos(angle);
-	float32 sinAngle = std::sin(angle);
+	float32 cos = std::cos(angle);
+	float32 sin = std::sin(angle);
 
-	// Passage du cercle dans le repere local du rectangle.
 	Vector2f localCirclePos;
-	localCirclePos.x = centerDelta.x * cosAngle + centerDelta.y * sinAngle;
-	localCirclePos.y = -centerDelta.x * sinAngle + centerDelta.y * cosAngle;
+	localCirclePos.x = T.x * cos + T.y * sin;
+	localCirclePos.y = -T.x * sin + T.y * cos;
 
 	Vector2f closestPoint;
 	closestPoint.x = std::max(-extents.x, std::min(localCirclePos.x, extents.x));
 	closestPoint.y = std::max(-extents.y, std::min(localCirclePos.y, extents.y));
 
-	Vector2f localDelta = localCirclePos - closestPoint;
-	float32 distanceSquared = (localDelta.x * localDelta.x) + (localDelta.y * localDelta.y);
-
-	Vector2f localNormal{ 1.0f, 0.0f };
-	float32 penetration = 0.0f;
-
-	if (distanceSquared <= PHYSICS_EPSILON * PHYSICS_EPSILON)
-	{
-		// Centre du cercle dans le rectangle : on choisit le cote le plus proche.
-		float32 overlapLeft = localCirclePos.x + extents.x;
-		float32 overlapRight = extents.x - localCirclePos.x;
-		float32 overlapTop = localCirclePos.y + extents.y;
-		float32 overlapBottom = extents.y - localCirclePos.y;
-		float32 minOverlap = std::min({ overlapLeft, overlapRight, overlapTop, overlapBottom });
-
-		if (minOverlap == overlapLeft)
-			localNormal = { -1.0f, 0.0f };
-		else if (minOverlap == overlapRight)
-			localNormal = { 1.0f, 0.0f };
-		else if (minOverlap == overlapTop)
-			localNormal = { 0.0f, -1.0f };
-		else
-			localNormal = { 0.0f, 1.0f };
-
-		penetration = radius + minOverlap;
-	}
-	else
-	{
-		float32 distance = std::sqrt(distanceSquared);
-		if (distance > radius)
-			return false;
-
-		localNormal = localDelta / distance;
-		penetration = radius - distance;
-	}
-
-
-	float32 cos = std::cos(angle);
-	float32 sin = std::sin(angle);
-
-
-	Vector2f worldNormal;
-	worldNormal.x = localNormal.x * cosAngle - localNormal.y * sinAngle;
-	worldNormal.y = localNormal.x * sinAngle + localNormal.y * cosAngle;
-
-	colDatas.orientation = SafeNormal(worldNormal, { 1.0f, 0.0f }); // direction OBB -> cercle
-	colDatas.penetration = penetration;
+	float32 deltaX = localCirclePos.x - closestPoint.x;
+	float32 deltaY = localCirclePos.y - closestPoint.y;
 
 	float32 distanceCarree = (deltaX * deltaX) + (deltaY * deltaY);
 
 	if (distanceCarree > (radius * radius))
 		return false;
 
-	float32 distance = (distanceCarree == 0.f) ? 0.f :std::sqrt(distanceCarree) ;
+	float32 distance = (distanceCarree == 0.f) ? 0.f : std::sqrt(distanceCarree);
 	Vector2f localNormal;
 	colDatas.penetration = radius - distance;
 
