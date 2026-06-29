@@ -22,7 +22,9 @@ void GameManager::Loop()
 
 	while (isRunning == true)
 	{
-		PROFILER_START("Colliders", "Colliders Update");
+		//PROFILER_START("Update", "Update");
+
+		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		accDt += m_Time.GetDeltaTime();
 		while (accDt >= fixedUpdateDT) {
@@ -33,8 +35,8 @@ void GameManager::Loop()
 				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
 			exec += 1;
 		}
-		PROFILER_END("Colliders");
-		//DEBUG_INFO << "Fixed update execution : " << exec << ENDL
+		//PROFILER_END("Colliders");
+		//GCLE_INFO << "Fixed update execution : " << exec << ENDL;
 
 
 		//PROFILER_START("time", "Timer Update");
@@ -81,6 +83,7 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
+		//PROFILER_START("FPSCount", "FPSCount");
 
 		fpsTimer += m_Time.GetDeltaTime();
 		if (fpsTimer >= 1.f) {
@@ -88,8 +91,13 @@ void GameManager::Loop()
 			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
 		}
 		GCLE_INFO << "FPS : " << fpsCount << ENDL;
-		
+
+		//PROFILER_END("FPSCount");
+
+
 		system("CLS");
+		//PROFILER_END("Update");
+
 	}
 
 	isRunning = false;

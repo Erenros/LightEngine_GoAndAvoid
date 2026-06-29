@@ -24,11 +24,11 @@ struct ColliderEntry{
 	AABB aabb;
 	Entity* entity;
 };
-
+class QuadNodePool;
 
 class QuadNode {
 	AABB m_bounds;
-	int32 depth = 0;
+	int32 m_depth = 0;
 
 	std::vector<ColliderEntry> m_entities;  //if a leaf
 	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
@@ -38,10 +38,10 @@ class QuadNode {
 
 	~QuadNode();
 
-	void Subdivide();
+	void Subdivide(QuadNodePool& pool);
 	bool IsLeaf();
 
-	void Insert(Entity* entity);
+	void Insert(Entity* entity, QuadNodePool& pool);
 	void Query(AABB& range, std::vector<ColliderEntry>& results, std::unordered_set<Entity*>& seen);
 
 	void Clear();
@@ -49,5 +49,20 @@ class QuadNode {
 
 	friend class QuadTree;
 	friend class PhysicsManager;
+	friend class QuadNodePool;
 
+};
+
+
+class QuadNodePool {
+	std::vector<QuadNode> m_pool;
+	int32 m_index = 0;
+
+public:
+
+	QuadNodePool(int32 size);
+	
+
+	QuadNode* Get(float32 x, float32 y, float32 x2, float32 y2, int32 depth);
+	void Reset();
 };
