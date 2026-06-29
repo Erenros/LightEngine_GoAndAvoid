@@ -17,12 +17,8 @@ void RigidBody2D::Initialize(Transform2D* transform)
 	mp_Transform = transform;
 }
 
-void RigidBody2D::Update(Clock& timer)
+void RigidBody2D::Update(float32 dt)
 {
-
-	float32 dt = static_cast<float32>(timer.GetDeltaTime());
-	dt = 0.016f;
-
 	ApplyFriction(dt);
 	ApplyGravity(dt);
 

@@ -19,27 +19,27 @@ void SampleScene::OnInitialize()
 	entity1->SetPosition(10, -200);
 	entity1->SetRotation(45);
 	entity1->SetRigidBody(true); 
-	entity1->GetShape()->SetIsKinematic(true);
+	entity1->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
 
 	 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true); 
-	entity2->GetShape()->SetIsKinematic(true);
+	entity2->SetIsKinematic(true);
 	entity2->SetTexture("images");
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(200, 100);
 	entity3->SetRotation(45);
 	entity3->SetRigidBody(true); 
-	entity3->GetShape()->SetIsKinematic(true);
+	entity3->SetIsKinematic(true);
 	entity3->SetTexture("images");
 
 	Entity* entity4 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity4->SetPosition(-200, 100);
 	entity4->SetRigidBody(true); 
-	entity4->GetShape()->SetIsKinematic(true);
+	entity4->SetIsKinematic(true);
 
 
 }

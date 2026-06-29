@@ -167,6 +167,8 @@ void PhysicsManager::Update(float64 deltaTime)
 		m_EntitiesToUpdate.push_back(entity);
 	}
 
+	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
+
 	m_EntitiesToAdd.clear();
 	m_EntitiesToRemove.clear();
 

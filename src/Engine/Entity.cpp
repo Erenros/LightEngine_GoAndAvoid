@@ -18,7 +18,7 @@ void Entity::Initialize(gcle::Shapes shape)
 
 
 	mp_Shape = GetBaseShape(shape);
-	mp_RenderShape = new gcle::Shape(*GetBaseShape(shape));
+	mp_RenderShape = mp_Shape->Clone();
 
 
 	m_RigidBody.Initialize(mp_Shape->GetTransform());
@@ -62,12 +62,10 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	return nullptr;
 }
 
-void Entity::Update(Clock& timer)
+void Entity::Update(float32 dt)
 {
-	float32 dt = static_cast<float32>(timer.GetTimeScale());
-
 	if (IsRigidBody())
-		m_RigidBody.Update(timer);
+		m_RigidBody.Update(dt);
 
 	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;

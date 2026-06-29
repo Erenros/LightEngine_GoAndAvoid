@@ -32,7 +32,7 @@ namespace gcle
 
 	Shape::Shape(const Shape& pShape) : mp_texture(pShape.mp_texture), m_Transform(pShape.m_Transform), m_radius(pShape.m_radius), m_center(pShape.m_center),
 		m_smoothness(pShape.m_smoothness), m_height(pShape.m_height), m_width(pShape.m_width), m_origin(pShape.m_origin), m_trianglepoints(pShape.m_trianglepoints),
-		m_shape(pShape.m_shape), m_localPositions(pShape.m_localPositions), m_indicies(pShape.m_indicies), m_IsKinematic(pShape.m_IsKinematic), mp_Owner(pShape.mp_Owner)
+		m_shape(pShape.m_shape), m_localPositions(pShape.m_localPositions), m_indicies(pShape.m_indicies), mp_Owner(pShape.mp_Owner)
 	{
 
 		m_verticies.resize(pShape.m_verticies.size());

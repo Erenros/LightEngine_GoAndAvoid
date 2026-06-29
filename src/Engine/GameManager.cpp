@@ -24,65 +24,42 @@ void GameManager::Loop()
 	{
 		int32 exec = 0;
 		accDt += m_Time.GetDeltaTime();
+
 		while (accDt >= fixedUpdateDT) {
+
 			accDt -= fixedUpdateDT;
-			//PROFILER_START("Colliders", "Colliders Update");
 			if (m_loopTour < 1)
 				m_loopTour++;
 			else
+			{
 				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
-			//PROFILER_END("Colliders");
+				InputManager::GetInstance().Update();
+				SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+			}
 			exec += 1;
+
 		}
 
-
-		//PROFILER_START("time", "Timer Update");
 		m_Time.Update();
-		//PROFILER_END("time");
 	
-		//PROFILER_START("Entity", "Entity Creation / Deletion");
+		m_Cam.Update(m_Time, m_entities);
+		
 		UpdateEntitySystem();
-		//PROFILER_END("Entity");
 
 		if (InputManager::GetInstance().IsDown(F1))
 		{
 			m_isVisualDebugActive = !m_isVisualDebugActive;
 		}
 
-		//PROFILER_START("Input", "Input Update");
-		InputManager::GetInstance().Update();
-		//PROFILER_END("Input");
-
-		//PROFILER_START("SceneU", "Scene Update");
-		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		//PROFILER_END("SceneU");
-		
-		fixedUpdateTime += m_Time.GetDeltaTime();
-		if (fixedUpdateTime >= 1.f)
-			fixedUpdateTime -= 1.f;
-
-		//PROFILER_START("Colliders", "Colliders Update");
-		if (m_loopTour < 1)
-			m_loopTour++;
-		else
-			PhysicsManager::GetInstance().Update(0.016f);
-		//PROFILER_END("Colliders");
-		
-		//PROFILER_START("Camera", "Camera Update");
-		m_Cam.Update(m_Time, m_entities);
-		//PROFILER_END("Camera");
-	
 		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
 
-		//PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
 		if (m_isVisualDebugActive)
 		{
 			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
 		}
-		//PROFILER_END("SceneD");
 	
 		mp_window->Present();
 

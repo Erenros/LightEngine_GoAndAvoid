@@ -12,7 +12,7 @@ public:
 
 	void Initialize(Transform2D* mp_Transform);
 
-	void Update(Clock& timer);
+	void Update(float32 dt);
 
 	void AddForce(Vector2f direction, float32 strength, float32 dt);
 

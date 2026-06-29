@@ -43,8 +43,6 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 	{
 		for (Entity* e : layer)
 		{
-			e->Update(time);
-
 			gcle::Shape* realShape = e->GetShape();
 
 			e->SetRenderPosition((realShape->GetPosition() - GetPosition()) * static_cast<float32>(GetZoom()) + screenMiddle);

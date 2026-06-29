@@ -91,7 +91,7 @@ protected:
 	virtual void OnDestroy() {};
 
 private:
-	void Update(Clock& timer);
+	void Update(float32 dt);
 	void Initialize(gcle::Shapes shape);
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
