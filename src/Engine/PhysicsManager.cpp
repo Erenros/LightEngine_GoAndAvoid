@@ -153,6 +153,7 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 
 void PhysicsManager::Update(float64 deltaTime)
 {
+	//PROFILER_START("RemoveEntity", "RemoveEntities");
 	for (EntityInfo entity : m_EntitiesToRemove) {
 		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
 		{
@@ -162,17 +163,120 @@ void PhysicsManager::Update(float64 deltaTime)
 
 		}
 	}
+	//PROFILER_END("RemoveEntity");
 
+	//PROFILER_START("AddEntity", "AddEntity");
 	for (EntityInfo entity : m_EntitiesToAdd) {
 		m_EntitiesToUpdate.push_back(entity);
 	}
+	//PROFILER_END("AddEntity");
 
 	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
 
 	m_EntitiesToAdd.clear();
 	m_EntitiesToRemove.clear();
 
-	auto MakePairKey = [](int64 idA, int64 idB) -> uint64
+	int32 nbrTest = 0;
+	if (m_activateQuadTree == true) {
+		std::vector<Entity*> activeEntities; 
+		//PROFILER_START("GetActiveEntities", "GetActiveEntities");
+		for(auto& e : m_EntitiesToUpdate){
+			if(e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+			activeEntities.push_back(e.pEntity);
+		}
+		//PROFILER_END("GetActiveEntities");
+
+		//PROFILER_START("QuadTreeRegeneration", "QuadTreeRegeneration");
+		m_timeBetweenRegeneration += 1;
+		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
+			m_timeBetweenRegeneration = 0;
+			m_quadTree->Clear();
+			for (auto& entity : activeEntities) {
+				m_quadTree->Insert(entity);
+			}
+		}
+		//PROFILER_END("QuadTreeRegeneration");
+
+		//PROFILER_START("Query", "Query");
+		for (auto& entity : activeEntities) {
+			AABB aabb;
+			Vector2f pos1 = entity->GetPosition(0.f, 0.f);
+			Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+			aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+
+			bool present = false;
+			ColliderEntry e{ aabb, entity };
+			
+			////PROFILER_START("QueryQuad", "QueryQuad");
+			const auto& candidates = m_quadTree->Query(e);
+			////PROFILER_END("QueryQuad");
+
+			for (auto& c : candidates) {
+				if (entity < c.entity) {
+					m_pairs.push_back({ entity, c.entity });
+				}
+			}
+		}
+		//PROFILER_END("Query");
+
+		//PROFILER_START("collisionLoop", "collisionLoop");
+		for (auto& entities : m_pairs) {
+			nbrTest += 1;
+
+			//PROFILER_START("collisionTest", "Collision test");
+			bool coliding = entities.first->IsColliding(entities.second);
+			//PROFILER_END("collisionTest");
+			
+			
+			if (coliding) {
+				if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
+				{
+					//PROFILER_START("Repulse", "Repulse");
+
+					Repulse(entities.first, entities.second);
+					//PROFILER_END("Repulse");
+				}
+				//PROFILER_START("Callbacks", "Callbacks");
+				if (!entities.first->CollidingEntity.contains(entities.second->GetId()))
+				{
+					entities.first->OnCollisionEnter(entities.second);
+					entities.first->CollidingEntity.insert(entities.second->GetId());
+
+					entities.second->OnCollisionEnter(entities.first);
+					entities.second->CollidingEntity.insert(entities.first->GetId());
+				}
+
+				else
+				{
+					entities.first->OnCollision(entities.second);
+					entities.second->OnCollision(entities.first);
+				}
+				//PROFILER_END("Callbacks");
+			}
+
+			else
+			{
+			//PROFILER_START("Callbacks", "Callbacks");
+				if (entities.first->CollidingEntity.contains(entities.second->GetId()))
+				{
+					entities.first->OnCollisionExit(entities.second);
+					entities.first->CollidingEntity.erase(entities.second->GetId());
+					entities.second->OnCollisionExit(entities.first);
+					entities.second->CollidingEntity.erase(entities.first->GetId());
+				}
+			}
+			//PROFILER_END("Callbacks");
+
+
+		}
+		m_pairs.clear();
+
+		//PROFILER_END("collisionLoop");
+		//GCLE_INFO << "Loop end" << ENDL;
+	}
+	
+	else {
+		auto MakePairKey = [](int64 idA, int64 idB) -> uint64
 		{
 			if (idA > idB) std::swap(idA, idB);
 			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
@@ -200,8 +304,10 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 	}
 
-	// 2) Test de chaque paire de colliders, d?duplique par paire d'ENTIT?S.
-	std::unordered_set<uint64> collidingPairsThisFrame;
+	//GCLE_INFO << nbrTest << ENDL;
+
+	
+
 
 	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
 	{
@@ -511,8 +617,8 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 	if (!TestRectAxis(axesB[0], centerDelta, axesA, axesB, extentsA, extentsB, minOverlap, collisionNormal)) return false;
 	if (!TestRectAxis(axesB[1], centerDelta, axesA, axesB, extentsA, extentsB, minOverlap, collisionNormal)) return false;
 
-	colDatas.penetration = minOverlap;
-	colDatas.orientation = collisionNormal; // pRect1 -> pRect2
+	m_colDatas.penetration = minOverlap;
+	m_colDatas.orientation = collisionNormal;
 
 	return true;
 }
@@ -549,11 +655,11 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 	float32 distance = (distanceCarree == 0.f) ? 0.f : std::sqrt(distanceCarree);
 	Vector2f localNormal;
-	colDatas.penetration = radius - distance;
+	m_colDatas.penetration = radius - distance;
 
 	if (distance == 0.f) {
 		localNormal = { 1.f, 1.f };
-		colDatas.penetration = radius;
+		m_colDatas.penetration = radius;
 	}
 	else {
 		localNormal = { deltaX / distance, deltaY / distance };
@@ -563,7 +669,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	worldNormal.x = localNormal.x * cos - localNormal.y * sin;
 	worldNormal.y = localNormal.x * sin + localNormal.y * cos;
 
-	colDatas.orientation = worldNormal;
+	m_colDatas.orientation = worldNormal;
 
 	if (distanceCarree <= (radius * radius)) {
 		return true;
@@ -588,7 +694,7 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 	else if (angleB != 0) {
 		bool hit = CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
 		if (hit) {
-			colDatas.orientation = -colDatas.orientation;
+			m_colDatas.orientation = -m_colDatas.orientation;
 		}
 		return hit;
 	}
@@ -616,11 +722,11 @@ bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
 	if (angle != 0) {
-		bool hit = CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
-		if (hit) {
-			colDatas.orientation = -colDatas.orientation; // fonction appelee en rect->circle, ordre reel circle->rect
-		}
+		bool hit =CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		if (hit)
+			m_colDatas.orientation = -m_colDatas.orientation;
 		return hit;
+
 	}
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
@@ -911,4 +1017,28 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider*
 		return 0.5;
 	else
 		return 1.0;
+}
+
+void PhysicsManager::SetActivateQuadTree(bool activate){
+	m_activateQuadTree = activate;
+}
+
+void PhysicsManager::SetDynamicQuadTreeSize(bool activate){
+	m_dynamicQuadTreeSize = activate;
+}
+
+void PhysicsManager::SetQuadTreePos1(Vector2f pos1){
+	m_quadTreePos1 = pos1;
+}
+
+void PhysicsManager::SetQuadTreePos2(Vector2f pos2){
+	m_quadTreePos2 = pos2;
+}
+
+void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame){
+	m_frameBetweenQuadTreeRegenerations = nbrFrame;
+}
+
+PhysicsManager::~PhysicsManager(){
+	delete m_quadTree;
 }

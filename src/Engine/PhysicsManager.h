@@ -1,11 +1,14 @@
 #pragma once 
+#include <vector>
+
 #include "include.h"
 #include "Entity.h"
 #include "Collider.h"
 #include "Shape.h"
+#include "Render/Shape.h"
+#include "QuadTree.h"
 
-#include <vector>
-#include <unordered_map>
+
 
 struct EntityInfo
 {
@@ -18,6 +21,8 @@ struct CollisionInfo {
 	float32 penetration = 0.f;
 	Vector2f orientation{ 0.f, 0.f };
 };
+
+struct ColliderEntry;
 
 enum class RepulseTypes {
 	AABB,
@@ -94,7 +99,34 @@ private:
 	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
 
 private:
-	CollisionInfo colDatas;
+	CollisionInfo m_colDatas;
+
+private:
+	bool m_activateQuadTree = true;
+	bool m_dynamicQuadTreeSize = false;
+	
+	Vector2f m_quadTreePos1{ -50000, -50000 };
+	Vector2f m_quadTreePos2{50000, 50000};
+
+	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
+
+	int8 m_frameBetweenQuadTreeRegenerations = 1;
+	int8 m_timeBetweenRegeneration = 0;
+
+	std::vector<std::pair<Entity*, Entity*>> m_pairs;
+	std::vector<ColliderEntry> m_queryResult;
+
+public:
+	void SetActivateQuadTree(bool activate);
+	void SetDynamicQuadTreeSize(bool activate);
+	void SetQuadTreePos1(Vector2f pos1);
+	void SetQuadTreePos2(Vector2f pos2);
+	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
+
+
+public : 
+	~PhysicsManager();
+};
 
 	Collider* m_pCurrentColliderA = nullptr;
 	Collider* m_pCurrentColliderB = nullptr;
