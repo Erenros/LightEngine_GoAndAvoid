@@ -8,15 +8,15 @@
 #include "RessourceManager.h"
 #include "SceneManager.h"
 
+#define FixedUpdateExecution 50
+
 class Entity;
 class Scene;
-
-#define FixedUpdateExecution 60;
-#define FPS 60;
 
 class GameManager
 {
 public:
+	int16 m_fps = 120;
 
 	static GameManager& GetInstance() {
 		static GameManager instance;
@@ -24,16 +24,18 @@ public:
 	}
 
 	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
-	float64 accDt = 0.f;
+	float64 m_accDt = 0.f;
 
-	int16 fpsCount = 0;
-	float64 fpsTimer = 0.f;
+	float64 m_fpsDT = 1.f / m_fps;
+	int16 m_fpsCount = 0;
+	float64 m_fpsTimer = 0.f;
+	int32 m_frameCount = 0;
 
 	GameManager() = default;
 	~GameManager();
 
 
-	bool Init(int32 windowWidth, int32 windowHeight);
+	bool Init(int32 windowWidth, int32 windowHeight, int16 FPS = 60);
 	void Loop();
 	void Close();
 

@@ -46,7 +46,7 @@ public:
 		int32 width, 
 		int32 height, 
 		uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_SHOWN, 
-		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC,
+		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED,
 		int32 x = 0, 
 		int32 y = 0
 	);

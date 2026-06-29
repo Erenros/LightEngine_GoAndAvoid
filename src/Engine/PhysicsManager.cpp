@@ -86,14 +86,14 @@ void PhysicsManager::Update(float64 deltaTime)
 	int32 nbrTest = 0;
 	if (m_activateQuadTree == true) {
 		std::vector<Entity*> activeEntities; 
-		PROFILER_START("GetActiveEntities", "GetActiveEntities");
+		//PROFILER_START("GetActiveEntities", "GetActiveEntities");
 		for(auto& e : m_EntitiesToUpdate){
 			if(e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
 			activeEntities.push_back(e.pEntity);
 		}
-		PROFILER_END("GetActiveEntities");
+		//PROFILER_END("GetActiveEntities");
 
-		PROFILER_START("QuadTreeRegeneration", "QuadTreeRegeneration");
+		//PROFILER_START("QuadTreeRegeneration", "QuadTreeRegeneration");
 		m_timeBetweenRegeneration += 1;
 		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
 			m_timeBetweenRegeneration = 0;
@@ -102,9 +102,9 @@ void PhysicsManager::Update(float64 deltaTime)
 				m_quadTree->Insert(entity);
 			}
 		}
-		PROFILER_END("QuadTreeRegeneration");
+		//PROFILER_END("QuadTreeRegeneration");
 
-		PROFILER_START("Query", "Query");
+		//PROFILER_START("Query", "Query");
 		for (auto& entity : activeEntities) {
 			AABB aabb;
 			Vector2f pos1 = entity->GetPosition(0.f, 0.f);
@@ -114,27 +114,36 @@ void PhysicsManager::Update(float64 deltaTime)
 			bool present = false;
 			ColliderEntry e{ aabb, entity };
 			
-			//PROFILER_START("QueryQuad", "QueryQuad");
-			m_queryResult = m_quadTree->Query(e);
-			//PROFILER_END("QueryQuad");
+			////PROFILER_START("QueryQuad", "QueryQuad");
+			const auto& candidates = m_quadTree->Query(e);
+			////PROFILER_END("QueryQuad");
 
-			for (auto& c : m_queryResult) {
+			for (auto& c : candidates) {
 				if (entity < c.entity) {
 					m_pairs.push_back({ entity, c.entity });
 				}
 			}
 		}
-		PROFILER_END("Query");
+		//PROFILER_END("Query");
 
-		PROFILER_START("collisionLoop", "collisionLoop");
+		//PROFILER_START("collisionLoop", "collisionLoop");
 		for (auto& entities : m_pairs) {
 			nbrTest += 1;
-			if (entities.first->IsColliding(entities.second)) {
+
+			//PROFILER_START("collisionTest", "Collision test");
+			bool coliding = entities.first->IsColliding(entities.second);
+			//PROFILER_END("collisionTest");
+			
+			
+			if (coliding) {
 				if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
 				{
-					Repulse(entities.first, entities.second);
-				}
+					//PROFILER_START("Repulse", "Repulse");
 
+					Repulse(entities.first, entities.second);
+					//PROFILER_END("Repulse");
+				}
+				//PROFILER_START("Callbacks", "Callbacks");
 				if (!entities.first->CollidingEntity.contains(entities.second->GetId()))
 				{
 					entities.first->OnCollisionEnter(entities.second);
@@ -149,9 +158,12 @@ void PhysicsManager::Update(float64 deltaTime)
 					entities.first->OnCollision(entities.second);
 					entities.second->OnCollision(entities.first);
 				}
+				//PROFILER_END("Callbacks");
 			}
+
 			else
 			{
+			//PROFILER_START("Callbacks", "Callbacks");
 				if (entities.first->CollidingEntity.contains(entities.second->GetId()))
 				{
 					entities.first->OnCollisionExit(entities.second);
@@ -160,11 +172,14 @@ void PhysicsManager::Update(float64 deltaTime)
 					entities.second->CollidingEntity.erase(entities.first->GetId());
 				}
 			}
+			//PROFILER_END("Callbacks");
+
+
 		}
 		m_pairs.clear();
 
-		PROFILER_END("collisionLoop");
-		GCLE_INFO << "Loop end" << ENDL;
+		//PROFILER_END("collisionLoop");
+		//GCLE_INFO << "Loop end" << ENDL;
 	}
 	
 	else {

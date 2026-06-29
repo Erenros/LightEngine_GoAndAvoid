@@ -8,6 +8,11 @@
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
 
+
+#include <timeapi.h>
+#pragma comment(lib, "winmm.lib")
+
+
 void GameManager::Loop()
 {
 #ifndef NDEBUG
@@ -20,29 +25,32 @@ void GameManager::Loop()
 	 
 	m_Cam.Init(mp_window);
 
+	timeBeginPeriod(1);
 	while (isRunning == true)
 	{
+
 		//PROFILER_START("Update", "Update");
+
+
+
 
 		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
-		accDt += m_Time.GetDeltaTime();
-		while (accDt >= fixedUpdateDT) {
-			accDt -= fixedUpdateDT;
+		int32 maxSteps = 2;
+		m_accDt += m_Time.GetDeltaTime();
+		while (m_accDt >= fixedUpdateDT) {
+			m_accDt -= fixedUpdateDT;
 			if (m_loopTour < 1)
 				m_loopTour++;
 			else
 				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
 			exec += 1;
 		}
+		if (exec >= maxSteps)
+			m_accDt = 0.f;
 		//PROFILER_END("Colliders");
 		//GCLE_INFO << "Fixed update execution : " << exec << ENDL;
 
-
-		//PROFILER_START("time", "Timer Update");
-		m_Time.Update();
-		//PROFILER_END("time");
-	
 		//PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
 		//PROFILER_END("Entity");
@@ -82,24 +90,33 @@ void GameManager::Loop()
 		{
 			isRunning = false;
 		}
-
-		//PROFILER_START("FPSCount", "FPSCount");
-
-		fpsTimer += m_Time.GetDeltaTime();
-		if (fpsTimer >= 1.f) {
-			fpsTimer -= 1.f;
-			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
+		
+		float64 rawDT = m_Time.GetRawDT();
+		if (rawDT < m_fpsDT) {
+			float64 timeToSleep = m_fpsDT - rawDT;
+			m_Time.SmartSleep(timeToSleep);
 		}
-		GCLE_INFO << "FPS : " << fpsCount << ENDL;
-
-		//PROFILER_END("FPSCount");
 
 
-		system("CLS");
+		//PROFILER_START("time", "Timer Update");
+		m_Time.Update();
+		//PROFILER_END("time");
+
+
+	
+		m_fpsTimer += m_Time.GetDeltaTimeUnscaled();
+		m_frameCount++;
+
+		if (m_fpsTimer >= 1.f) {
+			m_fpsTimer -= 1.f;
+			m_fpsCount = static_cast<int16>(m_frameCount);
+			m_frameCount = 0;
+			GCLE_INFO << "FPS : " << m_fpsCount << ENDL;
+		}
 		//PROFILER_END("Update");
-
+		//system("CLS");
 	}
-
+	timeEndPeriod(1);
 	isRunning = false;
 }
 
@@ -123,15 +140,19 @@ GameManager::~GameManager()
 	m_entities.clear();
 }
 
-bool GameManager::Init(int32 windowWidth, int32 windowHeight)
+bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 {
+	m_fps = FPS;
+	m_fpsDT = 1.f / m_fps;
+
+
 	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
 
 	uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_RESIZABLE | SDL_WINDOW_FLAGS::WINDOW_SHOWN;
-	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC;
+	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED;
 
 
 	mp_window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);

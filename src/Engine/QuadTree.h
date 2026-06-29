@@ -8,7 +8,7 @@ class QuadTree {
 	QuadNode m_root;
 	QuadNodePool m_pool;
 	std::vector<ColliderEntry> m_queryResult;
-	std::unordered_set<Entity*> m_querySeen;
+	std::vector <Entity*> m_seenEntities;
 
 public:
 

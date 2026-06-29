@@ -10,9 +10,6 @@ QuadNode::QuadNode(float32 x1, float32 y1, float32 x2, float32 y2, int32 d) {
 QuadNode::~QuadNode(){
 	if (m_childs[0] == nullptr)
 		return;
-	for (int8 i = 0; i < 4; i++) {
-		delete m_childs[i];
-	}
 }
 
 void QuadNode::Subdivide(QuadNodePool& pool){
@@ -35,7 +32,7 @@ void QuadNode::Subdivide(QuadNodePool& pool){
 
 	for (auto& child : m_childs) {
 		if (static_cast<int32>(child->m_entities.size()) > maxEntities && child->m_depth < maxDepth) {
-			child->Subdivide();
+			child->Subdivide(pool);
 		}
 	}
 }
@@ -66,14 +63,16 @@ void QuadNode::Insert(Entity* entity, QuadNodePool& pool){
 	}
 }
 
-void QuadNode::Query(AABB& range, std::vector<ColliderEntry>& results, std::unordered_set<Entity*>& seen){
+void QuadNode::Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Entity*>& seen){
 	if (!m_bounds.overlaps(range)) {
 		return;
 	}
 	
 	if (IsLeaf()) {
 		for (auto& e : m_entities) {
-			if (seen.insert(e.entity).second) {
+			if (!e.entity->GetInQuerySeen()) {
+				e.entity->SetInQuerySeen(true);
+				seen.push_back(e.entity);
 				results.push_back(e);
 			}
 		}
@@ -95,15 +94,21 @@ void QuadNode::Clear(){
 
 
 
-QuadNodePool::QuadNodePool(int32 size){
-	m_pool.resize(size);
+void QuadNodePool::AddBlock(){
+	m_blocks.emplace_back(m_blockSize);
+	m_currentBlock = &m_blocks.back();
+	m_index = 0;
+}
+
+QuadNodePool::QuadNodePool(int32 size): m_blockSize(size){
+	AddBlock();
 }
 
 QuadNode* QuadNodePool::Get(float32 x, float32 y, float32 x2, float32 y2, int32 depth){
-	if (m_index >= static_cast<int32>(m_pool.size())) {
-		m_pool.resize(m_pool.size() * 2);
+	if (m_index >= static_cast<int32>(m_currentBlock->size())) {
+		AddBlock();
 	}
-	QuadNode* node = &m_pool[m_index++];
+	QuadNode* node = &(*m_currentBlock)[m_index++];
 	node->m_bounds = {x, y, x2, y2};
 	node->m_depth = depth;
 	node->m_entities.clear();
@@ -116,4 +121,8 @@ QuadNode* QuadNodePool::Get(float32 x, float32 y, float32 x2, float32 y2, int32 
 
 void QuadNodePool::Reset(){
 	m_index = 0;
+	if (m_blocks.size() > 1) {
+		m_blocks.resize(1);
+	}
+	m_currentBlock = &m_blocks[0];
 }

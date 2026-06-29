@@ -33,16 +33,19 @@ class QuadNode {
 	std::vector<ColliderEntry> m_entities;  //if a leaf
 	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
 
+
+public:
 	QuadNode() = default;
 	QuadNode(float32 x, float32 y, float32 w, float32 h, int32 d);
-
+	
 	~QuadNode();
 
+private:
 	void Subdivide(QuadNodePool& pool);
 	bool IsLeaf();
 
 	void Insert(Entity* entity, QuadNodePool& pool);
-	void Query(AABB& range, std::vector<ColliderEntry>& results, std::unordered_set<Entity*>& seen);
+	void Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Entity*>& seen);
 
 	void Clear();
 
@@ -55,8 +58,12 @@ class QuadNode {
 
 
 class QuadNodePool {
-	std::vector<QuadNode> m_pool;
+	std::vector<std::vector<QuadNode>> m_blocks;
+	std::vector<QuadNode>* m_currentBlock = nullptr;
+	int32 m_blockSize;
 	int32 m_index = 0;
+
+	void AddBlock();
 
 public:
 
