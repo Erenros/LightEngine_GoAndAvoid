@@ -102,10 +102,6 @@ void Window::Draw(gcle::Shape* pShape)
 		vertices.push_back(*v);
 	}
 
-
-	
-
-
 	if (pShape->GetTexture() == nullptr)
 		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	else {

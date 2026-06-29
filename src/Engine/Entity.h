@@ -133,10 +133,5 @@ private:
 	friend class Camera;
 	friend class PhysicsManager;
 
-private:
-	bool m_inQuerySeen = false;
 
-public:
-	bool GetInQuerySeen();
-	void SetInQuerySeen(bool seen);
 };

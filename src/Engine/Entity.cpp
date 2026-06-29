@@ -334,14 +334,6 @@ bool Entity::IsActiveIn(const std::string& sceneTag) {
 	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
 }
 
-bool Entity::GetInQuerySeen(){
-	return m_inQuerySeen;
-}
-
-void Entity::SetInQuerySeen(bool seen){
-	m_inQuerySeen = seen;
-}
-
 void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
 	Sprite* sprite = mp_RenderShape->GetTexture();

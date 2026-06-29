@@ -48,4 +48,11 @@ private:
 	bool m_IsActive = false;
 
 	CollisionDirection m_CollisionDirection;
+
+private:
+	bool m_inQuerySeen = false;
+
+public:
+	bool GetInQuerySeen();
+	void SetInQuerySeen(bool seen);
 };

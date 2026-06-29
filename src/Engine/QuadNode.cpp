@@ -1,6 +1,6 @@
 #include "QuadNode.h"
 #include "Entity.h"
-
+#include "Collider.h"
 
 QuadNode::QuadNode(float32 x1, float32 y1, float32 x2, float32 y2, int32 d) {
 	m_bounds = { x1, y1, x2, y2 };
@@ -41,10 +41,10 @@ bool QuadNode::IsLeaf(){
 	return m_childs[0] == nullptr;
 }
 
-void QuadNode::Insert(Entity* entity, QuadNodePool& pool){
+void QuadNode::Insert(Collider* entity, QuadNodePool& pool){
 	AABB aabb;
-	Vector2f pos1 = entity->GetPosition(0.f, 0.f);
-	Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+	Vector2f pos1 = entity->GetShape()->GetPosition(0.f, 0.f);
+	Vector2f pos2 = entity->GetShape()->GetPosition(1.f, 1.f);
 	aabb = { pos1.x, pos1.y, pos2.x , pos2.y};
 
 	if (!m_bounds.overlaps(aabb))
@@ -63,7 +63,7 @@ void QuadNode::Insert(Entity* entity, QuadNodePool& pool){
 	}
 }
 
-void QuadNode::Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Entity*>& seen){
+void QuadNode::Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Collider*>& seen){
 	if (!m_bounds.overlaps(range)) {
 		return;
 	}

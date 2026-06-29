@@ -45,3 +45,11 @@ void Collider::StoppedColliding()
     m_CollisionDirection.IsCollidingOnTop = false;
     m_CollisionDirection.IsCollidingOnBottom = false;
 }
+
+bool Collider::GetInQuerySeen() {
+    return m_inQuerySeen;
+}
+
+void Collider::SetInQuerySeen(bool seen) {
+    m_inQuerySeen = seen;
+}

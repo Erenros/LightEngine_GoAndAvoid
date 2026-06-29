@@ -34,7 +34,7 @@ void Scene::Draw(Window* window) {
 			}
 		}
 	}
-	//GCLE_INFO << i << ENDL;
+	GCLE_INFO << i << ENDL;
 
 	for (Text* t : m_texts)
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);

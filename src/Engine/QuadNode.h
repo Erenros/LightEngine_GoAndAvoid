@@ -6,7 +6,7 @@
 #define maxEntities 8
 #define maxDepth 9
 
-
+class Collider;
 class Entity;
 
 struct AABB {
@@ -22,8 +22,9 @@ struct AABB {
 };
 struct ColliderEntry{
 	AABB aabb;
-	Entity* entity;
+	Collider* entity;
 };
+
 class QuadNodePool;
 
 class QuadNode {
@@ -44,8 +45,8 @@ private:
 	void Subdivide(QuadNodePool& pool);
 	bool IsLeaf();
 
-	void Insert(Entity* entity, QuadNodePool& pool);
-	void Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Entity*>& seen);
+	void Insert(Collider* entity, QuadNodePool& pool);
+	void Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Collider*>& seen);
 
 	void Clear();
 

@@ -7,13 +7,7 @@
 #include "PhysicsManager.h"
 
 void SampleScene::OnInitialize()
-{
-	 
-	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	pEntity->SetTexture(tex);
-	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);*/
-	 
+{ 
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 	 
@@ -21,7 +15,7 @@ void SampleScene::OnInitialize()
 	entity1->SetPosition(10, -200);
 	entity1->SetRotation(45);
 	entity1->SetRigidBody(true); 
-	entity1->GetShape()->SetIsKinematic(true);
+	entity1->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
 
 
@@ -51,7 +45,7 @@ void SampleScene::OnInitialize()
 		entity->SetPosition(-49000 + (i * 100), -49000 + (i * 100));
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
-		entity->GetShape()->SetIsKinematic(true);
+		entity->SetIsKinematic(true);
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);

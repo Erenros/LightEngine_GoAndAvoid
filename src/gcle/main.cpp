@@ -7,6 +7,7 @@
 
 #include "DebugScene.h"
 #include "SampleScene2.h"
+#include "SampleScene.h"
 #include "SceneManager.h"
 #include "Profiler.h"
 
@@ -19,9 +20,9 @@ int main(int argc, char** argv)
 
     gm.Init(640, 480, 120);
 
-    SceneManager::GetInstance().CreateScene<DebugScene>("DebugScene");
+    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
 
-    SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
 
     
     gm.Loop();

@@ -36,7 +36,6 @@ void GameManager::Loop()
 
 		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
-		int32 maxSteps = 2;
 		m_accDt += m_Time.GetDeltaTime();
 		while (m_accDt >= fixedUpdateDT) {
 			m_accDt -= fixedUpdateDT;
@@ -49,11 +48,10 @@ void GameManager::Loop()
 				SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 			}
 			exec += 1;
-
 		}
-		if (exec >= maxSteps)
-			m_accDt = 0.f;
 		//PROFILER_END("Colliders");
+
+
 		//GCLE_INFO << "Fixed update execution : " << exec << ENDL;
 
 		//PROFILER_START("Entity", "Entity Creation / Deletion");

@@ -4,7 +4,6 @@
 #include "include.h"
 #include "Entity.h"
 #include "Collider.h"
-#include "Shape.h"
 #include "Render/Shape.h"
 #include "QuadTree.h"
 
@@ -113,7 +112,7 @@ private:
 	int8 m_frameBetweenQuadTreeRegenerations = 1;
 	int8 m_timeBetweenRegeneration = 0;
 
-	std::vector<std::pair<Entity*, Entity*>> m_pairs;
+	std::vector<std::pair<Collider*, Collider*>> m_pairs;
 	std::vector<ColliderEntry> m_queryResult;
 
 public:

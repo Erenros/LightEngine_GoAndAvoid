@@ -178,11 +178,12 @@ void PhysicsManager::Update(float64 deltaTime)
 
 	int32 nbrTest = 0;
 	if (m_activateQuadTree == true) {
-		std::vector<Entity*> activeEntities; 
+		std::vector<Collider*> activeEntities;
 		//PROFILER_START("GetActiveEntities", "GetActiveEntities");
-		for(auto& e : m_EntitiesToUpdate){
-			if(e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
-			activeEntities.push_back(e.pEntity);
+		for (auto& e : m_EntitiesToUpdate) {
+			if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+				for(auto& collider : e.pEntity->GetColliders())
+					activeEntities.push_back(collider);
 		}
 		//PROFILER_END("GetActiveEntities");
 
@@ -200,19 +201,19 @@ void PhysicsManager::Update(float64 deltaTime)
 		//PROFILER_START("Query", "Query");
 		for (auto& entity : activeEntities) {
 			AABB aabb;
-			Vector2f pos1 = entity->GetPosition(0.f, 0.f);
-			Vector2f pos2 = entity->GetPosition(1.f, 1.f);
+			Vector2f pos1 = entity->GetOwner()->GetPosition(0.f, 0.f);
+			Vector2f pos2 = entity->GetOwner()->GetPosition(1.f, 1.f);
 			aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
 
 			bool present = false;
 			ColliderEntry e{ aabb, entity };
-			
+
 			////PROFILER_START("QueryQuad", "QueryQuad");
 			const auto& candidates = m_quadTree->Query(e);
 			////PROFILER_END("QueryQuad");
 
 			for (auto& c : candidates) {
-				if (entity < c.entity) {
+				if (entity < c.entity && entity->GetOwner()->GetId() != entity->GetOwner()->GetId()) {
 					m_pairs.push_back({ entity, c.entity });
 				}
 			}
@@ -224,48 +225,44 @@ void PhysicsManager::Update(float64 deltaTime)
 			nbrTest += 1;
 
 			//PROFILER_START("collisionTest", "Collision test");
-			bool coliding = entities.first->IsColliding(entities.second);
+			bool coliding =IsColliding(entities.first, entities.second);
 			//PROFILER_END("collisionTest");
-			
-			
+
+
 			if (coliding) {
-				if (entities.first->IsRigidBody() && entities.second->IsRigidBody())
+				if (entities.first->GetOwner()->IsRigidBody() && entities.second->GetOwner()->IsRigidBody())
 				{
 					//PROFILER_START("Repulse", "Repulse");
 
 					Repulse(entities.first, entities.second);
 					//PROFILER_END("Repulse");
 				}
-				//PROFILER_START("Callbacks", "Callbacks");
-				if (!entities.first->CollidingEntity.contains(entities.second->GetId()))
+				if (!entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
 				{
-					entities.first->OnCollisionEnter(entities.second);
-					entities.first->CollidingEntity.insert(entities.second->GetId());
+					entities.first->GetOwner()->OnCollisionEnter(entities.second->GetOwner());
+					entities.first->GetOwner()->CollidingEntity.insert({ entities.second->GetOwner()->GetId(), entities.second->GetOwner() });
 
-					entities.second->OnCollisionEnter(entities.first);
-					entities.second->CollidingEntity.insert(entities.first->GetId());
+					entities.second->GetOwner()->OnCollisionEnter(entities.first->GetOwner());
+					entities.second->GetOwner()->CollidingEntity.insert({entities.first->GetOwner()->GetId(), entities.first->GetOwner()});
 				}
 
 				else
 				{
-					entities.first->OnCollision(entities.second);
-					entities.second->OnCollision(entities.first);
+					entities.first->GetOwner()->OnCollision(entities.second->GetOwner());
+					entities.second->GetOwner()->OnCollision(entities.first->GetOwner());
 				}
-				//PROFILER_END("Callbacks");
 			}
 
 			else
 			{
-			//PROFILER_START("Callbacks", "Callbacks");
-				if (entities.first->CollidingEntity.contains(entities.second->GetId()))
+				if (entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
 				{
-					entities.first->OnCollisionExit(entities.second);
-					entities.first->CollidingEntity.erase(entities.second->GetId());
-					entities.second->OnCollisionExit(entities.first);
-					entities.second->CollidingEntity.erase(entities.first->GetId());
+					entities.first->GetOwner()->OnCollisionExit(entities.second->GetOwner());
+					entities.first->GetOwner()->CollidingEntity.erase(entities.second->GetOwner()->GetId());
+					entities.second->GetOwner()->OnCollisionExit(entities.first->GetOwner());
+					entities.second->GetOwner()->CollidingEntity.erase(entities.first->GetOwner()->GetId());
 				}
 			}
-			//PROFILER_END("Callbacks");
 
 
 		}
@@ -273,121 +270,122 @@ void PhysicsManager::Update(float64 deltaTime)
 
 		//PROFILER_END("collisionLoop");
 		//GCLE_INFO << "Loop end" << ENDL;
+		//GCLE_INFO << nbrTest << ENDL;
 	}
-	
+
 	else {
 		auto MakePairKey = [](int64 idA, int64 idB) -> uint64
-		{
-			if (idA > idB) std::swap(idA, idB);
-			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
-		};
+			{
+				if (idA > idB) std::swap(idA, idB);
+				return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
+			};
 
-	// 1) Collecte des colliders actifs des entit?s actives dans la sc?ne courante.
-	std::vector<Collider*> activeColliders;
-	for (auto& info : m_EntitiesToUpdate)
-	{
-		Entity* entity = info.pEntity;
-		if (info.toRemove || entity == nullptr || !entity->IsActiveIn(currentScene))
-			continue;
-
-		for (Collider* pCollider : entity->GetColliders())
+		// 1) Collecte des colliders actifs des entit?s actives dans la sc?ne courante.
+		std::vector<Collider*> activeColliders;
+		for (auto& info : m_EntitiesToUpdate)
 		{
-			if (pCollider == nullptr)
+			Entity* entity = info.pEntity;
+			if (info.toRemove || entity == nullptr || !entity->IsActiveIn(currentScene))
 				continue;
 
-			pCollider->StoppedColliding();
-
-			if (pCollider->IsActive())
+			for (Collider* pCollider : entity->GetColliders())
 			{
-				activeColliders.push_back(pCollider);
+				if (pCollider == nullptr)
+					continue;
+
+				pCollider->StoppedColliding();
+
+				if (pCollider->IsActive())
+				{
+					activeColliders.push_back(pCollider);
+				}
 			}
 		}
-	}
-
-	//GCLE_INFO << nbrTest << ENDL;
-
-	
 
 
-	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
-	{
-		Collider* collider1 = *it1;
-		Entity* entity = collider1->GetOwner();
 
-		for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
+
+		std::unordered_set<uint64> collidingPairsThisFrame;
+
+		for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
 		{
-			Collider* collider2 = *it2;
-			Entity* otherEntity = collider2->GetOwner();
+			Collider* collider1 = *it1;
+			Entity* entity = collider1->GetOwner();
 
-			if (entity == otherEntity)
-				continue;
-
-			if (!IsColliding(collider1, collider2))
-				continue;
-
-			if (entity->IsRigidBody() && otherEntity->IsRigidBody())
-				Repulse(collider1, collider2);
-
-			collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
-
-			if (!entity->CollidingEntity.contains(otherEntity->GetId()))
+			for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
 			{
-				entity->OnCollisionEnter(otherEntity);
-				entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
+				Collider* collider2 = *it2;
+				Entity* otherEntity = collider2->GetOwner();
 
-				otherEntity->OnCollisionEnter(entity);
-				otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
-			}
-			else
-			{
-				entity->OnCollision(otherEntity);
-				otherEntity->OnCollision(entity);
+				if (entity == otherEntity)
+					continue;
+
+				if (!IsColliding(collider1, collider2))
+					continue;
+
+				if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+					Repulse(collider1, collider2);
+
+				collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
+
+				if (!entity->CollidingEntity.contains(otherEntity->GetId()))
+				{
+					entity->OnCollisionEnter(otherEntity);
+					entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
+
+					otherEntity->OnCollisionEnter(entity);
+					otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
+				}
+				else
+				{
+					entity->OnCollision(otherEntity);
+					otherEntity->OnCollision(entity);
+				}
 			}
 		}
-	}
 
-	// 3) Application des corrections de position accumulees : une seule fois par
-	//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
-	for (auto& pair : m_PendingCorrections)
-	{
-		Entity* pEntity = pair.first;
-		Vector2f delta = pair.second;
-
-		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
-		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
-	}
-	m_PendingCorrections.clear();
-
-	// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
-	//    de leurs colliders ne se touche cette frame.
-	for (auto& info : m_EntitiesToUpdate)
-	{
-		Entity* entity = info.pEntity;
-
-		for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
+		// 3) Application des corrections de position accumulees : une seule fois par
+		//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
+		for (auto& pair : m_PendingCorrections)
 		{
-			uint64 key = MakePairKey(entity->GetId(), idIt->first);
+			Entity* pEntity = pair.first;
+			Vector2f delta = pair.second;
 
-			if (collidingPairsThisFrame.contains(key))
-			{
-				++idIt;
-				continue;
-			}
-
-			Entity* otherEntity = idIt->second;
-			idIt = entity->CollidingEntity.erase(idIt);
-			entity->OnCollisionExit(otherEntity);
+			Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
+			pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
 		}
-	}
+		m_PendingCorrections.clear();
 
-	// 5) Suppression des entites marquees a retirer.
-	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
-	{
-		if (m_EntitiesToUpdate[i].toRemove)
-			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+		// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
+		//    de leurs colliders ne se touche cette frame.
+		for (auto& info : m_EntitiesToUpdate)
+		{
+			Entity* entity = info.pEntity;
+
+			for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
+			{
+				uint64 key = MakePairKey(entity->GetId(), idIt->first);
+
+				if (collidingPairsThisFrame.contains(key))
+				{
+					++idIt;
+					continue;
+				}
+
+				Entity* otherEntity = idIt->second;
+				idIt = entity->CollidingEntity.erase(idIt);
+				entity->OnCollisionExit(otherEntity);
+			}
+		}
+
+		// 5) Suppression des entites marquees a retirer.
+		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+		{
+			if (m_EntitiesToUpdate[i].toRemove)
+				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+		}
 	}
 }
-
 void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
 {
 	m_PendingCorrections[pEntity] += delta;
@@ -579,8 +577,8 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 	if (!TestRectAxis(axesB[0], centerDelta, axesA, axesB, extentsA, extentsB, minOverlap, collisionNormal)) return false;
 	if (!TestRectAxis(axesB[1], centerDelta, axesA, axesB, extentsA, extentsB, minOverlap, collisionNormal)) return false;
 
-	colDatas.penetration = minOverlap;
-	colDatas.orientation = collisionNormal; // pRect1 -> pRect2
+	m_colDatas.penetration = minOverlap;
+	m_colDatas.orientation = collisionNormal; // pRect1 -> pRect2
 
 	return true;
 }
@@ -926,8 +924,8 @@ void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 	gcle::Shape* a = colA->GetShape();
 	gcle::Shape* b = colB->GetShape();
 
-	Vector2f normal = SafeNormal(colDatas.orientation, { 1.0f, 0.0f }); // colA -> colB
-	float32 penetration = std::max(static_cast<float32>(colDatas.penetration), 0.0f);
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); // colA -> colB
+	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
 
 	if (penetration <= 0.0f)
 		return;
@@ -949,8 +947,8 @@ void PhysicsManager::RepulseOBBAABB(Collider* colA, Collider* colB)
 	gcle::Shape* a = colA->GetShape(); // OBB
 	gcle::Shape* b = colB->GetShape(); // AABB
 
-	Vector2f normal = SafeNormal(colDatas.orientation, { 1.0f, 0.0f }); // direction A -> B
-	float32 penetration = std::max(static_cast<float32>(colDatas.penetration), 0.0f);
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); // direction A -> B
+	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
 	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
 	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
@@ -967,8 +965,8 @@ void PhysicsManager::RepulseOBBCircle(Collider* colA, Collider* colB)
 	gcle::Shape* a = colA->GetShape(); // OBB
 	gcle::Shape* b = colB->GetShape(); // Circle
 
-	Vector2f normal = SafeNormal(colDatas.orientation, { 1.0f, 0.0f });
-	float32 penetration = std::max(static_cast<float32>(colDatas.penetration), 0.0f);
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f });
+	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
 	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
 	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
@@ -992,8 +990,8 @@ void PhysicsManager::RepulseOBBOBB(Collider* colA, Collider* colB)
 	gcle::Shape* a = colA->GetShape();
 	gcle::Shape* b = colB->GetShape();
 
-	Vector2f normal = SafeNormal(colDatas.orientation, { 1.0f, 0.0f });
-	float32 penetration = std::max(static_cast<float32>(colDatas.penetration), 0.0f);
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f });
+	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
 	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
 	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());

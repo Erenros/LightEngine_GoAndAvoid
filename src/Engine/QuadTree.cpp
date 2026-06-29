@@ -5,7 +5,7 @@ QuadTree::QuadTree(float32 worldMinX, float32 worldMinY, float32 worldMaxX, floa
 	m_root = QuadNode{worldMinX, worldMinY, worldMaxX, worldMaxY , 0};
 }
 
-void QuadTree::Insert(Entity* entry){
+void QuadTree::Insert(Collider* entry){
 	m_root.Insert(entry, m_pool);
 }
 
