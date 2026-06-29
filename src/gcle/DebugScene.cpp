@@ -20,11 +20,12 @@ void DebugScene::OnInitialize()
 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(50, -200);
+	entity1->SetRotation(45);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(false);
 	entity1->SetIsKinematic(true);
 	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 50, -200 }, {1, 1});
-	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 100, -200 }, {1, 1});
+	setUpCollider->GetShape()->SetRotation(45);
 	
 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -33,8 +34,17 @@ void DebugScene::OnInitialize()
 	entity2->Rotate(180);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->SetIsKinematic(true);
 	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 320, 150 }, { 2, 1 });
+	setUpCollider->GetShape()->SetRotation(0);
+	entity2->SetIsKinematic(true);
+
+	Entity* entity4 = CreateEntity<Entity>(gcle::Shapes::Circle);
+	entity4->SetPosition(20, 150);
+	entity4->SetScale({ 1, 1 });
+	entity4->SetRigidBody(true);
+	entity4->GetRigidBody().SetGravity(false);
+	entity4->SetIsKinematic(true);
+	setUpCollider = entity4->CreateCollider(gcle::Shapes::Circle, true, { 20, 150 }, { 1, 1 });
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(320, 300);

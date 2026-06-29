@@ -118,15 +118,29 @@ void Transform2D::SetDirection(Vector2f position)
     m_Direction = position;
 }
  
-void Transform2D::SetDegAngle(Degrees angle) 
+void Transform2D::SetDegAngle(Degrees angle)
 {
     m_DegAngle = angle;
+    m_RadAngle = MathGC::DegToRad(angle);
+
+    if (mp_Parent != nullptr)
+    {
+        m_AngleDifferenceToParent = m_RadAngle - mp_Parent->GetRadAngle();
+    }
+
     SetDirty();
 }
- 
-void Transform2D::SetRadAngle(Radians angle) 
+
+void Transform2D::SetRadAngle(Radians angle)
 {
     m_RadAngle = angle;
+    m_DegAngle = MathGC::RadToDeg(angle);
+
+    if (mp_Parent != nullptr)
+    {
+        m_AngleDifferenceToParent = m_RadAngle - mp_Parent->GetRadAngle();
+    }
+
     SetDirty();
 }
 
@@ -232,6 +246,7 @@ void Transform2D::UpdateChildPosition()
         child->m_Position.y =
             m_Position.y +
             child->m_DistanceFromParent * std::sin(m_RadAngle + child->m_OffsetAngle);
+
 
         child->m_RadAngle = m_RadAngle + child->m_AngleDifferenceToParent;
         child->m_DegAngle = MathGC::RadToDeg(child->m_RadAngle);

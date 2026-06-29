@@ -97,7 +97,6 @@ namespace gcle
 	void Shape::SetRotation(Degrees angle)
 	{
 		m_Transform.SetDegAngle(angle);
-		m_Transform.SetRadAngle(MathGC::DegToRad(angle));
 	}
 
 	void Shape::Rotate(Degrees delta)

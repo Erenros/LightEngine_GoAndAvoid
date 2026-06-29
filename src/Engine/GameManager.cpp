@@ -34,7 +34,7 @@ void GameManager::Loop()
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		//PROFILER_END("SceneU");
 		
-		fixedUpdateTime += time.GetDeltaTime();
+		fixedUpdateTime += m_Time.GetDeltaTime();
 		if (fixedUpdateTime >= 1.f)
 			fixedUpdateTime -= 1.f;
 
