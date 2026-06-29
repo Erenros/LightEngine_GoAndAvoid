@@ -1,7 +1,7 @@
 #pragma once
 #include "include.h"
 #include "QuadNode.h"
-
+#include "Collider.h"
 
 class QuadTree {
 
@@ -19,7 +19,7 @@ public:
 
 	~QuadTree() = default;
 
-	void Insert(Entity* entry);
+	void Insert(Collider* entry);
 
 	void Clear();
 

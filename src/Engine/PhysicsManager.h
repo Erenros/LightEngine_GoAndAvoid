@@ -126,7 +126,6 @@ public:
 
 public : 
 	~PhysicsManager();
-};
 
 	Collider* m_pCurrentColliderA = nullptr;
 	Collider* m_pCurrentColliderB = nullptr;
