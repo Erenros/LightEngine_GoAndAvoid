@@ -134,12 +134,12 @@ void Scene::OnInitialize()
 	SetDebug();
 	mp_mainCamera	= CreateCamera();
 	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
-	mp_PosX			= CreateDebugText("",			125,		0,		100,	50,	255, 225, 255);
+	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
 	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
 	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			125,		75,		100,	50,	255, 225, 255); 
+	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
 	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			125,		150,	100,	50,	255, 225, 255);
+	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
 	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
 }
 
