@@ -26,7 +26,7 @@ public:
 	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
 	float32 accDt = 0.f;
 
-	int16 fpsCount = 0.f;
+	int16 fpsCount = 0;
 	float32 fpsTimer = 0.f;
 
 	GameManager() = default;

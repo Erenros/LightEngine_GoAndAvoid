@@ -141,10 +141,15 @@ void Scene::OnInitialize()
 	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
 	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
 	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
+
+	mp_Frame	= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
+	mp_FPS		= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
 { 
+	constexpr int32 DEBUG_UPDATE = 5;
+
 	if (InputManager::GetInstance().IsDown(LeftButton))
 	{
 		bool selected = false;
@@ -165,8 +170,12 @@ void Scene::OnUpdate(Clock& time)
 			m_selectedEntity = nullptr;
 	}
 
-	if (m_selectedEntity != nullptr)
+	m_updateDebug++;
+
+	if (m_selectedEntity != nullptr && m_updateDebug > DEBUG_UPDATE)
 	{
+		m_updateDebug = 0;
+
 		Vector2f pos = m_selectedEntity->GetPosition();
 		Degrees rot = m_selectedEntity->GetRotation();
 		Vector2f scale = m_selectedEntity->GetScale();
@@ -179,6 +188,17 @@ void Scene::OnUpdate(Clock& time)
 
 		mp_ScaleX->SetText(std::to_string(scale.x));
 		mp_ScaleY->SetText(std::to_string(scale.y));
+	}
+
+	fpsTimer += time.GetDeltaTime();
+	if (fpsTimer >= 1.f) {
+		fpsTimer -= 1.f;
+		fpsCount = static_cast<int16>(1.f / time.GetDeltaTime());
+	}
+
+	if (m_updateDebug > DEBUG_UPDATE)
+	{
+		mp_FPS->SetText(std::to_string(fpsCount));
 	}
 
 }

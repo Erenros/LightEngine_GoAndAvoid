@@ -67,6 +67,11 @@ private:
 private:
 	// DEBUG
 	bool m_debug = false;
+	int32 m_updateDebug = 0;
+
+	float32 fpsTimer = 0;
+	int16 fpsCount = 0;
+
 	std::vector<Text*> m_debugTexts;
 	Entity* m_selectedEntity = nullptr;
 
@@ -80,6 +85,9 @@ private:
 	Text* mp_Scale = nullptr;
 	Text* mp_ScaleX = nullptr;
 	Text* mp_ScaleY = nullptr; 
+
+	Text* mp_Frame = nullptr;
+	Text* mp_FPS = nullptr;
 
 private: 
 	friend class GameManager;
