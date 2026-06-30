@@ -2,7 +2,7 @@
 #include "Sprite.h"
 #include <fstream>
 
-Asset* AssetEngine::GetAsset(uint32 id)
+Asset* AssetEngine::GetAsset(std::string id)
 {
 	if (!m_assetMap.contains(id))
 		return nullptr;
@@ -45,6 +45,7 @@ bool AssetEngine::LoadFile(const std::string& path)
 
 		DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << "\n";
 		DEBUG_INFO << "ID : " << entry.id << "\n";
+		DEBUG_INFO << "Name : " << entry.name << "\n";
 		DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << "\n";
 		DEBUG_INFO << "Type : " << entry.type << "\n";
 		DEBUG_INFO << "Width : " << entry.width << "\n";
@@ -55,12 +56,13 @@ bool AssetEngine::LoadFile(const std::string& path)
 	
 		Asset* asset = new Asset();
 		asset->id = entry.id;
+		asset->name = entry.name;
 		asset->type = entry.type;
 		asset->width = entry.width;
 		asset->height = entry.height;
 		asset->data = std::move(data);
 
-		m_assetMap[asset->id] = asset;
+		m_assetMap[asset->name] = asset;
 	}
 
 	return true;
@@ -72,7 +74,7 @@ std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* win
 	
 	for (auto& pair : m_assetMap)
 	{
-		textureMap[std::to_string(pair.first)] = new Sprite(window, pair.second);
+		textureMap[pair.first] = new Sprite(window, pair.second);
 		delete pair.second;
 	}
 

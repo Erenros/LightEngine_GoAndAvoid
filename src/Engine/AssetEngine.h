@@ -15,6 +15,7 @@ struct Entry
 {
 	int8 key;
 	int64 id;
+	std::string name;
 	int8 flag;
 	int64 type;
 	int16 width;
@@ -24,7 +25,8 @@ struct Entry
 
 struct Asset
 {
-	int8 id;
+	int64 id;
+	std::string name;
 	int64 type;
 	int16 width;
 	int16 height;
@@ -39,15 +41,14 @@ private:
 
 public:
 
-
 	static AssetEngine& GetInstance() {
 		static AssetEngine instance;
 		return instance;
 	}
 	
-	std::unordered_map<uint32, Asset*> m_assetMap;
+	std::unordered_map<std::string, Asset*> m_assetMap;
 
-	Asset* GetAsset(uint32 id);
+	Asset* GetAsset(std::string id);
 
 	bool LoadFile(const std::string& path);
 
