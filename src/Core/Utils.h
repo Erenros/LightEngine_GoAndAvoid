@@ -2,6 +2,11 @@
 #include "PrimitiveTypes.h"
 #include <string>
 #include "Debugger.h"
+#include "Vector2.hpp"
+
+using Vector2f = Vector2<float32>;
+using Radians = float32;
+
 
 #ifdef _DEBUG
 #define GCLE_NEW new( _NORMAL_BLOCK, __FILE__ , __LINE__ )
@@ -97,3 +102,19 @@ private:
     T* ptr;
     uint64* refCount;
 };
+
+
+struct AABB {
+    float32 minX, minY, maxX, maxY;
+
+    bool overlaps(const AABB& other) {
+        return minX < other.maxX && minY < other.maxY && maxX > other.minX && maxY > other.minY;
+    }
+
+    bool include(const AABB& other) {
+        return other.minX >= minX && other.maxX <= maxX && other.minY >= minY && other.maxY <= maxY;
+    }
+};
+
+AABB GetRotatedAABB(Vector2f center, Vector2f halfSize, Radians rotation);
+

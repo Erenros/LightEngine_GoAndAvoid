@@ -51,8 +51,12 @@ private:
 
 private:
 	bool m_inQuerySeen = false;
+	AABB m_aabb;
 
 public:
 	bool GetInQuerySeen();
 	void SetInQuerySeen(bool seen);
+
+	AABB GetAABB();
+	void SetAABB(AABB aabb);
 };

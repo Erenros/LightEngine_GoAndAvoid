@@ -1,6 +1,8 @@
 #include "Utils.h"
 #include <string>
 
+
+
 int8 GenerateRandomNumber(int8 min, int8 max){
 	if (max == 0) {
 		max += 1;
@@ -181,4 +183,33 @@ std::string ChangeUnit(float64 value, int32 precision)
 	string = ChangeUnit(string, precision);
 
 	return string;
+}
+
+
+AABB GetRotatedAABB(Vector2f center, Vector2f halfSize, Radians rotation) {
+
+	float32 c = std::cos(rotation);
+	float32 s = std::sin(rotation);
+
+	Vector2f localCorners[4]{
+		{-halfSize.x, -halfSize.y},
+		{halfSize.x, -halfSize.y},
+		{halfSize.x, halfSize.y},
+		{-halfSize.x, halfSize.y}
+	};
+
+	float32 minX = FLT_MAX, maxX = -FLT_MAX;
+	float32 minY = FLT_MAX, maxY = -FLT_MAX;
+
+	for (auto& corner : localCorners) {
+		float32 worldX = center.x + (corner.x * c - corner.y * s);
+		float32 worldY = center.y + (corner.x * s + corner.y * c);
+
+		minX = std::min(minX, worldX);
+		maxX = std::max(maxX, worldX);
+		minY = std::min(minY, worldY);
+		maxY = std::max(maxY, worldY);
+	}
+
+	return { minX, minY, maxX, maxY };
 }

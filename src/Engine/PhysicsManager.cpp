@@ -178,13 +178,13 @@ void PhysicsManager::Update(float64 deltaTime)
 
 	int32 nbrTest = 0;
 	if (m_activateQuadTree == true) {
-		std::vector<Collider*> activeEntities;
+		std::vector<Collider*> activeColliders;
 		//PROFILER_START("GetActiveEntities", "GetActiveEntities");
 		for (auto& e : m_EntitiesToUpdate) {
 			if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
 				for (auto& collider : e.pEntity->GetColliders()) {
 					if(collider->IsActive())
-						activeEntities.push_back(collider);
+						activeColliders.push_back(collider);
 				}
 		}
 		//PROFILER_END("GetActiveEntities");
@@ -194,76 +194,82 @@ void PhysicsManager::Update(float64 deltaTime)
 		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
 			m_timeBetweenRegeneration = 0;
 			m_quadTree->Clear();
-			for (auto& entity : activeEntities) {
-				m_quadTree->Insert(entity);
+			for (auto& collider : activeColliders) {
+				Degrees angle = collider->GetShape()->GetRotation();
+				if (static_cast<int32>(angle) % 180 == 0) {
+					Vector2f pos1 = collider->GetShape()->GetPosition(0.f, 0.f);
+					Vector2f pos2 = collider->GetShape()->GetPosition(1.f, 1.f);
+					collider->SetAABB({ pos1.x, pos1.y, pos2.x , pos2.y });
+				}
+				else {
+					collider->SetAABB(GetRotatedAABB(collider->GetShape()->GetPosition(), { collider->GetShape()->GetWidth(), collider->GetShape()->GetHeight() }, (angle * DEG_TO_RAD)));
+				}
+				m_quadTree->Insert(collider);
 			}
 		}
 		//PROFILER_END("QuadTreeRegeneration");
 
 		//PROFILER_START("Query", "Query");
-		for (auto& entity : activeEntities) {
-			AABB aabb;
-			Vector2f pos1 = entity->GetShape()->GetPosition(0.f, 0.f);
-			Vector2f pos2 = entity->GetShape()->GetPosition(1.f, 1.f);
-			aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+		for (auto& collider : activeColliders) {
+			AABB aabb = collider->GetAABB();
 
 			bool present = false;
-			ColliderEntry e{ aabb, entity };
+			ColliderEntry e{ aabb, collider };
 
 			////PROFILER_START("QueryQuad", "QueryQuad");
 			const auto& candidates = m_quadTree->Query(e);
 			////PROFILER_END("QueryQuad");
 
 			for (auto& c : candidates) {
-				bool greater = entity < c.entity;
-				bool notTheSameEntity = entity->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
+				bool greater = collider < c.entity;
+				bool notTheSameEntity = collider->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
 				if (greater && notTheSameEntity) {
-					m_pairs.push_back({ entity, c.entity });
+					m_pairs.push_back({ collider, c.entity });
 				}
 			}
 		}
 		//PROFILER_END("Query");
 
 		//PROFILER_START("collisionLoop", "collisionLoop");
-		for (auto& entities : m_pairs) {
+		for (auto& collider : m_pairs) {
 			nbrTest += 1;
 			//PROFILER_START("collisionTest", "Collision test");
-			bool coliding = IsColliding(entities.first, entities.second);
+			bool coliding = IsColliding(collider.first, collider.second);
 			//PROFILER_END("collisionTest");
 
 
 			if (coliding) {
-				if (entities.first->GetOwner()->IsRigidBody() && entities.second->GetOwner()->IsRigidBody())
+				if (collider.first->GetOwner()->IsRigidBody() && collider.second->GetOwner()->IsRigidBody())
 				{
 					//PROFILER_START("Repulse", "Repulse");
 
-					Repulse(entities.first, entities.second);
+					Repulse(collider.first, collider.second);
 					//PROFILER_END("Repulse");
 				}
-				if (!entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
+				if (!collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
 				{
-					entities.first->GetOwner()->OnCollisionEnter(entities.second->GetOwner());
-					entities.first->GetOwner()->CollidingEntity.insert({ entities.second->GetOwner()->GetId(), entities.second->GetOwner() });
+					collider.first->GetOwner()->OnCollisionEnter(collider.second->GetOwner());
+					collider.first->GetOwner()->CollidingEntity.insert({ collider.second->GetOwner()->GetId(), collider.second->GetOwner() });
 
-					entities.second->GetOwner()->OnCollisionEnter(entities.first->GetOwner());
-					entities.second->GetOwner()->CollidingEntity.insert({entities.first->GetOwner()->GetId(), entities.first->GetOwner()});
+					collider.second->GetOwner()->OnCollisionEnter(collider.first->GetOwner());
+					collider.second->GetOwner()->CollidingEntity.insert({collider.first->GetOwner()->GetId(), collider.first->GetOwner()});
 				}
 
 				else
 				{
-					entities.first->GetOwner()->OnCollision(entities.second->GetOwner());
-					entities.second->GetOwner()->OnCollision(entities.first->GetOwner());
+					collider.first->GetOwner()->OnCollision(collider.second->GetOwner());
+					collider.second->GetOwner()->OnCollision(collider.first->GetOwner());
 				}
 			}
 
 			else
 			{
-				if (entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
+				if (collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
 				{
-					entities.first->GetOwner()->OnCollisionExit(entities.second->GetOwner());
-					entities.first->GetOwner()->CollidingEntity.erase(entities.second->GetOwner()->GetId());
-					entities.second->GetOwner()->OnCollisionExit(entities.first->GetOwner());
-					entities.second->GetOwner()->CollidingEntity.erase(entities.first->GetOwner()->GetId());
+					collider.first->GetOwner()->OnCollisionExit(collider.second->GetOwner());
+					collider.first->GetOwner()->CollidingEntity.erase(collider.second->GetOwner()->GetId());
+					collider.second->GetOwner()->OnCollisionExit(collider.first->GetOwner());
+					collider.second->GetOwner()->CollidingEntity.erase(collider.first->GetOwner()->GetId());
 				}
 			}
 
@@ -1080,68 +1086,6 @@ void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 	AccumulateCorrection(a->GetOwner(), deltaA);
 	AccumulateCorrection(b->GetOwner(), deltaB);
 }
-
-//void PhysicsManager::RepulseOBBAABB(Collider* colA, Collider* colB)
-//{
-//	gcle::Shape* a = colA->GetShape(); // OBB
-//	gcle::Shape* b = colB->GetShape(); // AABB
-//
-//	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); // direction A -> B
-//	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
-//	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
-//	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
-//	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
-//
-//	ApplyBlockingResponse(colA, colB, deltaA);
-//	ApplyBlockingResponse(colB, colA, deltaB);
-//
-//	AccumulateCorrection(a->GetOwner(), deltaA);
-//	AccumulateCorrection(b->GetOwner(), deltaB);
-//}
-//
-//void PhysicsManager::RepulseOBBCircle(Collider* colA, Collider* colB)
-//{
-//	gcle::Shape* a = colA->GetShape(); // OBB
-//	gcle::Shape* b = colB->GetShape(); // Circle
-//
-//	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f });
-//	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
-//	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
-//	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
-//	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
-//
-//	ApplyBlockingResponse(colA, colB, deltaA);
-//	ApplyBlockingResponse(colB, colA, deltaB);
-//
-//	AccumulateCorrection(a->GetOwner(), deltaA);
-//	AccumulateCorrection(b->GetOwner(), deltaB);
-//}
-//
-//void PhysicsManager::RepulseCircleOBB(Collider* colA, Collider* colB)
-//{
-//	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
-//	RepulseOBBCircle(colB, colA);
-//	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
-//}
-//
-//void PhysicsManager::RepulseOBBOBB(Collider* colA, Collider* colB)
-//{
-//	gcle::Shape* a = colA->GetShape();
-//	gcle::Shape* b = colB->GetShape();
-//
-//	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f });
-//	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
-//	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
-//	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
-//	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
-//
-//	ApplyBlockingResponse(colA, colB, deltaA);
-//	ApplyBlockingResponse(colB, colA, deltaB);
-//
-//	AccumulateCorrection(a->GetOwner(), deltaA);
-//	AccumulateCorrection(b->GetOwner(), deltaB);
-//}
-//
 
 
 

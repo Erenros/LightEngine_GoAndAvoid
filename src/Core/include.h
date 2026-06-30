@@ -16,3 +16,6 @@ constexpr float32 GRAVITY		= 9.80665f;
 
 class Entity;
 using EntityPtr = SmartPtr<Entity>;
+
+using Radians = float32;
+using Degrees = float32;

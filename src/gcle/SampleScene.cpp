@@ -48,7 +48,7 @@ void SampleScene::OnInitialize()
 	entity4->GetRigidBody().SetGravity(false);
 	entity4->GetShape()->SetIsKinematic(true);*/
 
-	for (int i = 0; i < 000; i++) {
+	for (int i = 0; i < 500; i++) {
 		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 		entity->SetPosition(-49000 + (i * 100), -49000 + (i * 100));
 		entity->SetRigidBody(true);
