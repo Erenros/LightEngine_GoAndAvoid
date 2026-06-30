@@ -28,7 +28,7 @@ public:
 	SDL_Texture* CreateTexture(Window* window);
 	SDL_Rect* GetSDLRect() { return mp_rect; };
 
-	Text(Font* font,const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	Text(Font* font,const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	
 	~Text();
 

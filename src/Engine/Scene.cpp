@@ -68,7 +68,7 @@ Scene::~Scene()
 	m_debugTexts.clear();
 }
 
-Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
+Text* Scene::CreateText(const std::string& text,Vector2f pos, int32 fontSize, byte r, byte g, byte b)
 {
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	if (font == nullptr)

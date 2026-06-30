@@ -19,7 +19,7 @@ class Scene
 {
 public:
 
-	Text* CreateText(const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255);
+	Text* CreateText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
 	void DestroyText(Text* text);
 
 	template<typename T>

@@ -30,7 +30,7 @@ SDL_Texture* Text::CreateTexture(Window* window)
 	return text_texture;
 }
 
-Text::Text(Font* font, const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b, byte a) :
+Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b, byte a) :
 	mp_font(font),
 	m_text(text)
 {
