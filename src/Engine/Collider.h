@@ -21,7 +21,7 @@ public:
 	Collider() = default;
 	~Collider() = default;
 
-	void Initialize(Shape* shape, Vector2f position, Entity* owner);
+	void Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner);
 
 	void CollidingOn(Vector2f direction);
 	void CollidingOnX(float32 direction);

@@ -1,11 +1,12 @@
 #include "Collider.h"
 #include "Entity.h"
 
-void Collider::Initialize(Shape* shape, Vector2f position, Entity* owner)
+void Collider::Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner)
 {
     m_shape = shape;
     mp_Owner = owner;
     m_shape->SetPosition(position.x, position.y);
+	m_shape->SetRotation(rotation);
     m_shape->GetTransform()->SetParent(mp_Owner->GetShape()->GetTransform());
 }
 

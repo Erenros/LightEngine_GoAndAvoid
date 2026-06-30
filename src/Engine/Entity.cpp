@@ -115,10 +115,10 @@ void Entity::RemoveCollider(Collider* pCollider)
 	mp_Colliders.erase(pCollider);
 }
 
-Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, Vector2f scale)
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
 {
 	Collider* collider = new Collider();
-	collider->Initialize(GetBaseShape(shape), position, this);
+	collider->Initialize(GetBaseShape(shape), mp_Shape->GetPosition() + relativePosition, rotation, this);
 	AddCollider(collider);
 	collider->SetActive(isActive);
 	collider->GetShape()->SetScale(scale);

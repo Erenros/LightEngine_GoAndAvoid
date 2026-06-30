@@ -75,7 +75,7 @@ public:
 public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider);
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, Vector2f scale);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, float32 rotation, Vector2f scale);
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
 
 protected:
