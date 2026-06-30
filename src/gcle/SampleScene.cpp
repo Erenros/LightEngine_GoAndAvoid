@@ -7,25 +7,25 @@
 #include "PhysicsManager.h"
 
 void SampleScene::OnInitialize()
-{ 
+{
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
-	 
+
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 10, -200 }, { 1, 1 })->GetShape()->SetRotation(45);
 	entity1->SetPosition(10, -200);
 	entity1->SetRotation(45);
-	entity1->SetRigidBody(true); 
+	entity1->SetRigidBody(true);
 	entity1->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 10, -200 }, { 1, 1 })->GetShape()->SetRotation(45);
 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(100, 100);
+	entity2->SetPosition(0, 0);
 	entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
 	entity2->SetIsKinematic(true);
 	entity2->SetTexture("test");
-	entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 100, -400}, {1, 1});
+	entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, { 1, 1 });
 
 	/*Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(200.f, 100.f);
@@ -34,7 +34,7 @@ void SampleScene::OnInitialize()
 	entity3->GetRigidBody().SetGravity(false);
 	entity3->GetShape()->SetIsKinematic(true);
 	entity3->SetTexture("images");
-	 
+
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10.f, 100.f);
 	entity2->SetRigidBody(true);
@@ -59,8 +59,8 @@ void SampleScene::OnInitialize()
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
 	PhysicsManager::GetInstance().SetActivateQuadTree(true);
-	PhysicsManager::GetInstance().SetQuadTreePos1({-50000, -50000});
-	PhysicsManager::GetInstance().SetQuadTreePos2({50000, 50000});
+	PhysicsManager::GetInstance().SetQuadTreePos1({ -50000, -50000 });
+	PhysicsManager::GetInstance().SetQuadTreePos2({ 50000, 50000 });
 }
 
 void SampleScene::OnUpdate(Clock& time)
@@ -74,4 +74,4 @@ void SampleScene::OnUpdate(Clock& time)
 	{
 		pEntity->Destroy();
 	}*/
-} 
+}
