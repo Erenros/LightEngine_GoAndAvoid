@@ -45,14 +45,13 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 	{
 		for (Entity* entity : layer)
 		{
-			//entity->Update(time); 
+			if (e->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
+				entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
 
-			entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
-
-			Vector2f realScale = entity->GetScale();
-			entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
-			entity->GetRenderShape()->SetRotation(entity->GetRotation());
-
+				Vector2f realScale = entity->GetScale();
+				entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+				entity->GetRenderShape()->SetRotation(entity->GetRotation());
+			}
 		}
 	}
 }

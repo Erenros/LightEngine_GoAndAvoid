@@ -16,6 +16,7 @@ public:
     void Forward();
 
     void UpdatePositionWithParentPosition();
+    void UpdateChildPosition();
 
 public:
     void SetPosition(Vector2f);
@@ -62,7 +63,7 @@ private:
     Vector2f m_Direction = { 0.f,0.f };
     Vector2f m_Scale = { 1.f,1.f };
 
-    Degrees m_DegAngle = 0.f;
+    Degrees m_DegAngle = 45.f;
     Radians m_RadAngle = 0.f;
 
     Transform2D* mp_Parent = nullptr;

@@ -49,7 +49,7 @@ public:
 		int32 width, 
 		int32 height, 
 		uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_SHOWN, 
-		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC,
+		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED,
 		int32 x = 0, 
 		int32 y = 0
 	);
@@ -71,12 +71,16 @@ public:
 	void DrawTextOnRenderer(Text* text);
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
+	
 	void DrawDebug(gcle::Shape* pShape);
 
 public: 
 	Vector2u GetMousePosition();
 	Vector2f GetWindowSize();
 	Vector2f GetMousePositionOnRenderTarget();
+
+public:
+	bool IsInsideWindow(Entity* entity);
 	
 private:
 	void InitImGUI();
@@ -89,4 +93,5 @@ private:
 
 private:
 	friend class Event;
+
 };

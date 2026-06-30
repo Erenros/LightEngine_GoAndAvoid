@@ -14,7 +14,7 @@ public:
 
 	void Initialize(Transform2D* mp_Transform);
 
-	void Update(Clock& timer);
+	void Update(float32 dt);
 
 	void AddForce(Vector2f direction, float32 strength, float32 dt);
 
@@ -41,8 +41,8 @@ public:
 	void ZeroVelocityX(bool right);
 	void ZeroVelocityY(bool down);
 
-	void ZeroVelocityX() { m_TempVelocity.x = 0; m_TempVelHasChanged = true; }
-	void ZeroVelocityY() { m_TempVelocity.x = 0; m_TempVelHasChanged = true; }
+	void ZeroVelocityX() { m_Velocity.x = 0; /*m_TempVelHasChanged = true;*/ }
+	void ZeroVelocityY() { m_Velocity.y = 0; /*m_TempVelHasChanged = true; */}
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 

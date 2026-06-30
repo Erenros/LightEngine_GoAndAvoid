@@ -4,7 +4,6 @@
 #include "MathGC.h"
 #include "Engine/Transform.h"
 #include "Texture.h"
-#include "Engine/Collider.h"
 #include "Engine/RessourceManager.h"
 #include "Sprite.h"
 
@@ -35,7 +34,6 @@ namespace gcle
 	protected:
 		Transform2D m_Transform;
 		Entity* mp_Owner;
-		Collider m_Collider;
 
 		//circle
 		float32 m_radius = 0.0f;
@@ -51,8 +49,6 @@ namespace gcle
 		std::vector<Vector2f> m_trianglepoints;
 
 		Shapes m_shape = Shapes::Triangle;
-
-		bool m_IsKinematic;
 		 
 		std::vector<Vector2f> m_localPositions;
 
@@ -86,10 +82,8 @@ namespace gcle
 		Vector2f GetScale() { return m_Transform.GetScale(); }
 		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
 
-		Transform2D& GetTransform() { return m_Transform; }
+		Transform2D* GetTransform() { return &m_Transform; }
 
-		bool IsKinematic() { return m_IsKinematic; }
-		Collider* GetCollider() { return &m_Collider; }
 
 	public:
 
@@ -124,8 +118,6 @@ namespace gcle
 		 
 		void SetRotation(Degrees angle); 
 		void Rotate(Degrees delta);
-
-		void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
 
 	public:
 		void Move(Vector2f translation);

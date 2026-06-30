@@ -35,12 +35,15 @@ void Scene::DrawDebug(Window* window)
 
 
 void Scene::Draw(Window* window) {
+	int i = 0;
 	for (auto layer : GameManager::GetInstance().m_entities) {
-		for(Entity* e : layer)
-		{
-			if(e->IsActiveIn(m_tag))
-				GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
-			
+		for(Entity* e : layer){
+			if (window->IsInsideWindow(e)) {
+				if (e->IsActiveIn(m_tag)) {
+					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					i++;
+				}
+			}
 		}
 	}
 
@@ -111,12 +114,11 @@ void Scene::SetDebug()
 }
 
 void Scene::Update(Clock& time){
-	for (auto layer : GameManager::GetInstance().m_entities) 
-	{
+	for (auto layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer)
 		{
 			if (e->IsActiveIn(m_tag))
-				e->Update(time);
+				e->Update(time.GetDeltaTime());
 		}
 	}
 }

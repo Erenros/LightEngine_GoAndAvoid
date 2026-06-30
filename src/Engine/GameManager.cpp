@@ -8,31 +8,35 @@
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
 
-
+#include <timeapi.h>
+#pragma comment(lib, "winmm.lib")
+ 
 
 void GameManager::Loop()
 {
-	isRunning = true; 
+	isRunning = true;   
 
+	timeBeginPeriod(1);
 	while (isRunning == true)
 	{
+ 
+
+		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
-		accDt += m_Time.GetDeltaTime();
-		while (accDt >= fixedUpdateDT) {
-			accDt -= fixedUpdateDT;
-			PROFILER_START("Colliders", "Colliders Update");
+		m_accDt += m_Time.GetDeltaTime();
+		while (m_accDt >= fixedUpdateDT) {
+			m_accDt -= fixedUpdateDT;
 			if (m_loopTour < 1)
 				m_loopTour++;
 			else
+			{
 				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
-			PROFILER_END("Colliders");
+				InputManager::GetInstance().Update();
+				SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+			}
 			exec += 1;
 		}
-
-
-		PROFILER_START("time", "Timer Update");
-		m_Time.Update();
-		PROFILER_END("time");
+		//PROFILER_END("Colliders");
 	
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
@@ -73,15 +77,27 @@ void GameManager::Loop()
 		if (Event::WindowEvent())
 		{
 			isRunning = false;
+		} 
+		 
+		
+		float64 rawDT = m_Time.GetRawDT();
+		if (rawDT < m_fpsDT) {
+			float64 timeToSleep = m_fpsDT - rawDT;
+			m_Time.SmartSleep(timeToSleep);
 		}
 
-		system("CLS");
-		 
-		//GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
 
-		
+		//PROFILER_START("time", "Timer Update");
+		m_Time.Update();
+		//PROFILER_END("time");
+
+
+	
+		GCLE_INFO << "FPS : " << m_Time->GetFramePerSecond() << ENDL;
+		//PROFILER_END("Update");
+		//system("CLS");
 	}
-
+	timeEndPeriod(1);
 	isRunning = false;
 }
 
@@ -105,7 +121,7 @@ GameManager::~GameManager()
 	m_entities.clear();
 }
 
-bool GameManager::Init(int32 windowWidth, int32 windowHeight)
+bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 {
 #ifndef NDEBUG
 	GCLE::DebuggerDesc desc{};
@@ -114,6 +130,9 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 #endif
 
 	srand(static_cast<int32>(m_Time.GetTime()));
+	
+	m_fps = FPS;
+	m_fpsDT = 1.f / m_fps;
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
@@ -135,6 +154,8 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});
 
+	m_Cam.Init(mp_window);
+
 	return true;
 }
 
@@ -145,6 +166,18 @@ void GameManager::Close()
 
 	delete mp_window;
 
+}
+
+std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
+{
+	std::vector<Entity*> results;
+	for (auto entities : m_entities) {
+		for (auto e : entities) {
+			if (e->IsActiveIn(scene))
+				results.push_back(e);
+		}
+	}
+	return results;
 }
 
 void GameManager::UpdateEntitySystem()

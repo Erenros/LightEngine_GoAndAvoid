@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cmath>
+#include <limits>
 #include "PhysicsManager.h"
 #include "SceneManager.h"
 #include "MathGC.h"
@@ -5,15 +8,104 @@
 #undef min
 #undef max
 
+
+namespace
+{
+	constexpr float32 PHYSICS_EPSILON = 0.00001f;
+
+	float32 Dot(const Vector2f& a, const Vector2f& b)
+	{
+		return a.x * b.x + a.y * b.y;
+	}
+
+	Vector2f SafeNormal(Vector2f value, Vector2f fallback)
+	{
+		float32 lengthSquared = (value.x * value.x) + (value.y * value.y);
+		if (lengthSquared <= PHYSICS_EPSILON * PHYSICS_EPSILON)
+			return fallback;
+
+		return value / std::sqrt(lengthSquared);
+	}
+
+
+	bool TestRectAxis(
+		const Vector2f& axis,
+		const Vector2f& centerDelta,
+		const Vector2f axesA[2],
+		const Vector2f axesB[2],
+		const Vector2f& extentsA,
+		const Vector2f& extentsB,
+		float32& minOverlap,
+		Vector2f& bestNormal)
+	{
+		Vector2f normal = SafeNormal(axis, { 1.0f, 0.0f });
+
+		float32 distance = Dot(centerDelta, normal);
+		float32 radiusA =
+			extentsA.x * std::abs(Dot(axesA[0], normal)) +
+			extentsA.y * std::abs(Dot(axesA[1], normal));
+		float32 radiusB =
+			extentsB.x * std::abs(Dot(axesB[0], normal)) +
+			extentsB.y * std::abs(Dot(axesB[1], normal));
+
+		float32 overlap = (radiusA + radiusB) - std::abs(distance);
+		if (overlap <= 0.0f)
+			return false;
+
+		if (overlap < minOverlap)
+		{
+			minOverlap = overlap;
+			bestNormal = normal * (distance >= 0.0f ? 1.0f : -1.0f); // A -> B
+		}
+
+		return true;
+	}
+
+	float32 KinematicFactor(Entity* pEntity)
+	{
+		return pEntity->IsKinematic() ? 1.0f : 0.0f;
+	}
+
+	bool ShouldBlockMovement(Entity* pEntity, Entity* pOtherEntity)
+	{
+		// Si les deux objets sont Kinematic, ils sont tous les deux deplacables :
+		// on les repousse, mais on ne bloque pas l'input avec CollisionDirection
+		// et on ne supprime pas leur vitesse.
+		// On bloque uniquement quand l'objet touche un obstacle non Kinematic.
+		return pEntity != nullptr &&
+			pOtherEntity != nullptr &&
+			pEntity->IsKinematic() &&
+			!pOtherEntity->IsKinematic();
+	}
+
+	void ApplyBlockingResponse(Collider* pCollider, Collider* pOtherCollider, const Vector2f& correction)
+	{
+		if (pCollider == nullptr || pOtherCollider == nullptr)
+			return;
+
+		Entity* pEntity = pCollider->GetOwner();
+		Entity* pOtherEntity = pOtherCollider->GetOwner();
+
+		if (!ShouldBlockMovement(pEntity, pOtherEntity))
+			return;
+
+		// La correction indique la direction qui sort l'objet de la collision.
+		// On retire seulement la vitesse qui continue a pousser dans l'obstacle,
+		// et on pose les flags uniquement contre les objets immobiles.
+		pEntity->GetRigidBody().RemoveVelocityAlongNormal(correction);
+		pCollider->CollidingOn(correction);
+	}
+}
+
 PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
 {
 	{
-		&PhysicsManager::CheckRectRect,
-		&PhysicsManager::CheckRectCircle,
+		&PhysicsManager::ThrowCheckRectRect,
+		&PhysicsManager::ThrowCheckRectCircle,
 	},
 	{
-		&PhysicsManager::CheckCircleRect,
-		&PhysicsManager::CheckCircleCircle,
+		&PhysicsManager::ThrowCheckCircleRect,
+		&PhysicsManager::ThrowCheckCircleCircle,
 	}
 };
 
@@ -59,7 +151,31 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 	}
 }
 
+#pragma region Update
+
 void PhysicsManager::Update(float64 deltaTime)
+{
+	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
+	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
+
+	std::vector<Collider*> activeColliders;
+
+	EntityToUpdate(&activeColliders, m_EntitiesToUpdate);
+
+	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
+
+	if (m_activateQuadTree == true) {
+		UpdateQuadTree(activeColliders);
+	}
+
+	else {
+		UpdateWithoutQuadTree(activeColliders);
+	}
+}
+
+#pragma region Helpers
+
+void PhysicsManager::EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate)
 {
 	for (EntityInfo entity : m_EntitiesToRemove) {
 		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
@@ -67,82 +183,248 @@ void PhysicsManager::Update(float64 deltaTime)
 			if (m_EntitiesToUpdate[i].pEntity == entity.pEntity) {
 				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 			}
-
 		}
 	}
+	m_EntitiesToRemove.clear();
+}
 
+void PhysicsManager::EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate) 
+{
 	for (EntityInfo entity : m_EntitiesToAdd) {
 		m_EntitiesToUpdate.push_back(entity);
 	}
-
 	m_EntitiesToAdd.clear();
-	m_EntitiesToRemove.clear();
 
-	//Collision
-	for (auto it1 = m_EntitiesToUpdate.begin(); it1 != m_EntitiesToUpdate.end(); ++it1)
+}
+
+void PhysicsManager::EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate)
+{
+	for (auto& e : m_EntitiesToUpdate) {
+		if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
+			for (auto& collider : e.pEntity->GetColliders()) {
+				if (collider->IsActive())
+					activeColliders->push_back(collider);
+			}
+		}
+	}
+}
+
+void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* activeColliders) {
+
+	if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
+		m_quadTree->Clear();
+		for (auto& collider : *activeColliders) {
+
+			Degrees angle = collider->GetShape()->GetRotation();
+			if (static_cast<int32>(angle) % 180 == 0) {
+				Vector2f pos1 = collider->GetShape()->GetPosition(0.f, 0.f);
+				Vector2f pos2 = collider->GetShape()->GetPosition(1.f, 1.f);
+				collider->SetAABB({ pos1.x, pos1.y, pos2.x , pos2.y });
+			}
+			else {
+				collider->SetAABB(GetRotatedAABB(collider->GetShape()->GetPosition(), { collider->GetShape()->GetWidth(), collider->GetShape()->GetHeight() }, (angle * DEG_TO_RAD)));
+			}
+			m_quadTree->Insert(collider);
+		}
+		m_timeBetweenRegeneration = 0;
+	}
+}
+
+void PhysicsManager::PendingCorrections()
+{
+	for (auto& pair : m_PendingCorrections)
 	{
-		auto it2 = it1;
-		++it2;
-		for (; it2 != m_EntitiesToUpdate.end(); ++it2)
-		{
-			Entity* entity = (*it1).pEntity;
-			Entity* otherEntity = (*it2).pEntity;
+		Entity* pEntity = pair.first;
+		Vector2f delta = pair.second;
 
-			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()) && otherEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
+		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
+	}
+	m_PendingCorrections.clear();
+}
+
+void PhysicsManager::MakePairs(std::vector<Collider*>* activeColliders) {
+	for (size_t i = 0; i < activeColliders->size(); ++i) {
+		Collider* colliderA = (*activeColliders)[i];
+		for (size_t j = i + 1; j < activeColliders->size(); ++j) {
+			Collider* colliderB = (*activeColliders)[j];
+			bool greater = colliderA < colliderB;
+			bool notTheSameEntity = colliderA->GetOwner()->GetId() != colliderB->GetOwner()->GetId();
+			if (greater && notTheSameEntity) {
+				m_pairs.push_back({ colliderA, colliderB });
+			}
+		}
+	}
+}
+
+void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
+{
+	for (auto& collider : *activeColliders) {
+
+		const auto& candidates = m_quadTree->Query(collider);
+
+		for (auto& c : candidates) {
+			bool greater = collider < c;
+			bool notTheSameEntity = collider->GetOwner()->GetId() != c->GetOwner()->GetId();
+			if (greater && notTheSameEntity) {
+				m_pairs.push_back({ collider, c });
+			}
+		}
+	}
+}
+
+void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
+{
+	int32 nbrTest = 0;
+
+	m_timeBetweenRegeneration += 1;
+
+	GenerateQuadTree(&activeColliders);
+	
+	MakeTreePairs(&activeColliders);
+
+	for (auto& collider : m_pairs) {
+		nbrTest += 1;
+		bool coliding = IsColliding(collider.first, collider.second);
+
+
+		if (coliding) {
+			if (collider.first->GetOwner()->IsRigidBody() && collider.second->GetOwner()->IsRigidBody())
 			{
-				if (entity->IsColliding(otherEntity))
-				{
-					if (entity->IsRigidBody() && otherEntity->IsRigidBody())
-					{
-						Repulse(entity, otherEntity);
-					}
+				ThrowRepulse(collider.first, collider.second);
+			}
+			if (!collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
+			{
+				collider.first->GetOwner()->OnCollisionEnter(collider.second->GetOwner());
+				collider.first->GetOwner()->CollidingEntity.insert({ collider.second->GetOwner()->GetId(), collider.second->GetOwner() });
 
-					if (!entity->CollidingEntity.contains(otherEntity->GetId()))
-					{
-						entity->OnCollisionEnter(otherEntity);
-						entity->CollidingEntity.insert(otherEntity->GetId());
+				collider.second->GetOwner()->OnCollisionEnter(collider.first->GetOwner());
+				collider.second->GetOwner()->CollidingEntity.insert({ collider.first->GetOwner()->GetId(), collider.first->GetOwner() });
+			}
 
-						otherEntity->OnCollisionEnter(entity);
-						otherEntity->CollidingEntity.insert(entity->GetId());
-					}
+			else
+			{
+				collider.first->GetOwner()->OnCollision(collider.second->GetOwner());
+				collider.second->GetOwner()->OnCollision(collider.first->GetOwner());
+			}
+		}
 
-					else
-					{
-						entity->OnCollision(otherEntity);
-						otherEntity->OnCollision(entity);
-					}
-				}
-				else 
-				{
-					if (entity->CollidingEntity.contains(otherEntity->GetId())) 
-					{
-						entity->OnCollisionExit(otherEntity);
-						entity->CollidingEntity.erase(otherEntity->GetId());
-						otherEntity->OnCollisionExit(entity);
-						otherEntity->CollidingEntity.erase(entity->GetId());
-					}
-				}
+		else
+		{
+			if (collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
+			{
+				collider.first->GetOwner()->OnCollisionExit(collider.second->GetOwner());
+				collider.first->GetOwner()->CollidingEntity.erase(collider.second->GetOwner()->GetId());
+				collider.second->GetOwner()->OnCollisionExit(collider.first->GetOwner());
+				collider.second->GetOwner()->CollidingEntity.erase(collider.first->GetOwner()->GetId());
+			}
+		}
+
+		PendingCorrections();
+
+		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+		{
+			if (m_EntitiesToUpdate[i].toRemove)
+				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+		}
+
+	}
+	m_pairs.clear();
+}
+
+void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeColliders) {
+
+	auto MakePairKey = [](int64 idA, int64 idB) -> uint64
+		{
+			if (idA > idB) std::swap(idA, idB);
+			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
+		};
+
+	std::unordered_set<uint64> collidingPairsThisFrame;
+
+	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
+	{
+		Collider* collider1 = *it1;
+		Entity* entity = collider1->GetOwner();
+
+		for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
+		{
+			Collider* collider2 = *it2;
+			Entity* otherEntity = collider2->GetOwner();
+
+			if (entity == otherEntity)
+				continue;
+
+			if (!IsColliding(collider1, collider2))
+				continue;
+
+			if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+				ThrowRepulse(collider1, collider2);
+
+			collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
+
+			if (!entity->CollidingEntity.contains(otherEntity->GetId()))
+			{
+				entity->OnCollisionEnter(otherEntity);
+				entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
+
+				otherEntity->OnCollisionEnter(entity);
+				otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
+			}
+			else
+			{
+				entity->OnCollision(otherEntity);
+				otherEntity->OnCollision(entity);
 			}
 		}
 	}
 
+	PendingCorrections();
 
-	//Erase
+	for (auto& info : m_EntitiesToUpdate)
+	{
+		Entity* entity = info.pEntity;
+
+		for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
+		{
+			uint64 key = MakePairKey(entity->GetId(), idIt->first);
+
+			if (collidingPairsThisFrame.contains(key))
+			{
+				++idIt;
+				continue;
+			}
+
+			Entity* otherEntity = idIt->second;
+			idIt = entity->CollidingEntity.erase(idIt);
+			entity->OnCollisionExit(otherEntity);
+		}
+	}
+
+	// 5) Suppression des entites marquees a retirer.
 	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
 	{
-		if (m_EntitiesToUpdate[i].toRemove == false)
-		{
-			continue;
-		}
-
-		m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+		if (m_EntitiesToUpdate[i].toRemove)
+			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 	}
 }
 
-bool PhysicsManager::IsColliding(Entity* pEntity1, Entity* pEntity2)
+#pragma endregion
+
+#pragma endregion
+
+
+
+
+void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
 {
-	auto* shapeA = pEntity1->GetShape();
-	auto* shapeB = pEntity2->GetShape();
+	m_PendingCorrections[pEntity] += delta;
+}
+
+bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
+{
+	auto* shapeA = pCollider1->GetShape();
+	auto* shapeB = pCollider2->GetShape();
 
 	if (shapeA->GetShape() == gcle::Shapes::Triangle || shapeB->GetShape() == gcle::Shapes::Triangle)
 	{
@@ -151,12 +433,19 @@ bool PhysicsManager::IsColliding(Entity* pEntity1, Entity* pEntity2)
 
 	int32 typeA = static_cast<int32>(shapeA->GetShape()) - 1;
 	int32 typeB = static_cast<int32>(shapeB->GetShape()) - 1;
+	int32 maxType = static_cast<int32>(gcle::Shapes::Count) - 1;
+
+	if (typeA < 0 || typeB < 0 || typeA >= maxType || typeB >= maxType)
+		return false;
 
 	return (this->*collisionTable[typeA][typeB])(shapeA, shapeB);
 }
 
+
 bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 {
+	if (pEntity == nullptr || pEntity->GetShape() == nullptr)
+		return false;
 
 	switch (pEntity->GetShape()->GetShape())
 	{
@@ -183,10 +472,13 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	return false;
 } 
 
-void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
+void PhysicsManager::ThrowRepulse(Collider* pCollider1, Collider* pCollider2)
 {
-	auto* shapeA = pEntity1->GetShape();
-	auto* shapeB = pEntity2->GetShape();
+	auto* shapeA = pCollider1->GetShape();
+	auto* shapeB = pCollider2->GetShape();
+
+	m_pCurrentColliderA = pCollider1;
+	m_pCurrentColliderB = pCollider2;
 
 	RepulseTypes typeA;
 	RepulseTypes typeB;
@@ -196,7 +488,7 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 		typeA = RepulseTypes::Circle;
 		break;
 	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeA->GetTransform().GetDegAngle()) % 180 != 0) 
+		if (static_cast<int32>(shapeA->GetTransform()->GetDegAngle()) % 180 != 0)
 			typeA = RepulseTypes::OOB;
 		else
 			typeA = RepulseTypes::AABB;
@@ -211,7 +503,7 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 		typeB = RepulseTypes::Circle;
 		break;
 	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeB->GetTransform().GetDegAngle()) % 180 != 0) 
+		if (static_cast<int32>(shapeB->GetTransform()->GetDegAngle()) % 180 != 0)
 			typeB = RepulseTypes::OOB;
 		else
 			typeB = RepulseTypes::AABB;
@@ -222,7 +514,7 @@ void PhysicsManager::Repulse(Entity* pEntity1, Entity* pEntity2)
 	}
 
 
-	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(shapeA, shapeB);
+	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(pCollider1, pCollider2);
 }
 
 
@@ -239,12 +531,10 @@ bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Recta
 	float32 h2 = pRect2->GetHeight();
 
 
-	return {
-		x1 + w1 >= x2 &&
+	return x1 + w1 >= x2 &&
 		x1 <= x2 + w2 &&
 		y1 + h1 >= y2 &&
-		y1 <= y2 + h2
-	};
+		y1 <= y2 + h2;
 }
 
 bool PhysicsManager::CheckAABBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle)
@@ -286,29 +576,29 @@ bool PhysicsManager::CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Ci
 }
 
 
-bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
+bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2) {
 
 	Vector2f axes[2];
 
-	float32 radRotation = pRect1->GetTransform().GetRadAngle();
-	axes[0] = {std::cos(radRotation), std::sin(radRotation) };
-	axes[1] = {-std::sin(radRotation), std::cos(radRotation) };
+	float32 radRotation = pRect1->GetTransform()->GetRadAngle();
+	axes[0] = { std::cos(radRotation), std::sin(radRotation) };
+	axes[1] = { -std::sin(radRotation), std::cos(radRotation) };
 
 
 	//OBB values
-	Vector2f obbExtents{pRect1->GetWidth() / 2, pRect1->GetHeight()/2};
+	Vector2f obbExtents{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
 
 	//AABB values
 	Vector2f aabbExtents{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
 
 	Vector2f T = pRect2->GetPosition() - pRect1->GetPosition();
-	
+
 	Matrix relativeRotation(2, 2);
 	Matrix absoluteRotation(2, 2);
 
-	
+
 	const float64 Epsilon = 1e-16;
-	
+
 	for (int i = 0; i < 2; i++) {
 		relativeRotation.m_matrix[0][i] = axes[i].x;
 		relativeRotation.m_matrix[1][i] = axes[i].y;
@@ -346,9 +636,9 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 		minOverlap = overlapY;
 		collisionNormal = { 0.f, (T.y > 0.f ? 1.f : -1.f) };
 	}
-	
-	
-	
+
+
+
 
 	ra = aabbExtents.x * absoluteRotation.m_matrix[0][0] + aabbExtents.y * absoluteRotation.m_matrix[0][1];
 	rb = obbExtents.x;
@@ -375,27 +665,27 @@ bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectan
 		float32 sign = (t_obbY > 0.f) ? 1.f : -1.f;
 		collisionNormal = { axes[1].x * sign, axes[1].y * sign };
 	}
-	
-	colDatas.orientation = collisionNormal;
-	colDatas.penetration = minOverlap;
+
+	m_colDatas.orientation = collisionNormal;
+	m_colDatas.penetration = minOverlap;
 
 	return true;
 }
 
-bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2){
+bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2) {
 	Vector2f axes1[2];
 	Vector2f axes2[2];
 
-	float32 radRotation1 = pRect1->GetTransform().GetRadAngle();
-	float32 radRotation2 = pRect2->GetTransform().GetRadAngle();
-	
+	float32 radRotation1 = pRect1->GetTransform()->GetRadAngle();
+	float32 radRotation2 = pRect2->GetTransform()->GetRadAngle();
+
 	axes1[0] = { std::cos(radRotation1), std::sin(radRotation1) };
 	axes1[1] = { -std::sin(radRotation1), std::cos(radRotation1) };
 
 	axes2[0] = { std::cos(radRotation2), std::sin(radRotation2) };
 	axes2[1] = { -std::sin(radRotation2), std::cos(radRotation2) };
 
-	
+
 	Vector2f extents1{ pRect1->GetWidth() / 2, pRect1->GetHeight() / 2 };
 	Vector2f extents2{ pRect2->GetWidth() / 2, pRect2->GetHeight() / 2 };
 
@@ -475,8 +765,8 @@ bool PhysicsManager::CheckOBBOBBCollision(gcle::Rectangle* pRect1, gcle::Rectang
 		collisionNormal = { axes2[1].x * sign, axes2[1].y * sign };
 	}
 
-	colDatas.penetration = minOverlap;
-	colDatas.orientation = collisionNormal;
+	m_colDatas.penetration = minOverlap;
+	m_colDatas.orientation = collisionNormal;
 
 	return true;
 }
@@ -485,7 +775,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 	Vector2f rectPos = pRect->GetPosition();
 	Vector2f extents{ pRect->GetWidth() / 2 , pRect->GetHeight() / 2 };
-	float32 angle = pRect->GetTransform().GetRadAngle();
+	float32 angle = pRect->GetTransform()->GetRadAngle();
 
 	Vector2f circlePos = pCircle->GetPosition();
 	float32 radius = pCircle->GetRadius();
@@ -511,13 +801,13 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	if (distanceCarree > (radius * radius))
 		return false;
 
-	float32 distance = (distanceCarree == 0.f) ? 0.f :std::sqrt(distanceCarree) ;
+	float32 distance = (distanceCarree == 0.f) ? 0.f : std::sqrt(distanceCarree);
 	Vector2f localNormal;
-	colDatas.penetration = radius - distance;
+	m_colDatas.penetration = radius - distance;
 
 	if (distance == 0.f) {
 		localNormal = { 1.f, 1.f };
-		colDatas.penetration = radius;
+		m_colDatas.penetration = radius;
 	}
 	else {
 		localNormal = { deltaX / distance, deltaY / distance };
@@ -527,7 +817,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 	worldNormal.x = localNormal.x * cos - localNormal.y * sin;
 	worldNormal.y = localNormal.x * sin + localNormal.y * cos;
 
-	colDatas.orientation = worldNormal;
+	m_colDatas.orientation = worldNormal;
 
 	if (distanceCarree <= (radius * radius)) {
 		return true;
@@ -537,10 +827,11 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 }
 
 
-bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angleA = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
-	int16 angleB = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+	int16 angleA = static_cast<int16>(a->GetTransform()->GetDegAngle());
+	int16 angleB = static_cast<int16>(b->GetTransform()->GetDegAngle()) ;
+
 
 	if (angleA != 0) {
 		if (angleB != 0)
@@ -549,9 +840,9 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 			return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 	}
 	else if (angleB != 0) {
-		bool hit =  CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
+		bool hit = CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
 		if (hit) {
-			colDatas.orientation = -colDatas.orientation;
+			m_colDatas.orientation = -m_colDatas.orientation;
 		}
 		return hit;
 	}
@@ -560,14 +851,15 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 }
 
-bool PhysicsManager::CheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
 {
 	return CheckCircleCircleCollision(static_cast<gcle::Circle*>(a), static_cast<gcle::Circle*>(b));
 }
 
-bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angle = static_cast<int16>(a->GetTransform().GetDegAngle()) % 180;
+	int16 angle = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
+
 	if (angle != 0) {
 		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 	}
@@ -575,18 +867,25 @@ bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 }
 
-bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
-	int16 angle = static_cast<int16>(b->GetTransform().GetDegAngle()) % 180;
+	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
 	if (angle != 0) {
-		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		bool hit =CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		if (hit)
+			m_colDatas.orientation = -m_colDatas.orientation;
+		return hit;
+
 	}
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
 }
 
 
-void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 {
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
 	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(a);
 	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(b);
 
@@ -606,10 +905,10 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 	if (overlapX <= 0.0f || overlapY <= 0.0f)
 		return;
 
-	Vector2f pos1 = a->GetPosition(0.5f, 0.5f);
-	Vector2f pos2 = b->GetPosition(0.5f, 0.5f);
+	Vector2f delta1 = { 0.f, 0.f };
+	Vector2f delta2 = { 0.f, 0.f };
 
-	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(colA, colB);
 
 	if (overlapX < overlapY)
 	{
@@ -617,32 +916,22 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 
 		if (x1 < x2)
 		{
-			pos1.x -= correction * a->IsKinematic();
-			pos2.x += correction * b->IsKinematic();
+			delta1.x -= correction * a->GetOwner()->IsKinematic();
+			delta2.x += correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityX(false);
-			b->GetOwner()->GetRigidBody().ZeroVelocityX(false);
-			
-			a->GetCollider()->CollidingOnX(-correction);
-			b->GetCollider()->CollidingOnX(correction);
 		}
 		else
 		{
-			pos1.x += correction * a->IsKinematic();
-			pos2.x -= correction * b->IsKinematic();
+			delta1.x += correction * a->GetOwner()->IsKinematic();
+			delta2.x -= correction * b->GetOwner()->IsKinematic();
 
-			b->GetOwner()->GetRigidBody().ZeroVelocityX(true);
-			a->GetOwner()->GetRigidBody().ZeroVelocityX(true);
-
-			a->GetCollider()->CollidingOnX(correction);
-			b->GetCollider()->CollidingOnX(-correction);
 		}
 
-		if (a->IsKinematic())
+		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
+		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityX();
-		if (b->IsKinematic())
 			b->GetOwner()->GetRigidBody().ZeroVelocityX();
-
+		}
 	}
 	else
 	{
@@ -650,70 +939,66 @@ void PhysicsManager::RepulseRectRect(gcle::Shape* a, gcle::Shape* b)
 
 		if (y1 < y2)
 		{
-			pos1.y -= correction * a->IsKinematic();
-			pos2.y += correction * b->IsKinematic();
+			delta1.y -= correction * a->GetOwner()->IsKinematic();
+			delta2.y += correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityY(false);
-			b->GetOwner()->GetRigidBody().ZeroVelocityY(false);
-
-			a->GetCollider()->CollidingOnY(-correction);
-			b->GetCollider()->CollidingOnY(correction);
 		}
 		else
 		{
-			pos1.y += correction * a->IsKinematic();
-			pos2.y -= correction * b->IsKinematic();
+			delta1.y += correction * a->GetOwner()->IsKinematic();
+			delta2.y -= correction * b->GetOwner()->IsKinematic();
 
-			a->GetOwner()->GetRigidBody().ZeroVelocityY(true);
-			b->GetOwner()->GetRigidBody().ZeroVelocityY(true);
-
-			a->GetCollider()->CollidingOnY(correction);
-			b->GetCollider()->CollidingOnY(-correction);
 		}
-		
-		if(a->IsKinematic())
+
+		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
+		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityY();
-		if(b->IsKinematic())
 			b->GetOwner()->GetRigidBody().ZeroVelocityY();
+		}
 	}
 
-	a->SetPosition(pos1.x, pos1.y, 0.5f, 0.5f);
-	b->SetPosition(pos2.x, pos2.y, 0.5f, 0.5f);
+	ApplyBlockingResponse(colA, colB, delta1);
+	ApplyBlockingResponse(colB, colA, delta2);
+
+	AccumulateCorrection(a->GetOwner(), delta1);
+	AccumulateCorrection(b->GetOwner(), delta2);
 
 }
 
-void PhysicsManager::RepulseCircleCircle(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseCircleCircle(Collider* colA, Collider* colB)
 {
-	Vector2f distance = a->GetPosition(0.5f, 0.5f) - b->GetPosition(0.5f, 0.5f);
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
 
+	Vector2f distance = a->GetPosition(0.5f, 0.5f) - b->GetPosition(0.5f, 0.5f);
 	float32 sqrLength = (distance.x * distance.x) + (distance.y * distance.y);
 	float32 length = std::sqrt(sqrLength);
 
 	float32 radius1 = a->GetRadius();
 	float32 radius2 = b->GetRadius();
+	float32 penetration = (radius1 + radius2) - length;
 
-	float32 overlap = (length - (radius1 + radius2)) * GetRepulseCorrectionMultiplyer(a, b);
+	if (penetration <= 0.0f)
+		return;
 
-	Vector2f normal = distance / length;
+	Vector2f normal = SafeNormal(distance, { 1.0f, 0.0f }); // direction B -> A
+	Vector2f translation = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 
-	Vector2f translation = normal * overlap;
+	Vector2f delta1 = translation * KinematicFactor(a->GetOwner());
+	Vector2f delta2 = -translation * KinematicFactor(b->GetOwner());
 
-	Vector2f position1 = a->GetPosition(0.5f, 0.5f) - translation * a->IsKinematic();
-	Vector2f position2 = b->GetPosition(0.5f, 0.5f) + translation * b->IsKinematic();
+	AccumulateCorrection(a->GetOwner(), delta1);
+	AccumulateCorrection(b->GetOwner(), delta2);
 
-	a->SetPosition(position1.x, position1.y, 0.5f, 0.5f);
-	b->SetPosition(position2.x, position2.y, 0.5f, 0.5f);
-
-	//gestion de la velocity
-
-	if (!a->IsKinematic() || !b->IsKinematic()){
-		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
-	}
+	ApplyBlockingResponse(colA, colB, delta1);
+	ApplyBlockingResponse(colB, colA, delta2);
 }
 
-void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseRectCircle(Collider* colA, Collider* colB)
 {
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
 	gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(a);
 	gcle::Circle* pCircle = static_cast<gcle::Circle*>(b);
 
@@ -732,7 +1017,7 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	Vector2f delta = circlePos - nearest;
 	float32 dist = delta.x * delta.x + delta.y * delta.y;
 
-	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(a, b);
+	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(colA, colB);
 
 	if (dist == 0.0f)
 	{
@@ -751,17 +1036,14 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
 		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
+		Vector2f deltaRect = -translation * KinematicFactor(a->GetOwner());
+		Vector2f deltaCircle = translation * KinematicFactor(b->GetOwner());
 
-		Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
-		pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+		ApplyBlockingResponse(colA, colB, deltaRect);
+		ApplyBlockingResponse(colB, colA, deltaCircle);
 
-		Vector2f newRectPos = rectPos - translation * a->IsKinematic();
-		pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
-
-		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
-		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-		if (!a->IsKinematic() || !b->IsKinematic()) {
-		}
+		AccumulateCorrection(a->GetOwner(), deltaRect);
+		AccumulateCorrection(b->GetOwner(), deltaCircle);
 
 		return;
 	}
@@ -771,45 +1053,77 @@ void PhysicsManager::RepulseRectCircle(gcle::Shape* a, gcle::Shape* b)
 	float32  overlap = (pCircle->GetRadius() - length) * correctionMultiplyer;
 
 	Vector2f translation = normal * overlap;
+	Vector2f deltaRect = -translation * KinematicFactor(a->GetOwner());
+	Vector2f deltaCircle = translation * KinematicFactor(b->GetOwner());
 
-	Vector2f newCirclePos = circlePos + translation * b->IsKinematic();
-	pCircle->SetPosition(newCirclePos.x, newCirclePos.y, 0.5f, 0.5f);
+	ApplyBlockingResponse(colA, colB, deltaRect);
+	ApplyBlockingResponse(colB, colA, deltaCircle);
 
-	Vector2f newRectPos = rectPos - translation * a->IsKinematic();
-	pRect->SetPosition(newRectPos.x, newRectPos.y, 0.5f, 0.5f);
-
-	if (!a->IsKinematic() || !b->IsKinematic()) {
-		a->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(normal);
-		b->GetOwner()->GetRigidBody().RemoveVelocityAlongNormal(-normal);
-	}
-
-	a->GetCollider()->CollidingOn(normal);
-	b->GetCollider()->CollidingOn(normal);
+	AccumulateCorrection(a->GetOwner(), deltaRect);
+	AccumulateCorrection(b->GetOwner(), deltaCircle);
 }
 
-void PhysicsManager::RepulseCircleRect(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseCircleRect(Collider* colA, Collider* colB)
 {
-	RepulseRectCircle(b, a);
+	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
+	RepulseRectCircle(colB, colA);
+	std::swap(m_pCurrentColliderA, m_pCurrentColliderB);
 }
 
-void PhysicsManager::RepulseOBB(gcle::Shape* a, gcle::Shape* b) {
-	if (a->IsKinematic() == true) {
-		Vector2f actualPosition= a->GetPosition();
-		Vector2f pos = actualPosition - ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
-		a->SetPosition(pos.x, pos.y);
-	}
-	if (b->IsKinematic() == true) {
-		Vector2f actualPosition = b->GetPosition();
-		Vector2f pos = actualPosition + ((colDatas.orientation * colDatas.penetration) * GetRepulseCorrectionMultiplyer(a, b));
-		b->SetPosition(pos.x, pos.y);
-	}
-
-}
-
-float32 PhysicsManager::GetRepulseCorrectionMultiplyer(gcle::Shape* a, gcle::Shape* b)
+void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 {
-	if (a->IsKinematic() && b->IsKinematic())
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); // colA -> colB
+	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
+
+	if (penetration <= 0.0f)
+		return;
+
+	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
+
+	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
+	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
+
+	ApplyBlockingResponse(colA, colB, deltaA);
+	ApplyBlockingResponse(colB, colA, deltaB);
+
+	AccumulateCorrection(a->GetOwner(), deltaA);
+	AccumulateCorrection(b->GetOwner(), deltaB);
+}
+
+float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider* colB)
+{
+	gcle::Shape* a = colA->GetShape();
+	gcle::Shape* b = colB->GetShape();
+
+	if (a->GetOwner()->IsKinematic() && b->GetOwner()->IsKinematic())
 		return 0.5;
 	else
 		return 1.0;
+}
+
+void PhysicsManager::SetActivateQuadTree(bool activate){
+	m_activateQuadTree = activate;
+}
+
+void PhysicsManager::SetDynamicQuadTreeSize(bool activate){
+	m_dynamicQuadTreeSize = activate;
+}
+
+void PhysicsManager::SetQuadTreePos1(Vector2f pos1){
+	m_quadTreePos1 = pos1;
+}
+
+void PhysicsManager::SetQuadTreePos2(Vector2f pos2){
+	m_quadTreePos2 = pos2;
+}
+
+void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame){
+	m_frameBetweenQuadTreeRegenerations = nbrFrame;
+}
+
+PhysicsManager::~PhysicsManager(){
+	delete m_quadTree;
 }

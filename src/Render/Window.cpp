@@ -12,10 +12,11 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <backends/imgui_impl_sdl2.h> 
-#include <backends/imgui_impl_sdlrenderer2.h>
+#include <backends/imgui_impl_sdlrenderer2.h> 
 
+#include "Engine/Entity.h"
+#include "Shape.h"
 #include "Engine/GameManager.h"
-
 
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
@@ -274,16 +275,33 @@ void Window::Draw(gcle::Shape* pShape)
 		vertices.push_back(*v);
 	}
 
-
-	
-
-
 	if (pShape->GetTexture() == nullptr)
 		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	else {
 		Texture* text = pShape->GetTexture();
 		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	}
+}
+
+bool Window::IsInsideWindow(Entity* entity){
+	int32 w;
+	int32 h;
+	SDL_GetWindowSize(mp_Window, &w, &h);
+	Vector2f camPos = GameManager::GetInstance().m_Cam.GetPosition();
+	float32 margin = 50.f;
+	
+	AABB entityAABB;
+	if (static_cast<int32>(entity->GetRenderShape()->GetRotation()) % 180 != 0) {
+		entityAABB = GetRotatedAABB(entity->GetRenderPosition(), { entity->GetRenderShape()->GetWidth(), entity->GetRenderShape()->GetHeight() }, entity->GetRenderShape()->GetRotation() * DEG_TO_RAD);
+		entityAABB = { entityAABB.minX - margin, entityAABB.minY - margin, entityAABB.maxX + margin, entityAABB.maxY + margin };
+	}
+	else
+		entityAABB = { entity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , entity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , entity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, entity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin};
+
+	AABB windowAABB = { camPos.x , camPos.y , camPos.x + w , camPos.y + h };
+
+
+	return windowAABB.overlaps(entityAABB);
 }
 
 void Window::DrawDebug(gcle::Shape* pShape)
