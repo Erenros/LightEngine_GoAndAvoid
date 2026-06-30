@@ -9,7 +9,7 @@ void QuadTree::Insert(Collider* entry){
 	m_root.Insert(entry, m_pool);
 }
 
-std::vector<ColliderEntry>& QuadTree::Query(ColliderEntry& entry){
+std::vector<Collider*>& QuadTree::Query(Collider* entry){
 
 	for (auto& r : m_seenEntities) {
 		r->SetInQuerySeen(false);
@@ -17,12 +17,12 @@ std::vector<ColliderEntry>& QuadTree::Query(ColliderEntry& entry){
 	m_seenEntities.clear();
 	m_queryResult.clear();
 
-	entry.entity->SetInQuerySeen(true);
-	m_seenEntities.push_back(entry.entity);
+	entry->SetInQuerySeen(true);
+	m_seenEntities.push_back(entry);
 
 
 	float32 margin = 1.f;
-	AABB marginAABB = { entry.aabb.minX - margin, entry.aabb.minY - margin, entry.aabb.maxX + margin, entry.aabb.maxY + margin };
+	AABB marginAABB = { entry->GetAABB().minX - margin, entry->GetAABB().minY - margin, entry->GetAABB().maxX + margin, entry->GetAABB().maxY + margin };
 	m_root.Query(marginAABB, m_queryResult, m_seenEntities);
 	
 	return m_queryResult;

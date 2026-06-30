@@ -9,12 +9,6 @@
 #define maxDepth 9
 
 class Collider;
-class Entity;
-
-struct ColliderEntry{
-	AABB aabb;
-	Collider* entity;
-};
 
 
 class QuadNodePool;
@@ -23,7 +17,7 @@ class QuadNode {
 	AABB m_bounds;
 	int32 m_depth = 0;
 
-	std::vector<ColliderEntry> m_entities;  //if a leaf
+	std::vector<Collider*> m_entities;  //if a leaf
 	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
 
 
@@ -38,7 +32,7 @@ private:
 	bool IsLeaf();
 
 	void Insert(Collider* entity, QuadNodePool& pool);
-	void Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Collider*>& seen);
+	void Query(AABB& range, std::vector<Collider*>& results, std::vector<Collider*>& seen);
 
 	void Clear();
 

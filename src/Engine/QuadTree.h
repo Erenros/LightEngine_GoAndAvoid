@@ -7,7 +7,7 @@ class QuadTree {
 
 	QuadNode m_root;
 	QuadNodePool m_pool;
-	std::vector<ColliderEntry> m_queryResult;
+	std::vector<Collider*> m_queryResult;
 	std::vector <Collider*> m_seenEntities;
 
 public:
@@ -23,6 +23,6 @@ public:
 
 	void Clear();
 
-	std::vector<ColliderEntry>& Query(ColliderEntry& entry);
+	std::vector<Collider*>& Query(Collider* entry);
 	friend class PhysicsManager;
 };

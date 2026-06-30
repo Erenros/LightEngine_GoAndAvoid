@@ -21,7 +21,6 @@ struct CollisionInfo {
 	Vector2f orientation{ 0.f, 0.f };
 };
 
-struct ColliderEntry;
 
 enum class RepulseTypes {
 	AABB,
@@ -100,7 +99,7 @@ private:
 	int8 m_timeBetweenRegeneration = 0;
 
 	std::vector<std::pair<Collider*, Collider*>> m_pairs;
-	std::vector<ColliderEntry> m_queryResult;
+	std::vector<Collider*> m_queryResult;
 
 public:
 	void SetActivateQuadTree(bool activate);
@@ -113,6 +112,11 @@ private:
 	void EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate);
 	void EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate);
 	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void GenerateQuadTree(std::vector<Collider*>* activeColliders);
+	void PendingCorrections();
+	void MakeTreePairs(std::vector<Collider*>* activeColliders);
+	void MakePairs(std::vector<Collider*>* activeColliders);
+
 	void UpdateQuadTree(std::vector<Collider*> activeColliders);
 	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders);
 

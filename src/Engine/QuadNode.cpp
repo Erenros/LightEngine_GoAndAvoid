@@ -24,7 +24,7 @@ void QuadNode::Subdivide(QuadNodePool& pool){
 
 	for (auto& e : m_entities) {
 		for (auto& child : m_childs) {
-			if (child->m_bounds.overlaps(e.aabb)) {
+			if (child->m_bounds.overlaps(e->GetAABB())) {
 				child->m_entities.push_back(e);
 			}
 		}
@@ -42,35 +42,35 @@ bool QuadNode::IsLeaf(){
 	return m_childs[0] == nullptr;
 }
 
-void QuadNode::Insert(Collider* entity, QuadNodePool& pool){
-	AABB aabb = entity->GetAABB();
+void QuadNode::Insert(Collider* collider, QuadNodePool& pool){
+	AABB aabb = collider->GetAABB();
 
 	if (!m_bounds.overlaps(aabb))
 		return;
 
 	if (IsLeaf()) {
-		m_entities.push_back(ColliderEntry{aabb, entity});
+		m_entities.push_back(collider);
 		if (static_cast<int32>(m_entities.size()) > maxEntities && m_depth < maxDepth) {
 			Subdivide(pool);
 		}
 	}
 	else {
 		for (auto* c : m_childs) {
-			c->Insert(entity, pool);
+			c->Insert(collider, pool);
 		}
 	}
 }
 
-void QuadNode::Query(AABB& range, std::vector<ColliderEntry>& results, std::vector<Collider*>& seen){
+void QuadNode::Query(AABB& range, std::vector<Collider*>& results, std::vector<Collider*>& seen){
 	if (!m_bounds.overlaps(range)) {
 		return;
 	}
 	
 	if (IsLeaf()) {
 		for (auto& e : m_entities) {
-			if (!e.entity->GetInQuerySeen()) {
-				e.entity->SetInQuerySeen(true);
-				seen.push_back(e.entity);
+			if (!e->GetInQuerySeen()) {
+				e->SetInQuerySeen(true);
+				seen.push_back(e);
 				results.push_back(e);
 			}
 		}

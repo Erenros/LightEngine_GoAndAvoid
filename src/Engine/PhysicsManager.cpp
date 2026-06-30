@@ -168,8 +168,9 @@ void PhysicsManager::Update(float64 deltaTime)
 		UpdateQuadTree(activeColliders);
 	}
 
-	else {}
-	UpdateWithoutQuadTree(activeColliders);
+	else {
+		UpdateWithoutQuadTree(activeColliders);
+	}
 }
 
 #pragma region Helpers
@@ -208,16 +209,12 @@ void PhysicsManager::EntityToUpdate(std::vector<Collider*>* activeColliders, std
 	}
 }
 
-void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
-{
-	int32 nbrTest = 0;
-
-	m_timeBetweenRegeneration += 1;
+void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* activeColliders) {
 
 	if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
-		m_timeBetweenRegeneration = 0;
 		m_quadTree->Clear();
-		for (auto& collider : activeColliders) {
+		for (auto& collider : *activeColliders) {
+
 			Degrees angle = collider->GetShape()->GetRotation();
 			if (static_cast<int32>(angle) % 180 == 0) {
 				Vector2f pos1 = collider->GetShape()->GetPosition(0.f, 0.f);
@@ -229,24 +226,62 @@ void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
 			}
 			m_quadTree->Insert(collider);
 		}
+		m_timeBetweenRegeneration = 0;
 	}
+}
 
-	for (auto& collider : activeColliders) {
-		AABB aabb = collider->GetAABB();
+void PhysicsManager::PendingCorrections()
+{
+	for (auto& pair : m_PendingCorrections)
+	{
+		Entity* pEntity = pair.first;
+		Vector2f delta = pair.second;
 
-		bool present = false;
-		ColliderEntry e{ aabb, collider };
+		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
+		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
+	}
+	m_PendingCorrections.clear();
+}
 
-		const auto& candidates = m_quadTree->Query(e);
-
-		for (auto& c : candidates) {
-			bool greater = collider < c.entity;
-			bool notTheSameEntity = collider->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
+void PhysicsManager::MakePairs(std::vector<Collider*>* activeColliders) {
+	for (size_t i = 0; i < activeColliders->size(); ++i) {
+		Collider* colliderA = (*activeColliders)[i];
+		for (size_t j = i + 1; j < activeColliders->size(); ++j) {
+			Collider* colliderB = (*activeColliders)[j];
+			bool greater = colliderA < colliderB;
+			bool notTheSameEntity = colliderA->GetOwner()->GetId() != colliderB->GetOwner()->GetId();
 			if (greater && notTheSameEntity) {
-				m_pairs.push_back({ collider, c.entity });
+				m_pairs.push_back({ colliderA, colliderB });
 			}
 		}
 	}
+}
+
+void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
+{
+	for (auto& collider : *activeColliders) {
+
+		const auto& candidates = m_quadTree->Query(collider);
+
+		for (auto& c : candidates) {
+			bool greater = collider < c;
+			bool notTheSameEntity = collider->GetOwner()->GetId() != c->GetOwner()->GetId();
+			if (greater && notTheSameEntity) {
+				m_pairs.push_back({ collider, c });
+			}
+		}
+	}
+}
+
+void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
+{
+	int32 nbrTest = 0;
+
+	m_timeBetweenRegeneration += 1;
+
+	GenerateQuadTree(&activeColliders);
+	
+	MakeTreePairs(&activeColliders);
 
 	for (auto& collider : m_pairs) {
 		nbrTest += 1;
@@ -285,15 +320,7 @@ void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
 			}
 		}
 
-		for (auto& pair : m_PendingCorrections)
-		{
-			Entity* pEntity = pair.first;
-			Vector2f delta = pair.second;
-
-			Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
-			pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
-		}
-		m_PendingCorrections.clear();
+		PendingCorrections();
 
 		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
 		{
@@ -352,20 +379,8 @@ void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeCollider
 		}
 	}
 
-	// 3) Application des corrections de position accumulees : une seule fois par
-	//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
-	for (auto& pair : m_PendingCorrections)
-	{
-		Entity* pEntity = pair.first;
-		Vector2f delta = pair.second;
+	PendingCorrections();
 
-		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
-		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
-	}
-	m_PendingCorrections.clear();
-
-	// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
-	//    de leurs colliders ne se touche cette frame.
 	for (auto& info : m_EntitiesToUpdate)
 	{
 		Entity* entity = info.pEntity;
