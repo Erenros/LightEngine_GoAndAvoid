@@ -92,8 +92,6 @@ void GameManager::Loop()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
-	AssetEngine::GetInstance().LoadFile("../../test.gcle");
-
 	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
@@ -112,6 +110,17 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 	}
 
 	RessourceManager::GetInstance().Init(mp_window);
+
+	if (AssetEngine::GetInstance().LoadFile("../../test.gcle"))
+	{
+		std::unordered_map<std::string, Sprite*> test = AssetEngine::GetInstance().AssetToTexture(GetWindow());
+		size_t bruh = test.size();
+
+		for (auto& pair : test)
+		{
+			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
+		}
+	}
 
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});

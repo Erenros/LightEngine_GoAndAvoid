@@ -1,5 +1,13 @@
 #include "AssetEngine.h"
+#include "Sprite.h"
 #include <fstream>
+
+Asset* AssetEngine::GetAsset(uint32 id)
+{
+	if (!m_assetMap.contains(id))
+		return nullptr;
+	return m_assetMap[id];
+}
 
 bool AssetEngine::LoadFile(const std::string& path)
 {
@@ -18,30 +26,58 @@ bool AssetEngine::LoadFile(const std::string& path)
 
 	Entry entry;
 
-	if (!ReadEntry(file, entry))
+	while (ReadEntry(file, entry))
 	{
-		DEBUG_WARN << "Can't read Entry" << ENDL;
-		return false;
+		if (entry.flag == 0x01)
+		{
+			DEBUG_INFO << "Entry " << entry.id << " Deleted " << "| size : " << entry.size << " byte" << ENDL;
+			file.seekg(entry.size, std::ios::cur); // std::ios::cur = current pos 
+			continue;
+		}
+
+		std::vector<byte> data;
+		if (!ReadData(file, entry, data))
+		{
+			DEBUG_WARN << "Si ce message s'affiche gg well play c'est casser donc recommance ta mal fait un truc" << ENDL;
+			return false;
+		};
+
+
+		DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << "\n";
+		DEBUG_INFO << "ID : " << entry.id << "\n";
+		DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << "\n";
+		DEBUG_INFO << "Type : " << entry.type << "\n";
+		DEBUG_INFO << "Width : " << entry.width << "\n";
+		DEBUG_INFO << "Height : " << entry.height << "\n";
+		DEBUG_INFO << "Size : " << entry.size << ENDL;
+
+		DEBUG_INFO << "File load with a size of : " << data.size() << " byte" << ENDL;
+	
+		Asset* asset = new Asset();
+		asset->id = entry.id;
+		asset->type = entry.type;
+		asset->width = entry.width;
+		asset->height = entry.height;
+		asset->data = std::move(data);
+
+		m_assetMap[asset->id] = asset;
 	}
 
-	DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << "\n";
-	DEBUG_INFO << "ID : " << entry.id << "\n";
-	DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << "\n";
-	DEBUG_INFO << "Type : " << entry.type << "\n";
-	DEBUG_INFO << "Width : " << entry.width << "\n";
-	DEBUG_INFO << "Height : " << entry.height << "\n";
-	DEBUG_INFO << "Size : " << entry.size << ENDL;
-
-	std::vector<byte> data;
-	if (!ReadData(file, entry, data))
-	{
-		DEBUG_WARN << "Can't read data" << ENDL;
-		return false;
-	}
-
-
-	DEBUG_INFO << "File load with a size of : " << data.size() << " byte" << ENDL;
 	return true;
+}
+
+std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* window)
+{
+	std::unordered_map< std::string, Sprite*> textureMap;
+	
+	for (auto& pair : m_assetMap)
+	{
+		textureMap[std::to_string(pair.first)] = new Sprite(window, pair.second);
+		delete pair.second;
+	}
+
+	m_assetMap.clear();
+	return textureMap;
 }
 
 bool AssetEngine::ReadHeader(std::ifstream& file)

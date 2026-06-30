@@ -67,6 +67,10 @@ private:
 
 public:
 
+	//TEMP ONLY FOR TEST
+	void ForcePutTexture(Sprite* text, std::string id);
+
+
 	static RessourceManager& GetInstance() {
 		static RessourceManager instance;
 		return instance;

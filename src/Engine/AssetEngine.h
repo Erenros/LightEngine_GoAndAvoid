@@ -2,7 +2,8 @@
 #include "include.h"
 #include <unordered_map>
 
-class Texture;
+class Window;
+class Sprite;
 
 struct Header
 {
@@ -21,6 +22,16 @@ struct Entry
 	int32 size;
 };
 
+struct Asset
+{
+	int8 id;
+	int64 type;
+	int16 width;
+	int16 height;
+
+	std::vector<byte> data;
+};
+
 class AssetEngine
 {
 private:
@@ -34,9 +45,13 @@ public:
 		return instance;
 	}
 	
-	//std::unordered_map<std::string, Texture*>& ReadFromFile(std::string path);
+	std::unordered_map<uint32, Asset*> m_assetMap;
+
+	Asset* GetAsset(uint32 id);
 
 	bool LoadFile(const std::string& path);
+
+	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
 
 	bool ReadHeader(std::ifstream& file);
 	bool ReadEntry(std::ifstream& file, Entry& entry);

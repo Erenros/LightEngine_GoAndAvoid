@@ -2,6 +2,7 @@
 #include <string>
 
 class Window;
+struct Asset;
 struct SDL_Texture;
 
 class Texture
@@ -26,9 +27,11 @@ public:
 	};
 
 	Texture(Window* window, const std::string& path);
+	Texture(Window* window, Asset* data);
 	Texture() = default;
 
 	virtual ~Texture() ;
 
+	void InitTextureWithBuffer(Window* window, Asset* asset);
 	void InitTexture(Window* window, const std::string& path);
 };
