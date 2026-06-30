@@ -3,10 +3,12 @@
 #include <unordered_map>
 #include "include.h"
 #include <Windows.h>
+#include <Xinput.h>
 
+#pragma comment(lib, "Xinput.lib")
 
-
-namespace Mouse{
+namespace Mouse
+{
 	#define LeftButton VK_LBUTTON
 	#define RightButton VK_RBUTTON
 	#define MiddleButton VK_MBUTTON
@@ -14,7 +16,8 @@ namespace Mouse{
 	#define Button2 VK_XBUTTON2
 }
 
-namespace Keyboard {
+namespace Keyboard
+{
 	#define Space VK_SPACE
 	#define Shift VK_SHIFT
 	#define Escape 0x1B
@@ -40,8 +43,14 @@ namespace Keyboard {
 	#define F10 VK_F10
 	#define F11 VK_F11
 	#define F12 VK_F12
+}
 
-
+namespace Controller
+{
+#define XBoxA VK_PAD_A
+#define XBoxB VK_PAD_B
+#define XBoxX VK_PAD_X
+#define XBoxY VK_PAD_Y
 }
 
 
@@ -53,7 +62,8 @@ private:
 
 public:
 
-	static InputManager& GetInstance() {
+	static InputManager& GetInstance()
+	{
 		static InputManager instance;
 		return instance;
 	}
@@ -74,6 +84,8 @@ public:
 	bool IsDown(const short key);
 	bool IsHeld(const char key);
 	bool IsUp(const char key);
+
+	bool IsControllerDown(const short key);
 
 
 	Vector2<long> GetMouseRelativePosition();

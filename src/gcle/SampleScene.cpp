@@ -47,13 +47,13 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 
-	/*if (InputManager::GetInstance().IsDown(Space))
-	{
-		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
-	}
-
 	if (InputManager::GetInstance().IsDown('A'))
 	{
 		pEntity->Destroy();
-	}*/
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBoxA))
+	{
+		std::cout << "qivzd" << std::endl;
+	}
 } 

@@ -117,6 +117,8 @@ GameManager::~GameManager()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
+	//XInputEnable(true);
+
 	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
