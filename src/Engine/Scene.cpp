@@ -52,6 +52,12 @@ void Scene::Draw(Window* window) {
 
 	if (m_debug && m_selectedEntity != nullptr)
 	{
+		for (Text* t : m_debugInfoTexts)
+			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+	}
+
+	if (m_debug && m_debugPerf)
+	{
 		for (Text* t : m_debugTexts)
 			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
 	}
@@ -66,6 +72,10 @@ Scene::~Scene()
 	for (Text* t : m_debugTexts)
 		delete t;
 	m_debugTexts.clear();
+
+	for (Text* t : m_debugInfoTexts)
+		delete t;
+	m_debugInfoTexts.clear();
 }
 
 Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
@@ -140,6 +150,26 @@ Text* Scene::CreateDebugText(const std::string& text, int x, int y, int w, int h
 void Scene::DestroyDebugText(Text* text)
 {
 	std::erase_if(m_debugTexts, [text](Text* t) { return t == text; });
+	delete text;
+}
+
+Text* Scene::CreateDebugInfoText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
+{
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+	if (font == nullptr)
+	{
+		GCLE_WARN << "Couldn't find the default font" << ENDL;
+		return nullptr;
+	}
+
+	Text* new_text = GCLE_NEW Text(font, text, x, y, w, h, r, g, b);
+	m_debugInfoTexts.push_back(new_text);
+	return new_text;
+}
+
+void Scene::DestroyDebugInfoText(Text* text)
+{
+	std::erase_if(m_debugInfoTexts, [text](Text* t) { return t == text; });
 	delete text;
 }
 
@@ -237,19 +267,34 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
-	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
+	mp_Position		= CreateDebugInfoText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
+	mp_PosX			= CreateDebugInfoText("",			125,	0,		100,	50,	255, 225, 255);
+	mp_PosY			= CreateDebugInfoText("",			250,	0,		100,	50,	255, 225, 255); 
 
-	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
+	mp_Rotation		= CreateDebugInfoText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
+	mp_RotZ			= CreateDebugInfoText("",			125,	75,		100,	50,	255, 225, 255); 
 
-	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
+	mp_Scale		= CreateDebugInfoText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
+	mp_ScaleX		= CreateDebugInfoText("",			125,	150,	100,	50,	255, 225, 255);
+	mp_ScaleY		= CreateDebugInfoText("",			250,	150,	100,	50,	255, 225, 255); 
 
 	mp_Frame		= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
 	mp_FPS			= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
+
+	mp_Colliders	= CreateDebugText("Colliders: ", 0, 1000, 100, 50, 255, 225, 255);
+	mp_CollidersP	= CreateDebugText("", 100, 1000, 100, 50, 255, 225, 255);
+
+	mp_Entity		= CreateDebugText("Entity C/D: ", 200, 1000, 100, 50, 255, 225, 255);
+	mp_EntityP		= CreateDebugText("", 300, 1000, 100, 50, 255, 225, 255);
+
+	mp_Input		= CreateDebugText("InputManager: ", 400, 1000, 100, 50, 255, 225, 255);
+	mp_InputP		= CreateDebugText("", 500, 1000, 100, 50, 255, 225, 255);
+
+	mp_Update		= CreateDebugText("Update: ", 600, 1000, 100, 50, 255, 225, 255);
+	mp_UpdateP		= CreateDebugText("", 700, 1000, 100, 50, 255, 225, 255);
+
+	mp_Draw 		= CreateDebugText("Draw: ", 800, 1000, 100, 50, 255, 225, 255);
+	mp_DrawP		= CreateDebugText("", 900, 1000, 100, 50, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -264,6 +309,9 @@ void Scene::OnUpdate(Clock& time)
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
 	//GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
+
+	if (InputManager::GetInstance().IsDown(F1))
+		m_debugPerf = !m_debugPerf;
 
 	if (m_updateDebug >= DEBUG_UPDATE)
 	{
