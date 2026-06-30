@@ -153,6 +153,25 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 
 #pragma region Update
 
+void PhysicsManager::Update(float64 deltaTime)
+{
+	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
+	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
+
+	std::vector<Collider*> activeColliders;
+
+	EntityToUpdate(&activeColliders, m_EntitiesToUpdate);
+
+	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
+
+	if (m_activateQuadTree == true) {
+		UpdateQuadTree(activeColliders);
+	}
+
+	else {}
+	UpdateWithoutQuadTree(activeColliders);
+}
+
 #pragma region Helpers
 
 void PhysicsManager::EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate)
@@ -373,24 +392,7 @@ void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeCollider
 #pragma endregion
 
 
-void PhysicsManager::Update(float64 deltaTime)
-{
-	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
-	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
 
-	std::vector<Collider*> activeColliders;
-
-	EntityToUpdate(&activeColliders, m_EntitiesToUpdate);
-
-	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
-
-	if (m_activateQuadTree == true) {
-		UpdateQuadTree(activeColliders);
-	}
-		
-	else {}
-		UpdateWithoutQuadTree(activeColliders);
-}
 
 void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
 {
