@@ -24,7 +24,7 @@ void SampleScene::OnInitialize()
 	entity1->SetRigidBody(true); 
 	entity1->SetIsKinematic(true); 
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 45.0f, { 1.0f, 1.0f }); 
 
 	mp_mainCamera->SetFollowing(entity1);
 
@@ -37,7 +37,7 @@ void SampleScene::OnInitialize()
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
 		entity->SetIsKinematic(true);
-		entity->CreateCollider(gcle::Shapes::Rectangle, true, { -49000.f + (i * 100), -49000.f + (i * 100) }, 0,  { 1, 1 });
+		entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
