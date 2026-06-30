@@ -35,6 +35,7 @@ public:
 
 	void SetDebug();
 
+	Camera* GetCurrentCamera();
 protected: 
 	Scene() = default;
 		
@@ -45,7 +46,6 @@ protected:
 	virtual void OnExit();
 
 	Camera* GetMainCamera();
-	Camera* GetCurrentCamera();
 	void SwitchCamera(Camera* pCamera);
 
 private: 

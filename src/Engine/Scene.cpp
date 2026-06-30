@@ -177,7 +177,7 @@ void Scene::EntityInfoVisibility(const int32 debugConstant)
 		}
 	}
 
-	if (m_selectedEntity != nullptr && m_updateDebug > debugConstant)
+	if (m_selectedEntity != nullptr && m_updateDebug >= debugConstant)
 	{
 
 
@@ -241,11 +241,11 @@ void Scene::OnUpdate(Clock& time)
 	EntityInfoVisibility(DEBUG_UPDATE);
 	DebugSetEntityPosition();
 
-	GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
-	GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
-	GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
+	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
+	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
+	//GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
 
-	if (m_updateDebug > DEBUG_UPDATE)
+	if (m_updateDebug >= DEBUG_UPDATE)
 	{
 		m_updateDebug = 0;
 		mp_FPS->SetText(std::to_string(time.GetFramePerSecond()));

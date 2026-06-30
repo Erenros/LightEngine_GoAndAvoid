@@ -93,9 +93,9 @@ void GameManager::Loop()
 
 
 	
-		GCLE_INFO << "FPS : " << m_Time->GetFramePerSecond() << ENDL;
-		//PROFILER_END("Update");
-		//system("CLS");
+		// GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
+		// PROFILER_END("Update");
+		// system("CLS");
 	}
 	timeEndPeriod(1);
 	isRunning = false;
@@ -152,9 +152,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 	RessourceManager::GetInstance().Init(mp_window);
 
 	for (int i = 0; i < 32; i++)
-		m_entities.push_back({});
-
-	m_Cam.Init(mp_window);
+		m_entities.push_back({}); 
 
 	return true;
 }

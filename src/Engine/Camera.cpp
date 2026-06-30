@@ -45,7 +45,7 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 	{
 		for (Entity* entity : layer)
 		{
-			if (e->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
+			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
 				entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
 
 				Vector2f realScale = entity->GetScale();

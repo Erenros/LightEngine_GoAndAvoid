@@ -24,7 +24,7 @@ public:
 	}
 
 	float64 fixedUpdateDT = 1.f / FixedUpdateExecution; 
-	float32 accDt = 0.f;
+	float32 m_accDt = 0.f;
 	float64 m_fpsDT = 1.f / m_fps; 
 
 	GameManager() = default;

@@ -18,6 +18,9 @@
 #include "Shape.h"
 #include "Engine/GameManager.h"
 
+constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
+constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
+
 void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
 	m_width = width;
@@ -60,7 +63,7 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 
 	// Create a Render Target
 
-	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, 1920, 1080);
+	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT);
 	SDL_SetTextureScaleMode(mp_RenderTarget, SDL_ScaleModeLinear);
 
 	if (!mp_RenderTarget)
@@ -86,10 +89,7 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 Vector2f Window::GetMousePositionOnRenderTarget()
 {
 	Vector2u mousePos = GetMousePosition(); 
-	Vector2f windowSize = GetWindowSize();  
-	 
-	constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
-	constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
+	Vector2f windowSize = GetWindowSize();   
 
 	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
 	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
@@ -283,11 +283,9 @@ void Window::Draw(gcle::Shape* pShape)
 	}
 }
 
-bool Window::IsInsideWindow(Entity* entity){
-	int32 w;
-	int32 h;
-	SDL_GetWindowSize(mp_Window, &w, &h);
-	Vector2f camPos = GameManager::GetInstance().m_Cam.GetPosition();
+bool Window::IsInsideWindow(Entity* entity){ 
+
+	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 	
 	AABB entityAABB;
@@ -298,7 +296,7 @@ bool Window::IsInsideWindow(Entity* entity){
 	else
 		entityAABB = { entity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , entity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , entity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, entity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin};
 
-	AABB windowAABB = { camPos.x , camPos.y , camPos.x + w , camPos.y + h };
+	AABB windowAABB = { -margin, -margin, margin + RENDER_TARGET_WIDTH , margin + RENDER_TARGET_HEIGHT };
 
 
 	return windowAABB.overlaps(entityAABB);
