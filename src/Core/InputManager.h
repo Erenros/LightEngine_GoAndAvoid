@@ -45,13 +45,26 @@ namespace Keyboard
 	#define F12 VK_F12
 }
 
-namespace Controller
-{
-#define XBoxA VK_PAD_A
-#define XBoxB VK_PAD_B
-#define XBoxX VK_PAD_X
-#define XBoxY VK_PAD_Y
-}
+
+
+#define XBOX_START XINPUT_GAMEPAD_START
+#define XBOX_BACK XINPUT_GAMEPAD_BACK
+
+#define XBOX_PAD_UP XINPUT_GAMEPAD_DPAD_UP
+#define XBOX_PAD_LEFT XINPUT_GAMEPAD_DPAD_LEFT
+#define XBOX_PAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
+#define XBOX_PAD_DOWN XINPUT_GAMEPAD_DPAD_DOWN
+
+#define XBOX_A XINPUT_GAMEPAD_A
+#define XBOX_B XINPUT_GAMEPAD_B
+#define XBOX_X XINPUT_GAMEPAD_X
+#define XBOX_Y XINPUT_GAMEPAD_Y
+
+#define XBOX_LJS XINPUT_GAMEPAD_LEFT_THUMB
+#define XBOX_RJS XINPUT_GAMEPAD_RIGHT_THUMB
+#define XBOX_LB XINPUT_GAMEPAD_LEFT_SHOULDER
+#define XBOX_RB XINPUT_GAMEPAD_RIGHT_SHOULDER
+
 
 
 class InputManager
@@ -85,7 +98,7 @@ public:
 	bool IsHeld(const char key);
 	bool IsUp(const char key);
 
-	bool IsControllerDown(const short key);
+	bool IsControllerDown(int16 key);
 
 
 	Vector2<long> GetMouseRelativePosition();

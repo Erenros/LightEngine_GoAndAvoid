@@ -47,13 +47,85 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 
-	if (InputManager::GetInstance().IsDown('A'))
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_A))
 	{
-		pEntity->Destroy();
+		std::cout << "XBOX A" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBoxA))
+	if (InputManager::GetInstance().IsControllerDown(XBOX_B))
 	{
-		std::cout << "qivzd" << std::endl;
+		std::cout << "XBOX B" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_X))
+	{
+		std::cout << "XBOX X" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_Y))
+	{
+		std::cout << "XBOX Y" << std::endl;
+	}
+
+
+
+
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_BACK))
+	{
+		std::cout << "XBOX BACK" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_LEFT))
+	{
+		std::cout << "XBOX PAD LEFT" << std::endl;
+	}
+
+
+
+
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_RIGHT))
+	{
+		std::cout << "XBOX PAD RIGHT" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_UP))
+	{
+		std::cout << "XBOX PAD UP" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_DOWN))
+	{
+		std::cout << "XBOX PAD DOWN" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_DOWN))
+	{
+		std::cout << "XBOX PAD DOWN" << std::endl;
+	}
+
+
+
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_RJS))
+	{
+		std::cout << "XBOX RT DOWN" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_LJS))
+	{
+		std::cout << "XBOX LT DOWN" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_RB))
+	{
+		std::cout << "XBOX RB DOWN" << std::endl;
+	}
+
+	if (InputManager::GetInstance().IsControllerDown(XBOX_LB))
+	{
+		std::cout << "XBOX LB DOWN" << std::endl;
 	}
 } 

@@ -51,31 +51,15 @@ bool InputManager::IsUp(const char key){
     return ((GetAsyncKeyState(key) & 0x8000) == 0);
 }
 
-bool InputManager::IsControllerDown(const short key)
+bool InputManager::IsControllerDown(int16 key)
 { 
-    XINPUT_KEYSTROKE x;
-    x.VirtualKey = key;
-    x.Unicode = 0;
-    x.Flags = XINPUT_KEYSTROKE_KEYDOWN;
-    x.UserIndex = 0;
-    x.HidCode = key;
-
-
-    XINPUT_VIBRATION vib;
-    vib.wLeftMotorSpeed = 65535;
-    vib.wRightMotorSpeed = 65535;
-
-    XInputSetState(0, &vib);
-
-    //XInputGetKeystroke(1, 0, &x);
-
-    long long ll = XInputGetKeystroke(0, 0, &x);
-    
-    if (ll != 4306)
+    XINPUT_STATE state;
+    if (!XInputGetState(0, &state) == ERROR_SUCCESS)
+        return false;
+     
+    if (state.Gamepad.wButtons & key)
     {
-        std::cout << "XBox Key Detected" << std::endl;
-        int a;
-        std::cin >> a;
+        return true;
     }
 
     return false;
