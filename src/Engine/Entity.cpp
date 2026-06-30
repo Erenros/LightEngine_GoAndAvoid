@@ -125,7 +125,6 @@ Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f rel
 	return collider;
 }
 
-
 void Entity::Destroy()
 {
 	m_ToDestroy = true;

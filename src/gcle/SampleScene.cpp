@@ -24,38 +24,12 @@ void SampleScene::OnInitialize()
 	entity1->SetRigidBody(true); 
 	entity1->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, { 1.0f, 1.0f })->GetShape()->Rotate(45);
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
 
 	mp_mainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
 
-	 
-	/*Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(10, 100);
-	entity2->SetRigidBody(true); 
-	entity2->GetShape()->SetIsKinematic(true);
-	entity2->SetTexture("images");
-
-	/*Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity3->SetPosition(200.f, 100.f);
-	entity3->SetRotation(45.f);
-	entity3->SetRigidBody(true);
-	entity3->GetRigidBody().SetGravity(false);
-	entity3->GetShape()->SetIsKinematic(true);
-	entity3->SetTexture("images");
-
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(10.f, 100.f);
-	entity2->SetRigidBody(true);
-	entity2->GetRigidBody().SetGravity(false);
-	entity2->GetShape()->SetIsKinematic(true);
-	entity2->SetTexture("images");
-
-	Entity* entity4 = CreateEntity<Entity>(gcle::Shapes::Circle);
-	entity4->SetPosition(-200, 100);
-	entity4->SetRigidBody(true); 
-	entity4->GetShape()->SetIsKinematic(true);*/
 
 	for (int i = 0; i < 500; i++) {
 		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -63,7 +37,7 @@ void SampleScene::OnInitialize()
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
 		entity->SetIsKinematic(true);
-		entity->CreateCollider(gcle::Shapes::Rectangle, true, { -49000.f + (i * 100), -49000.f + (i * 100) }, { 1, 1 });
+		entity->CreateCollider(gcle::Shapes::Rectangle, true, { -49000.f + (i * 100), -49000.f + (i * 100) }, 0,  { 1, 1 });
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
