@@ -8,19 +8,19 @@ void Player::OnUpdate() {
     
 
     if (im.IsHeld('Q')) {
-        GetRigidBody().AddForce({ -1, 0 }, 100, dt);
+        GetRigidBody().AddForce({ -1, 0 }, 600, dt);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody().AddForce({ 1, 0 }, 100, dt);
+        GetRigidBody().AddForce({ 1, 0 }, 600, dt);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody().AddForce({ 0, 1 }, 100, dt);
+        GetRigidBody().AddForce({ 0, 1 }, 600, dt);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody().AddForce({ 0, -1 }, 100, dt);
+        GetRigidBody().AddForce({ 0, -1 }, 600, dt);
     }
     if (im.IsHeld('B')) {
-        GetRigidBody().AddImpulse({ 0, -1 }, 500);
+        GetRigidBody().AddImpulse({ 0, -1 }, 600);
     }
 }
 

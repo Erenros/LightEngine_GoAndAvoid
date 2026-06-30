@@ -78,5 +78,7 @@ public:
 
 	Vector2<long> GetMouseRelativePosition();
 	Vector2<long> GetMouseWorldPosition();
+
+	
 };
 

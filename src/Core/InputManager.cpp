@@ -1,5 +1,8 @@
 #include "InputManager.h"
 
+#include "Render/Window.h"
+#include "Engine/GameManager.h"
+
 void InputManager::Update() {
     std::unordered_map<short, bool>::iterator it;
 
@@ -51,3 +54,4 @@ Vector2<long> InputManager::GetMouseWorldPosition(){
     //TODO a faire
     return Vector2<long>();
 }
+

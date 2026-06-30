@@ -25,15 +25,15 @@ Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, c
 	if (m_textureMap[id].mp_texture != nullptr)
 		return m_textureMap[id].mp_texture;
 
-    Sprite* texture = new Sprite(window, path);
+    Sprite* texture = GCLE_NEW Sprite(window, path);
     if (texture == nullptr || !texture->IsTextureInit())
     {
-        DEBUG_WARN << "Got a nullptr Texture for path : " + path << ENDL;
+        GCLE_WARN << "Got a nullptr Texture for path : " + path << ENDL;
         delete texture;
         return nullptr;
     }
      
-    DEBUG_INFO << "Texture created" << ENDL;
+    GCLE_INFO << "Texture created" << ENDL;
     m_textureMap[id].mp_texture = texture;
     return texture;
 }
@@ -48,10 +48,10 @@ void RessourceManager::SetFontSize(const std::string& id, int size)
 
 bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 {
-    Music* music = new Music(path);
+    Music* music = GCLE_NEW Music(path);
     if (music == nullptr || !music->IsMusicInit())
     {
-        DEBUG_WARN << "Got nullptr music for path " + path << ENDL;
+        GCLE_WARN << "Got nullptr music for path " + path << ENDL;
         delete music;
         return false;
     }
@@ -62,10 +62,10 @@ bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 
 bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 {
-    Sound* sound = new Sound(path);
+    Sound* sound = GCLE_NEW Sound(path);
     if (sound == nullptr || !sound->IsSoundInit())
     {
-        DEBUG_WARN << "Got a nullptr sound for path : " + path << ENDL;
+        GCLE_WARN << "Got a nullptr sound for path : " + path << ENDL;
         delete sound;
         return false;
     }
@@ -76,10 +76,10 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 
 bool RessourceManager::LoadFont(const std::string& path, const std::string& id, int size)
 {
-    Font* font = new Font(path, size);
+    Font* font = GCLE_NEW Font(path, size);
     if (font == NULL)
     {
-        DEBUG_WARN << "Got a nullptr font for path " + path << ENDL;
+        GCLE_WARN << "Got a nullptr font for path " + path << ENDL;
         delete font;
         return false;
     }
