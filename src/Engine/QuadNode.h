@@ -2,6 +2,8 @@
 #include <vector>
 #include "include.h"
 #include <unordered_set>
+#include "Utils.h"
+
 
 #define maxEntities 8
 #define maxDepth 9
@@ -9,21 +11,11 @@
 class Collider;
 class Entity;
 
-struct AABB {
-	float32 minX, minY, maxX, maxY;
-
-	bool overlaps(const AABB& other) {
-		return minX < other.maxX && minY < other.maxY && maxX > other.minX && maxY > other.minY;
-	}
-
-	bool include(const AABB& other) {
-		return other.minX >= minX && other.maxX <= maxX && other.minY >= minY && other.maxY <= maxY;
-	}
-};
 struct ColliderEntry{
 	AABB aabb;
 	Collider* entity;
 };
+
 
 class QuadNodePool;
 

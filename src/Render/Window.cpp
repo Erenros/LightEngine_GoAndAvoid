@@ -114,20 +114,23 @@ bool Window::IsInsideWindow(Entity* entity){
 	int32 w;
 	int32 h;
 	SDL_GetWindowSize(mp_Window, &w, &h);
-	Vector2f camCenter = GameManager::GetInstance().m_Cam.GetPosition();
-	float32 margin = 100.f;
+	Vector2f camPos = GameManager::GetInstance().m_Cam.GetPosition();
+	float32 margin = 50.f;
+	
+	AABB entityAABB;
+	if (static_cast<int32>(entity->GetRenderShape()->GetRotation()) % 180 != 0) {
+		entityAABB = GetRotatedAABB(entity->GetRenderPosition(), { entity->GetRenderShape()->GetWidth(), entity->GetRenderShape()->GetHeight() }, entity->GetRenderShape()->GetRotation() * DEG_TO_RAD);
+		entityAABB = { entityAABB.minX - margin, entityAABB.minY - margin, entityAABB.maxX + margin, entityAABB.maxY + margin };
+	}
+	else
+		entityAABB = { entity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , entity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , entity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, entity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin};
 
-	Vector2f camPos1 = { camCenter.x - margin , camCenter.y - margin };
-	Vector2f camPos2 = { camCenter.x + w + margin, camCenter.y + h + margin};
+	AABB windowAABB = { camPos.x , camPos.y , camPos.x + w , camPos.y + h };
 
 
-	gcle::Shape* shape = entity->GetRenderShape();
-
-	Vector2f pos1 = shape->GetPosition(0.f, 0.f);
-	Vector2f pos2 = shape->GetPosition(1.f, 1.f);
-
-	return pos1.x < camPos2.x && pos1.y < camPos2.y && pos2.x > camPos1.x && pos2.y > camPos1.y;
+	return windowAABB.overlaps(entityAABB);
 }
+
 void Window::DrawDebug(gcle::Shape* pShape)
 {
 	std::vector<SDL_FPoint*> pointsPtr;

@@ -53,3 +53,11 @@ bool Collider::GetInQuerySeen() {
 void Collider::SetInQuerySeen(bool seen) {
     m_inQuerySeen = seen;
 }
+
+AABB Collider::GetAABB(){
+    return m_aabb;
+}
+
+void Collider::SetAABB(AABB aabb){
+    m_aabb = aabb;
+}
