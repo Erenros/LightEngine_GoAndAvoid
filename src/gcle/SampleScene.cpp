@@ -12,12 +12,20 @@ void SampleScene::OnInitialize()
 	CreateText(text, 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 10, -200 }, { 1, 1 })->GetShape()->SetRotation(45);
 	entity1->SetPosition(10, -200);
 	entity1->SetRotation(45);
 	entity1->SetRigidBody(true); 
 	entity1->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
 
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(100, 100);
+	entity2->SetRigidBody(true);
+	entity2->GetRigidBody().SetGravity(false);
+	entity2->SetIsKinematic(true);
+	entity2->SetTexture("test");
+	entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 100, -400}, {1, 1});
 
 	/*Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(200.f, 100.f);
@@ -40,12 +48,13 @@ void SampleScene::OnInitialize()
 	entity4->GetRigidBody().SetGravity(false);
 	entity4->GetShape()->SetIsKinematic(true);*/
 
-	for (int i = 0; i < 500; i++) {
+	for (int i = 0; i < 000; i++) {
 		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 		entity->SetPosition(-49000 + (i * 100), -49000 + (i * 100));
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
 		entity->SetIsKinematic(true);
+		entity->CreateCollider(gcle::Shapes::Rectangle, true, { -49000.f + (i * 100), -49000.f + (i * 100) }, { 1, 1 });
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);

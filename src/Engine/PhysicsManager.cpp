@@ -213,7 +213,9 @@ void PhysicsManager::Update(float64 deltaTime)
 			////PROFILER_END("QueryQuad");
 
 			for (auto& c : candidates) {
-				if (entity < c.entity && entity->GetOwner()->GetId() != entity->GetOwner()->GetId()) {
+				bool greater = entity < c.entity;
+				bool notTheSameEntity = entity->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
+				if (greater && notTheSameEntity) {
 					m_pairs.push_back({ entity, c.entity });
 				}
 			}
@@ -225,7 +227,7 @@ void PhysicsManager::Update(float64 deltaTime)
 			nbrTest += 1;
 
 			//PROFILER_START("collisionTest", "Collision test");
-			bool coliding =IsColliding(entities.first, entities.second);
+			bool coliding = IsColliding(entities.first, entities.second);
 			//PROFILER_END("collisionTest");
 
 

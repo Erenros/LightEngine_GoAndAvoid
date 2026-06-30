@@ -23,7 +23,6 @@ void GameManager::Loop()
 
 	isRunning = true;
 	 
-	m_Cam.Init(mp_window);
 
 	timeBeginPeriod(1);
 	while (isRunning == true)
@@ -64,6 +63,8 @@ void GameManager::Loop()
 
 		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
+
+		m_Cam.Update(m_Time, m_entities);
 
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
@@ -130,11 +131,10 @@ GameManager::~GameManager()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 {
+	srand(static_cast<int32>(m_Time.GetTime()));
+	
 	m_fps = FPS;
 	m_fpsDT = 1.f / m_fps;
-
-
-	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
@@ -155,6 +155,8 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});
+
+	m_Cam.Init(mp_window);
 
 	return true;
 }

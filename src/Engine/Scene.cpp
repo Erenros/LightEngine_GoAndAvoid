@@ -34,7 +34,7 @@ void Scene::Draw(Window* window) {
 			}
 		}
 	}
-	GCLE_INFO << i << ENDL;
+	//GCLE_INFO << i << ENDL;
 
 	for (Text* t : m_texts)
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
@@ -79,8 +79,7 @@ bool Scene::isDrawn(const std::string& tag){
 }
 
 void Scene::Update(Clock& time){
-	for (auto layer : GameManager::GetInstance().m_entities) 
-	{
+	for (auto layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer)
 		{
 			if (e->IsActiveIn(m_tag))
