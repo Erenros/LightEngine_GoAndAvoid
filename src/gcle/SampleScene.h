@@ -13,5 +13,7 @@ public:
 	private:
 		Entity* pEntity = nullptr;
 		Entity* otherEntity = nullptr;
+
+		Camera* pSceneCamera = nullptr;
 };
 

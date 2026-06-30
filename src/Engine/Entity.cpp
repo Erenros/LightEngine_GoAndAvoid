@@ -150,10 +150,16 @@ void Entity::SetRigidBody(bool isRigidBody)
 	m_RigidBody.SetActive(isRigidBody);
 
 	if (isRigidBody)
+	{
 		PhysicsManager::GetInstance().AddEntity(this);
+		m_isHighlighted = true;
+	}
 
 	if (!isRigidBody)
+	{
 		PhysicsManager::GetInstance().RemoveEntity(this);
+		m_isHighlighted = false;
+	}
 }
 
 void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)

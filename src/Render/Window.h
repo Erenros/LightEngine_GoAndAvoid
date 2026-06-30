@@ -86,4 +86,7 @@ private:
 	SDL_Renderer* mp_Renderer = nullptr;
 	SDL_Texture* mp_RenderTarget = nullptr;
 	uint32 m_width, m_height = 0;
+
+private:
+	friend class Event;
 };

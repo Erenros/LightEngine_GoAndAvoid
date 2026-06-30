@@ -6,7 +6,7 @@ void Scene::DrawDebug(Window* window)
 	for (auto layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer)
 		{
-			if (e->IsActiveIn(m_tag)) {
+			if (e->IsActiveIn(m_tag) && e->m_isHighlighted) {
 				if (e->CollidingEntity.empty())
 				{
 					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
@@ -15,7 +15,19 @@ void Scene::DrawDebug(Window* window)
 				{
 					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
 				}
-				GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+
+				if (m_isVisualDebugActive)
+				{
+					GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+				}
+				else if (m_selectedEntity != nullptr)
+				{
+					if (e->GetId() == m_selectedEntity->GetId())
+					{
+						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
+						GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+					}
+				}
 			}
 		}
 	}
@@ -129,37 +141,24 @@ void Scene::DestroyDebugText(Text* text)
 	delete text;
 }
 
-void Scene::OnInitialize()
+void Scene::SetGizmoVisibility()
 {
-	SetDebug();
-	mp_mainCamera	= CreateCamera();
-	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
-	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
-	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
-	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
-
-	mp_Frame	= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
-	mp_FPS		= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
+	m_isVisualDebugActive = !m_isVisualDebugActive;
 }
 
-void Scene::OnUpdate(Clock& time)
-{ 
-	constexpr int32 DEBUG_UPDATE = 5;
-
+void Scene::EntityInfoVisibility(const int32 debugConstant)
+{
 	if (InputManager::GetInstance().IsDown(LeftButton))
 	{
 		bool selected = false;
 		for (auto& layer : GameManager::GetInstance().m_entities)
 		{
 			for (Entity* e : layer)
-			{   
-				if (e->IsInside(mp_mainCamera->GetMousePosition()))
-				{ 
+			{
+				if (e->IsInside(mp_activeCamera->GetScreenMousePosition()))
+				{
 					m_selectedEntity = e;
+					m_selectedEntity->m_isHighlighted = true;
 					selected = true;
 					break;
 				}
@@ -167,14 +166,18 @@ void Scene::OnUpdate(Clock& time)
 		}
 
 		if (selected == false)
-			m_selectedEntity = nullptr;
+		{
+			if (m_selectedEntity != nullptr)
+			{
+				m_selectedEntity->m_isHighlighted = false;
+				m_selectedEntity = nullptr;
+			}
+		}
 	}
 
-	m_updateDebug++;
-
-	if (m_selectedEntity != nullptr && m_updateDebug > DEBUG_UPDATE)
+	if (m_selectedEntity != nullptr && m_updateDebug > debugConstant)
 	{
-		m_updateDebug = 0;
+
 
 		Vector2f pos = m_selectedEntity->GetPosition();
 		Degrees rot = m_selectedEntity->GetRotation();
@@ -184,21 +187,66 @@ void Scene::OnUpdate(Clock& time)
 		mp_PosX->SetText(std::to_string(pos.x));
 		mp_PosY->SetText(std::to_string(pos.y));
 
-		mp_RotZ->SetText(std::to_string(rot)); 
+		mp_RotZ->SetText(std::to_string(rot));
 
 		mp_ScaleX->SetText(std::to_string(scale.x));
 		mp_ScaleY->SetText(std::to_string(scale.y));
 	}
+}
 
-	fpsTimer += time.GetDeltaTime();
-	if (fpsTimer >= 1.f) {
-		fpsTimer -= 1.f;
-		fpsCount = static_cast<int16>(1.f / time.GetDeltaTime());
+void Scene::DebugSetEntityPosition()
+{
+	if (m_selectedEntity != nullptr)
+	{
+		if (InputManager::GetInstance().IsDown(RightButton))
+		{
+			m_selectedEntity->SetPosition(
+				mp_activeCamera->GetMouseScreenToWorldPosition().x,
+				mp_activeCamera->GetMouseScreenToWorldPosition().y
+			);
+		}
 	}
+}
+
+void Scene::OnInitialize()
+{
+	SetDebug();
+	mp_mainCamera	= CreateCamera();
+	mp_mainCamera->SetActive(true);
+	mp_activeCamera = mp_mainCamera;
+
+	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
+	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
+	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
+
+	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
+	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
+
+	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
+	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
+	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
+
+	mp_Frame		= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
+	mp_FPS			= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
+}
+
+void Scene::OnUpdate(Clock& time)
+{ 
+	constexpr int32 DEBUG_UPDATE = 5;
+
+	m_updateDebug++;
+	
+	EntityInfoVisibility(DEBUG_UPDATE);
+	DebugSetEntityPosition();
+
+	GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
+	GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
+	GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
 
 	if (m_updateDebug > DEBUG_UPDATE)
 	{
-		mp_FPS->SetText(std::to_string(fpsCount));
+		m_updateDebug = 0;
+		mp_FPS->SetText(std::to_string(time.GetFramePerSecond()));
 	}
 
 }
@@ -211,4 +259,23 @@ void Scene::OnExit()
 Camera* Scene::GetMainCamera()
 {
 	return mp_mainCamera;
+}
+
+Camera* Scene::GetCurrentCamera()
+{
+	return mp_activeCamera;
+}
+
+void Scene::SwitchCamera(Camera* pCamera)
+{
+	for (auto& cam : GameManager::GetInstance().m_camera)
+	{
+		cam->SetActive(false);
+
+		if (cam->GetId() == pCamera->GetId())
+		{
+			cam->SetActive(true);
+			mp_activeCamera = cam;
+		}
+	}
 }

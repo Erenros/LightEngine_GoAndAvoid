@@ -12,12 +12,6 @@
 
 void GameManager::Loop()
 {
-#ifndef NDEBUG
-	GCLE::DebuggerDesc desc{};
-	desc.output = GCLE::DebuggerOutput::CONSOLE | GCLE::DebuggerOutput::LOGS;
-	GCLE::Debugger::Init(&desc); 
-#endif
-
 	isRunning = true; 
 
 	while (isRunning == true)
@@ -55,6 +49,7 @@ void GameManager::Loop()
 		PROFILER_START("Camera", "Camera Update"); 
 		for (auto& cam : m_camera)
 		{
+			if (cam->IsActive())
 			cam->Update(m_Time, m_entities);
 		}
 		PROFILER_END("Camera");
@@ -65,10 +60,8 @@ void GameManager::Loop()
 		PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
-		if (m_isVisualDebugActive)
-		{
-			SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
-		}
+		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
+
 		PROFILER_END("SceneD");
 
 		//ImGUI
@@ -83,13 +76,8 @@ void GameManager::Loop()
 		}
 
 		system("CLS");
-
-		fpsTimer += m_Time.GetDeltaTime();
-		if (fpsTimer >= 1.f) {
-			fpsTimer -= 1.f;
-			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
-		}
-		//GCLE_INFO << "FPS : " << fpsCount << ENDL;
+		 
+		//GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
 
 		
 	}
@@ -119,13 +107,19 @@ GameManager::~GameManager()
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 {
+#ifndef NDEBUG
+	GCLE::DebuggerDesc desc{};
+	desc.output = GCLE::DebuggerOutput::CONSOLE | GCLE::DebuggerOutput::LOGS;
+	GCLE::Debugger::Init(&desc);
+#endif
+
 	srand(static_cast<int32>(m_Time.GetTime()));
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
 
 	uint32 windowFlags = SDL_WINDOW_FLAGS::WINDOW_RESIZABLE | SDL_WINDOW_FLAGS::WINDOW_SHOWN;
-	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED | SDL_RENDERER_FLAGS::RENDERER_PRESENTVSYNC;
+	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED;
 
 
 	mp_window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
@@ -185,9 +179,4 @@ void GameManager::UpdateEntitySystem()
 	}
 
 	m_entitiesToCreate.clear();
-}
-
-void GameManager::SetGizmoVisualState()
-{
-	m_isVisualDebugActive = !m_isVisualDebugActive;
-}
+} 

@@ -85,6 +85,9 @@ private:
 	void Initialize(gcle::Shapes shape);
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
+private:
+	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
+
 public:
 	void AddActiveScene(const std::string& sceneTag);
 	void RemoveActiveScene(const std::string& sceneTag);
@@ -101,6 +104,8 @@ protected:
 	int32			m_Tag = -1;
 	Target			m_Target;
 
+private:
+	bool m_isHighlighted = false;
 
 private:
 	gcle::Shape*	mp_Shape = nullptr;
@@ -115,9 +120,7 @@ private:
 	int32 m_layer = 0;
 
 private:
-
-	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
-
+	 
 	friend class Scene;
 	friend class GameManager;
 	friend class Camera;

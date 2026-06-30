@@ -22,6 +22,14 @@ void Clock::Update() {
     m_DeltaTime = time_s * m_TimeScale;
 
     m_LastUpdateTime = t;
+
+    // FPS Count
+    m_fpsTimer += GetDeltaTime();
+    if (m_fpsTimer >= 1.f) {
+        m_fpsTimer -= 1.f;
+        m_fpsCount = static_cast<int16>(1.f / GetDeltaTime());
+    }
+
 }
 
 float64 Clock::GetDeltaTime() const {
@@ -38,6 +46,11 @@ float64 Clock::GetTime() const {
 
 float64 Clock::GetTimeUnscaled() const {
     return m_UnscaleTime;
+}
+
+int16 Clock::GetFramePerSecond() const
+{
+    return m_fpsCount;
 }
 
 float64 Clock::GetTimeScale() const {

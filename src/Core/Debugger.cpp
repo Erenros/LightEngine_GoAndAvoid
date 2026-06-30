@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#include <sstream>
+#include <windows.h>
+#pragma comment(lib, "user32.lib")
+
 namespace GCLE
 {
 	Debugger& Debugger::SelfRef()
@@ -50,6 +54,20 @@ namespace GCLE
 		}
 
 		m_IsInit = true;
+
+		SYSTEM_INFO siSysInfo{};
+		GetSystemInfo(&siSysInfo);
+
+		Debugger& ref = Debugger::SelfRef();
+		GCLE_INFO << "Hardware information:\n";
+		GCLE_INFO << "  OEM ID: " << siSysInfo.dwOemId << ENDL;
+		GCLE_INFO << "  Number of processors: " << siSysInfo.dwNumberOfProcessors << ENDL;
+		GCLE_INFO << "  Page size: " << siSysInfo.dwPageSize << ENDL;
+		GCLE_INFO << "  Processor type: " << siSysInfo.dwProcessorType << ENDL;
+		GCLE_INFO << "  Minimum application address: " << siSysInfo.lpMinimumApplicationAddress << ENDL;
+		GCLE_INFO << "  Maximum application address: " << siSysInfo.lpMaximumApplicationAddress << ENDL;
+		GCLE_INFO << "  Active processor mask: " << static_cast<unsigned long long>(siSysInfo.dwActiveProcessorMask) << ENDL;
+
 	}
 
 	Debugger& Debugger::StartWithInputMode(DebuggerInputMode inputMode)
@@ -109,6 +127,50 @@ namespace GCLE
 
 	Debugger& Debugger::operator<<(const std::string_view& str) {
 		Output(str.data());
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(int value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(unsigned int value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(long value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(unsigned long value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(long long value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(unsigned long long value)
+	{
+		Output(std::to_string(value));
+		return *this;
+	}
+
+	Debugger& Debugger::operator<<(void* ptr)
+	{
+		std::ostringstream oss;
+		oss << ptr;
+		Output(oss.str());
 		return *this;
 	}
 

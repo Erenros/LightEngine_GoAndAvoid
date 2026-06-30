@@ -45,17 +45,28 @@ protected:
 	virtual void OnExit();
 
 	Camera* GetMainCamera();
+	Camera* GetCurrentCamera();
+	void SwitchCamera(Camera* pCamera);
 
 private: 
 	void Update(Clock& time);
-	void DrawDebug(Window* window);
 	void Draw(Window* window);
-	Text* CreateDebugText(const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255);
-	void DestroyDebugText(Text* text);
+
+
+private:
+	Text*	CreateDebugText(const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255);
+	void	DestroyDebugText(Text* text);
+	void	DrawDebug(Window* window);
+	void	SetGizmoVisibility();
+
+	void	EntityInfoVisibility(const int32 debugConstant);
+	void	DebugSetEntityPosition();
 
 
 protected:
 	std::string m_tag;
+	Camera* mp_mainCamera   = nullptr;
+	Camera* mp_activeCamera = nullptr;
 
 private:
 
@@ -66,16 +77,12 @@ private:
 
 private:
 	// DEBUG
+	bool m_isVisualDebugActive = false;
 	bool m_debug = false;
 	int32 m_updateDebug = 0;
 
-	float32 fpsTimer = 0;
-	int16 fpsCount = 0;
-
 	std::vector<Text*> m_debugTexts;
 	Entity* m_selectedEntity = nullptr;
-
-	Camera* mp_mainCamera = nullptr;
 
 	Text* mp_Position = nullptr;
 	Text* mp_PosX = nullptr;

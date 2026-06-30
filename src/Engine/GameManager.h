@@ -25,9 +25,7 @@ public:
 
 	float64 fixedUpdateDT = 1.f / FixedUpdateExecution;
 	float32 accDt = 0.f;
-
-	int16 fpsCount = 0;
-	float32 fpsTimer = 0.f;
+	 
 
 	GameManager() = default;
 	~GameManager();
@@ -43,9 +41,7 @@ public:
 
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
 	
-	Window* GetWindow() { return mp_window; };
-
-	void SetGizmoVisualState();
+	Window* GetWindow() { return mp_window; }; 
 
 private:
 	void UpdateEntitySystem();
@@ -60,8 +56,6 @@ private:
 	Clock m_Time;
 
 	bool isRunning = false;
-
-	bool m_isVisualDebugActive = false;
 
 	int32 m_WindW = 0, m_WindH = 0;
 

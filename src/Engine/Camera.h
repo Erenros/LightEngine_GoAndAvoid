@@ -22,8 +22,13 @@ class Camera
 		void SetZoom(float32 zoom);
 		float32 GetZoom();
 
-		Vector2f GetMousePosition();
+		Vector2f GetScreenMousePosition();
 		Vector2f GetMouseScreenToWorldPosition();
+
+		void SetActive(bool isActive);
+		bool IsActive() const;
+
+		uint64 GetId() const;
 
 private:
 		void Update(Clock& time, std::vector<std::vector<Entity*>>& entities);
@@ -37,7 +42,9 @@ private:
 
 	uint64			m_Id = 0;
 
-private:
+	bool m_isActive = false;
+
+private: 
 	friend class GameManager;
 };
 

@@ -78,6 +78,13 @@ namespace GCLE
 		Debugger& operator << (const char* str);
 		Debugger& operator << (const std::string& str);
 		Debugger& operator << (const std::string_view& str);
+		Debugger& operator<<(int value);
+		Debugger& operator<<(unsigned int value);
+		Debugger& operator<<(long value);
+		Debugger& operator<<(unsigned long value);
+		Debugger& operator<<(long long value);
+		Debugger& operator<<(unsigned long long value);
+		Debugger& operator<<(void* ptr);
 
 		Debugger& operator << (bool b);
 

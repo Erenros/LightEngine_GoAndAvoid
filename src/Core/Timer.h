@@ -17,6 +17,10 @@ class Clock
 
     Seconds m_DeltaTime;
     Seconds m_UnscaleDeltaTime;
+
+    // FPS
+    float32 m_fpsTimer = 0;
+    int16   m_fpsCount = 0;
 public:
     Clock() :
         m_TimeScale(1.0),
@@ -38,6 +42,8 @@ public:
 
     [[nodiscard]] Seconds GetTime() const;
     [[nodiscard]] Seconds GetTimeUnscaled() const;
+
+    [[nodiscard]] int16 GetFramePerSecond() const;
 
     [[nodiscard]] float64 GetTimeScale() const;
     void SetTimeScale(float64 scale);

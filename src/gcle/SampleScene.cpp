@@ -17,10 +17,14 @@ void SampleScene::OnInitialize()
 	CreateText(text, 40, 40, 20, 20);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->SetPosition(10, -200); 
+	entity1->SetPosition(0, 0); 
 	entity1->SetRigidBody(true); 
 	entity1->GetShape()->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
+
+	mp_mainCamera->SetFollowing(entity1);
+
+	pSceneCamera = CreateCamera();
 
 	 
 	/*Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -47,13 +51,16 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate(Clock& time)
 {
 	Scene::OnUpdate(time);
-	/*if (InputManager::GetInstance().IsDown(Space))
-	{
-		SceneManager::GetInstance().SetCurrentSceneToPreviousScene();
-	}
-
+	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		pEntity->Destroy();
-	}*/
+		if (GetCurrentCamera()->GetId() != mp_mainCamera->GetId())
+		{
+			SwitchCamera(mp_mainCamera);
+		}
+		else
+		{
+			SwitchCamera(pSceneCamera);
+		}
+	}
 } 
