@@ -41,8 +41,8 @@ public:
 	void ZeroVelocityX(bool right);
 	void ZeroVelocityY(bool down);
 
-	void ZeroVelocityX() { m_Velocity.x = 0; /*m_TempVelHasChanged = true;*/ }
-	void ZeroVelocityY() { m_Velocity.y = 0; /*m_TempVelHasChanged = true; */}
+	void ZeroVelocityX() { m_Velocity.x = 0;}
+	void ZeroVelocityY() { m_Velocity.y = 0;}
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
