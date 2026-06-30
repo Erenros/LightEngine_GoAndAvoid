@@ -28,7 +28,7 @@ void Clock::Update() {
     m_LastUpdateTime = t;
 
     // FPS Count
-    m_fpsTimer += GetDeltaTime();
+    m_fpsTimer += static_cast<float32>(GetDeltaTime());
     if (m_fpsTimer >= 1.f) {
         m_fpsTimer -= 1.f;
         m_fpsCount = static_cast<int16>(1.f / GetDeltaTime());
@@ -75,7 +75,7 @@ Seconds Clock::GetRawDT() const{
 }
 
 void Clock::ClockSleep(Seconds time){
-	Sleep(time * 1000);
+	Sleep(static_cast<DWORD>(time) * 1000);
 }
 
 void Clock::SmartSleep(Seconds time) {

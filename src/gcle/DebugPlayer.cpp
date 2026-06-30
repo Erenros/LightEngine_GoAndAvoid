@@ -4,7 +4,7 @@
 void DebugPlayer::OnUpdate() {
     InputManager& im = InputManager::GetInstance();
     RigidBody2D rb = GetRigidBody();
-    Seconds dt = GameManager::GetInstance().GetTime()->GetDeltaTime();
+    float32 dt = static_cast<float32>(GameManager::GetInstance().GetTime()->GetDeltaTime());
 
 
     if (im.IsHeld('Q')) {

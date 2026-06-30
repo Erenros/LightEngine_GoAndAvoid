@@ -118,7 +118,7 @@ void Scene::Update(Clock& time){
 		for(Entity* e : layer)
 		{
 			if (e->IsActiveIn(m_tag))
-				e->Update(time.GetDeltaTime());
+				e->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
 	}
 }

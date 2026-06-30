@@ -63,7 +63,7 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 
 	// Create a Render Target
 
-	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT);
+	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, static_cast<int32>(RENDER_TARGET_WIDTH), static_cast<int32>(RENDER_TARGET_HEIGHT));
 	SDL_SetTextureScaleMode(mp_RenderTarget, SDL_ScaleModeLinear);
 
 	if (!mp_RenderTarget)

@@ -21,8 +21,8 @@ bool Event::WindowEvent()
 			if (event.window.event == SDL_WINDOWEVENT_RESIZED || event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 			{
 				Window* pWindow = GameManager::GetInstance().GetWindow();
-				pWindow->m_width = pWindow->GetWindowSize().x;
-				pWindow->m_height = pWindow->GetWindowSize().y;
+				pWindow->m_width = static_cast<uint32>(pWindow->GetWindowSize().x);
+				pWindow->m_height = static_cast<uint32>(pWindow->GetWindowSize().y);
 			}
 		}
 

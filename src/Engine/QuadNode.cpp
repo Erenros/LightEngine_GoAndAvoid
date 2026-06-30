@@ -1,7 +1,8 @@
 #include "QuadNode.h"
 #include "Entity.h"
 #include "Collider.h"
-#include "Utils.h";
+#include "Utils.h"
+
 
 QuadNode::QuadNode(float32 x1, float32 y1, float32 x2, float32 y2, int32 d) {
 	m_bounds = { x1, y1, x2, y2 };
