@@ -20,11 +20,11 @@ void SampleScene::OnInitialize()
 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(0, 0); 
-	entity1->Rotate(45);
+	entity1->Rotate(0);
 	entity1->SetRigidBody(true); 
 	entity1->SetIsKinematic(true); 
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 45.0f, { 1.0f, 1.0f }); 
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 
 	mp_mainCamera->SetFollowing(entity1);
 

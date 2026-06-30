@@ -28,7 +28,7 @@ public:
 	Camera* CreateCamera();
 
 
-	uint32 GetFlag() { return m_flag; }
+	uint32 GetFlag() const { return m_flag; }
 
 	void AddDrawnTexture(const std::string&);
 	bool isDrawn(const std::string& tag);
@@ -60,7 +60,7 @@ private:
 	void	SetGizmoVisibility();
 
 	void	EntityInfoVisibility(const int32 debugConstant);
-	void	DebugSetEntityPosition();
+	void	DebugSetEntityInfo();
 
 
 protected:
@@ -70,7 +70,7 @@ protected:
 
 private:
 
-	uint32 m_flag;
+	uint32 m_flag = 0;
 	std::vector<Text*> m_texts;
 	std::vector<std::string> m_activeTextures;
 

@@ -196,7 +196,7 @@ void Scene::EntityInfoVisibility(const int32 debugConstant)
 	}
 }
 
-void Scene::DebugSetEntityPosition()
+void Scene::DebugSetEntityInfo()
 {
 	if (m_selectedEntity != nullptr)
 	{
@@ -206,6 +206,26 @@ void Scene::DebugSetEntityPosition()
 				mp_activeCamera->GetMouseScreenToWorldPosition().x,
 				mp_activeCamera->GetMouseScreenToWorldPosition().y
 			);
+		}
+
+		if (InputManager::GetInstance().IsHeld(LeftArrow))
+		{
+			m_selectedEntity->Rotate(-0.1f);
+		}
+
+		if (InputManager::GetInstance().IsHeld(RightArrow))
+		{
+			m_selectedEntity->Rotate(0.1f);
+		}
+
+		if (InputManager::GetInstance().IsHeld(UpArrow))
+		{
+			m_selectedEntity->ScaleBy({ 1.01f, 1.01f });
+		}
+
+		if (InputManager::GetInstance().IsHeld(DownArrow))
+		{
+			m_selectedEntity->ScaleBy({ 0.99f, 0.99f });
 		}
 	}
 }
@@ -239,7 +259,7 @@ void Scene::OnUpdate(Clock& time)
 	m_updateDebug++;
 	
 	EntityInfoVisibility(DEBUG_UPDATE);
-	DebugSetEntityPosition();
+	DebugSetEntityInfo();
 
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;

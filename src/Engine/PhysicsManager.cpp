@@ -1075,7 +1075,7 @@ void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 	gcle::Shape* a = colA->GetShape();
 	gcle::Shape* b = colB->GetShape();
 
-	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); // colA -> colB
+	Vector2f normal = SafeNormal(m_colDatas.orientation, { 1.0f, 0.0f }); 
 	float32 penetration = std::max(static_cast<float32>(m_colDatas.penetration), 0.0f);
 
 	if (penetration <= 0.0f)
