@@ -58,7 +58,7 @@ void SampleScene::OnInitialize()
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
-	PhysicsManager::GetInstance().SetActivateQuadTree(true);
+	PhysicsManager::GetInstance().SetActivateQuadTree(false);
 	PhysicsManager::GetInstance().SetQuadTreePos1({ -50000, -50000 });
 	PhysicsManager::GetInstance().SetQuadTreePos2({ 50000, 50000 });
 }

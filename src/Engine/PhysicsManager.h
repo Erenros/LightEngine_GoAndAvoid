@@ -41,7 +41,7 @@ public:
 	void Update(float64 deltaTime);
 	bool IsColliding(Collider* pCollider1, Collider* pCollider2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
-	void Repulse(Collider* pCollider1, Collider* pCollider2);
+	void ThrowRepulse(Collider* pCollider1, Collider* pCollider2);
 
 private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
@@ -52,10 +52,10 @@ private:
 	bool CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle);
 
 private:
-	bool CheckRectRect(gcle::Shape* a, gcle::Shape* b);
-	bool CheckCircleCircle(gcle::Shape* a, gcle::Shape* b);
-	bool CheckRectCircle(gcle::Shape* a, gcle::Shape* b);
-	bool CheckCircleRect(gcle::Shape* a, gcle::Shape* b);
+	bool ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b);
+	bool ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b);
+	bool ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b);
+	bool ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b);
 
 private:
 	void RepulseRectRect(Collider* a, Collider* b);
@@ -109,6 +109,12 @@ public:
 	void SetQuadTreePos2(Vector2f pos2);
 	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
 
+private:
+	void EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void UpdateQuadTree(std::vector<Collider*> activeColliders);
+	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders);
 
 public : 
 	~PhysicsManager();

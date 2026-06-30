@@ -100,12 +100,12 @@ namespace
 PhysicsManager::CollisionFn PhysicsManager::collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1]
 {
 	{
-		&PhysicsManager::CheckRectRect,
-		&PhysicsManager::CheckRectCircle,
+		&PhysicsManager::ThrowCheckRectRect,
+		&PhysicsManager::ThrowCheckRectCircle,
 	},
 	{
-		&PhysicsManager::CheckCircleRect,
-		&PhysicsManager::CheckCircleCircle,
+		&PhysicsManager::ThrowCheckCircleRect,
+		&PhysicsManager::ThrowCheckCircleCircle,
 	}
 };
 
@@ -151,220 +151,114 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 	}
 }
 
-void PhysicsManager::Update(float64 deltaTime)
+#pragma region Update
+
+#pragma region Helpers
+
+void PhysicsManager::EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate)
 {
-	//PROFILER_START("RemoveEntity", "RemoveEntities");
 	for (EntityInfo entity : m_EntitiesToRemove) {
 		for (int i = (int)m_EntitiesToUpdate.size() - 1; i >= 0; --i)
 		{
 			if (m_EntitiesToUpdate[i].pEntity == entity.pEntity) {
 				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 			}
-
 		}
 	}
-	//PROFILER_END("RemoveEntity");
+	m_EntitiesToRemove.clear();
+}
 
-	//PROFILER_START("AddEntity", "AddEntity");
+void PhysicsManager::EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate) 
+{
 	for (EntityInfo entity : m_EntitiesToAdd) {
 		m_EntitiesToUpdate.push_back(entity);
 	}
-	//PROFILER_END("AddEntity");
-
-	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
-
 	m_EntitiesToAdd.clear();
-	m_EntitiesToRemove.clear();
 
+}
+
+void PhysicsManager::EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate)
+{
+	for (auto& e : m_EntitiesToUpdate) {
+		if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
+			for (auto& collider : e.pEntity->GetColliders()) {
+				if (collider->IsActive())
+					activeColliders->push_back(collider);
+			}
+		}
+	}
+}
+
+void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
+{
 	int32 nbrTest = 0;
-	if (m_activateQuadTree == true) {
-		std::vector<Collider*> activeEntities;
-		//PROFILER_START("GetActiveEntities", "GetActiveEntities");
-		for (auto& e : m_EntitiesToUpdate) {
-			if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
-				for (auto& collider : e.pEntity->GetColliders()) {
-					if(collider->IsActive())
-						activeEntities.push_back(collider);
-				}
-		}
-		//PROFILER_END("GetActiveEntities");
 
-		//PROFILER_START("QuadTreeRegeneration", "QuadTreeRegeneration");
-		m_timeBetweenRegeneration += 1;
-		if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
-			m_timeBetweenRegeneration = 0;
-			m_quadTree->Clear();
-			for (auto& entity : activeEntities) {
-				m_quadTree->Insert(entity);
+	m_timeBetweenRegeneration += 1;
+
+	if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations) {
+		m_timeBetweenRegeneration = 0;
+		m_quadTree->Clear();
+		for (auto& entity : activeColliders) {
+			m_quadTree->Insert(entity);
+		}
+	}
+
+	for (auto& entity : activeColliders) {
+		AABB aabb;
+		Vector2f pos1 = entity->GetShape()->GetPosition(0.f, 0.f);
+		Vector2f pos2 = entity->GetShape()->GetPosition(1.f, 1.f);
+		aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+
+		bool present = false;
+		ColliderEntry e{ aabb, entity };
+
+		const auto& candidates = m_quadTree->Query(e);
+
+		for (auto& c : candidates) {
+			bool greater = entity < c.entity;
+			bool notTheSameEntity = entity->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
+			if (greater && notTheSameEntity) {
+				m_pairs.push_back({ entity, c.entity });
 			}
 		}
-		//PROFILER_END("QuadTreeRegeneration");
+	}
+	for (auto& entities : m_pairs) {
 
-		//PROFILER_START("Query", "Query");
-		for (auto& entity : activeEntities) {
-			AABB aabb;
-			Vector2f pos1 = entity->GetShape()->GetPosition(0.f, 0.f);
-			Vector2f pos2 = entity->GetShape()->GetPosition(1.f, 1.f);
-			aabb = { pos1.x, pos1.y, pos2.x , pos2.y };
+		nbrTest += 1;
 
-			bool present = false;
-			ColliderEntry e{ aabb, entity };
-
-			////PROFILER_START("QueryQuad", "QueryQuad");
-			const auto& candidates = m_quadTree->Query(e);
-			////PROFILER_END("QueryQuad");
-
-			for (auto& c : candidates) {
-				bool greater = entity < c.entity;
-				bool notTheSameEntity = entity->GetOwner()->GetId() != c.entity->GetOwner()->GetId();
-				if (greater && notTheSameEntity) {
-					m_pairs.push_back({ entity, c.entity });
-				}
+		if (IsColliding(entities.first, entities.second)) {
+			if (entities.first->GetOwner()->IsRigidBody() && entities.second->GetOwner()->IsRigidBody())
+			{
+				ThrowRepulse(entities.first, entities.second);
 			}
-		}
-		//PROFILER_END("Query");
 
-		//PROFILER_START("collisionLoop", "collisionLoop");
-		for (auto& entities : m_pairs) {
-			nbrTest += 1;
-			//PROFILER_START("collisionTest", "Collision test");
-			bool coliding = IsColliding(entities.first, entities.second);
-			//PROFILER_END("collisionTest");
+			if (!entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
+			{
+				entities.first->GetOwner()->OnCollisionEnter(entities.second->GetOwner());
+				entities.first->GetOwner()->CollidingEntity.insert({ entities.second->GetOwner()->GetId(), entities.second->GetOwner() });
 
-
-			if (coliding) {
-				if (entities.first->GetOwner()->IsRigidBody() && entities.second->GetOwner()->IsRigidBody())
-				{
-					//PROFILER_START("Repulse", "Repulse");
-
-					Repulse(entities.first, entities.second);
-					//PROFILER_END("Repulse");
-				}
-				if (!entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
-				{
-					entities.first->GetOwner()->OnCollisionEnter(entities.second->GetOwner());
-					entities.first->GetOwner()->CollidingEntity.insert({ entities.second->GetOwner()->GetId(), entities.second->GetOwner() });
-
-					entities.second->GetOwner()->OnCollisionEnter(entities.first->GetOwner());
-					entities.second->GetOwner()->CollidingEntity.insert({entities.first->GetOwner()->GetId(), entities.first->GetOwner()});
-				}
-
-				else
-				{
-					entities.first->GetOwner()->OnCollision(entities.second->GetOwner());
-					entities.second->GetOwner()->OnCollision(entities.first->GetOwner());
-				}
+				entities.second->GetOwner()->OnCollisionEnter(entities.first->GetOwner());
+				entities.second->GetOwner()->CollidingEntity.insert({ entities.first->GetOwner()->GetId(), entities.first->GetOwner() });
 			}
 
 			else
 			{
-				if (entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
-				{
-					entities.first->GetOwner()->OnCollisionExit(entities.second->GetOwner());
-					entities.first->GetOwner()->CollidingEntity.erase(entities.second->GetOwner()->GetId());
-					entities.second->GetOwner()->OnCollisionExit(entities.first->GetOwner());
-					entities.second->GetOwner()->CollidingEntity.erase(entities.first->GetOwner()->GetId());
-				}
+				entities.first->GetOwner()->OnCollision(entities.second->GetOwner());
+				entities.second->GetOwner()->OnCollision(entities.first->GetOwner());
 			}
-
-			for (auto& pair : m_PendingCorrections)
-			{
-				Entity* pEntity = pair.first;
-				Vector2f delta = pair.second;
-
-				Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
-				pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
-			}
-			m_PendingCorrections.clear();
-
-			// 5) Suppression des entites marquees a retirer.
-			for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
-			{
-				if (m_EntitiesToUpdate[i].toRemove)
-					m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
-			}
-
 		}
-		m_pairs.clear();
 
-		//PROFILER_END("collisionLoop");
-		//GCLE_INFO << "Loop end" << ENDL;
-		//GCLE_INFO << nbrTest << ENDL;
-	}
-
-	else {
-		auto MakePairKey = [](int64 idA, int64 idB) -> uint64
-			{
-				if (idA > idB) std::swap(idA, idB);
-				return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
-			};
-
-		// 1) Collecte des colliders actifs des entit?s actives dans la sc?ne courante.
-		std::vector<Collider*> activeColliders;
-		for (auto& info : m_EntitiesToUpdate)
+		else
 		{
-			Entity* entity = info.pEntity;
-			if (info.toRemove || entity == nullptr || !entity->IsActiveIn(currentScene))
-				continue;
-
-			for (Collider* pCollider : entity->GetColliders())
+			if (entities.first->GetOwner()->CollidingEntity.contains(entities.second->GetOwner()->GetId()))
 			{
-				if (pCollider == nullptr)
-					continue;
-
-				pCollider->StoppedColliding();
-
-				if (pCollider->IsActive())
-				{
-					activeColliders.push_back(pCollider);
-				}
+				entities.first->GetOwner()->OnCollisionExit(entities.second->GetOwner());
+				entities.first->GetOwner()->CollidingEntity.erase(entities.second->GetOwner()->GetId());
+				entities.second->GetOwner()->OnCollisionExit(entities.first->GetOwner());
+				entities.second->GetOwner()->CollidingEntity.erase(entities.first->GetOwner()->GetId());
 			}
 		}
 
-
-
-
-		std::unordered_set<uint64> collidingPairsThisFrame;
-
-		for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
-		{
-			Collider* collider1 = *it1;
-			Entity* entity = collider1->GetOwner();
-
-			for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
-			{
-				Collider* collider2 = *it2;
-				Entity* otherEntity = collider2->GetOwner();
-
-				if (entity == otherEntity)
-					continue;
-
-				if (!IsColliding(collider1, collider2))
-					continue;
-
-				if (entity->IsRigidBody() && otherEntity->IsRigidBody())
-					Repulse(collider1, collider2);
-
-				collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
-
-				if (!entity->CollidingEntity.contains(otherEntity->GetId()))
-				{
-					entity->OnCollisionEnter(otherEntity);
-					entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
-
-					otherEntity->OnCollisionEnter(entity);
-					otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
-				}
-				else
-				{
-					entity->OnCollision(otherEntity);
-					otherEntity->OnCollision(entity);
-				}
-			}
-		}
-
-		// 3) Application des corrections de position accumulees : une seule fois par
-		//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
 		for (auto& pair : m_PendingCorrections)
 		{
 			Entity* pEntity = pair.first;
@@ -375,35 +269,127 @@ void PhysicsManager::Update(float64 deltaTime)
 		}
 		m_PendingCorrections.clear();
 
-		// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
-		//    de leurs colliders ne se touche cette frame.
-		for (auto& info : m_EntitiesToUpdate)
-		{
-			Entity* entity = info.pEntity;
-
-			for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
-			{
-				uint64 key = MakePairKey(entity->GetId(), idIt->first);
-
-				if (collidingPairsThisFrame.contains(key))
-				{
-					++idIt;
-					continue;
-				}
-
-				Entity* otherEntity = idIt->second;
-				idIt = entity->CollidingEntity.erase(idIt);
-				entity->OnCollisionExit(otherEntity);
-			}
-		}
-
-		// 5) Suppression des entites marquees a retirer.
 		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
 		{
 			if (m_EntitiesToUpdate[i].toRemove)
 				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 		}
+
 	}
+	m_pairs.clear();
+}
+
+void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeColliders) {
+
+	auto MakePairKey = [](int64 idA, int64 idB) -> uint64
+		{
+			if (idA > idB) std::swap(idA, idB);
+			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
+		};
+
+	std::unordered_set<uint64> collidingPairsThisFrame;
+
+	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
+	{
+		Collider* collider1 = *it1;
+		Entity* entity = collider1->GetOwner();
+
+		for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
+		{
+			Collider* collider2 = *it2;
+			Entity* otherEntity = collider2->GetOwner();
+
+			if (entity == otherEntity)
+				continue;
+
+			if (!IsColliding(collider1, collider2))
+				continue;
+
+			if (entity->IsRigidBody() && otherEntity->IsRigidBody())
+				ThrowRepulse(collider1, collider2);
+
+			collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
+
+			if (!entity->CollidingEntity.contains(otherEntity->GetId()))
+			{
+				entity->OnCollisionEnter(otherEntity);
+				entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
+
+				otherEntity->OnCollisionEnter(entity);
+				otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
+			}
+			else
+			{
+				entity->OnCollision(otherEntity);
+				otherEntity->OnCollision(entity);
+			}
+		}
+	}
+
+	// 3) Application des corrections de position accumulees : une seule fois par
+	//    entite, meme si plusieurs de ses colliders ont ete corriges cette frame.
+	for (auto& pair : m_PendingCorrections)
+	{
+		Entity* pEntity = pair.first;
+		Vector2f delta = pair.second;
+
+		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
+		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
+	}
+	m_PendingCorrections.clear();
+
+	// 4) Sortie de collision : une paire d'entites ne "sort" que si plus aucun
+	//    de leurs colliders ne se touche cette frame.
+	for (auto& info : m_EntitiesToUpdate)
+	{
+		Entity* entity = info.pEntity;
+
+		for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
+		{
+			uint64 key = MakePairKey(entity->GetId(), idIt->first);
+
+			if (collidingPairsThisFrame.contains(key))
+			{
+				++idIt;
+				continue;
+			}
+
+			Entity* otherEntity = idIt->second;
+			idIt = entity->CollidingEntity.erase(idIt);
+			entity->OnCollisionExit(otherEntity);
+		}
+	}
+
+	// 5) Suppression des entites marquees a retirer.
+	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+	{
+		if (m_EntitiesToUpdate[i].toRemove)
+			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+	}
+}
+
+#pragma endregion
+
+#pragma endregion
+
+
+void PhysicsManager::Update(float64 deltaTime)
+{
+	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
+	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
+
+	std::vector<Collider*> activeColliders;
+
+	EntityToUpdate(&activeColliders, m_EntitiesToUpdate);
+
+	const std::string& currentScene = SceneManager::GetInstance().GetCurrentSceneTag();
+
+	if (m_activateQuadTree == true) {
+		UpdateQuadTree(activeColliders);
+	}
+		
+	else {}
+		UpdateWithoutQuadTree(activeColliders);
 }
 
 void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
@@ -461,7 +447,7 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	return false;
 }
 
-void PhysicsManager::Repulse(Collider* pCollider1, Collider* pCollider2)
+void PhysicsManager::ThrowRepulse(Collider* pCollider1, Collider* pCollider2)
 {
 	auto* shapeA = pCollider1->GetShape();
 	auto* shapeB = pCollider2->GetShape();
@@ -816,7 +802,7 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 }
 
 
-bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
 	int16 angleA = static_cast<int16>(a->GetTransform()->GetDegAngle());
 	int16 angleB = static_cast<int16>(b->GetTransform()->GetDegAngle()) ;
@@ -840,14 +826,15 @@ bool PhysicsManager::CheckRectRect(gcle::Shape* a, gcle::Shape* b)
 	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 }
 
-bool PhysicsManager::CheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
 {
 	return CheckCircleCircleCollision(static_cast<gcle::Circle*>(a), static_cast<gcle::Circle*>(b));
 }
 
-bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 {
 	int16 angle = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
+
 	if (angle != 0) {
 		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 	}
@@ -855,7 +842,7 @@ bool PhysicsManager::CheckRectCircle(gcle::Shape* a, gcle::Shape* b)
 	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
 }
 
-bool PhysicsManager::CheckCircleRect(gcle::Shape* a, gcle::Shape* b)
+bool PhysicsManager::ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b)
 {
 	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
 	if (angle != 0) {
