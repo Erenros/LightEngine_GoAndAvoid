@@ -127,9 +127,12 @@ Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f rel
 
 void Entity::Destroy()
 {
-	m_ToDestroy = true;
-	PhysicsManager::GetInstance().RemoveEntity(this);
-	OnDestroy();
+	if (this != nullptr)
+	{
+		m_ToDestroy = true;
+		PhysicsManager::GetInstance().RemoveEntity(this);
+		OnDestroy();
+	}
 }
 
 bool Entity::GoToPosition(float32 x, float32 y, float32 speed)

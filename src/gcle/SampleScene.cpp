@@ -18,15 +18,15 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, 40, 40, 20, 20);
 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->SetPosition(0, 0); 
-	entity1->Rotate(0);
-	entity1->SetRigidBody(true); 
-	entity1->SetIsKinematic(true); 
-	entity1->GetRigidBody().SetDampingStrenght(0.9);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	pEntity->SetPosition(0, 0); 
+	pEntity->Rotate(0);
+	pEntity->SetRigidBody(true); 
+	pEntity->SetIsKinematic(true); 
+	pEntity->GetRigidBody().SetDampingStrenght(0.9);
+	pEntity->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 
-	mp_mainCamera->SetFollowing(entity1);
+	mp_mainCamera->SetFollowing(pEntity);
 
 	pSceneCamera = CreateCamera();
 
@@ -60,5 +60,7 @@ void SampleScene::OnUpdate(Clock& time)
 		{
 			SwitchCamera(pSceneCamera);
 		}
+
+		pEntity->Destroy();
 	}
 } 

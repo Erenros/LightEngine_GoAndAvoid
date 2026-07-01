@@ -200,10 +200,15 @@ void PhysicsManager::EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::
 void PhysicsManager::EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate)
 {
 	for (auto& e : m_EntitiesToUpdate) {
-		if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
-			for (auto& collider : e.pEntity->GetColliders()) {
-				if (collider->IsActive())
-					activeColliders->push_back(collider);
+		if (e.toRemove == false)
+		{
+			if (e.pEntity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+			{
+				for (auto& collider : e.pEntity->GetColliders())
+				{
+					if (collider->IsActive())
+						activeColliders->push_back(collider);
+				}
 			}
 		}
 	}

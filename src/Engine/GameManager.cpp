@@ -61,19 +61,18 @@ void GameManager::Loop()
 	
 		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
-
-		PROFILER_START("SceneD", "Scene Draw");
+		 
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
-		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
-
-		debugInfo.SceneUpdate = PROFILER_END("SceneD");
+		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window); 
 
 		//ImGUI
 		mp_window->StartImGUIFrame();
 		mp_window->ImGUIUpdate();
 	
+		PROFILER_START("SceneD", "Scene Draw");
 		mp_window->Present();
+		debugInfo.SceneUpdate = PROFILER_END("SceneD");
 
 		if (Event::WindowEvent())
 		{
