@@ -47,8 +47,8 @@ public:
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
 	Vector2f GetRenderPosition();
-	bool IsKinematic() { return m_IsKinematic; }
-	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
+	bool IsStatic() { return m_IsStatic; }
+	void SetIsStatic(bool isStatic) { m_IsStatic = isStatic; }
 
 	void SetScale(Vector2f scale);
 	void SetScale(float32 scale) { SetScale({ scale, scale }); }
@@ -111,7 +111,7 @@ protected:
 	Vector2f		m_Direction = { 0.0f, 0.0f };
 	float32			m_Speed = 0.f;
 	bool			m_ToDestroy = false;
-	bool			m_IsKinematic = true;
+	bool			m_IsStatic = true;
 	int32			m_Tag = -1;
 	Target			m_Target;
 

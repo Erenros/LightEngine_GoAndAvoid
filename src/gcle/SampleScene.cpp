@@ -22,7 +22,7 @@ void SampleScene::OnInitialize()
 	entity1->SetPosition(0, 0); 
 	entity1->Rotate(45);
 	entity1->SetRigidBody(true); 
-	entity1->SetIsKinematic(true); 
+	entity1->SetIsStatic(true); 
 	entity1->GetRigidBody().SetDampingStrenght(0.9);
 	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 45.0f, { 1.0f, 1.0f }); 
 
@@ -36,7 +36,7 @@ void SampleScene::OnInitialize()
 		entity->SetPosition(-49000.0f + (i * 100.0f), -49000.0f + (i * 100.0f));
 		entity->SetRigidBody(true);
 		entity->GetRigidBody().SetGravity(false);
-		entity->SetIsKinematic(true);
+		entity->SetIsStatic(true);
 		entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
 	}
 

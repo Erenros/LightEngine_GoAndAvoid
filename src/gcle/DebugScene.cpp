@@ -21,7 +21,7 @@ void DebugScene::OnInitialize()
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(1000, true);
 	entity1->GetRigidBody().SetMaxSpeed(10000);
-	entity1->SetIsKinematic(true);
+	entity1->SetIsStatic(true);
 	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {1, 1});
 
 	mp_mainCamera->SetFollowing(entity1);
@@ -34,7 +34,7 @@ void DebugScene::OnInitialize()
 		entity3->SetScale({ 1, 1 });
 		entity3->SetRigidBody(true);
 		entity3->GetRigidBody().SetGravity(false);
-		entity3->SetIsKinematic(false);
+		entity3->SetIsStatic(false);
 		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}
 

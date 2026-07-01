@@ -63,7 +63,7 @@ namespace
 
 	float32 KinematicFactor(Entity* pEntity)
 	{
-		return pEntity->IsKinematic() ? 1.0f : 0.0f;
+		return pEntity->IsStatic() ? 1.0f : 0.0f;
 	}
 
 	bool ShouldBlockMovement(Entity* pEntity, Entity* pOtherEntity)
@@ -74,8 +74,8 @@ namespace
 		// On bloque uniquement quand l'objet touche un obstacle non Kinematic.
 		return pEntity != nullptr &&
 			pOtherEntity != nullptr &&
-			pEntity->IsKinematic() &&
-			!pOtherEntity->IsKinematic();
+			pEntity->IsStatic() &&
+			!pOtherEntity->IsStatic();
 	}
 
 	void ApplyBlockingResponse(Collider* pCollider, Collider* pOtherCollider, const Vector2f& correction)
@@ -916,18 +916,18 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 
 		if (x1 < x2)
 		{
-			delta1.x -= correction * a->GetOwner()->IsKinematic();
-			delta2.x += correction * b->GetOwner()->IsKinematic();
+			delta1.x -= correction * a->GetOwner()->IsStatic();
+			delta2.x += correction * b->GetOwner()->IsStatic();
 
 		}
 		else
 		{
-			delta1.x += correction * a->GetOwner()->IsKinematic();
-			delta2.x -= correction * b->GetOwner()->IsKinematic();
+			delta1.x += correction * a->GetOwner()->IsStatic();
+			delta2.x -= correction * b->GetOwner()->IsStatic();
 
 		}
 
-		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
+		if (!colA->GetOwner()->IsStatic() || !colB->GetOwner()->IsStatic())
 		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityX();
 			b->GetOwner()->GetRigidBody().ZeroVelocityX();
@@ -939,18 +939,18 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 
 		if (y1 < y2)
 		{
-			delta1.y -= correction * a->GetOwner()->IsKinematic();
-			delta2.y += correction * b->GetOwner()->IsKinematic();
+			delta1.y -= correction * a->GetOwner()->IsStatic();
+			delta2.y += correction * b->GetOwner()->IsStatic();
 
 		}
 		else
 		{
-			delta1.y += correction * a->GetOwner()->IsKinematic();
-			delta2.y -= correction * b->GetOwner()->IsKinematic();
+			delta1.y += correction * a->GetOwner()->IsStatic();
+			delta2.y -= correction * b->GetOwner()->IsStatic();
 
 		}
 
-		if (!colA->GetOwner()->IsKinematic() || !colB->GetOwner()->IsKinematic())
+		if (!colA->GetOwner()->IsStatic() || !colB->GetOwner()->IsStatic())
 		{
 			a->GetOwner()->GetRigidBody().ZeroVelocityY();
 			b->GetOwner()->GetRigidBody().ZeroVelocityY();
@@ -1098,7 +1098,7 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider*
 	gcle::Shape* a = colA->GetShape();
 	gcle::Shape* b = colB->GetShape();
 
-	if (a->GetOwner()->IsKinematic() && b->GetOwner()->IsKinematic())
+	if (a->GetOwner()->IsStatic() && b->GetOwner()->IsStatic())
 		return 0.5;
 	else
 		return 1.0;

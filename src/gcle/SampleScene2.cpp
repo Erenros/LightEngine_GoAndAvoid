@@ -14,7 +14,7 @@ void SampleScene2::OnInitialize()
 	entity3->SetPosition(110, -100);
 	/*entity2->SetRigidBody(true);
 	entity2->GetRigidBody().SetGravity(false);
-	entity2->GetShape()->SetIsKinematic(false);
+	entity2->GetShape()->SetIsStatic(false);
 	entity2->SetTexture("test");
 	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32);
 	entity2->PlayAnimation("anim1");*/
