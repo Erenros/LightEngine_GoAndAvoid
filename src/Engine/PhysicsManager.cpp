@@ -8,7 +8,6 @@
 #undef min
 #undef max
 
-
 namespace
 {
 	constexpr float32 PHYSICS_EPSILON = 0.00001f;
@@ -26,7 +25,6 @@ namespace
 
 		return value / std::sqrt(lengthSquared);
 	}
-
 
 	bool TestRectAxis(
 		const Vector2f& axis,
@@ -360,10 +358,6 @@ void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeCollider
 	m_pairs.clear();
 }
 
-#pragma endregion
-
-#pragma endregion
-
 void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
 {
 	m_PendingCorrections[pEntity] += delta;
@@ -418,6 +412,10 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 
 	return false;
 } 
+
+#pragma endregion
+
+#pragma endregion
 
 #pragma region Checks
 
@@ -1075,6 +1073,8 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider*
 		return 1.0;
 }
 
+#pragma region Sets
+
 void PhysicsManager::SetActivateQuadTree(bool activate){
 	m_activateQuadTree = activate;
 }
@@ -1095,6 +1095,9 @@ void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame){
 	m_frameBetweenQuadTreeRegenerations = nbrFrame;
 }
 
+#pragma endregion
+
 PhysicsManager::~PhysicsManager(){
 	delete m_quadTree;
 }
+

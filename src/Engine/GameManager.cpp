@@ -37,7 +37,8 @@ void GameManager::Loop()
 				m_loopTour++;
 			else
 			{
-				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
+				UpdateRigidBodies(fixedUpdateDT);
+				PhysicsManager::GetInstance().Update(fixedUpdateDT);
 			}
 			exec += 1;
 		}
@@ -159,6 +160,15 @@ void GameManager::Close()
 
 	delete mp_window;
 
+}
+
+void GameManager::UpdateRigidBodies(float32 dt)
+{
+	for (auto& entity : GetActiveEntities(SceneManager::GetInstance().m_CurrentSceneTag))
+	{
+		if (entity->IsRigidBody())
+			entity->GetRigidBody().Update(dt);
+	}
 }
 
 std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)

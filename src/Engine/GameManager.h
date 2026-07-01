@@ -40,6 +40,8 @@ public:
 	void SetWindowClearColor(Color color) { m_ClearColor = color; }
 
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
+
+	void UpdateRigidBodies(float32 dt);
 	
 	Window* GetWindow() { return mp_window; }; 
 

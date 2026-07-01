@@ -11,13 +11,6 @@
 
 class Collider;
 
-struct Target
-{
-	Vector2f position;
-	float distance = 0.f;
-	bool isSet = false;
-};
-
 class Entity
 {
 public:
@@ -36,8 +29,6 @@ public:
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
-	void SetSpeed(float32 speed) { m_Speed = speed; }
-	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
 	void SetRigidBody(bool isRigidBody);
 	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
@@ -108,12 +99,9 @@ public:
 protected:
 
 	int64			m_Id = 0;
-	Vector2f		m_Direction = { 0.0f, 0.0f };
-	float32			m_Speed = 0.f;
 	bool			m_ToDestroy = false;
 	bool			m_IsStatic = true;
 	int32			m_Tag = -1;
-	Target			m_Target;
 
 private:
 	bool m_isHighlighted = false;
