@@ -26,6 +26,10 @@ void GameManager::Loop()
 		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
+		
+		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+		InputManager::GetInstance().Update();
+		 
 		while (m_accDt >= fixedUpdateDT) 
 		{
 			m_accDt -= static_cast<float32>(fixedUpdateDT);
@@ -34,8 +38,6 @@ void GameManager::Loop()
 			else
 			{
 				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
-				InputManager::GetInstance().Update();
-				SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 			}
 			exec += 1;
 		}
@@ -44,14 +46,6 @@ void GameManager::Loop()
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
 		debugInfo.Entity = PROFILER_END("Entity");
-
-		PROFILER_START("Input", "Input Update");
-		InputManager::GetInstance().Update();
-		debugInfo.Input = PROFILER_END("Input");
-
-		PROFILER_START("SceneU", "Scene Update");
-		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		debugInfo.SceneUpdate = PROFILER_END("SceneU");
 		 
 		for (auto& cam : m_camera)
 		{

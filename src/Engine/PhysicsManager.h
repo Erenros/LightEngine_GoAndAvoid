@@ -114,6 +114,7 @@ private:
 	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
 	void GenerateQuadTree(std::vector<Collider*>* activeColliders);
 	void PendingCorrections();
+	void HandleCollision(std::pair<Collider*, Collider*> collider);
 	void MakeTreePairs(std::vector<Collider*>* activeColliders);
 	void MakePairs(std::vector<Collider*>* activeColliders);
 

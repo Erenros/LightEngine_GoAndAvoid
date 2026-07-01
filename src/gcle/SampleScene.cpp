@@ -30,18 +30,24 @@ void SampleScene::OnInitialize()
 
 	pSceneCamera = CreateCamera();
 
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(-200, -100);
+	entity2->SetRigidBody(true);
+	entity2->GetRigidBody().SetGravity(false);
+	entity2->SetIsStatic(true);
+	entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 
-	for (int32 i = 0; i < 500; i++) {
-		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-		entity->SetPosition(-49000.0f + (i * 100.0f), -49000.0f + (i * 100.0f));
-		entity->SetRigidBody(true);
-		entity->GetRigidBody().SetGravity(false);
-		entity->SetIsStatic(true);
-		entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
-	}
+	//for (int32 i = 0; i < 50; i++) {
+	//	Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	//	entity->SetPosition(0, -4900.0f + (i * 100.0f));
+	//	entity->SetRigidBody(true);
+	//	entity->GetRigidBody().SetGravity(false);
+	//	entity->SetIsStatic(true);
+	//	entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
+	//}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
-	PhysicsManager::GetInstance().SetActivateQuadTree(true);
+	PhysicsManager::GetInstance().SetActivateQuadTree(false);
 	PhysicsManager::GetInstance().SetQuadTreePos1({ -50000, -50000 });
 	PhysicsManager::GetInstance().SetQuadTreePos2({ 50000, 50000 });
 }

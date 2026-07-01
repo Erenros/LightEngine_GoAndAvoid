@@ -273,6 +273,43 @@ void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
 	}
 }
 
+void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider){
+
+	bool coliding = IsColliding(collider.first, collider.second);
+
+	if (coliding) {
+		if (collider.first->GetOwner()->IsRigidBody() && collider.second->GetOwner()->IsRigidBody())
+		{
+			ThrowRepulse(collider.first, collider.second);
+		}
+		if (!collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
+		{
+			collider.first->GetOwner()->OnCollisionEnter(collider.second->GetOwner());
+			collider.first->GetOwner()->CollidingEntity.insert({ collider.second->GetOwner()->GetId(), collider.second->GetOwner() });
+
+			collider.second->GetOwner()->OnCollisionEnter(collider.first->GetOwner());
+			collider.second->GetOwner()->CollidingEntity.insert({ collider.first->GetOwner()->GetId(), collider.first->GetOwner() });
+		}
+
+		else
+		{
+			collider.first->GetOwner()->OnCollision(collider.second->GetOwner());
+			collider.second->GetOwner()->OnCollision(collider.first->GetOwner());
+		}
+	}
+
+	else
+	{
+		if (collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
+		{
+			collider.first->GetOwner()->OnCollisionExit(collider.second->GetOwner());
+			collider.first->GetOwner()->CollidingEntity.erase(collider.second->GetOwner()->GetId());
+			collider.second->GetOwner()->OnCollisionExit(collider.first->GetOwner());
+			collider.second->GetOwner()->CollidingEntity.erase(collider.first->GetOwner()->GetId());
+		}
+	}
+}
+
 void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
 {
 	int32 nbrTest = 0;
@@ -283,42 +320,10 @@ void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
 	
 	MakeTreePairs(&activeColliders);
 
-	for (auto& collider : m_pairs) {
+	for (auto& pair : m_pairs) {
 		nbrTest += 1;
-		bool coliding = IsColliding(collider.first, collider.second);
 
-
-		if (coliding) {
-			if (collider.first->GetOwner()->IsRigidBody() && collider.second->GetOwner()->IsRigidBody())
-			{
-				ThrowRepulse(collider.first, collider.second);
-			}
-			if (!collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
-			{
-				collider.first->GetOwner()->OnCollisionEnter(collider.second->GetOwner());
-				collider.first->GetOwner()->CollidingEntity.insert({ collider.second->GetOwner()->GetId(), collider.second->GetOwner() });
-
-				collider.second->GetOwner()->OnCollisionEnter(collider.first->GetOwner());
-				collider.second->GetOwner()->CollidingEntity.insert({ collider.first->GetOwner()->GetId(), collider.first->GetOwner() });
-			}
-
-			else
-			{
-				collider.first->GetOwner()->OnCollision(collider.second->GetOwner());
-				collider.second->GetOwner()->OnCollision(collider.first->GetOwner());
-			}
-		}
-
-		else
-		{
-			if (collider.first->GetOwner()->CollidingEntity.contains(collider.second->GetOwner()->GetId()))
-			{
-				collider.first->GetOwner()->OnCollisionExit(collider.second->GetOwner());
-				collider.first->GetOwner()->CollidingEntity.erase(collider.second->GetOwner()->GetId());
-				collider.second->GetOwner()->OnCollisionExit(collider.first->GetOwner());
-				collider.second->GetOwner()->CollidingEntity.erase(collider.first->GetOwner()->GetId());
-			}
-		}
+		HandleCollision(pair);
 
 		PendingCorrections();
 
@@ -332,89 +337,32 @@ void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders)
 	m_pairs.clear();
 }
 
-void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeColliders) {
+void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeColliders)
+{
+	m_pairs.clear();
 
-	auto MakePairKey = [](int64 idA, int64 idB) -> uint64
-		{
-			if (idA > idB) std::swap(idA, idB);
-			return (static_cast<uint64>(idA) << 32) ^ static_cast<uint64>(idB);
-		};
+	MakePairs(&activeColliders);
 
-	std::unordered_set<uint64> collidingPairsThisFrame;
-
-	for (auto it1 = activeColliders.begin(); it1 != activeColliders.end(); ++it1)
+	for (auto& pair : m_pairs)
 	{
-		Collider* collider1 = *it1;
-		Entity* entity = collider1->GetOwner();
 
-		for (auto it2 = std::next(it1); it2 != activeColliders.end(); ++it2)
-		{
-			Collider* collider2 = *it2;
-			Entity* otherEntity = collider2->GetOwner();
+		HandleCollision(pair);
 
-			if (entity == otherEntity)
-				continue;
-
-			if (!IsColliding(collider1, collider2))
-				continue;
-
-			if (entity->IsRigidBody() && otherEntity->IsRigidBody())
-				ThrowRepulse(collider1, collider2);
-
-			collidingPairsThisFrame.insert(MakePairKey(entity->GetId(), otherEntity->GetId()));
-
-			if (!entity->CollidingEntity.contains(otherEntity->GetId()))
-			{
-				entity->OnCollisionEnter(otherEntity);
-				entity->CollidingEntity.insert({ otherEntity->GetId(), otherEntity });
-
-				otherEntity->OnCollisionEnter(entity);
-				otherEntity->CollidingEntity.insert({ entity->GetId(), entity });
-			}
-			else
-			{
-				entity->OnCollision(otherEntity);
-				otherEntity->OnCollision(entity);
-			}
-		}
+		PendingCorrections();
 	}
 
-	PendingCorrections();
-
-	for (auto& info : m_EntitiesToUpdate)
-	{
-		Entity* entity = info.pEntity;
-
-		for (auto idIt = entity->CollidingEntity.begin(); idIt != entity->CollidingEntity.end(); )
-		{
-			uint64 key = MakePairKey(entity->GetId(), idIt->first);
-
-			if (collidingPairsThisFrame.contains(key))
-			{
-				++idIt;
-				continue;
-			}
-
-			Entity* otherEntity = idIt->second;
-			idIt = entity->CollidingEntity.erase(idIt);
-			entity->OnCollisionExit(otherEntity);
-		}
-	}
-
-	// 5) Suppression des entites marquees a retirer.
 	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
 	{
 		if (m_EntitiesToUpdate[i].toRemove)
 			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
 	}
+
+	m_pairs.clear();
 }
 
 #pragma endregion
 
 #pragma endregion
-
-
-
 
 void PhysicsManager::AccumulateCorrection(Entity* pEntity, Vector2f delta)
 {
@@ -440,7 +388,6 @@ bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
 
 	return (this->*collisionTable[typeA][typeB])(shapeA, shapeB);
 }
-
 
 bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 {
@@ -472,51 +419,69 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	return false;
 } 
 
-void PhysicsManager::ThrowRepulse(Collider* pCollider1, Collider* pCollider2)
+#pragma region Checks
+
+#pragma region ThrowChecks
+
+bool PhysicsManager::ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b)
 {
-	auto* shapeA = pCollider1->GetShape();
-	auto* shapeB = pCollider2->GetShape();
+	int16 angleA = static_cast<int16>(a->GetTransform()->GetDegAngle());
+	int16 angleB = static_cast<int16>(b->GetTransform()->GetDegAngle()) ;
 
-	m_pCurrentColliderA = pCollider1;
-	m_pCurrentColliderB = pCollider2;
 
-	RepulseTypes typeA;
-	RepulseTypes typeB;
-
-	switch (shapeA->GetShape()) {
-	case gcle::Shapes::Circle:
-		typeA = RepulseTypes::Circle;
-		break;
-	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeA->GetTransform()->GetDegAngle()) % 180 != 0)
-			typeA = RepulseTypes::OOB;
+	if (angleA != 0) {
+		if (angleB != 0)
+			return CheckOBBOBBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 		else
-			typeA = RepulseTypes::AABB;
-		break;
-	case gcle::Shapes::Triangle:
-		return;
-		break;
+			return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 	}
-
-	switch (shapeB->GetShape()) {
-	case gcle::Shapes::Circle:
-		typeB = RepulseTypes::Circle;
-		break;
-	case gcle::Shapes::Rectangle:
-		if (static_cast<int32>(shapeB->GetTransform()->GetDegAngle()) % 180 != 0)
-			typeB = RepulseTypes::OOB;
-		else
-			typeB = RepulseTypes::AABB;
-		break;
-	case gcle::Shapes::Triangle:
-		return;
-		break;
+	else if (angleB != 0) {
+		bool hit = CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
+		if (hit) {
+			m_colDatas.orientation = -m_colDatas.orientation;
+		}
+		return hit;
 	}
 
 
-	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(pCollider1, pCollider2);
+	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
 }
 
+bool PhysicsManager::ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
+{
+	return CheckCircleCircleCollision(static_cast<gcle::Circle*>(a), static_cast<gcle::Circle*>(b));
+}
+
+bool PhysicsManager::ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b)
+{
+	int16 angle = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
+
+	if (angle != 0) 
+	{
+		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
+	}
+	else
+	{
+		return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
+	}
+}
+
+bool PhysicsManager::ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b)
+{
+	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
+	if (angle != 0) {
+		bool hit =CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+		if (hit)
+			m_colDatas.orientation = -m_colDatas.orientation;
+		return hit;
+
+	}
+	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
+}
+
+#pragma endregion
+
+#pragma region ActualsChecks
 
 bool PhysicsManager::CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2)
 {
@@ -826,60 +791,62 @@ bool PhysicsManager::CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circl
 
 }
 
+#pragma endregion
 
-bool PhysicsManager::ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b)
+#pragma endregion
+
+#pragma region Repulse
+
+#pragma region ThrowRepulse
+
+void PhysicsManager::ThrowRepulse(Collider* pCollider1, Collider* pCollider2)
 {
-	int16 angleA = static_cast<int16>(a->GetTransform()->GetDegAngle());
-	int16 angleB = static_cast<int16>(b->GetTransform()->GetDegAngle()) ;
+	auto* shapeA = pCollider1->GetShape();
+	auto* shapeB = pCollider2->GetShape();
 
+	m_pCurrentColliderA = pCollider1;
+	m_pCurrentColliderB = pCollider2;
 
-	if (angleA != 0) {
-		if (angleB != 0)
-			return CheckOBBOBBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
+	RepulseTypes typeA;
+	RepulseTypes typeB;
+
+	switch (shapeA->GetShape()) {
+	case gcle::Shapes::Circle:
+		typeA = RepulseTypes::Circle;
+		break;
+	case gcle::Shapes::Rectangle:
+		if (static_cast<int32>(shapeA->GetTransform()->GetDegAngle()) % 180 != 0)
+			typeA = RepulseTypes::OOB;
 		else
-			return CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
-	}
-	else if (angleB != 0) {
-		bool hit = CheckOBBAABBCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Rectangle*>(a));
-		if (hit) {
-			m_colDatas.orientation = -m_colDatas.orientation;
-		}
-		return hit;
+			typeA = RepulseTypes::AABB;
+		break;
+	case gcle::Shapes::Triangle:
+		return;
+		break;
 	}
 
-
-	return CheckAABBAABBCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Rectangle*>(b));
-}
-
-bool PhysicsManager::ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b)
-{
-	return CheckCircleCircleCollision(static_cast<gcle::Circle*>(a), static_cast<gcle::Circle*>(b));
-}
-
-bool PhysicsManager::ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b)
-{
-	int16 angle = static_cast<int16>(a->GetTransform()->GetDegAngle()) % 180;
-
-	if (angle != 0) {
-		return CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
+	switch (shapeB->GetShape()) {
+	case gcle::Shapes::Circle:
+		typeB = RepulseTypes::Circle;
+		break;
+	case gcle::Shapes::Rectangle:
+		if (static_cast<int32>(shapeB->GetTransform()->GetDegAngle()) % 180 != 0)
+			typeB = RepulseTypes::OOB;
+		else
+			typeB = RepulseTypes::AABB;
+		break;
+	case gcle::Shapes::Triangle:
+		return;
+		break;
 	}
 
-	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(a), static_cast<gcle::Circle*>(b));
+
+	(this->*repulseTable[static_cast<int32>(typeA)][static_cast<int32>(typeB)])(pCollider1, pCollider2);
 }
 
-bool PhysicsManager::ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b)
-{
-	int16 angle = static_cast<int16>(b->GetTransform()->GetDegAngle()) % 180;
-	if (angle != 0) {
-		bool hit =CheckOBBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
-		if (hit)
-			m_colDatas.orientation = -m_colDatas.orientation;
-		return hit;
+#pragma endregion
 
-	}
-	return CheckAABBCircleCollision(static_cast<gcle::Rectangle*>(b), static_cast<gcle::Circle*>(a));
-}
-
+#pragma region ActualRepulse
 
 void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 {
@@ -1092,6 +1059,10 @@ void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 	AccumulateCorrection(a->GetOwner(), deltaA);
 	AccumulateCorrection(b->GetOwner(), deltaB);
 }
+
+#pragma endregion
+
+#pragma endregion
 
 float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider* colB)
 {
