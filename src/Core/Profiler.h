@@ -35,7 +35,7 @@ namespace gcle
         static void Clear();
 
         static void NewTask(std::string id, std::string message = "");
-        static uint32 EndTask(std::string id);
+        static float32 EndTask(std::string id);
 
     private:
         static std::unordered_map<std::string, Task>* m_tasks;

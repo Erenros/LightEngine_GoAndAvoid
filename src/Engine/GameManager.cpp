@@ -53,6 +53,7 @@ void GameManager::Loop()
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		debugInfo.SceneUpdate = PROFILER_END("SceneU");
 		 
+		PROFILER_START("SceneD", "Scene Draw");
 		for (auto& cam : m_camera)
 		{
 			if (cam->IsActive())
@@ -70,7 +71,6 @@ void GameManager::Loop()
 		mp_window->StartImGUIFrame();
 		mp_window->ImGUIUpdate();
 	
-		PROFILER_START("SceneD", "Scene Draw");
 		mp_window->Present();
 		debugInfo.SceneUpdate = PROFILER_END("SceneD");
 

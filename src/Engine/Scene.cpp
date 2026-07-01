@@ -1,5 +1,9 @@
 #include "Scene.h"
 #include "Render/Text.h"
+#include "PhysicsManager.h"
+
+#include <sstream>
+#include <iomanip>
 
 void Scene::DrawDebug(Window* window)
 {
@@ -268,34 +272,36 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugInfoText("Pos: "			, { 0,		0 },		25,		255, 225, 255);
-	mp_PosX			= CreateDebugInfoText(""				, { 100,	0 },		25,		255, 225, 255);
-	mp_PosY			= CreateDebugInfoText(""				, { 300,	0 },		25,		255, 225, 255);
+	mp_Position		= CreateDebugInfoText("Pos: "		, { 0,		0	},		25,		255, 225, 255);
+	mp_PosX			= CreateDebugInfoText(""			, { 100,	0	},		25,		255, 225, 255);
+	mp_PosY			= CreateDebugInfoText(""			, { 300,	0	},		25,		255, 225, 255);
 
-	mp_Rotation		= CreateDebugInfoText("Rot: "			, { 0,		75 },		25,		255, 225, 255);
-	mp_RotZ			= CreateDebugInfoText(""				, { 100,	75 },		25,		255, 225, 255);
+	mp_Rotation		= CreateDebugInfoText("Rot: "		, { 0,		75  },		25,		255, 225, 255);
+	mp_RotZ			= CreateDebugInfoText(""			, { 100,	75  },		25,		255, 225, 255);
 
-	mp_Scale		= CreateDebugInfoText("Scale: "			, { 0,		150 },		25,		255, 225, 255);
-	mp_ScaleX		= CreateDebugInfoText(""				, { 100,	150 },		25,		255, 225, 255);
-	mp_ScaleY		= CreateDebugInfoText(""				, { 300,	150 },		25,		255, 225, 255);
+	mp_Scale		= CreateDebugInfoText("Scale: "		, { 0,		150 },		25,		255, 225, 255);
+	mp_ScaleX		= CreateDebugInfoText(""			, { 100,	150 },		25,		255, 225, 255);
+	mp_ScaleY		= CreateDebugInfoText(""			, { 300,	150 },		25,		255, 225, 255);
 
-	mp_Frame		= CreateText("FPS"						, { 1860,	0 },		25,		255, 225, 255);
-	mp_FPS			= CreateText(""							, { 1800,	0 },		25,		255, 225, 255);
-															
-	mp_Colliders	= CreateDebugText("Colliders: "			, { 0,		1000 },		25,		255, 225, 255);
-	mp_CollidersP	= CreateDebugText(""					, { 100,	1000 },		25,		255, 225, 255);
-															
-	mp_Entity		= CreateDebugText("Entity C/D: "		, { 150,	1000 },		25,		255, 225, 255);
-	mp_EntityP		= CreateDebugText(""					, { 250,	1000 },		25,		255, 225, 255);
-															
-	mp_Input		= CreateDebugText("InputManager: "		, { 300,	1000 },		25,		255, 225, 255);
-	mp_InputP		= CreateDebugText(""					, {450,		1000},		25,		255, 225, 255);
-															
-	mp_Update		= CreateDebugText("Update: "			, {500,		1000},		25,		255, 225, 255);
-	mp_UpdateP		= CreateDebugText(""					, {600,		1000},		25,		255, 225, 255);
-															
-	mp_Draw 		= CreateDebugText("Draw: "				, {650,		1000},		25,		255, 225, 255);
-	mp_DrawP		= CreateDebugText(""					, {750,		1000},		25,		255, 225, 255);
+	mp_Frame		= CreateText("FPS"					, { 1860,	0	},		25,		255, 225, 255);
+	mp_FPS			= CreateText(""						, { 1800,	0	},		25,		255, 225, 255);
+														
+	mp_Colliders	= CreateDebugText("Colliders: "		, { 0,		1000 },		25,		255, 225, 255);
+	mp_CollidersP	= CreateDebugText(""				, { 150,	1000 },		25,		255, 225, 255);
+														
+	mp_Entity		= CreateDebugText("Entity C/D: "	, { 275,	1000 },		25,		255, 225, 255);
+	mp_EntityP		= CreateDebugText(""				, { 450,	1000 },		25,		255, 225, 255);
+														
+	mp_Input		= CreateDebugText("InputManager: "	, { 560,	1000 },		25,		255, 225, 255);
+	mp_InputP		= CreateDebugText(""				, { 760,	1000 },		25,		255, 225, 255);
+														
+	mp_Update		= CreateDebugText("Update: "		, { 870,	1000 },		25,		255, 225, 255);
+	mp_UpdateP		= CreateDebugText(""				, { 975,	1000 },		25,		255, 225, 255);
+														
+	mp_Draw 		= CreateDebugText("Draw: "			, { 1085,	1000 },		25,		255, 225, 255);
+	mp_DrawP		= CreateDebugText(""				, { 1160,	1000 },		25,		255, 225, 255);
+
+	mp_QuadTree     = CreateDebugText("QuadTree"		, { 1260,	1000 },		25,		0  , 225, 0);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -311,6 +317,24 @@ void Scene::OnUpdate(Clock& time)
 
 	if (InputManager::GetInstance().IsDown(F1))
 		m_debugPerf = !m_debugPerf;
+
+	if (InputManager::GetInstance().IsDown(F2) && m_debugPerf)
+	{
+		bool isActive = PhysicsManager::GetInstance().IsQuadTreeActive();
+
+		if (isActive)
+		{
+			mp_QuadTree->SetColor(255, 0, 0);
+			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+		}
+		else
+		{
+			mp_QuadTree->SetColor(0, 255, 0);
+			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+		}
+
+		
+	}
 
 	if (m_updateDebug >= 1)
 	{
@@ -355,21 +379,21 @@ void Scene::SetDebugInfo(DebugInformation& info) const
 {
 	if (m_debugPerf && m_updateDebug >= 4)
 	{
-		uint32 totalTime = info.Colliders + info.Draw + info.Entity + info.Input + info.SceneUpdate;
+		float32 totalTime = info.Colliders + info.Draw + info.Entity + info.Input + info.SceneUpdate;
 
-		if (totalTime <= 0)
-			return;
 
-		uint32 percentC = (info.Colliders * 100) / totalTime;
-		uint32 percentD = (info.Draw * 100) / totalTime;
-		uint32 percentE = (info.Entity * 100) / totalTime;
-		uint32 percentI = (info.Input * 100) / totalTime;
-		uint32 percentU = (info.SceneUpdate * 100) / totalTime;
 
-		mp_CollidersP->SetText(std::to_string(percentC) + "%");
-		mp_DrawP->SetText(std::to_string(percentD) + "%");
-		mp_EntityP->SetText(std::to_string(percentE) + "%");
-		mp_InputP->SetText(std::to_string(percentI) + "%");
-		mp_UpdateP->SetText(std::to_string(percentU) + "%");
+		auto FormatMs = +[](float value)
+		{
+			std::ostringstream oss;
+			oss << std::fixed << std::setprecision(2) << value;
+			return oss.str();
+		};
+
+		mp_CollidersP->SetText(	FormatMs(info.Colliders)	+ "ms");
+		mp_DrawP->SetText(		FormatMs(info.Draw)			+ "ms");
+		mp_EntityP->SetText(	FormatMs(info.Entity)		+ "ms");
+		mp_InputP->SetText(		FormatMs(info.Input)		+ "ms");
+		mp_UpdateP->SetText(	FormatMs(info.SceneUpdate)	+ "ms");
 	}
 }

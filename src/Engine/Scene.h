@@ -20,11 +20,11 @@ class Scene
 private :
 	struct DebugInformation
 	{
-		uint32 Colliders	= 0;
-		uint32 Entity		= 0;
-		uint32 Input		= 0;
-		uint32 SceneUpdate	= 0;
-		uint32 Draw			= 0;
+		float32 Colliders	= 0;
+		float32 Entity		= 0;
+		float32 Input		= 0;
+		float32 SceneUpdate	= 0;
+		float32 Draw		= 0;
 	};
 
 public:
@@ -128,6 +128,8 @@ private:
 
 	Text*  mp_Draw 			= nullptr;
 	Text*  mp_DrawP			= nullptr;
+
+	Text*  mp_QuadTree		= nullptr;
 
 private: 
 	friend class GameManager;

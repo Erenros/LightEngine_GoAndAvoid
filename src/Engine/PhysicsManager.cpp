@@ -1129,6 +1129,11 @@ void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame){
 	m_frameBetweenQuadTreeRegenerations = nbrFrame;
 }
 
+bool PhysicsManager::IsQuadTreeActive() const
+{
+	return m_activateQuadTree;
+}
+
 PhysicsManager::~PhysicsManager(){
 	delete m_quadTree;
 }

@@ -107,6 +107,7 @@ public:
 	void SetQuadTreePos1(Vector2f pos1);
 	void SetQuadTreePos2(Vector2f pos2);
 	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
+	bool IsQuadTreeActive() const;
 
 private:
 	void EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate);
