@@ -15,7 +15,7 @@ struct Entry
 {
 	int8 key;
 	int64 id;
-	std::string name;
+	int32 nameLength;
 	int8 flag;
 	int64 type;
 	int16 width;
@@ -54,6 +54,7 @@ public:
 
 	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
 
+	void ReadName(std::ifstream& file, Entry& entry, std::string& name);
 	bool ReadHeader(std::ifstream& file);
 	bool ReadEntry(std::ifstream& file, Entry& entry);
 	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);

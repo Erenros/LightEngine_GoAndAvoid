@@ -25,6 +25,14 @@ void RessourceManager::ForcePutTexture(Sprite* text, std::string id)
     m_textureMap[id].mp_texture = text;
 }
 
+TextureStruct* RessourceManager::GetTexture(const std::string& id)
+{
+    if (!m_textureMap.contains(id))
+        return nullptr;
+
+    return &m_textureMap[id];
+}
+
 Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
 	if (m_textureMap[id].mp_texture != nullptr)

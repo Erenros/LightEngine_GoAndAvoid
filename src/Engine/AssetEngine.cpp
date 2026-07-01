@@ -35,6 +35,9 @@ bool AssetEngine::LoadFile(const std::string& path)
 			continue;
 		}
 
+		std::string name;
+		ReadName(file, entry, name);
+
 		std::vector<byte> data;
 		if (!ReadData(file, entry, data))
 		{
@@ -43,20 +46,21 @@ bool AssetEngine::LoadFile(const std::string& path)
 		};
 
 
-		DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << "\n";
-		DEBUG_INFO << "ID : " << entry.id << "\n";
-		DEBUG_INFO << "Name : " << entry.name << "\n";
-		DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << "\n";
-		DEBUG_INFO << "Type : " << entry.type << "\n";
-		DEBUG_INFO << "Width : " << entry.width << "\n";
-		DEBUG_INFO << "Height : " << entry.height << "\n";
+		DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << ENDL;
+		DEBUG_INFO << "ID : " << entry.id << ENDL;
+		DEBUG_INFO << "Name : " << name << ENDL;
+		DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << ENDL;
+		DEBUG_INFO << "Type : " << entry.type << ENDL;
+		DEBUG_INFO << "Width : " << entry.width << ENDL;
+		DEBUG_INFO << "Height : " << entry.height << ENDL;
 		DEBUG_INFO << "Size : " << entry.size << ENDL;
 
 		DEBUG_INFO << "File load with a size of : " << data.size() << " byte" << ENDL;
-	
-		Asset* asset = new Asset();
+
+		Asset* asset = new Asset;
 		asset->id = entry.id;
-		asset->name = entry.name;
+		asset->name.resize(name.size());
+		asset->name = std::string(name);
 		asset->type = entry.type;
 		asset->width = entry.width;
 		asset->height = entry.height;
@@ -64,6 +68,8 @@ bool AssetEngine::LoadFile(const std::string& path)
 
 		m_assetMap[asset->name] = asset;
 	}
+
+	file.close();
 
 	return true;
 }
@@ -80,6 +86,12 @@ std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* win
 
 	m_assetMap.clear();
 	return textureMap;
+}
+
+void AssetEngine::ReadName(std::ifstream& file, Entry& entry, std::string& name)
+{
+	name.resize(entry.nameLength);
+	file.read(name.data(), entry.nameLength);
 }
 
 bool AssetEngine::ReadHeader(std::ifstream& file)

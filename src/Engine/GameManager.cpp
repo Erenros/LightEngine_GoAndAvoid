@@ -122,6 +122,8 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 		}
 	}
 
+	TextureStruct* test = RessourceManager::GetInstance().GetTexture("Test");
+
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});
 

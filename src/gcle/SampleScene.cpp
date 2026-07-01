@@ -28,7 +28,7 @@ void SampleScene::OnInitialize()
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true); 
 	entity2->GetShape()->SetIsKinematic(true);
-	entity2->SetTexture("42");
+	entity2->SetTexture("Test");
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(200, 100);
