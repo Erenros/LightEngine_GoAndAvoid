@@ -95,6 +95,12 @@ void Transform2D::SetParent(Transform2D* pParent) {
          
         Vector2f offset = m_Position - mp_Parent->GetPosition();
         m_OffsetAngle = MathGC::VecToAngle(offset) - mp_Parent->GetRadAngle(); 
+
+        Vector2f parentScale = mp_Parent->GetScale();
+        m_ScaleRatioToParent = {
+            (parentScale.x != 0.0f) ? m_Scale.x / parentScale.x : 1.0f,
+            (parentScale.y != 0.0f) ? m_Scale.y / parentScale.y : 1.0f
+        };
     }
 }
 
@@ -250,6 +256,9 @@ void Transform2D::UpdateChildPosition()
 
         child->m_RadAngle = m_RadAngle + child->m_AngleDifferenceToParent;
         child->m_DegAngle = MathGC::RadToDeg(child->m_RadAngle);
+
+        child->m_Scale.x = m_Scale.x * child->m_ScaleRatioToParent.x;
+        child->m_Scale.y = m_Scale.y * child->m_ScaleRatioToParent.y;
 
         child->UpdateChildPosition();
     }

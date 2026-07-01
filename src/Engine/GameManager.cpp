@@ -16,12 +16,14 @@ void GameManager::Loop()
 {
 	isRunning = true;   
 
+	Scene::DebugInformation debugInfo{};
+
 	timeBeginPeriod(1);
 	while (isRunning == true)
 	{
  
 
-		//PROFILER_START("Colliders", "Colliders Update");
+		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
 		while (m_accDt >= fixedUpdateDT) 
@@ -37,27 +39,25 @@ void GameManager::Loop()
 			}
 			exec += 1;
 		}
-		//PROFILER_END("Colliders");
+		debugInfo.Colliders = PROFILER_END("Colliders");
 	
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
-		PROFILER_END("Entity"); 
+		debugInfo.Entity = PROFILER_END("Entity");
 
 		PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
-		PROFILER_END("Input");
+		debugInfo.Input = PROFILER_END("Input");
 
 		PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		PROFILER_END("SceneU");
-		
-		PROFILER_START("Camera", "Camera Update"); 
+		debugInfo.SceneUpdate = PROFILER_END("SceneU");
+		 
 		for (auto& cam : m_camera)
 		{
 			if (cam->IsActive())
 			cam->Update(m_Time, m_entities);
-		}
-		PROFILER_END("Camera");
+		} 
 	
 		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
@@ -67,7 +67,7 @@ void GameManager::Loop()
 		 
 		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
 
-		PROFILER_END("SceneD");
+		debugInfo.SceneUpdate = PROFILER_END("SceneD");
 
 		//ImGUI
 		mp_window->StartImGUIFrame();
@@ -92,7 +92,7 @@ void GameManager::Loop()
 		m_Time.Update();
 		//PROFILER_END("time");
 
-
+		SceneManager::GetInstance().GetCurrentScene()->SetDebugInfo(debugInfo);
 	
 		// GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
 		// PROFILER_END("Update");

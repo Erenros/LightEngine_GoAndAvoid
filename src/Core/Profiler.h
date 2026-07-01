@@ -7,7 +7,7 @@
 #include "Utils.h"
 #include "Debugger.h"
 
-//#define PROFILER
+#define PROFILER
 
 #if defined(_DEBUG) && defined(PROFILER)
 
@@ -16,7 +16,7 @@
 #define PROFILER_CLEAR(name) gcle::Profiler::Clear()
 #else
 #define PROFILER_START(name, message) {}
-#define PROFILER_END(name) {}
+#define PROFILER_END(name) {0}
 #define PROFILER_CLEAR(name) {}
 #endif // _DEBUG
 
@@ -35,7 +35,7 @@ namespace gcle
         static void Clear();
 
         static void NewTask(std::string id, std::string message = "");
-        static void EndTask(std::string id);
+        static uint32 EndTask(std::string id);
 
     private:
         static std::unordered_map<std::string, Task>* m_tasks;

@@ -52,6 +52,12 @@ void Scene::Draw(Window* window) {
 
 	if (m_debug && m_selectedEntity != nullptr)
 	{
+		for (Text* t : m_debugInfoTexts)
+			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+	}
+
+	if (m_debug && m_debugPerf)
+	{
 		for (Text* t : m_debugTexts)
 			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
 	}
@@ -66,6 +72,10 @@ Scene::~Scene()
 	for (Text* t : m_debugTexts)
 		delete t;
 	m_debugTexts.clear();
+
+	for (Text* t : m_debugInfoTexts)
+		delete t;
+	m_debugInfoTexts.clear();
 }
 
 Text* Scene::CreateText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
@@ -143,6 +153,26 @@ void Scene::DestroyDebugText(Text* text)
 	delete text;
 }
 
+Text* Scene::CreateDebugInfoText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
+{
+	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
+	if (font == nullptr)
+	{
+		GCLE_WARN << "Couldn't find the default font" << ENDL;
+		return nullptr;
+	}
+
+	Text* new_text = GCLE_NEW Text(font, text, x, y, w, h, r, g, b);
+	m_debugInfoTexts.push_back(new_text);
+	return new_text;
+}
+
+void Scene::DestroyDebugInfoText(Text* text)
+{
+	std::erase_if(m_debugInfoTexts, [text](Text* t) { return t == text; });
+	delete text;
+}
+
 void Scene::SetGizmoVisibility()
 {
 	m_isVisualDebugActive = !m_isVisualDebugActive;
@@ -196,7 +226,7 @@ void Scene::EntityInfoVisibility(const int32 debugConstant)
 	}
 }
 
-void Scene::DebugSetEntityPosition()
+void Scene::DebugSetEntityInfo()
 {
 	if (m_selectedEntity != nullptr)
 	{
@@ -206,6 +236,26 @@ void Scene::DebugSetEntityPosition()
 				mp_activeCamera->GetMouseScreenToWorldPosition().x,
 				mp_activeCamera->GetMouseScreenToWorldPosition().y
 			);
+		}
+
+		if (InputManager::GetInstance().IsHeld(LeftArrow))
+		{
+			m_selectedEntity->Rotate(-0.1f);
+		}
+
+		if (InputManager::GetInstance().IsHeld(RightArrow))
+		{
+			m_selectedEntity->Rotate(0.1f);
+		}
+
+		if (InputManager::GetInstance().IsHeld(UpArrow))
+		{
+			m_selectedEntity->ScaleBy({ 1.01f, 1.01f });
+		}
+
+		if (InputManager::GetInstance().IsHeld(DownArrow))
+		{
+			m_selectedEntity->ScaleBy({ 0.99f, 0.99f });
 		}
 	}
 }
@@ -217,19 +267,34 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
-	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
+	mp_Position		= CreateDebugInfoText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
+	mp_PosX			= CreateDebugInfoText("",			125,	0,		100,	50,	255, 225, 255);
+	mp_PosY			= CreateDebugInfoText("",			250,	0,		100,	50,	255, 225, 255); 
 
-	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
+	mp_Rotation		= CreateDebugInfoText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
+	mp_RotZ			= CreateDebugInfoText("",			125,	75,		100,	50,	255, 225, 255); 
 
-	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
+	mp_Scale		= CreateDebugInfoText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
+	mp_ScaleX		= CreateDebugInfoText("",			125,	150,	100,	50,	255, 225, 255);
+	mp_ScaleY		= CreateDebugInfoText("",			250,	150,	100,	50,	255, 225, 255); 
 
 	mp_Frame		= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
 	mp_FPS			= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
+
+	mp_Colliders	= CreateDebugText("Colliders: ", 0, 1000, 100, 50, 255, 225, 255);
+	mp_CollidersP	= CreateDebugText("", 100, 1000, 25, 50, 255, 225, 255);
+
+	mp_Entity		= CreateDebugText("Entity C/D: ", 150, 1000, 100, 50, 255, 225, 255);
+	mp_EntityP		= CreateDebugText("", 250, 1000, 25, 50, 255, 225, 255);
+
+	mp_Input		= CreateDebugText("InputManager: ", 300, 1000, 150, 50, 255, 225, 255);
+	mp_InputP		= CreateDebugText("", 450, 1000, 25, 50, 255, 225, 255);
+
+	mp_Update		= CreateDebugText("Update: ", 500, 1000, 100, 50, 255, 225, 255);
+	mp_UpdateP		= CreateDebugText("", 600, 1000, 25, 50, 255, 225, 255);
+
+	mp_Draw 		= CreateDebugText("Draw: ", 650, 1000, 100, 50, 255, 225, 255);
+	mp_DrawP		= CreateDebugText("", 750, 1000, 25, 50, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -239,11 +304,14 @@ void Scene::OnUpdate(Clock& time)
 	m_updateDebug++;
 	
 	EntityInfoVisibility(DEBUG_UPDATE);
-	DebugSetEntityPosition();
+	DebugSetEntityInfo();
 
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
 	//GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
+
+	if (InputManager::GetInstance().IsDown(F1))
+		m_debugPerf = !m_debugPerf;
 
 	if (m_updateDebug >= DEBUG_UPDATE)
 	{
@@ -279,5 +347,28 @@ void Scene::SwitchCamera(Camera* pCamera)
 			cam->SetActive(true);
 			mp_activeCamera = cam;
 		}
+	}
+}
+
+void Scene::SetDebugInfo(DebugInformation& info) const
+{
+	if (m_debugPerf && m_updateDebug >= 4)
+	{
+		uint32 totalTime = info.Colliders + info.Draw + info.Entity + info.Input + info.SceneUpdate;
+
+		if (totalTime <= 0)
+			return;
+
+		uint32 percentC = (info.Colliders * 100) / totalTime;
+		uint32 percentD = (info.Draw * 100) / totalTime;
+		uint32 percentE = (info.Entity * 100) / totalTime;
+		uint32 percentI = (info.Input * 100) / totalTime;
+		uint32 percentU = (info.SceneUpdate * 100) / totalTime;
+
+		mp_CollidersP->SetText(std::to_string(percentC) + "%");
+		mp_DrawP->SetText(std::to_string(percentD) + "%");
+		mp_EntityP->SetText(std::to_string(percentE) + "%");
+		mp_InputP->SetText(std::to_string(percentI) + "%");
+		mp_UpdateP->SetText(std::to_string(percentU) + "%");
 	}
 }

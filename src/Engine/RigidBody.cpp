@@ -33,8 +33,6 @@ void RigidBody2D::Update(float32 dt)
 	m_TempVelocity = m_Velocity;
 
 	mp_Transform->UpdateChildPosition();
-
-	//std::cout << m_Velocity.x << " : " << m_Velocity.y << std::endl;
 }
 
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
