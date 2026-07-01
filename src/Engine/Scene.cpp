@@ -282,19 +282,19 @@ void Scene::OnInitialize()
 	mp_FPS			= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
 
 	mp_Colliders	= CreateDebugText("Colliders: ", 0, 1000, 100, 50, 255, 225, 255);
-	mp_CollidersP	= CreateDebugText("", 100, 1000, 100, 50, 255, 225, 255);
+	mp_CollidersP	= CreateDebugText("", 100, 1000, 25, 50, 255, 225, 255);
 
-	mp_Entity		= CreateDebugText("Entity C/D: ", 200, 1000, 100, 50, 255, 225, 255);
-	mp_EntityP		= CreateDebugText("", 300, 1000, 100, 50, 255, 225, 255);
+	mp_Entity		= CreateDebugText("Entity C/D: ", 150, 1000, 100, 50, 255, 225, 255);
+	mp_EntityP		= CreateDebugText("", 250, 1000, 25, 50, 255, 225, 255);
 
-	mp_Input		= CreateDebugText("InputManager: ", 400, 1000, 100, 50, 255, 225, 255);
-	mp_InputP		= CreateDebugText("", 500, 1000, 100, 50, 255, 225, 255);
+	mp_Input		= CreateDebugText("InputManager: ", 300, 1000, 150, 50, 255, 225, 255);
+	mp_InputP		= CreateDebugText("", 450, 1000, 25, 50, 255, 225, 255);
 
-	mp_Update		= CreateDebugText("Update: ", 600, 1000, 100, 50, 255, 225, 255);
-	mp_UpdateP		= CreateDebugText("", 700, 1000, 100, 50, 255, 225, 255);
+	mp_Update		= CreateDebugText("Update: ", 500, 1000, 100, 50, 255, 225, 255);
+	mp_UpdateP		= CreateDebugText("", 600, 1000, 25, 50, 255, 225, 255);
 
-	mp_Draw 		= CreateDebugText("Draw: ", 800, 1000, 100, 50, 255, 225, 255);
-	mp_DrawP		= CreateDebugText("", 900, 1000, 100, 50, 255, 225, 255);
+	mp_Draw 		= CreateDebugText("Draw: ", 650, 1000, 100, 50, 255, 225, 255);
+	mp_DrawP		= CreateDebugText("", 750, 1000, 25, 50, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -347,5 +347,28 @@ void Scene::SwitchCamera(Camera* pCamera)
 			cam->SetActive(true);
 			mp_activeCamera = cam;
 		}
+	}
+}
+
+void Scene::SetDebugInfo(DebugInformation& info) const
+{
+	if (m_debugPerf && m_updateDebug >= 4)
+	{
+		uint32 totalTime = info.Colliders + info.Draw + info.Entity + info.Input + info.SceneUpdate;
+
+		if (totalTime <= 0)
+			return;
+
+		uint32 percentC = (info.Colliders * 100) / totalTime;
+		uint32 percentD = (info.Draw * 100) / totalTime;
+		uint32 percentE = (info.Entity * 100) / totalTime;
+		uint32 percentI = (info.Input * 100) / totalTime;
+		uint32 percentU = (info.SceneUpdate * 100) / totalTime;
+
+		mp_CollidersP->SetText(std::to_string(percentC) + "%");
+		mp_DrawP->SetText(std::to_string(percentD) + "%");
+		mp_EntityP->SetText(std::to_string(percentE) + "%");
+		mp_InputP->SetText(std::to_string(percentI) + "%");
+		mp_UpdateP->SetText(std::to_string(percentU) + "%");
 	}
 }

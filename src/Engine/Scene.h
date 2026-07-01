@@ -74,6 +74,8 @@ private:
 	void	EntityInfoVisibility(const int32 debugConstant);
 	void	DebugSetEntityInfo();
 
+	void	SetDebugInfo(DebugInformation& info) const;
+
 
 protected:
 	std::string m_tag;
