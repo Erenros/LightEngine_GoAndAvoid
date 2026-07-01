@@ -139,7 +139,7 @@ public:
 	bool LoadMusic(const std::string& path, const std::string& id);
 	bool LoadSound(const std::string& path, const std::string& id);
 
-	bool LoadFont(const std::string& path, const std::string& id, int size);
+	bool LoadFont(const std::string& path, const std::string& id);
 
 	void Init(Window* window);
 

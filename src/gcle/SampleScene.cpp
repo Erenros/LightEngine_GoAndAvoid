@@ -16,7 +16,7 @@ void SampleScene::OnInitialize()
 	pEntity->SetRigidBody(true);*/
 	 
 	std::string text = "Test";
-	CreateText(text, 40, 40, 20, 20);
+	CreateText(text, { 40, 40 }, 50);
 
 	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetPosition(0, 0); 
