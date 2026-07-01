@@ -110,6 +110,13 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	}
 }
 
+Vector2f RigidBody2D::CalculateNextPosition()
+{
+	Vector2f pos = mp_Transform->GetPosition();
+	Vector2f nextPos = pos + m_Velocity;
+	return nextPos;
+}
+
 void RigidBody2D::ApplyVelocity(float32 dt)
 {
 	Vector2f pos = mp_Transform->GetPosition();

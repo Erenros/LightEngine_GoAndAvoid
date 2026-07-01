@@ -50,6 +50,7 @@ public:
 	void SetDampingOnXAxis(Vector2f strenght) { m_Friction = strenght; }
 	void SetDampingOnYAxis(Vector2f strenght) { m_Friction = strenght; }
 
+	Vector2f CalculateNextPosition();
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
