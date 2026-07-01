@@ -29,7 +29,7 @@ namespace Keyboard
 	#define UpArrow VK_UP
 	#define DownArrow VK_DOWN
 
-    #define Delete VK_DELETE
+	#define Delete VK_DELETE
 
 	#define F1 VK_F1
 	#define F2 VK_F2
@@ -73,6 +73,16 @@ private:
 
 	std::unordered_map<short, bool> m_keysDownReset;
 
+	std::vector<short> m_LeftStickDeadzone = { 4000, -4000, 4000, -4000 };
+	std::vector<short> m_RightStickDeadzone = { 4000, -4000, 4000, -4000 };
+
+	BYTE m_LeftTriggerDeadzone = 30;
+	BYTE m_RightTriggerDeadzone = 30;
+
+	XINPUT_STATE m_State;
+
+	BYTE m_GamepadIndex = 0; // this is supposed to be referring to which controller you're using (from 0 to 3) but it's not used for now
+
 public:
 
 	static InputManager& GetInstance()
@@ -94,14 +104,41 @@ public:
 
 	//Input tests
 
+	Vector2<long> GetMouseRelativePosition();
+	Vector2<long> GetMouseWorldPosition();
+
 	bool IsDown(const short key);
 	bool IsHeld(const char key);
 	bool IsUp(const char key);
 
 	bool IsControllerDown(int16 key);
 
+	void SetVibration(float32 powerLeft, float32 powerRight);
 
-	Vector2<long> GetMouseRelativePosition();
-	Vector2<long> GetMouseWorldPosition();
+
+	XINPUT_STATE GetGamepadState();
+
+
+	void SetLeftStickDeadZone(float Xpos, float Xneg, float Ypos, float Yneg);
+	void SetRightStickDeadZone(float Xpos, float Xneg, float Ypos, float Yneg);
+	std::vector<short> GetLeftStickDeadZone();
+	std::vector<short> GetRightStickDeadZone();
+
+	bool IsLeftStickInHorizontalDeadzone();
+	bool IsLeftStickInVerticalDeadzone();
+	bool IsRightStickInHorizontalDeadzone();
+	bool IsRightStickInVerticalDeadzone();
+
+	float GetLeftStickX();
+	float GetLeftStickY();
+	float GetRightStickX();
+	float GetRightStickY();
+
+	Vector2f LeftStickPressed();
+	Vector2f RightStickPressed();
+
+
+	float LeftTriggerPressed();
+	float RightTriggerPressed();
 };
 

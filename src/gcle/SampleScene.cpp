@@ -46,86 +46,123 @@ void SampleScene::OnInitialize()
 
 void SampleScene::OnUpdate(Clock& time)
 {
+	InputManager IM = InputManager::GetInstance();
 
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_A))
+	Vector2f LS = IM.LeftStickPressed();
+	Vector2f RS = IM.RightStickPressed();
+
+	if ((LS.x != 0) and (LS.y != 0))
 	{
-		std::cout << "XBOX A" << std::endl;
+		std::cout << "Orientation of left joystick is : " << std::endl << LS.x << std::endl << LS.y << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_B))
+	if ((RS.x != 0) and (RS.y != 0))
 	{
-		std::cout << "XBOX B" << std::endl;
+		std::cout << "Orientation of right joystick is : " << std::endl << RS.x << std::endl << RS.y << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_X))
+	float LT = IM.LeftTriggerPressed();
+	float RT = IM.RightTriggerPressed();
+
+
+	if (LT > 0)
 	{
-		std::cout << "XBOX X" << std::endl;
+		std::cout << "Push on left trigger is : " << IM.LeftTriggerPressed() << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_Y))
+	if(RT > 0)
 	{
-		std::cout << "XBOX Y" << std::endl;
-	}
-
-
-
-
-
-	if (InputManager::GetInstance().IsControllerDown(XBOX_BACK))
-	{
-		std::cout << "XBOX BACK" << std::endl;
-	}
-
-	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_LEFT))
-	{
-		std::cout << "XBOX PAD LEFT" << std::endl;
+		std::cout << "Push on right trigger is : " << IM.RightTriggerPressed() << std::endl;
 	}
 
 
 
-
-
-	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_RIGHT))
+	if (IM.IsControllerDown(XBOX_A))
 	{
-		std::cout << "XBOX PAD RIGHT" << std::endl;
+		std::cout << "XBOX A is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_UP))
+	if (IM.IsControllerDown(XBOX_B))
 	{
-		std::cout << "XBOX PAD UP" << std::endl;
+		std::cout << "XBOX B is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_DOWN))
+	if (IM.IsControllerDown(XBOX_X))
 	{
-		std::cout << "XBOX PAD DOWN" << std::endl;
+		std::cout << "XBOX X is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_PAD_DOWN))
+	if (IM.IsControllerDown(XBOX_Y))
 	{
-		std::cout << "XBOX PAD DOWN" << std::endl;
+		std::cout << "XBOX Y is down" << std::endl;
 	}
 
 
 
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_RJS))
+
+	if (IM.IsControllerDown(XBOX_BACK))
 	{
-		std::cout << "XBOX RT DOWN" << std::endl;
+		std::cout << "XBOX BACK is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_LJS))
+	if (IM.IsControllerDown(XBOX_START))
 	{
-		std::cout << "XBOX LT DOWN" << std::endl;
+		std::cout << "XBOX START is down" << std::endl;
+	}
+	
+	
+	
+	if (IM.IsControllerDown(XBOX_PAD_LEFT))
+	{
+		std::cout << "XBOX PAD LEFT is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_RB))
+	if (IM.IsControllerDown(XBOX_PAD_RIGHT))
 	{
-		std::cout << "XBOX RB DOWN" << std::endl;
+		std::cout << "XBOX PAD RIGHT is down" << std::endl;
 	}
 
-	if (InputManager::GetInstance().IsControllerDown(XBOX_LB))
+	if (IM.IsControllerDown(XBOX_PAD_UP))
 	{
-		std::cout << "XBOX LB DOWN" << std::endl;
+		std::cout << "XBOX PAD UP is down" << std::endl;
+	}
+
+	if (IM.IsControllerDown(XBOX_PAD_DOWN))
+	{
+		std::cout << "XBOX PAD DOWN is down" << std::endl;
+	}
+
+	
+
+
+
+
+	if (IM.IsControllerDown(XBOX_RJS))
+	{
+		std::cout << "XBOX RIGHT JOYSTICK is down" << std::endl;
+	}
+
+	if (IM.IsControllerDown(XBOX_LJS))
+	{
+		std::cout << "XBOX LEFT JOYSTICK is down" << std::endl;
+	}
+
+	if (IM.IsControllerDown(XBOX_RB))
+	{
+		std::cout << "XBOX RB is down" << std::endl;
+	}
+
+	if (IM.IsControllerDown(XBOX_LB))
+	{
+		std::cout << "XBOX LB is down" << std::endl;
+
+		IM.SetVibration(1, 1);
+	}
+
+	else
+	{
+		IM.SetVibration(0, 0);
 	}
 } 
