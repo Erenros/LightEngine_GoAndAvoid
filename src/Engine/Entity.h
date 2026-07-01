@@ -26,20 +26,22 @@ public:
 	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
 public:
-	gcle::Shape* GetShape() { return mp_Shape; }
+	//void SetRenderShape(gcle::Shapes);
 	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
-	Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+	Vector2f GetPosition();
 	int64 GetId() const { return m_Id; }
 	Vector2f GetScale();
 	Degrees GetRotation();
 	RigidBody2D& GetRigidBody() { return m_RigidBody; }
+	Transform2D& GetTransform2D() { return m_Transform; }
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
 	void SetSpeed(float32 speed) { m_Speed = speed; }
 	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
 	void SetRigidBody(bool isRigidBody);
-	void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+	void SetPosition(float32 x, float32 y);
+	void Move(Vector2f translation);
 
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -78,6 +80,9 @@ public:
 	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, float32 rotation, Vector2f scale);
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
 
+public:
+	bool isWorldText() { return m_isWorldText; }
+
 protected:
 	Entity() = default;
 	~Entity();
@@ -93,6 +98,7 @@ protected:
 private:
 	void Update(float32 dt);
 	void Initialize(gcle::Shapes shape);
+	void Initialize();
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
 private:
@@ -118,8 +124,11 @@ protected:
 private:
 	bool m_isHighlighted = false;
 
+protected:
+	bool m_isWorldText = false;
+
 private:
-	gcle::Shape* mp_Shape = nullptr;
+	Transform2D m_Transform;
 	gcle::Shape* mp_RenderShape = nullptr;
 	RigidBody2D		m_RigidBody;
 

@@ -38,10 +38,11 @@ public:
 	void SetText(const std::string& text);
 
 	void SetPosition(int x, int y);
-	void SetWidth(int w)		  ;
-	void SetHeight(int h);
+
 
 	Font* GetFont();
 	void SetFontSize(int32 size);
 	int32 GetFontSize();
+
+	Vector2f GetSizes();
 };

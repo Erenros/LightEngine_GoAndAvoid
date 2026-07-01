@@ -12,6 +12,7 @@ class Text;
 class Camera;
 class GameManager;
 class Window;
+class WorldText;
 
 
 
@@ -24,6 +25,12 @@ public:
 
 	template<typename T>
 	T* CreateEntity(gcle::Shapes shape);
+
+	template<typename T>
+	T* CreateEntity();
+
+	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+
 
 	Camera* CreateCamera();
 

@@ -93,6 +93,10 @@ int32 Text::GetFontSize() {
 	return m_fontSize;
 }
 
+Vector2f Text::GetSizes(){
+	return { static_cast<float32>(mp_rect->w), static_cast<float32>(mp_rect->h)};
+}
+
 Font* Text::GetFont() {
 	return mp_font;
 }
