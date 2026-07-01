@@ -77,7 +77,7 @@ void GameManager::Loop()
 		if (Event::WindowEvent())
 		{
 			isRunning = false;
-		} 
+		}
 		 
 		
 		float64 rawDT = m_Time.GetRawDT();

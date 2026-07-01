@@ -89,6 +89,7 @@ private:
 	SDL_Window* mp_Window = nullptr;
 	SDL_Renderer* mp_Renderer = nullptr;
 	SDL_Texture* mp_RenderTarget = nullptr;
+	SDL_Rect* mp_dst;
 	uint32 m_width, m_height = 0;
 
 private:

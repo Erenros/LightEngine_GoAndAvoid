@@ -20,7 +20,7 @@ void Scene::DrawDebug(Window* window)
 				{
 					GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
 				}
-				else if (m_selectedEntity != nullptr)
+				else if (m_selectedEntity != nullptr && m_debugPerf)
 				{
 					if (e->GetId() == m_selectedEntity->GetId())
 					{
@@ -153,7 +153,7 @@ void Scene::DestroyDebugText(Text* text)
 	delete text;
 }
 
-Text* Scene::CreateDebugInfoText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
+Text* Scene::CreateDebugInfoText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
 {
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	if (font == nullptr)
@@ -162,7 +162,7 @@ Text* Scene::CreateDebugInfoText(const std::string& text, int x, int y, int w, i
 		return nullptr;
 	}
 
-	Text* new_text = GCLE_NEW Text(font, text, x, y, w, h, r, g, b);
+	Text* new_text = GCLE_NEW Text(font, text, pos, fontSize, r, g, b);
 	m_debugInfoTexts.push_back(new_text);
 	return new_text;
 }
@@ -208,9 +208,7 @@ void Scene::EntityInfoVisibility(const int32 debugConstant)
 	}
 
 	if (m_selectedEntity != nullptr && m_updateDebug >= debugConstant)
-	{
-
-
+	{ 
 		Vector2f pos = m_selectedEntity->GetPosition();
 		Degrees rot = m_selectedEntity->GetRotation();
 		Vector2f scale = m_selectedEntity->GetScale();
@@ -223,6 +221,9 @@ void Scene::EntityInfoVisibility(const int32 debugConstant)
 
 		mp_ScaleX->SetText(std::to_string(scale.x));
 		mp_ScaleY->SetText(std::to_string(scale.y));
+
+
+		m_updateDebug = 0;
 	}
 }
 
@@ -263,48 +264,46 @@ void Scene::DebugSetEntityInfo()
 void Scene::OnInitialize()
 {
 	SetDebug();
-	mp_mainCamera	= CreateCamera();
+	mp_mainCamera = CreateCamera();
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position = CreateDebugText("Pos: ",			{ 0,	0},		50, 255, 225, 255);
-	mp_PosX			= CreateDebugText("",			{125,	0},		50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			{250,	0},		50,	255, 225, 255); 
-													
-	mp_Rotation		= CreateDebugText("Rot: ",		{0,		75},	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			{125,	75},	50, 255, 225, 255);
-													
-	mp_Scale		= CreateDebugText("Scale: ",	{0,		150 },  50, 255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			{125,	150 },  50, 255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			{250,	150 },  50, 255, 225, 255);
+	mp_Position		= CreateDebugInfoText("Pos: "			, { 0,		0 },		25,		255, 225, 255);
+	mp_PosX			= CreateDebugInfoText(""				, { 100,	0 },		25,		255, 225, 255);
+	mp_PosY			= CreateDebugInfoText(""				, { 300,	0 },		25,		255, 225, 255);
 
-	mp_Frame		= CreateText("FPS: ",			{ 1600, 0 },	50, 255, 225, 255);
-	mp_FPS			= CreateText("",				{ 1750, 0 },	50, 255, 225, 255);
-	
-	mp_Colliders	= CreateDebugText("Colliders: ", 0, 1000, 100, 50, 255, 225, 255);
-	mp_CollidersP	= CreateDebugText("", 100, 1000, 25, 50, 255, 225, 255);
+	mp_Rotation		= CreateDebugInfoText("Rot: "			, { 0,		75 },		25,		255, 225, 255);
+	mp_RotZ			= CreateDebugInfoText(""				, { 100,	75 },		25,		255, 225, 255);
 
-	mp_Entity		= CreateDebugText("Entity C/D: ", 150, 1000, 100, 50, 255, 225, 255);
-	mp_EntityP		= CreateDebugText("", 250, 1000, 25, 50, 255, 225, 255);
+	mp_Scale		= CreateDebugInfoText("Scale: "			, { 0,		150 },		25,		255, 225, 255);
+	mp_ScaleX		= CreateDebugInfoText(""				, { 100,	150 },		25,		255, 225, 255);
+	mp_ScaleY		= CreateDebugInfoText(""				, { 300,	150 },		25,		255, 225, 255);
 
-	mp_Input		= CreateDebugText("InputManager: ", 300, 1000, 150, 50, 255, 225, 255);
-	mp_InputP		= CreateDebugText("", 450, 1000, 25, 50, 255, 225, 255);
-
-	mp_Update		= CreateDebugText("Update: ", 500, 1000, 100, 50, 255, 225, 255);
-	mp_UpdateP		= CreateDebugText("", 600, 1000, 25, 50, 255, 225, 255);
-
-	mp_Draw 		= CreateDebugText("Draw: ", 650, 1000, 100, 50, 255, 225, 255);
-	mp_DrawP		= CreateDebugText("", 750, 1000, 25, 50, 255, 225, 255);
+	mp_Frame		= CreateText("FPS"						, { 1860,	0 },		25,		255, 225, 255);
+	mp_FPS			= CreateText(""							, { 1800,	0 },		25,		255, 225, 255);
+															
+	mp_Colliders	= CreateDebugText("Colliders: "			, { 0,		1000 },		25,		255, 225, 255);
+	mp_CollidersP	= CreateDebugText(""					, { 100,	1000 },		25,		255, 225, 255);
+															
+	mp_Entity		= CreateDebugText("Entity C/D: "		, { 150,	1000 },		25,		255, 225, 255);
+	mp_EntityP		= CreateDebugText(""					, { 250,	1000 },		25,		255, 225, 255);
+															
+	mp_Input		= CreateDebugText("InputManager: "		, { 300,	1000 },		25,		255, 225, 255);
+	mp_InputP		= CreateDebugText(""					, {450,		1000},		25,		255, 225, 255);
+															
+	mp_Update		= CreateDebugText("Update: "			, {500,		1000},		25,		255, 225, 255);
+	mp_UpdateP		= CreateDebugText(""					, {600,		1000},		25,		255, 225, 255);
+															
+	mp_Draw 		= CreateDebugText("Draw: "				, {650,		1000},		25,		255, 225, 255);
+	mp_DrawP		= CreateDebugText(""					, {750,		1000},		25,		255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
 { 
 	constexpr int32 DEBUG_UPDATE = 5;
 
-	m_updateDebug++;
 	
-	EntityInfoVisibility(DEBUG_UPDATE);
-	DebugSetEntityInfo();
+	m_updateDebug++;
 
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
 	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
@@ -313,11 +312,13 @@ void Scene::OnUpdate(Clock& time)
 	if (InputManager::GetInstance().IsDown(F1))
 		m_debugPerf = !m_debugPerf;
 
-	if (m_updateDebug >= DEBUG_UPDATE)
+	if (m_updateDebug >= 1)
 	{
-		m_updateDebug = 0;
 		mp_FPS->SetText(std::to_string(time.GetFramePerSecond()));
 	}
+	
+	EntityInfoVisibility(DEBUG_UPDATE);
+	DebugSetEntityInfo();
 
 }
 

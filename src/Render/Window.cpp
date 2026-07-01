@@ -83,6 +83,7 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 
 	SDL_SetRenderTarget(mp_Renderer, NULL);
 
+	mp_dst = new SDL_Rect();
 
 	//InitImGUI();
 }
@@ -95,10 +96,10 @@ Vector2f Window::GetMousePositionOnRenderTarget()
 	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
 	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
 
-	return Vector2f{
-		static_cast<float32>(mousePos.x) * scaleX,
-		static_cast<float32>(mousePos.y) * scaleY
-	};
+	mousePos.x = (mousePos.x - mp_dst->x) * (1920.0f / mp_dst->w);
+	mousePos.y = (mousePos.y - mp_dst->y) * (1080.0f / mp_dst->h);
+
+	return Vector2f{ static_cast<float32>(mousePos.x) * scaleX, static_cast<float32>(mousePos.y) * scaleY };
 }
 
 void Window::InitImGUI()
@@ -227,17 +228,33 @@ void Window::End(){
 }
 
 void Window::Present()
-{ 
-	//SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
-	//SDL_RenderClear(mp_Renderer);
-
-	//ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mp_Renderer);
+{
 	SDL_SetRenderTarget(mp_Renderer, nullptr);
-	 
+
 	SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
 	SDL_RenderClear(mp_Renderer);
-	 
-	SDL_RenderCopy(mp_Renderer, mp_RenderTarget, nullptr, nullptr);
+
+	int windowW, windowH;
+	SDL_GetWindowSize(mp_Window, &windowW, &windowH);
+
+	constexpr float aspect = 1920.f / 1080.f; 
+
+	if ((float)windowW / windowH > aspect)
+	{
+		mp_dst->h = windowH;
+		mp_dst->w = (int)(windowH * aspect);
+		mp_dst->x = (windowW - mp_dst->w) / 2;
+		mp_dst->y = 0;
+	}
+	else
+	{
+		mp_dst->w = windowW;
+		mp_dst->h = (int)(windowW / aspect);
+		mp_dst->x = 0;
+		mp_dst->y = (windowH - mp_dst->h) / 2;
+	}
+
+	SDL_RenderCopy(mp_Renderer, mp_RenderTarget, nullptr, mp_dst);
 
 	SDL_RenderPresent(mp_Renderer);
 }
