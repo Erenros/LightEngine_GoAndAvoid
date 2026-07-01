@@ -77,7 +77,7 @@ Text* Scene::CreateText(const std::string& text,Vector2f pos, int32 fontSize, by
 		return nullptr;
 	}
 
-	Text* new_text = GCLE_NEW Text(font,text, x, y, w, h, r, g, b);
+	Text* new_text = GCLE_NEW Text(font,text,pos, fontSize, r, g, b);
 	m_texts.push_back(new_text);
 	return new_text;
 }
@@ -123,7 +123,7 @@ void Scene::Update(Clock& time){
 	}
 }
 
-Text* Scene::CreateDebugText(const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b)
+Text* Scene::CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
 {
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
 	if (font == nullptr)
@@ -132,7 +132,7 @@ Text* Scene::CreateDebugText(const std::string& text, int x, int y, int w, int h
 		return nullptr;
 	}
 
-	Text* new_text = GCLE_NEW Text(font, text, x, y, w, h, r, g, b);
+	Text* new_text = GCLE_NEW Text(font, text, pos, fontSize, r, g, b);
 	m_debugTexts.push_back(new_text);
 	return new_text;
 }
@@ -217,19 +217,19 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugText("Pos: ",		0,		0,		100,	50,	255, 225, 255);
-	mp_PosX			= CreateDebugText("",			125,	0,		100,	50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			250,	0,		100,	50,	255, 225, 255); 
+	mp_Position = CreateDebugText("Pos: ",			{ 0,	0},		50, 255, 225, 255);
+	mp_PosX			= CreateDebugText("",			{125,	0},		50,	255, 225, 255);
+	mp_PosY			= CreateDebugText("",			{250,	0},		50,	255, 225, 255); 
+													
+	mp_Rotation		= CreateDebugText("Rot: ",		{0,		75},	50,	255, 225, 255);
+	mp_RotZ			= CreateDebugText("",			{125,	75},	50, 255, 225, 255);
+													
+	mp_Scale		= CreateDebugText("Scale: ",	{0,		150 },  50, 255, 225, 255);
+	mp_ScaleX		= CreateDebugText("",			{125,	150 },  50, 255, 225, 255);
+	mp_ScaleY		= CreateDebugText("",			{250,	150 },  50, 255, 225, 255);
 
-	mp_Rotation		= CreateDebugText("Rot: ",		0,		75,		100,	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			125,	75,		100,	50,	255, 225, 255); 
-
-	mp_Scale		= CreateDebugText("Scale: ",	0,		150,	100,	50,	255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			125,	150,	100,	50,	255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			250,	150,	100,	50,	255, 225, 255); 
-
-	mp_Frame		= CreateText("FPS: ",	1600, 0, 100, 50, 255, 225, 255);
-	mp_FPS			= CreateText("",		1750, 0, 50, 50, 255, 225, 255);
+	mp_Frame		= CreateText("FPS: ",			{ 1600, 0 },	50, 255, 225, 255);
+	mp_FPS			= CreateText("",				{ 1750, 0 },	50, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)

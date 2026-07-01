@@ -15,11 +15,11 @@ public:
 
 	bool IsFontInit() { return mp_font == nullptr ? false : true; };
 
-	Font(const std::string& path, int size = 25);
+	Font(const std::string& path);
 	Font() = default;
 	~Font();
 
-	void InitFont(const std::string& path, int size = 25);
+	void InitFont(const std::string& path);
 
 	void SetFontSize(int size);
 };

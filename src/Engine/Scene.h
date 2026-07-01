@@ -54,7 +54,7 @@ private:
 
 
 private:
-	Text*	CreateDebugText(const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255);
+	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
 	void	DestroyDebugText(Text* text);
 	void	DrawDebug(Window* window);
 	void	SetGizmoVisibility();

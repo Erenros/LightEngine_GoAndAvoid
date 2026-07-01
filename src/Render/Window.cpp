@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Window.h"
 #include <iostream>
 #include <vector>
 #include "SDL.h"
@@ -256,7 +257,7 @@ void Window::DrawTextOnRenderer(Text* text)
 	if (texture == nullptr)
 		return;
 
-	DrawOnRenderer(texture, nullptr,text->GetSDLRect());
+	DrawOnRenderer(texture, nullptr, text->GetSDLRect());
 }
 
 void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){

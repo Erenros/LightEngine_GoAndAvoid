@@ -7,14 +7,13 @@
 
 void DebugScene::OnInitialize()
 {
-
 	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetTexture(tex);
 	pEntity->SetScale(0.5f);
 	pEntity->SetRigidBody(true);*/
 
 	std::string text = "Test";
-	CreateText(text, 40, 40, 20, 20);
+	CreateText(text, { 40, 40 }, 50);
 
 	Collider* setUpCollider = nullptr;
 
@@ -53,8 +52,6 @@ void DebugScene::OnInitialize()
 	entity3->GetRigidBody().SetGravity(false);
 	entity3->SetIsKinematic(false);
 	setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 320, 300 }, 0, { 10, 1 });
-
-
 }
 
 void DebugScene::OnUpdate(Clock& time)

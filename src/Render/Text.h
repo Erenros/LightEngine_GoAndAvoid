@@ -2,6 +2,7 @@
 #include "Font.h"
 #include <string>
 #include "PrimitiveTypes.h"
+#include "include.h"
 
 class Window;
 struct SDL_Texture;
@@ -22,7 +23,7 @@ private:
 	SDL_Rect* mp_rect = nullptr;
 	
 	bool m_needToChange = false;
-
+	int32 m_fontSize = 24;
 public:
 
 	SDL_Texture* CreateTexture(Window* window);
@@ -39,4 +40,8 @@ public:
 	void SetPosition(int x, int y);
 	void SetWidth(int w)		  ;
 	void SetHeight(int h);
+
+	Font* GetFont();
+	void SetFontSize(int32 size);
+	int32 GetFontSize();
 };

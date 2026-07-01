@@ -9399,8 +9399,7 @@ ImFontBaked* ImGui::GetFontBaked()
 // Get current font size (= height in pixels) of current font, with global scale factors applied.
 // - Use style.FontSizeBase to get value before global scale factors.
 // - recap: ImGui::GetFontSize() == style.FontSizeBase * (style.FontScaleMain * style.FontScaleDpi * other_scaling_factors)
-float ImGui::GetFontSize()
-{
+float ImGui::GetFontSize(){
     return GImGui->FontSize;
 }
 

@@ -2,7 +2,6 @@
 #include "Texture.h"
 #include "Utils.h"
 #include "SceneManager.h"
-
 #undef PlaySound
 
 
@@ -74,9 +73,9 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
     return true;
 }
 
-bool RessourceManager::LoadFont(const std::string& path, const std::string& id, int size)
+bool RessourceManager::LoadFont(const std::string& path, const std::string& id)
 {
-    Font* font = GCLE_NEW Font(path, size);
+    Font* font = GCLE_NEW Font(path);
     if (font == NULL)
     {
         GCLE_WARN << "Got a nullptr font for path " + path << ENDL;
@@ -212,7 +211,7 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        LoadFont(entry.path().string(), entry.path().stem().string(), 25);
+        LoadFont(entry.path().string(), entry.path().stem().string());
     }
 }
 
