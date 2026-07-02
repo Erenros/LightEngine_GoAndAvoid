@@ -21,16 +21,16 @@ void DebugScene::OnInitialize()
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(10, true);
 	entity1->GetRigidBody().SetMaxSpeed(10000);
-	entity1->SetIsStatic(true);
+	entity1->SetIsStatic(false);
 	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {1, 1});
-	//entity1->GetRigidBody().SetCollisionOnContinuous();
+	entity1->GetRigidBody().SetCollisionOnContinuous();
 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(0, -100);
 	entity2->SetScale({ 5, 1 });
 	entity2->SetRotation(0);
 	entity2->SetRigidBody(true);
-	entity2->SetIsStatic(false);
+	entity2->SetIsStatic(true);
 	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 1});
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -38,7 +38,7 @@ void DebugScene::OnInitialize()
 	entity3->SetScale({10, 1});
 	entity3->SetRotation(0);
 	entity3->SetRigidBody(true);
-	entity3->SetIsStatic(false);
+	entity3->SetIsStatic(true);
 	setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {10, 1});
 
 

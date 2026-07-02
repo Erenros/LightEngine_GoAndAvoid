@@ -410,35 +410,35 @@ bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
 	return (this->*collisionTable[typeA][typeB])(shapeA, shapeB);
 }
 
-//bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
-//{
-//	if (pEntity == nullptr || pEntity->GetShape() == nullptr)
-//		return false;
-//
-//	switch (pEntity->GetShape()->GetShape())
-//	{
-//	case gcle::Shapes::Rectangle:
-//	{
-//		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetRenderShape());
-//		return
-//		{
-//			positionToCheck.x >= pRect->GetPosition().x - pRect->GetWidth() * 0.5f &&
-//			positionToCheck.x <= pRect->GetPosition().x + pRect->GetWidth() * 0.5f &&
-//			positionToCheck.y >= pRect->GetPosition().y - pRect->GetHeight() * 0.5f &&
-//			positionToCheck.y <= pRect->GetPosition().y + pRect->GetHeight() * 0.5f
-//		};
-//	}
-//	case gcle::Shapes::Circle:
-//	{
-//		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetRenderShape());
-//		return pCircle->GetPosition().GetDistance(positionToCheck) <= pCircle->GetRadius();
-//	}
-//	default:
-//		break;
-//	}
-//
-//	return false;
-//}
+bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
+{
+	if (pEntity == nullptr || pEntity->GetShape() == nullptr)
+		return false;
+
+	switch (pEntity->GetShape()->GetShape())
+	{
+	case gcle::Shapes::Rectangle:
+	{
+		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetRenderShape());
+		return
+		{
+			positionToCheck.x >= pRect->GetPosition().x - pRect->GetWidth() * 0.5f &&
+			positionToCheck.x <= pRect->GetPosition().x + pRect->GetWidth() * 0.5f &&
+			positionToCheck.y >= pRect->GetPosition().y - pRect->GetHeight() * 0.5f &&
+			positionToCheck.y <= pRect->GetPosition().y + pRect->GetHeight() * 0.5f
+		};
+	}
+	case gcle::Shapes::Circle:
+	{
+		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetRenderShape());
+		return pCircle->GetPosition().GetDistance(positionToCheck) <= pCircle->GetRadius();
+	}
+	default:
+		break;
+	}
+
+	return false;
+}
 
 #pragma endregion
 
@@ -807,7 +807,6 @@ bool PhysicsManager::CheckCircleCircleCollision(gcle::Circle* pCircle1, gcle::Ci
 	float32 distance = pos1.GetDistance(pos2);
 	return (distance <= (pCircle1->GetRadius() + pCircle2->GetRadius()));
 }
-
 
 bool PhysicsManager::CheckOBBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2) {
 
