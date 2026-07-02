@@ -178,6 +178,18 @@ bool AssetEngine::ReadData(std::ifstream& file, Entry& entry, std::vector<byte>&
 	return true;
 }
 
+uint64 AssetEngine::HashName(const std::string& name)
+{
+	//FNV 1a because why not
+	uint64 hash = 14695981039346656037ULL;
+	for (byte c : name)
+	{
+		hash ^= c;
+		hash *= 1099511628211ULL;
+	}
+	return hash;
+}
+
 void AssetEngine::SaveInFile(const std::string& path)
 {
 	LoadFile(path); //On reload car flm de garder des donnees en memoires quand le truc tourne
@@ -200,8 +212,13 @@ void AssetEngine::SaveInFile(const std::string& path)
 		if (pair.second->flag == 0x01)
 			continue;
 
+		uint64 ID = pair.second->id;
+
+		if (ID == 0)
+			ID = HashName(pair.first);
+
 		entry.key = 83; //Absolute hardcode
-		entry.id = pair.second->id;
+		entry.id = ID;
 		entry.nameLength = static_cast<int32>(pair.first.size());
 		entry.flag = pair.second->flag;
 		entry.type = pair.second->type;

@@ -14,7 +14,7 @@ struct Header
 struct Entry
 {
 	int8 key;
-	int64 id;
+	uint64 id;
 	int32 nameLength;
 	int8 flag;
 	int64 type;
@@ -25,7 +25,7 @@ struct Entry
 
 struct Asset
 {
-	int64 id;
+	uint64 id;
 	std::string name;
 	int8 flag;
 	int64 type;
@@ -52,6 +52,8 @@ private:
 	bool ReadHeader(std::ifstream& file);
 	bool ReadEntry(std::ifstream& file, Entry& entry);
 	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
+
+	uint64 HashName(const std::string& name);
 
 public:
 

@@ -34,6 +34,9 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 		return;
 	}
 
+	asset->width = surface->w;
+	asset->height = surface->h;
+
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 	if (texture == NULL)
 		DEBUG_WARN << "Error during creation of the texture" << ENDL;
