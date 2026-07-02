@@ -237,19 +237,19 @@ void Window::Present()
 	int windowW, windowH;
 	SDL_GetWindowSize(mp_Window, &windowW, &windowH);
 
-	constexpr float aspect = 1920.f / 1080.f; 
+	constexpr float32 aspect = 1920.f / 1080.f; 
 
-	if ((float)windowW / windowH > aspect)
+	if (static_cast<float32>(windowW) / windowH > aspect)
 	{
 		mp_dst->h = windowH;
-		mp_dst->w = (int)(windowH * aspect);
+		mp_dst->w = static_cast<int32>(windowH * aspect);
 		mp_dst->x = (windowW - mp_dst->w) / 2;
 		mp_dst->y = 0;
 	}
 	else
 	{
 		mp_dst->w = windowW;
-		mp_dst->h = (int)(windowW / aspect);
+		mp_dst->h = static_cast<int32>(windowW / aspect);
 		mp_dst->x = 0;
 		mp_dst->y = (windowH - mp_dst->h) / 2;
 	}

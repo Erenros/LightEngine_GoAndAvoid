@@ -101,42 +101,44 @@ private:
 	bool m_isVisualDebugActive = false;
 	bool m_debug = false;
 	bool m_debugPerf = false;
+	bool m_frustrumCulling = true;
 	int32 m_updateDebug = 0;
 
 	std::vector<Text*> m_debugInfoTexts;
 	std::vector<Text*> m_debugTexts;
 	Entity* m_selectedEntity = nullptr;
 
-	Text* mp_Position = nullptr;
-	Text* mp_PosX = nullptr;
-	Text* mp_PosY = nullptr; 
+	Text* mp_Position			= nullptr;
+	Text* mp_PosX				= nullptr;
+	Text* mp_PosY				= nullptr; 
 
-	Text* mp_Rotation = nullptr;
-	Text* mp_RotZ = nullptr; 
+	Text* mp_Rotation			= nullptr;
+	Text* mp_RotZ				= nullptr; 
 
-	Text* mp_Scale = nullptr;
-	Text* mp_ScaleX = nullptr;
-	Text* mp_ScaleY = nullptr; 
+	Text* mp_Scale				= nullptr;
+	Text* mp_ScaleX				= nullptr;
+	Text* mp_ScaleY				= nullptr; 
 
-	Text* mp_Frame = nullptr;
-	Text* mp_FPS = nullptr;
+	Text* mp_Frame				= nullptr;
+	Text* mp_FPS				= nullptr;
 
-	Text*  mp_Colliders		= nullptr;
-	Text*  mp_CollidersP	= nullptr;
+	Text*  mp_Colliders			= nullptr;
+	Text*  mp_CollidersP		= nullptr;
 
-	Text*  mp_Entity		= nullptr;
-	Text*  mp_EntityP		= nullptr;
+	Text*  mp_Entity			= nullptr;
+	Text*  mp_EntityP			= nullptr;
 
-	Text*  mp_Input			= nullptr; 
-	Text*  mp_InputP		= nullptr;
+	Text*  mp_Input				= nullptr; 
+	Text*  mp_InputP			= nullptr;
 
-	Text*  mp_Update		= nullptr;
-	Text*  mp_UpdateP		= nullptr;
+	Text*  mp_Update			= nullptr;
+	Text*  mp_UpdateP			= nullptr;
 
-	Text*  mp_Draw 			= nullptr;
-	Text*  mp_DrawP			= nullptr;
+	Text*  mp_Draw 				= nullptr;
+	Text*  mp_DrawP				= nullptr;
 
-	Text*  mp_QuadTree		= nullptr;
+	Text*  mp_QuadTree			= nullptr;
+	Text* mp_FrustrumCulling	= nullptr;
 
 private: 
 	friend class GameManager;

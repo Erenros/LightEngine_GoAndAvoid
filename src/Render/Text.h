@@ -33,7 +33,7 @@ public:
 	
 	~Text();
 
-	void SetColor(byte r,byte g, byte b, byte a);
+	void SetColor(byte r,byte g, byte b, byte a = 255);
 	void SetFont(const std::string& id);
 	void SetText(const std::string& text);
 

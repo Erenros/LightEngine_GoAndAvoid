@@ -12,16 +12,8 @@ void Scene::DrawDebug(Window* window)
 	for (auto layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer)
 		{
-			if (e->IsActiveIn(m_tag) && e->m_isHighlighted) {
-				if (e->CollidingEntity.empty())
-				{
-					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-				}
-				else
-				{
-					GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 0, 0, 255);
-				}
-
+			if (e->IsActiveIn(m_tag) && e->m_isHighlighted) 
+			{
 				if (m_isVisualDebugActive)
 				{
 					GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
@@ -32,6 +24,13 @@ void Scene::DrawDebug(Window* window)
 					{
 						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
 						GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
+
+						for (auto& col : e->GetColliders())
+						{
+							GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+							GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape());
+						}
+
 					}
 				}
 			}
@@ -42,16 +41,28 @@ void Scene::DrawDebug(Window* window)
 
 void Scene::Draw(Window* window) {
 	int i = 0;
-	for (auto layer : GameManager::GetInstance().m_entities) {
+	for (auto& layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer){
-			if (window->IsInsideWindow(e) && e->GetRenderShape() != nullptr) {
-				if (e->IsActiveIn(m_tag)) {
+			if (window->IsInsideWindow(e) && e->GetRenderShape() != nullptr && m_frustrumCulling) 
+			{
+				if (e->IsActiveIn(m_tag)) 
+				{
 					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
 					i++;
 				}
 			}
-			else if (e->isWorldText()) {
-				if (e->IsActiveIn(m_tag)) {
+			else if (e->GetRenderShape() != nullptr)
+			{
+				if (e->IsActiveIn(m_tag))
+				{
+					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					i++;
+				}
+			}
+			else if (e->isWorldText()) 
+			{
+				if (e->IsActiveIn(m_tag)) 
+				{
 					WorldText* text = static_cast<WorldText*>(e);
 					GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(text->GetText());
 					i++;
@@ -285,36 +296,37 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugInfoText("Pos: "		, { 0,		0	},		25,		255, 225, 255);
-	mp_PosX			= CreateDebugInfoText(""			, { 100,	0	},		25,		255, 225, 255);
-	mp_PosY			= CreateDebugInfoText(""			, { 300,	0	},		25,		255, 225, 255);
+	mp_Position				= CreateDebugInfoText("Pos: "		, { 0,		0	},		25,		255, 225, 255);
+	mp_PosX					= CreateDebugInfoText(""			, { 100,	0	},		25,		255, 225, 255);
+	mp_PosY					= CreateDebugInfoText(""			, { 300,	0	},		25,		255, 225, 255);
 
-	mp_Rotation		= CreateDebugInfoText("Rot: "		, { 0,		75  },		25,		255, 225, 255);
-	mp_RotZ			= CreateDebugInfoText(""			, { 100,	75  },		25,		255, 225, 255);
+	mp_Rotation				= CreateDebugInfoText("Rot: "		, { 0,		75  },		25,		255, 225, 255);
+	mp_RotZ					= CreateDebugInfoText(""			, { 100,	75  },		25,		255, 225, 255);
 
-	mp_Scale		= CreateDebugInfoText("Scale: "		, { 0,		150 },		25,		255, 225, 255);
-	mp_ScaleX		= CreateDebugInfoText(""			, { 100,	150 },		25,		255, 225, 255);
-	mp_ScaleY		= CreateDebugInfoText(""			, { 300,	150 },		25,		255, 225, 255);
+	mp_Scale				= CreateDebugInfoText("Scale: "		, { 0,		150 },		25,		255, 225, 255);
+	mp_ScaleX				= CreateDebugInfoText(""			, { 100,	150 },		25,		255, 225, 255);
+	mp_ScaleY				= CreateDebugInfoText(""			, { 300,	150 },		25,		255, 225, 255);
 
-	mp_Frame		= CreateText("FPS"					, { 1860,	0	},		25,		255, 225, 255);
-	mp_FPS			= CreateText(""						, { 1800,	0	},		25,		255, 225, 255);
-														
-	mp_Colliders	= CreateDebugText("Colliders: "		, { 0,		1000 },		25,		255, 225, 255);
-	mp_CollidersP	= CreateDebugText(""				, { 150,	1000 },		25,		255, 225, 255);
-														
-	mp_Entity		= CreateDebugText("Entity C/D: "	, { 275,	1000 },		25,		255, 225, 255);
-	mp_EntityP		= CreateDebugText(""				, { 450,	1000 },		25,		255, 225, 255);
-														
-	mp_Input		= CreateDebugText("InputManager: "	, { 560,	1000 },		25,		255, 225, 255);
-	mp_InputP		= CreateDebugText(""				, { 760,	1000 },		25,		255, 225, 255);
-														
-	mp_Update		= CreateDebugText("Update: "		, { 870,	1000 },		25,		255, 225, 255);
-	mp_UpdateP		= CreateDebugText(""				, { 975,	1000 },		25,		255, 225, 255);
-														
-	mp_Draw 		= CreateDebugText("Draw: "			, { 1085,	1000 },		25,		255, 225, 255);
-	mp_DrawP		= CreateDebugText(""				, { 1160,	1000 },		25,		255, 225, 255);
+	mp_Frame				= CreateText("FPS"					, { 1860,	0	},		25,		255, 225, 255);
+	mp_FPS					= CreateText(""						, { 1800,	0	},		25,		255, 225, 255);
+																
+	mp_Colliders			= CreateDebugText("Colliders: "		, { 0,		1000 },		25,		255, 225, 255);
+	mp_CollidersP			= CreateDebugText(""				, { 150,	1000 },		25,		255, 225, 255);
+																
+	mp_Entity				= CreateDebugText("Entity C/D: "	, { 275,	1000 },		25,		255, 225, 255);
+	mp_EntityP				= CreateDebugText(""				, { 450,	1000 },		25,		255, 225, 255);
+																
+	mp_Input				= CreateDebugText("InputManager: "	, { 560,	1000 },		25,		255, 225, 255);
+	mp_InputP				= CreateDebugText(""				, { 760,	1000 },		25,		255, 225, 255);
+																
+	mp_Update				= CreateDebugText("Update: "		, { 870,	1000 },		25,		255, 225, 255);
+	mp_UpdateP				= CreateDebugText(""				, { 975,	1000 },		25,		255, 225, 255);
+																
+	mp_Draw 				= CreateDebugText("Draw: "			, { 1085,	1000 },		25,		255, 225, 255);
+	mp_DrawP				= CreateDebugText(""				, { 1160,	1000 },		25,		255, 225, 255);
 
-	mp_QuadTree     = CreateDebugText("QuadTree"		, { 1260,	1000 },		25,		0  , 225, 0);
+	mp_QuadTree				= CreateDebugText("QuadTree"		, { 1280,	1000 },		25,		0  , 225, 0);
+	mp_FrustrumCulling      = CreateDebugText("FrustrumCulling"	, { 1420,	1000 },		25,		0  , 225, 0);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -331,22 +343,38 @@ void Scene::OnUpdate(Clock& time)
 	if (InputManager::GetInstance().IsDown(F1))
 		m_debugPerf = !m_debugPerf;
 
+	// QuadTree debug
 	if (InputManager::GetInstance().IsDown(F2) && m_debugPerf)
 	{
 		bool isActive = PhysicsManager::GetInstance().IsQuadTreeActive();
 
 		if (isActive)
 		{
-			mp_QuadTree->SetColor(255, 0, 0);
-			//PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+			mp_QuadTree->SetColor(255, 0, 0, 0);
+			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		}
 		else
 		{
-			mp_QuadTree->SetColor(0, 255, 0);
-			//PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+			mp_QuadTree->SetColor(0, 255, 0, 0);
+			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		}
 
 		
+	}
+	
+	// Frustrum Culling
+	if (InputManager::GetInstance().IsDown(F3) && m_debugPerf)
+	{ 
+		if (m_frustrumCulling)
+		{
+			m_frustrumCulling = false;
+			mp_FrustrumCulling->SetColor(255, 0, 0, 0); 
+		}
+		else
+		{
+			m_frustrumCulling = true;
+			mp_FrustrumCulling->SetColor(0, 255, 0, 0);
+		} 
 	}
 
 	if (m_updateDebug >= 1)

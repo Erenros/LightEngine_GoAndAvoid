@@ -57,7 +57,7 @@ void Text::SetColor(byte r, byte g, byte b, byte a)
 	mp_color->r = r;
 	mp_color->g = g;
 	mp_color->b = b;
-	mp_color->a = a;
+	mp_color->a = 255;
 	m_needToChange = true;
 }
 
