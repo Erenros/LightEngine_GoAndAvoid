@@ -109,15 +109,10 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 		return false;
 	}
 
-	if (AssetEngine::GetInstance().LoadFile("../../test.gcle"))
-	{
-		std::unordered_map<std::string, Sprite*> loadedSprite = AssetEngine::GetInstance().AssetToTexture(GetWindow());
 
-		for (auto& pair : loadedSprite)
-			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
-	}
-
+	AssetEngine::GetInstance().Init(mp_window, "../../test.gcle");
 	RessourceManager::GetInstance().Init(mp_window);
+
 
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});
@@ -132,7 +127,6 @@ void GameManager::Close()
 	mp_window->End();
 
 	delete mp_window;
-
 }
 
 void GameManager::UpdateEntitySystem()

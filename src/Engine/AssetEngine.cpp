@@ -1,6 +1,20 @@
 #include "AssetEngine.h"
+#include "RessourceManager.h"
 #include "Sprite.h"
 #include <fstream>
+
+void AssetEngine::Init(Window* window,const std::string& path)
+{
+	if (LoadFile("../../test.gcle"))
+	{
+		std::unordered_map<std::string, Sprite*> loadedSprite = AssetToTexture(window);
+
+		for (auto& pair : loadedSprite)
+			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
+
+		ClearAsset();
+	}
+}
 
 Asset* AssetEngine::GetAsset(std::string id)
 {
@@ -45,19 +59,10 @@ bool AssetEngine::LoadFile(const std::string& path)
 			return false;
 		};
 
-
-		DEBUG_INFO << "Key : " << static_cast<int>(entry.key) << ENDL;
-		DEBUG_INFO << "ID : " << entry.id << ENDL;
-		DEBUG_INFO << "Name : " << name << ENDL;
-		DEBUG_INFO << "Flag : " << static_cast<int>(entry.flag) << ENDL;
-		DEBUG_INFO << "Type : " << entry.type << ENDL;
-		DEBUG_INFO << "Width : " << entry.width << ENDL;
-		DEBUG_INFO << "Height : " << entry.height << ENDL;
-		DEBUG_INFO << "Size : " << entry.size << ENDL;
-
-		DEBUG_INFO << "File load with a size of : " << data.size() << " byte" << ENDL;
+		DEBUG_INFO << "File '" << name << "' load with a size of : " << data.size() << " byte" << ENDL;
 
 		Asset* asset = new Asset;
+
 		asset->id = entry.id;
 		asset->name.resize(name.size());
 		asset->name = std::string(name);
@@ -70,7 +75,6 @@ bool AssetEngine::LoadFile(const std::string& path)
 	}
 
 	file.close();
-
 	return true;
 }
 
@@ -94,12 +98,8 @@ std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* win
 	std::unordered_map< std::string, Sprite*> textureMap;
 	
 	for (auto& pair : m_assetMap)
-	{
 		textureMap[pair.first] = new Sprite(window, pair.second);
-//		delete pair.second;
-	}
 
-//	m_assetMap.clear();
 	return textureMap;
 }
 
@@ -109,6 +109,14 @@ void AssetEngine::DeleteAsset(const std::string& id)
 		return;
 
 	m_assetMap[id]->flag = 0x01;
+}
+
+void AssetEngine::ClearAsset()
+{
+	for (auto& pair : m_assetMap)
+		delete pair.second;
+
+	m_assetMap.clear();
 }
 
 void AssetEngine::ReadName(std::ifstream& file, Entry& entry, std::string& name)
@@ -132,7 +140,6 @@ bool AssetEngine::ReadHeader(std::ifstream& file)
 	}
 
 	DEBUG_INFO << "Open file -> version : " << static_cast<int>(version)  << ENDL;
-
 	return true;
 }
 
@@ -173,6 +180,8 @@ bool AssetEngine::ReadData(std::ifstream& file, Entry& entry, std::vector<byte>&
 
 void AssetEngine::SaveInFile(const std::string& path)
 {
+	LoadFile(path); //On reload car flm de garder des donnees en memoires quand le truc tourne
+
 	std::ofstream file(path, std::ios::binary);
 	if (!file)
 	{
@@ -227,7 +236,7 @@ void AssetEngine::ReadFile(const std::string& path, std::vector<byte>& data)
 {
 	std::ifstream file(path, std::ios::binary);
 	if (!file)
-		DEBUG_ERROR << "AAAAAAAAAAAAAH MAYDAY" << ENDL;
+		DEBUG_ERROR << "Can't read file with path : " << path << ENDL;
 
 	file.seekg(0, std::ios::end);
 	std::streamsize size = file.tellg();

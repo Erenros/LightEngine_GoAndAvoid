@@ -11,7 +11,6 @@
 #include "include.h"
 
 class Window;
-class GameManager;
 //Faudra biennnn optimiser ca plus tard
 
 struct TextureStruct {
@@ -69,7 +68,7 @@ private:
 private: 
 
 	void ForcePutTexture(Sprite* text, std::string id);
-	friend class GameManager;
+	friend class AssetEngine;
 
 public:
 

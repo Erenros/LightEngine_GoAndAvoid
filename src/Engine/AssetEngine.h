@@ -33,9 +33,9 @@ struct Asset
 	int16 height;
 
 	std::vector<byte> data;
-
 	std::string path;
 };
+
 
 class AssetEngine
 {
@@ -60,6 +60,8 @@ public:
 		return instance;
 	}
 
+	void Init(Window* window,const std::string& path);
+
 	Asset* GetAsset(std::string id);
 
 	bool LoadFile(const std::string& path);
@@ -68,6 +70,6 @@ public:
 
 	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
 
-
 	void DeleteAsset(const std::string& id);
+	void ClearAsset();
 };
