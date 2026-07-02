@@ -339,6 +339,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 	Entity* entityB = colliderB->GetOwner();
 
 	bool coliding = IsColliding(colliderA, colliderB);
+	std::cout << colliderA->GetShape()->GetWidth() << " " << colliderB->GetShape()->GetWidth() << std::endl;
 
 	if (coliding)
 	{
@@ -478,6 +479,10 @@ ContinuousCollisionHit PhysicsManager::SweepColliderAgainstAABB(Collider* moving
 
 ContinuousCollisionHit PhysicsManager::SegmentAABBIntersection(Vector2f start, Vector2f end, const AABB& target)
 {
+	m_entryTime = 0.0f;
+	m_exitTime = 1.0f;
+	m_entryNormal = { 0.0f, 0.0f };
+
 	Vector2f delta = end - start;
 
 	if (std::abs(delta.x) <= PHYSICS_EPSILON && std::abs(delta.y) <= PHYSICS_EPSILON)

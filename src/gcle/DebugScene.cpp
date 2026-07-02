@@ -21,8 +21,9 @@ void DebugScene::OnInitialize()
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(10, true);
 	entity1->GetRigidBody().SetMaxSpeed(10000);
-	entity1->SetIsStatic(false);
+	entity1->SetIsStatic(true);
 	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {1, 1});
+	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
 	entity1->GetRigidBody().SetCollisionOnContinuous();
 
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -30,19 +31,18 @@ void DebugScene::OnInitialize()
 	entity2->SetScale({ 5, 1 });
 	entity2->SetRotation(0);
 	entity2->SetRigidBody(true);
-	entity2->SetIsStatic(true);
-	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 1});
+	entity2->SetIsStatic(false);
+	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 0.3});
+	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity3->SetPosition(0, 300);
 	entity3->SetScale({10, 1});
 	entity3->SetRotation(0);
 	entity3->SetRigidBody(true);
-	entity3->SetIsStatic(true);
+	entity3->SetIsStatic(false);
 	setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {10, 1});
-
-
-
+	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
 
 
 
@@ -51,14 +51,13 @@ void DebugScene::OnInitialize()
 	pSceneCamera = CreateCamera();
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
-	PhysicsManager::GetInstance().SetActivateQuadTree(false);
+	PhysicsManager::GetInstance().SetActivateQuadTree(true);
 	PhysicsManager::GetInstance().SetQuadTreePos1({ -50000, -50000 });
 	PhysicsManager::GetInstance().SetQuadTreePos2({ 50000, 50000 });
 }
 
 void DebugScene::OnUpdate(Clock& time)
 {
-
 	Scene::OnUpdate(time);
 
 	if (InputManager::GetInstance().IsDown(Space))

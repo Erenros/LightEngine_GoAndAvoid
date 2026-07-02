@@ -23,7 +23,7 @@ void GameManager::Loop()
 	{
  
 
-		PROFILER_START("Colliders", "Colliders Update");
+		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
 		
@@ -42,11 +42,11 @@ void GameManager::Loop()
 			}
 			exec += 1;
 		}
-		debugInfo.Colliders = PROFILER_END("Colliders");
+		//debugInfo.Colliders = PROFILER_END("Colliders");
 	
-		PROFILER_START("Entity", "Entity Creation / Deletion");
+		//PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
-		debugInfo.Entity = PROFILER_END("Entity");
+		//debugInfo.Entity = PROFILER_END("Entity");
 		 
 		for (auto& cam : m_camera)
 		{
@@ -57,12 +57,12 @@ void GameManager::Loop()
 		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
 		mp_window->Clear();
 
-		PROFILER_START("SceneD", "Scene Draw");
+		//PROFILER_START("SceneD", "Scene Draw");
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
 		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
 
-		debugInfo.SceneUpdate = PROFILER_END("SceneD");
+		//debugInfo.SceneUpdate = PROFILER_END("SceneD");
 
 		//ImGUI
 		mp_window->StartImGUIFrame();

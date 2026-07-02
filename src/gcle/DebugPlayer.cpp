@@ -20,7 +20,7 @@ void DebugPlayer::OnUpdate() {
         GetRigidBody().AddForce({ 0, -1 }, 100, dt);
     }
     if (im.IsHeld('B')) {
-        GetRigidBody().AddImpulse({ 0, -1 }, 500);
+        GetRigidBody().AddImpulse({ 0, -1 }, 10000);
     }
 }
 
