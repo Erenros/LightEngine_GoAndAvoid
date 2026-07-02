@@ -19,6 +19,10 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
     m_soundMap[id]->PlaySound(mode, volume);
 }
 
+Font* RessourceManager::GetFont(const std::string& id){
+    return m_fontMap[id]; 
+}
+
 Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
 {
 	if (m_textureMap[id].mp_texture != nullptr)

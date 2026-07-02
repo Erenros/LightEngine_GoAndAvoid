@@ -54,8 +54,11 @@ Text::~Text()
 
 void Text::SetColor(byte r, byte g, byte b, byte a)
 {
-	delete mp_color;
-	mp_color = GCLE_NEW SDL_Color(r, g, b, a);
+	mp_color->r = r;
+	mp_color->g = g;
+	mp_color->b = b;
+	mp_color->a = a;
+	m_needToChange = true;
 }
 
 void Text::SetFont(const std::string& id)
@@ -91,6 +94,10 @@ void Text::SetFontSize(int32 size) {
 
 int32 Text::GetFontSize() {
 	return m_fontSize;
+}
+
+Vector2f Text::GetSizes(){
+	return { static_cast<float32>(mp_rect->w), static_cast<float32>(mp_rect->h)};
 }
 
 Font* Text::GetFont() {

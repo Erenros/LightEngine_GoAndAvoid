@@ -148,7 +148,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 		std::cout << "Window Initialization";
 		return false;
 	}
-
+	RessourceManager& rm = RessourceManager::GetInstance();
 	RessourceManager::GetInstance().Init(mp_window);
 
 	for (int i = 0; i < 32; i++)

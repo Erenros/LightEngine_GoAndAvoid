@@ -242,8 +242,8 @@ void PhysicsManager::PendingCorrections()
 		Entity* pEntity = pair.first;
 		Vector2f delta = pair.second;
 
-		Vector2f current = pEntity->GetShape()->GetPosition(0.5f, 0.5f);
-		pEntity->GetShape()->SetPosition(current.x + delta.x, current.y + delta.y, 0.5f, 0.5f);
+		Vector2f current = pEntity->GetPosition();
+		pEntity->SetPosition(current.x + delta.x, current.y + delta.y);
 	}
 	m_PendingCorrections.clear();
 }
@@ -449,10 +449,10 @@ bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
 
 bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 {
-	if (pEntity == nullptr || pEntity->GetShape() == nullptr)
+	if (pEntity == nullptr || pEntity->GetRenderShape() == nullptr)
 		return false;
 
-	switch (pEntity->GetShape()->GetShape())
+	switch (pEntity->GetRenderShape()->GetShape())
 	{
 	case gcle::Shapes::Rectangle:
 	{

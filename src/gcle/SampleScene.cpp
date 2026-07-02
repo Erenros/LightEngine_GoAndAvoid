@@ -9,12 +9,7 @@
 void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
-	 
-	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	pEntity->SetTexture(tex);
-	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);*/
-	 
+	 	 
 	std::string text = "Test";
 	CreateText(text, { 40, 40 }, 50);
 
@@ -30,15 +25,14 @@ void SampleScene::OnInitialize()
 
 	pSceneCamera = CreateCamera();
 
-
-	for (int32 i = 0; i < 500; i++) {
-		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-		entity->SetPosition(-49000.0f + (i * 100.0f), -49000.0f + (i * 100.0f));
-		entity->SetRigidBody(true);
-		entity->GetRigidBody().SetGravity(false);
-		entity->SetIsKinematic(true);
-		entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
-	}
+	//for (int32 i = 0; i < 500; i++) {
+	//	Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	//	entity->SetPosition(-49000.0f + (i * 100.0f), -49000.0f + (i * 100.0f));
+	//	entity->SetRigidBody(true);
+	//	entity->GetRigidBody().SetGravity(false);
+	//	entity->SetIsKinematic(true);
+	//	entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
+	//}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
 	PhysicsManager::GetInstance().SetActivateQuadTree(true);

@@ -7,7 +7,7 @@ void Collider::Initialize(Shape* shape, Vector2f position, float32 rotation, Ent
     mp_Owner = owner;
     m_shape->SetPosition(position.x, position.y);
 	m_shape->SetRotation(rotation);
-    m_shape->GetTransform()->SetParent(mp_Owner->GetShape()->GetTransform());
+    m_shape->GetTransform()->SetParent(&mp_Owner->GetTransform2D());
 }
 
 void Collider::CollidingOn(Vector2f direction)

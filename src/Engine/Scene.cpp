@@ -4,6 +4,8 @@
 
 #include <sstream>
 #include <iomanip>
+#include "WorldText.h"
+#include "RessourceManager.h"
 
 void Scene::DrawDebug(Window* window)
 {
@@ -42,9 +44,16 @@ void Scene::Draw(Window* window) {
 	int i = 0;
 	for (auto layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer){
-			if (window->IsInsideWindow(e)) {
+			if (window->IsInsideWindow(e) && e->GetRenderShape() != nullptr) {
 				if (e->IsActiveIn(m_tag)) {
 					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					i++;
+				}
+			}
+			else if (e->isWorldText()) {
+				if (e->IsActiveIn(m_tag)) {
+					WorldText* text = static_cast<WorldText*>(e);
+					GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(text->GetText());
 					i++;
 				}
 			}
@@ -400,4 +409,21 @@ void Scene::SetDebugInfo(DebugInformation& info) const
 		mp_InputP->SetText(		FormatMs(info.Input)		+ "ms");
 		mp_UpdateP->SetText(	FormatMs(info.SceneUpdate)	+ "ms");
 	}
+}
+
+Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a) 
+{
+	WorldText* worldText = CreateEntity<WorldText>();
+	Font* font = RessourceManager::GetInstance().GetFont(fontId);
+	if (font == nullptr)
+	{
+		GCLE_WARN << "Couldn't find the font " << fontId <<  ENDL;
+		return nullptr;
+	}
+
+	Text* textObject = GCLE_NEW Text(font, text, worldText->GetPosition(), fontSize, r, g, b, a);
+	worldText->m_text = textObject;
+	Entity* entity = worldText;
+
+	return entity;
 }

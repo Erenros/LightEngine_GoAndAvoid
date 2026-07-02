@@ -17,11 +17,32 @@ void Entity::Initialize(gcle::Shapes shape)
 	m_Target;
 
 
-	mp_Shape = GetBaseShape(shape);
-	mp_RenderShape = mp_Shape->Clone();
+
+	mp_RenderShape = GetBaseShape(shape);
 
 
-	m_RigidBody.Initialize(mp_Shape->GetTransform());
+	m_RigidBody.Initialize(&m_Transform);
+	m_RigidBody.SetActive(true);
+
+	m_Target.isSet = false;
+
+	m_Id = sId++;
+
+	OnInitialize();
+}
+
+void Entity::Initialize() {
+
+	m_Direction = { 0.0f, 0.0f };
+	m_Speed = 0.f;
+	m_ToDestroy = false;
+	m_Tag = -1;
+	m_Target;
+
+
+	mp_RenderShape = nullptr;
+
+	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
 
 	m_Target.isSet = false;
@@ -70,17 +91,19 @@ void Entity::Update(float32 dt)
 	float32 distance = dt * m_Speed;
 	Vector2f translation = m_Direction * distance;
 
-	mp_Shape->Move(translation);
-	Texture* tex = mp_RenderShape->GetTexture();
-	if (tex != nullptr)
-	{
-		if (tex->IsSprite())
-			static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+	Move(translation);
+	if (mp_RenderShape != nullptr) {
+		Texture* tex = mp_RenderShape->GetTexture();
+		if (tex != nullptr)
+		{
+			if (tex->IsSprite())
+				static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+		}
 	}
 	if (m_Target.isSet)
 	{
-		float32 x1 = GetPosition(0.5f, 0.5f).x;
-		float32 y1 = GetPosition(0.5f, 0.5f).y;
+		float32 x1 = GetPosition().x;
+		float32 y1 = GetPosition().y;
 
 		float32 x2 = x1 + m_Direction.x * m_Target.distance;
 		float32 y2 = y1 + m_Direction.y * m_Target.distance;
@@ -89,7 +112,7 @@ void Entity::Update(float32 dt)
 
 		if (m_Target.distance <= 0)
 		{
-			SetPosition(m_Target.position.x, m_Target.position.y, 0.5f, 0.5f);
+			SetPosition(m_Target.position.x, m_Target.position.y);
 			m_Direction = Vector2f({ 0.f, 0.f });
 			m_Target.isSet = false;
 		}
@@ -118,7 +141,7 @@ void Entity::RemoveCollider(Collider* pCollider)
 Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
 {
 	Collider* collider = new Collider();
-	collider->Initialize(GetBaseShape(shape), mp_Shape->GetPosition() + relativePosition, rotation, this);
+	collider->Initialize(GetBaseShape(shape), GetPosition() + relativePosition, rotation, this);
 	AddCollider(collider);
 	collider->SetActive(isActive);
 	collider->GetShape()->SetScale(scale);
@@ -140,7 +163,7 @@ bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
 	if (GoToDirection(x, y, speed) == false)
 		return false;
 
-	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+	Vector2f position = m_Transform.GetPosition();
 
 	m_Target.position = { x, y };
 	m_Target.distance = position.GetDistance({ x, y });
@@ -149,9 +172,14 @@ bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
 	return true;
 }
 
+void Entity::Move(Vector2f translation) {
+	Vector2f pivot = m_Transform.GetPosition();
+	m_Transform.SetPosition({ pivot.x + translation.x, pivot.y + translation.y });
+}
+
 bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 {
-	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+	Vector2f position = m_Transform.GetPosition();
 	Vector2f direction = Vector2f({ x - position.x, y - position.y });
 
 	direction = direction.Normalized();
@@ -161,9 +189,9 @@ bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 	return true;
 }
 
-Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
+Vector2f Entity::GetPosition()
 {
-	return mp_Shape->GetPosition(ratioX, ratioY);
+	return m_Transform.GetPosition();
 }
 
 void Entity::SetDirection(float32 x, float32 y, float32 speed)
@@ -193,42 +221,45 @@ void Entity::SetRigidBody(bool isRigidBody)
 	}
 }
 
-void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
+void Entity::SetPosition(float32 x, float32 y)
 {
-	mp_Shape->SetPosition(x, y, ratioX, ratioY);
+	m_Transform.SetPosition({ x, y });
 }
 
 Vector2f Entity::GetScale()
 {
-	return mp_Shape->GetScale();
+	return m_Transform.GetScale();
 }
 
 Degrees Entity::GetRotation()
 {
-	return mp_Shape->GetRotation();
+	return m_Transform.GetDegAngle();
 }
 
 void Entity::SetScale(Vector2f scale)
 {
-	mp_Shape->SetScale(scale);
+	m_Transform.SetScale(scale);
 }
 
 void Entity::ScaleBy(Vector2f factor)
 {
-	mp_Shape->ScaleBy(factor);
+	Vector2f current = m_Transform.GetScale();
+	m_Transform.SetScale({ current.x * factor.x, current.y * factor.y });
 }
 
 void Entity::SetRotation(Degrees angle)
 {
-	mp_Shape->SetRotation(angle);
+	m_Transform.SetDegAngle(angle);
 }
 
 void Entity::Rotate(Degrees delta)
 {
-	mp_Shape->Rotate(delta);
+	m_Transform.SetDegAngle(static_cast<int32>((m_Transform.GetDegAngle() + delta)) % 360);
 }
 
 void Entity::SetTexture(const std::string& id) {
+	if (mp_RenderShape == nullptr)
+		return;
 	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
 		for (auto& sId : m_activeScenes)
@@ -242,16 +273,20 @@ void Entity::SetTexture(const std::string& id) {
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
 {
-	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
+	if(mp_RenderShape != nullptr)
+		mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
 void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
 {
-	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
+	if(mp_RenderShape != nullptr)
+		mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
 void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 {
+	if (mp_RenderShape == nullptr)
+		return;
 	if (shapeType == 0)
 	{
 
@@ -284,7 +319,8 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 
 Vector2f Entity::GetRenderPosition()
 {
-	return mp_RenderShape->GetPosition();
+	if(mp_RenderShape != nullptr)
+		return mp_RenderShape->GetPosition();
 }
 
 bool Entity::IsColliding(Entity* other)
@@ -313,8 +349,10 @@ bool Entity::IsInside(Vector2f position)
 }
 
 Entity::~Entity() {
-	delete mp_Shape;
-	delete mp_RenderShape;
+	if (mp_RenderShape != nullptr) {
+		delete mp_RenderShape;
+		mp_RenderShape = nullptr;
+	}
 }
 
 void Entity::AddActiveScene(const std::string& sceneTag) {

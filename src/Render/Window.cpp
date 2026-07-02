@@ -302,7 +302,8 @@ void Window::Draw(gcle::Shape* pShape)
 }
 
 bool Window::IsInsideWindow(Entity* entity){ 
-
+	if (entity->GetRenderShape() == nullptr)
+		return false;
 	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 	
