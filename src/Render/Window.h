@@ -52,10 +52,7 @@ public:
 		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED,
 		int32 x = 0, 
 		int32 y = 0
-	);
-
-	void StartImGUIFrame();
-	void ImGUIUpdate();
+	); 
 
 	void ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a);
 
@@ -82,8 +79,7 @@ public:
 public:
 	bool IsInsideWindow(Entity* entity);
 	
-private:
-	void InitImGUI();
+private: 
 
 private:
 	SDL_Window* mp_Window = nullptr;

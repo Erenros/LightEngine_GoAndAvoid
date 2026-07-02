@@ -18,7 +18,7 @@ void SampleScene::OnInitialize()
 	pEntity->Rotate(0);
 	pEntity->SetRigidBody(true); 
 	pEntity->SetIsKinematic(true); 
-	pEntity->GetRigidBody().SetDampingStrenght(0.9);
+	pEntity->GetRigidBody().SetDampingStrenght(0.9f);
 	pEntity->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 
 	mp_mainCamera->SetFollowing(pEntity);

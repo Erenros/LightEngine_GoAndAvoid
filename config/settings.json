@@ -40,10 +40,7 @@
             "$(SolutionDir)../lib/SDL2/include",
             "$(SolutionDir)../lib/SDL2_ttf/include",
             "$(SolutionDir)../lib/SDL2_mixer/include",
-            "$(SolutionDir)../lib/SDL2_image/include",
-
-            "$(SolutionDir)../lib/imgui",
-            "$(SolutionDir)../lib/imgui/backends"
+            "$(SolutionDir)../lib/SDL2_image/include"
           ],
           "additionalLibraryDirectories": [
             "$(SolutionDir)../lib/SDL2/lib/x64",

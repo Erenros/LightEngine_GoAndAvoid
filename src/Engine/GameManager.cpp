@@ -65,11 +65,7 @@ void GameManager::Loop()
 		 
 		SceneManager::GetInstance().DrawCurrentScene(mp_window);
 		 
-		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window); 
-
-		//ImGUI
-		mp_window->StartImGUIFrame();
-		mp_window->ImGUIUpdate();
+		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);  
 	
 		mp_window->Present();
 		debugInfo.Draw = PROFILER_END("SceneD");
