@@ -50,6 +50,7 @@ private:
 
 public:
 	
+	~Sprite() override;
 	void UpdateAnimation(float32 deltatime, gcle::Shape* shape);
 
 	bool IsAnimationPlaying() { return mp_currentAnimation == nullptr ? false : true; };

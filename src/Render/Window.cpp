@@ -111,6 +111,9 @@ void Window::End()
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
+
+	delete mp_dst;
+	mp_dst = nullptr;
 }
 
 void Window::Present()

@@ -100,21 +100,7 @@ void GameManager::Loop()
 GameManager::~GameManager()
 {
 	UpdateEntitySystem();
-
-	for (auto& layer : m_entities)
-	{
-		if (layer.empty())
-			continue;
-
-		for (auto& entity : layer)
-		{
-			delete entity;
-		}
-
-		layer.clear();
-	}
-
-	m_entities.clear();
+	DestroyAllEntitiesAndCameras();
 }
 
 bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
@@ -155,8 +141,10 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 
 void GameManager::Close()
 {
-	RessourceManager::GetInstance().DeleteAll();
-	mp_window->End();
+	RessourceManager::GetInstance().DeleteAll(); 
+	DestroyAllEntitiesAndCameras();
+
+	PROFILER_CLEAR();
 
 	delete mp_window;
 
@@ -209,4 +197,19 @@ void GameManager::UpdateEntitySystem()
 	}
 
 	m_entitiesToCreate.clear();
-} 
+}
+void GameManager::DestroyAllEntitiesAndCameras()
+{
+	for (auto& layer : m_entities)
+	{
+		for (auto& entity : layer)
+			delete entity;
+		layer.clear();
+	}
+	m_entities.clear();
+
+	for (auto& cam : m_camera)
+		delete cam;
+	m_camera.clear();
+}
+

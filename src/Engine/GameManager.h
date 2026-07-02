@@ -46,6 +46,7 @@ public:
 	std::vector<Entity*> GetActiveEntities(const std::string& scene);
 private:
 	void UpdateEntitySystem();
+	void DestroyAllEntitiesAndCameras();
 
 private:
 

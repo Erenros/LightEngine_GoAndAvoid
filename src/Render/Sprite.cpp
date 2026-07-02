@@ -41,6 +41,13 @@ void Sprite::PlayAnimation(const std::string& id)
 }
 
 
+Sprite::~Sprite()
+{
+	for (auto& pair : m_animationMap)
+		delete pair.second;
+	m_animationMap.clear();
+}
+
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 {
 	Animation* anim = mp_currentAnimation;

@@ -4,13 +4,7 @@
 
 SceneManager::~SceneManager()
 {
-    for (auto& scene : m_Scenes)
-    {
-        delete scene.second;
-        scene.second = nullptr;
-    }
-
-    m_Scenes.clear();
+    DeleteAllScenes();
 }
 
 Scene* SceneManager::GetCurrentScene() {
@@ -120,6 +114,18 @@ void SceneManager::DrawCurrentSceneDebug(Window* pWindow)
     if (m_CurrentSceneTag != "") {
         m_Scenes[m_CurrentSceneTag]->DrawDebug(pWindow);
     }
+}
+
+void SceneManager::DeleteAllScenes()
+{
+    for (auto& scene : m_Scenes)
+    {
+        delete scene.second;
+        scene.second = nullptr;
+    }
+    m_Scenes.clear();
+    m_CurrentSceneTag = "";
+    m_PreviousSceneTag = "";
 }
 
 void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){

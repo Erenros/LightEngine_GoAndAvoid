@@ -28,6 +28,8 @@ int main(int argc, char** argv)
 
     
     gm.Loop();
+
+    SceneManager::GetInstance().DeleteAllScenes();
     gm.Close();
 
     _CrtDumpMemoryLeaks();
