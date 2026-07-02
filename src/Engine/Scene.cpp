@@ -304,11 +304,5 @@ Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const s
 	worldText->m_text = textObject;
 	Entity* entity = worldText;
 
-	entity->m_activeScenes.push_back(m_tag);
-
-	entity->Initialize();
-
-	GameManager::GetInstance().AddEntity(entity);
-
 	return entity;
 }
