@@ -11,6 +11,7 @@
 #include "include.h"
 
 class Window;
+class GameManager;
 //Faudra biennnn optimiser ca plus tard
 
 struct TextureStruct {
@@ -64,12 +65,13 @@ private:
 	std::unordered_map<std::string, Font*> m_fontMap;
 
 	friend class SceneManager;
+	
+private: 
+
+	void ForcePutTexture(Sprite* text, std::string id);
+	friend class GameManager;
 
 public:
-
-	//TEMP ONLY FOR TEST
-	void ForcePutTexture(Sprite* text, std::string id);
-
 
 	static RessourceManager& GetInstance() {
 		static RessourceManager instance;

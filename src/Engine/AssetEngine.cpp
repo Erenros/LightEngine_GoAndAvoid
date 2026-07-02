@@ -74,6 +74,21 @@ bool AssetEngine::LoadFile(const std::string& path)
 	return true;
 }
 
+void AssetEngine::AddAsset(const std::string& id, Sprite* sprite)
+{
+	if (m_assetMap.contains(id))
+		return;
+
+	Asset* asset = new Asset;
+	asset->id = 0;
+	asset->name = id;
+	asset->width = 0;
+	asset->height = 0;
+	asset->type = 1;
+	asset->path = "../../assets/textures/" + id + ".png";
+	m_assetMap[id] = asset;
+}
+
 std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* window)
 {
 	std::unordered_map< std::string, Sprite*> textureMap;
@@ -81,11 +96,19 @@ std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* win
 	for (auto& pair : m_assetMap)
 	{
 		textureMap[pair.first] = new Sprite(window, pair.second);
-		delete pair.second;
+//		delete pair.second;
 	}
 
-	m_assetMap.clear();
+//	m_assetMap.clear();
 	return textureMap;
+}
+
+void AssetEngine::DeleteAsset(const std::string& id)
+{
+	if (!m_assetMap.contains(id))
+		return;
+
+	m_assetMap[id]->flag = 0x01;
 }
 
 void AssetEngine::ReadName(std::ifstream& file, Entry& entry, std::string& name)
@@ -146,4 +169,82 @@ bool AssetEngine::ReadData(std::ifstream& file, Entry& entry, std::vector<byte>&
 	}
 
 	return true;
+}
+
+void AssetEngine::SaveInFile(const std::string& path)
+{
+	std::ofstream file(path, std::ios::binary);
+	if (!file)
+	{
+		DEBUG_WARN << "Can't open file with path : " << path << ENDL;
+		return;
+	}
+
+	file.write("GCLE", 4);
+	int8 version = 1;
+	file.write(&version, 1);
+
+	Entry entry;
+
+	for (auto& pair : m_assetMap)
+	{
+		if (pair.second->flag == 0x01)
+			continue;
+
+		entry.key = 83; //Absolute hardcode
+		entry.id = pair.second->id;
+		entry.nameLength = static_cast<int32>(pair.first.size());
+		entry.flag = pair.second->flag;
+		entry.type = pair.second->type;
+		entry.width = pair.second->width;
+		entry.height = pair.second->height;
+		 
+		std::vector<byte> data;
+
+		if (pair.second->path.size() != 0)
+		{
+			ReadFile(pair.second->path, data);
+		}
+		else if (pair.second->data.size() != 0)
+		{
+			data = std::move(pair.second->data);
+		}
+		else
+			continue;
+
+		std::vector<byte> encryptedData = EncryptData(data, entry.key);
+		entry.size = static_cast<int32>(encryptedData.size());
+
+		file.write(reinterpret_cast<char*>(&entry), sizeof(entry));
+		file.write(pair.first.data(), entry.nameLength);
+		file.write(reinterpret_cast<char*>(encryptedData.data()), encryptedData.size());
+	}
+
+	file.close();
+}
+
+void AssetEngine::ReadFile(const std::string& path, std::vector<byte>& data)
+{
+	std::ifstream file(path, std::ios::binary);
+	if (!file)
+		DEBUG_ERROR << "AAAAAAAAAAAAAH MAYDAY" << ENDL;
+
+	file.seekg(0, std::ios::end);
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	data.resize(static_cast<size_t>(size));
+	file.read(reinterpret_cast<char*>(data.data()), size);
+}
+
+std::vector<byte> AssetEngine::EncryptData(std::vector<byte>& data, int8 key)
+{
+	std::vector<byte> encryptData(data.size());
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		byte temp = ((data[i] << 3) | (data[i] >> 5));
+		encryptData[i] = temp ^ key;
+	}
+
+	return encryptData;
 }

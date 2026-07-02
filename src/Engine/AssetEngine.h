@@ -27,17 +27,31 @@ struct Asset
 {
 	int64 id;
 	std::string name;
+	int8 flag;
 	int64 type;
 	int16 width;
 	int16 height;
 
 	std::vector<byte> data;
+
+	std::string path;
 };
 
 class AssetEngine
 {
 private:
 
+	std::unordered_map<std::string, Asset*> m_assetMap;
+
+private:
+
+	void ReadFile(const std::string& path, std::vector<byte>& data);
+	std::vector<byte> EncryptData(std::vector<byte>& data, int8 key);
+
+	void ReadName(std::ifstream& file, Entry& entry, std::string& name);
+	bool ReadHeader(std::ifstream& file);
+	bool ReadEntry(std::ifstream& file, Entry& entry);
+	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
 
 public:
 
@@ -45,17 +59,15 @@ public:
 		static AssetEngine instance;
 		return instance;
 	}
-	
-	std::unordered_map<std::string, Asset*> m_assetMap;
 
 	Asset* GetAsset(std::string id);
 
 	bool LoadFile(const std::string& path);
+	void AddAsset(const std::string& id, Sprite* sprite);
+	void SaveInFile(const std::string& path);
 
 	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
 
-	void ReadName(std::ifstream& file, Entry& entry, std::string& name);
-	bool ReadHeader(std::ifstream& file);
-	bool ReadEntry(std::ifstream& file, Entry& entry);
-	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
+
+	void DeleteAsset(const std::string& id);
 };

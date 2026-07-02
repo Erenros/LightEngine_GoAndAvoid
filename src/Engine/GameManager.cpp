@@ -109,20 +109,15 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 		return false;
 	}
 
-	RessourceManager::GetInstance().Init(mp_window);
-
 	if (AssetEngine::GetInstance().LoadFile("../../test.gcle"))
 	{
-		std::unordered_map<std::string, Sprite*> test = AssetEngine::GetInstance().AssetToTexture(GetWindow());
-		size_t bruh = test.size();
+		std::unordered_map<std::string, Sprite*> loadedSprite = AssetEngine::GetInstance().AssetToTexture(GetWindow());
 
-		for (auto& pair : test)
-		{
+		for (auto& pair : loadedSprite)
 			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
-		}
 	}
 
-	TextureStruct* test = RessourceManager::GetInstance().GetTexture("Test");
+	RessourceManager::GetInstance().Init(mp_window);
 
 	for (int i = 0; i < 32; i++)
 		m_entities.push_back({});
@@ -132,6 +127,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight)
 
 void GameManager::Close()
 {
+	AssetEngine::GetInstance().SaveInFile("../../test.gcle");
 	RessourceManager::GetInstance().DeleteAll();
 	mp_window->End();
 
