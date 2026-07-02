@@ -27,7 +27,7 @@ SDL_Texture* Text::CreateTexture(Window* window)
 
 	SDL_FreeSurface(surface);
 	
-	mp_rect->w = m_text.size() * m_fontSize * 0.6;
+	mp_rect->w = static_cast<int32>(m_text.size() * m_fontSize * 0.6f);
 	mp_rect->h = m_fontSize;
 
 
@@ -40,7 +40,7 @@ Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, by
 	m_fontSize(fontSize)
 {
 	mp_color = GCLE_NEW SDL_Color(r, g, b, a);
-	mp_rect = GCLE_NEW SDL_Rect(pos.x, pos.y,text.size() * fontSize * 0.6, fontSize);
+	mp_rect = GCLE_NEW SDL_Rect(static_cast<int32>(pos.x), static_cast<int32>(pos.y), static_cast<int32>(text.size()) * static_cast<float32>(fontSize) * 0.6f, fontSize);
 }
 
 Text::~Text()

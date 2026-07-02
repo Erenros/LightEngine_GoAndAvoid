@@ -97,8 +97,7 @@ namespace GCLE
 
 			while (ptr < end)
 			{
-				auto* entry =
-					reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(ptr);
+				auto* entry = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(ptr);
 
 				++physicalCores;
 
@@ -150,9 +149,7 @@ namespace GCLE
 
 		IDXGIAdapter1* adapter = nullptr;
 
-		for (UINT i = 0;
-			factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND;
-			++i)
+		for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i)
 		{
 			DXGI_ADAPTER_DESC1 desc;
 			adapter->GetDesc1(&desc);
@@ -160,9 +157,17 @@ namespace GCLE
 			std::wstring ws(desc.Description);
 			std::string name(ws.begin(), ws.end());
 
-			GCLE_INFO << "GPU : " << name << ENDL;
-			GCLE_INFO << "VRAM : " << desc.DedicatedVideoMemory / (1024 * 1024) << " MB" << ENDL;
-			GCLE_INFO << "Flags : " << desc.Flags << ENDL;
+			if (strcmp(name.c_str(), "Microsoft Basic Render Driver") == 0)
+			{
+				GCLE_INFO << "GPU : Couldn't be found !" << ENDL;
+				GCLE_INFO << "Look if your GPU drivers are installed or if a graphic card is detected in the task manager" << ENDL;
+			}
+			else
+			{
+				GCLE_INFO << "GPU : " << name << ENDL;
+				GCLE_INFO << "VRAM : " << desc.DedicatedVideoMemory / (static_cast<uint64>(1024) * 1024) << " MB" << ENDL;
+				GCLE_INFO << "Flags : " << desc.Flags << ENDL;
+			}
 
 			adapter->Release();
 		}

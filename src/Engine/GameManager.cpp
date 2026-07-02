@@ -72,7 +72,7 @@ void GameManager::Loop()
 		mp_window->ImGUIUpdate();
 	
 		mp_window->Present();
-		debugInfo.SceneUpdate = PROFILER_END("SceneD");
+		debugInfo.Draw = PROFILER_END("SceneD");
 
 		if (Event::WindowEvent())
 		{
@@ -169,8 +169,8 @@ void GameManager::Close()
 std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
 {
 	std::vector<Entity*> results;
-	for (auto entities : m_entities) {
-		for (auto e : entities) {
+	for (auto& layer : m_entities) {
+		for (auto e : layer) {
 			if (e->IsActiveIn(scene))
 				results.push_back(e);
 		}

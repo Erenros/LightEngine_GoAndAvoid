@@ -19,7 +19,7 @@ class Collider
 {
 public:
 	Collider() = default;
-	~Collider() = default;
+	~Collider();
 
 	void Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner);
 
@@ -41,7 +41,7 @@ public:
 	void SetOwner(Entity* pOwner) { mp_Owner = pOwner; }
 
 private:
-	Shape* m_shape;
+	Shape* m_shape = nullptr;
 
 	Entity* mp_Owner = nullptr;
 
@@ -51,7 +51,7 @@ private:
 
 private:
 	bool m_inQuerySeen = false;
-	AABB m_aabb;
+	AABB m_aabb{};
 
 public:
 	bool GetInQuerySeen();

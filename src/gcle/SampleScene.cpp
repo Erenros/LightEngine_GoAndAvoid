@@ -36,6 +36,7 @@ void SampleScene::OnInitialize()
 			entity->GetRigidBody().SetGravity(false);
 			entity->SetIsKinematic(true);
 			entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1.0f, 1.0f });
+			entity->SetStatic(true);
 		}
 	}
 

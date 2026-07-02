@@ -59,7 +59,7 @@ void Scene::Draw(Window* window) {
 					i++;
 				}
 			}
-			else if (e->isWorldText()) 
+			else if (e->IsWorldText()) 
 			{
 				if (e->IsActiveIn(m_tag)) 
 				{
@@ -100,6 +100,9 @@ Scene::~Scene()
 	for (Text* t : m_debugInfoTexts)
 		delete t;
 	m_debugInfoTexts.clear();
+
+	mp_mainCamera = nullptr;
+	mp_activeCamera = nullptr;
 }
 
 Text* Scene::CreateText(const std::string& text,Vector2f pos, int32 fontSize, byte r, byte g, byte b)
@@ -151,14 +154,15 @@ void Scene::SetDebug()
 	m_debug = true;
 }
 
-void Scene::Update(Clock& time){
-	for (auto layer : GameManager::GetInstance().m_entities) {
+void Scene::Update(Clock& time) const 
+{ 
+	for (auto& layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer)
 		{
 			if (e->IsActiveIn(m_tag))
 				e->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
-	}
+	} 
 }
 
 Text* Scene::CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
@@ -331,8 +335,7 @@ void Scene::OnInitialize()
 
 void Scene::OnUpdate(Clock& time)
 { 
-	constexpr int32 DEBUG_UPDATE = 5;
-
+	constexpr int32 DEBUG_UPDATE = 5; 
 	
 	m_updateDebug++;
 
@@ -383,8 +386,7 @@ void Scene::OnUpdate(Clock& time)
 	}
 	
 	EntityInfoVisibility(DEBUG_UPDATE);
-	DebugSetEntityInfo();
-
+	DebugSetEntityInfo(); 
 }
 
 void Scene::OnExit()

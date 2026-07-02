@@ -66,7 +66,7 @@ protected:
 	void SwitchCamera(Camera* pCamera);
 
 private: 
-	void Update(Clock& time);
+	void Update(Clock& time) const;
 	void Draw(Window* window);
 
 
@@ -94,6 +94,8 @@ private:
 	uint32 m_flag = 0;
 	std::vector<Text*> m_texts;
 	std::vector<std::string> m_activeTextures;
+
+	float32 m_test = 0;
 
 
 private:
@@ -138,7 +140,7 @@ private:
 	Text*  mp_DrawP				= nullptr;
 
 	Text*  mp_QuadTree			= nullptr;
-	Text* mp_FrustrumCulling	= nullptr;
+	Text*  mp_FrustrumCulling	= nullptr;
 
 private: 
 	friend class GameManager;

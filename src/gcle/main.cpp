@@ -16,6 +16,8 @@
 
 int main(int argc, char** argv)
 { 
+    //_CrtSetBreakAlloc(29164);
+
     GameManager& gm = GameManager::GetInstance();
 
     gm.Init(640, 480, 120);

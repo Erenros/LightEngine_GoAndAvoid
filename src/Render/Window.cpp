@@ -96,8 +96,8 @@ Vector2f Window::GetMousePositionOnRenderTarget()
 	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
 	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
 
-	mousePos.x = (mousePos.x - mp_dst->x) * (1920.0f / mp_dst->w);
-	mousePos.y = (mousePos.y - mp_dst->y) * (1080.0f / mp_dst->h);
+	mousePos.x = (mousePos.x - mp_dst->x) * (1920 / mp_dst->w);
+	mousePos.y = (mousePos.y - mp_dst->y) * (1080 / mp_dst->h);
 
 	return Vector2f{ static_cast<float32>(mousePos.x) * scaleX, static_cast<float32>(mousePos.y) * scaleY };
 }

@@ -11,6 +11,7 @@
 class Camera
 {
 	public:
+		~Camera();
 		void Init(Window* pWindow);
 
 		void SetFollowing(Entity* newEntity);

@@ -4,6 +4,12 @@
 
 static uint64 sId = 0;
 
+Camera::~Camera()
+{
+	mp_Window = nullptr;
+	m_followingEntity = nullptr;
+}
+
 void Camera::Init(Window* pWindow)
 {
 	transform.Initialize({ 0.0f, 0.0f }, 0); 
@@ -54,7 +60,7 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 					entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
 					entity->GetRenderShape()->SetRotation(entity->GetRotation());
 				}
-				else if (entity->isWorldText()) {
+				else if (entity->IsWorldText()) {
 					WorldText* text = static_cast<WorldText*>(entity);
 					text->SetRenderPosition((text->GetPosition() - GetPosition()) + screenMiddle);
 				}
