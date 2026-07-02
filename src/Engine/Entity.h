@@ -63,6 +63,8 @@ public:
 
 	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
 	void PlayAnimation(const std::string& id, int32 mode = 0);
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
+	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
 
 	int32 GetLayer() { return m_layer; };
 	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };

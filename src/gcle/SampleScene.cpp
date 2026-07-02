@@ -25,8 +25,14 @@ void SampleScene::OnInitialize()
 	entity2->Rotate(45);
 	entity2->SetRigidBody(true); 
 	entity2->SetIsKinematic(true); 
+	entity2->SetScale(3.f);
 	entity2->GetRigidBody().SetDampingStrenght(0.9);
-	entity2->CreateCollider(gcle::Shapes::Rectangle, true ,{ 0.f, 0.f }, 45.f, { 1.f, 1.f });
+	entity2->CreateCollider(gcle::Shapes::Rectangle, true ,{ 0.f, 0.f }, 45.f, { 2.f, 2.f });
+	entity2->SetTexture("test");
+	entity2->AddAnimation("bounce", 0, 3, 0, 32, 28, 0.2);
+	entity2->PlayAnimation("bounce");
+	//entity2->AddFunctionInFrame("bounce", 1, Test);
+	//entity2
 
 
 	mp_mainCamera->SetFollowing(entity2);

@@ -400,3 +400,23 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 
 	sprite->PlayAnimation(id);
 }
+
+void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->AddFunctionInFrame(animation, frame, function);
+}
+
+void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->RemoveFunctionInFrame(animation, frame);
+}
