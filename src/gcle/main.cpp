@@ -20,9 +20,9 @@ int main(int argc, char** argv)
 
     gm.Init(640, 480, 120);
 
-    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
+    SceneManager::GetInstance().CreateScene<DebugScene>("DebugScene");
 
-    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 
     
     gm.Loop();

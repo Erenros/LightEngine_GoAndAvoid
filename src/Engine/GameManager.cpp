@@ -37,7 +37,7 @@ void GameManager::Loop()
 				m_loopTour++;
 			else
 			{
-				UpdateRigidBodies(fixedUpdateDT);
+				UpdateRigidBodies(static_cast<float32> (fixedUpdateDT));
 				PhysicsManager::GetInstance().Update(fixedUpdateDT);
 			}
 			exec += 1;

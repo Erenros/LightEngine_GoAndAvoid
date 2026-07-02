@@ -6,6 +6,12 @@
 
 #undef max
 
+enum class CollisionDetectionMode
+{
+	Discrete,
+	Continuous
+};
+
 class RigidBody2D
 {
 public:
@@ -50,11 +56,20 @@ public:
 	void SetDampingOnXAxis(Vector2f strenght) { m_Friction = strenght; }
 	void SetDampingOnYAxis(Vector2f strenght) { m_Friction = strenght; }
 
-	Vector2f CalculateNextPosition();
+	Vector2f CalculateNextPosition(float32 dt);
+	bool UseContinuousCollision() const;
+
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
 	void ApplyGravity(float32 dt);
+
+private:
+	CollisionDetectionMode m_CollisionDetectionMode = CollisionDetectionMode::Discrete;
+
+public:
+	void SetCollisionDetectionMode(CollisionDetectionMode mode) {m_CollisionDetectionMode = mode;}
+	void SetCollisionOnContinuous() {m_CollisionDetectionMode = CollisionDetectionMode::Continuous;}
 
 private:
 	Vector2f m_Position;
