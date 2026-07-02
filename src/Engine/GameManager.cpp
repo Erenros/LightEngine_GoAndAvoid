@@ -191,8 +191,11 @@ void GameManager::UpdateEntitySystem()
 				m_entitiesToDestroy.push_back(entity);
 				it = m_entities[i].erase(it);
 			}
+			else
+			{
+				++it;
+			}
 
-			++it;
 		}
 	}
 

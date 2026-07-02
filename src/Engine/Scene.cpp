@@ -108,6 +108,10 @@ Camera* Scene::CreateCamera()
 	pCamera->Init(GameManager::GetInstance().GetWindow());
 
 	GameManager::GetInstance().m_camera.push_back(pCamera);
+
+	pCamera->SetActive(true);
+	mp_activeCamera = pCamera;
+
 	return pCamera;
 }
 
@@ -325,12 +329,12 @@ void Scene::OnUpdate(Clock& time)
 		if (isActive)
 		{
 			mp_QuadTree->SetColor(255, 0, 0);
-			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+			//PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		}
 		else
 		{
 			mp_QuadTree->SetColor(0, 255, 0);
-			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
+			//PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		}
 
 		

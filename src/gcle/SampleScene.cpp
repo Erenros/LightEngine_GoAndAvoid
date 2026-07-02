@@ -59,8 +59,6 @@ void SampleScene::OnUpdate(Clock& time)
 		else
 		{
 			SwitchCamera(pSceneCamera);
-		}
-
-		pEntity->Destroy();
+		} 
 	}
 } 
