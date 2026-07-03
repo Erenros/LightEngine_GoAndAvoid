@@ -83,17 +83,16 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 
 Vector2f Window::GetMousePositionOnRenderTarget()
 {
-	Vector2u mousePos = GetMousePosition(); 
-	Vector2f windowSize = GetWindowSize();   
+	Vector2u mousePos = GetMousePosition();
 
-	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
-	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
+	float32 scaleX = RENDER_TARGET_WIDTH / static_cast<float32>(mp_dst->w);
+	float32 scaleY = RENDER_TARGET_HEIGHT / static_cast<float32>(mp_dst->h);
 
-	mousePos.x = (mousePos.x - mp_dst->x) * (1920 / mp_dst->w);
-	mousePos.y = (mousePos.y - mp_dst->y) * (1080 / mp_dst->h);
+	float32 x = (static_cast<float32>(mousePos.x) - mp_dst->x) * scaleX;
+	float32 y = (static_cast<float32>(mousePos.y) - mp_dst->y) * scaleY;
 
-	return Vector2f{ static_cast<float32>(mousePos.x) * scaleX, static_cast<float32>(mousePos.y) * scaleY };
-}  
+	return Vector2f{ x, y };
+}
 
 void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
@@ -210,7 +209,7 @@ bool Window::IsInsideWindow(Entity* entity){
 	return windowAABB.overlaps(entityAABB);
 }
 
-void Window::DrawDebug(gcle::Shape* pShape)
+void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
 {
 	std::vector<SDL_FPoint*> pointsPtr;
 
@@ -221,29 +220,26 @@ void Window::DrawDebug(gcle::Shape* pShape)
 		auto pSh = static_cast<gcle::Rectangle*>(pShape);
 		pointsPtr = pSh->GetHollow();
 		break;
-	} 
+	}
 	case gcle::Shapes::Circle:
 	{
 		pointsPtr = (static_cast<gcle::Circle*>(pShape))->GetHollow();
 		break;
-	} 
+	}
 	case gcle::Shapes::Triangle:
 	{
 		pointsPtr = (static_cast<gcle::Triangle*>(pShape))->GetHollow();
 		break;
 	}
-
 	default:
 		break;
 	}
-
-
 
 	std::vector<SDL_FPoint> points;
 	points.reserve(pointsPtr.size());
 	for (SDL_FPoint* p : pointsPtr)
 	{
-		points.push_back(*p);
+		points.push_back(SDL_FPoint{ p->x + offset.x, p->y + offset.y });
 	}
 
 	SDL_RenderDrawLinesF(mp_Renderer, points.data(), static_cast<int32>(points.size()));

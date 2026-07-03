@@ -69,7 +69,7 @@ public:
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
 	
-	void DrawDebug(gcle::Shape* pShape);
+	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f });
 
 public: 
 	Vector2u GetMousePosition();

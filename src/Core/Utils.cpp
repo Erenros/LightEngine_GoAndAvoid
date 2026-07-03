@@ -186,12 +186,12 @@ std::string ChangeUnit(float64 value, int32 precision)
 }
 
 
-AABB GetRotatedAABB(Vector2f center, Vector2f halfSize, Radians rotation) {
+AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians rotation) {
 
 	float32 c = std::cos(rotation);
 	float32 s = std::sin(rotation);
 
-	Vector2f localCorners[4]{
+	Vector2<float32> localCorners[4]{
 		{-halfSize.x, -halfSize.y},
 		{halfSize.x, -halfSize.y},
 		{halfSize.x, halfSize.y},

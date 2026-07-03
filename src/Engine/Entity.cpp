@@ -88,6 +88,8 @@ void Entity::Update(float32 dt)
 	if (m_RigidBody.IsActive())
 		m_RigidBody.Update(dt);
 
+	m_Transform.UpdateChildPosition();
+
 	if (m_isStatic == false)
 	{
 		float32 distance = dt * m_Speed;

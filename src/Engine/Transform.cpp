@@ -151,7 +151,6 @@ void Transform2D::SetRadAngle(Radians angle)
 }
 
 void Transform2D::SetDirty() {
-    if (m_IsDirty) return;
     m_IsDirty = true;
     for (auto pChild : mp_Childs) {
         pChild->SetDirty();

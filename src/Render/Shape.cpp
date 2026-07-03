@@ -11,8 +11,7 @@ namespace gcle
 			delete vertex;
 		}
 		m_verticies.clear();
-
-		std::cout << "Destroy Shape\n";
+		 
 		for (SDL_FPoint* point : m_hollowPoints)
 		{
 			delete point;

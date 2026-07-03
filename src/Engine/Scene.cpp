@@ -9,31 +9,39 @@
 
 void Scene::DrawDebug(Window* window)
 {
-	for (auto layer : GameManager::GetInstance().m_entities) {
-		for(Entity* e : layer)
+	constexpr Vector2f screenMiddle({ 1920.0f / 2.0f, 1080.0f / 2.0f });
+	Vector2f camOffset = mp_activeCamera != nullptr ? (screenMiddle - mp_activeCamera->GetPosition()) : Vector2f{ 0.f, 0.f };
+
+	if (m_isVisualDebugActive)
+	{
+		for (auto& layer : GameManager::GetInstance().m_entities)
 		{
-			if (e->IsActiveIn(m_tag) && e->m_isHighlighted) 
+			for (Entity* e : layer)
 			{
-				if (m_isVisualDebugActive)
+				if (!e->IsActiveIn(m_tag))
+					continue;
+
+				for (auto& col : e->GetColliders())
 				{
-					GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
-				}
-				else if (m_selectedEntity != nullptr && m_debugPerf)
-				{
-					if (e->GetId() == m_selectedEntity->GetId())
+					if (col->IsActive())
 					{
-						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
-						GameManager::GetInstance().GetWindow()->DrawDebug(e->GetRenderShape());
-
-						for (auto& col : e->GetColliders())
-						{
-							GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-							GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape());
-						}
-
+						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+						GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
 					}
 				}
 			}
+		}
+	}
+
+	if (m_selectedEntity != nullptr && m_debugPerf && m_selectedEntity->IsActiveIn(m_tag))
+	{
+		GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
+		GameManager::GetInstance().GetWindow()->DrawDebug(m_selectedEntity->GetRenderShape()); 
+
+		for (auto& col : m_selectedEntity->GetColliders())
+		{
+			GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+			GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset); 
 		}
 	}
 }
@@ -385,6 +393,12 @@ void Scene::OnUpdate(Clock& time)
 			m_frustrumCulling = true;
 			mp_FrustrumCulling->SetColor(0, 255, 0, 0);
 		} 
+	}
+
+	// Gizmo Colliders
+	if (InputManager::GetInstance().IsDown(F4) && m_debugPerf)
+	{
+		SetGizmoVisibility();
 	}
 
 	if (m_updateDebug >= 1)
