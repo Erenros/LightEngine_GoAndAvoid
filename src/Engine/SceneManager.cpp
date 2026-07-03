@@ -135,8 +135,7 @@ void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
 
     for (auto& texture : currentScene->m_activeTextures) {
         if (std::find(newScene->m_activeTextures.begin(), newScene->m_activeTextures.end(), texture) != newScene->m_activeTextures.end()) {
-            m_activatedTextures.push_back(texture);
-            GCLE_INFO << "don't change " << texture << ENDL;
+            m_activatedTextures.push_back(texture); 
             continue;
         }
         else {

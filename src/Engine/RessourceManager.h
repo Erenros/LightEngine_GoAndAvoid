@@ -16,12 +16,12 @@ class Window;
 struct TextureStruct {
 public:
 	Sprite* mp_texture = nullptr;
-	
+
 private:
 	int32 m_useCount = 0;
 	bool m_destroyWhenUnused = true;
 	uint32 m_flag = 0b0;
-		
+
 public:
 	void SetFlag(uint32 flag) {
 		m_flag = flag;
@@ -34,11 +34,11 @@ public:
 	uint32 GetFlag() {
 		return m_flag;
 	}
-	
+
 	void UnloadTexture() {
-		if(mp_texture != nullptr)
+		if (mp_texture != nullptr)
 			delete mp_texture;
-			mp_texture = nullptr;
+		mp_texture = nullptr;
 	}
 
 	bool IsLoaded() {
@@ -50,38 +50,6 @@ public:
 	}
 
 };
-
-//Temporaire
-//struct Sprite
-//{
-//	/*bool SpriteSheet = true;
-//
-//	SDL_Texture* pTexture = nullptr;
-//	SDL_Rect SourceRect;
-//	
-//	float Duration;
-//	float Timer;
-//
-//	int Row, Column;
-//	int CurrentRow = 0;
-//	int CurrentColumn = 0;
-//
-//	Sprite(const std::string& id, SDL_Rect sourceRect, bool is_spritesheet = false, int row = 1, int column = 1, float duration = 0.5f);
-//
-//	void PlayAnimation(int nbr);
-//	void UpdateAnimation(float deltaTime = 0.f);*/
-//};
-
-
-
-/*
-Dans l'id�e �a donnera un truc du style 
-	EntityPtr* e = CreateEntity.... ect
-		
-	e->AddSprite(GCLE_NEW Sprite( TextureID / Texture* , bool spritesheet, int row, int col, srect, duration ) 
-*/
-
-
 
 
 class RessourceManager
@@ -97,6 +65,11 @@ private:
 
 	friend class SceneManager;
 
+private:
+
+	void ForcePutTexture(Sprite* text, std::string id);
+	friend class AssetEngine;
+
 public:
 
 	static RessourceManager& GetInstance() {
@@ -104,8 +77,8 @@ public:
 		return instance;
 	}
 
-	Font* GetFont(const std::string& id);
-	TextureStruct* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? &m_textureMap[id] : nullptr); };
+	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
+	TextureStruct* GetTexture(const std::string& id);
 	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }

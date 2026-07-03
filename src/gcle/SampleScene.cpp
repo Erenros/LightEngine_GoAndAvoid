@@ -18,7 +18,7 @@ void SampleScene::OnInitialize()
 	pEntity->Rotate(0);
 	pEntity->SetRigidBody(true);  
 	pEntity->GetRigidBody().SetDampingStrenght(0.9f);
-	pEntity->SetTexture("image");
+	pEntity->SetTexture("images");
 	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 

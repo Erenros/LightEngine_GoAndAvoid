@@ -13,8 +13,7 @@ Sprite::Sprite(Window* window, const std::string& path)
 	if (!IsTextureInit())
 		return;
 
-	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
+	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height); 
 }
 
 Sprite::Sprite(Window* window, Asset* asset)
