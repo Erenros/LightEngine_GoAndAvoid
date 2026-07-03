@@ -23,14 +23,14 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 	SDL_RWops* rw = SDL_RWFromMem(asset->data.data(), static_cast<int>(asset->data.size()));
 	if (rw == NULL)
 	{
-		DEBUG_WARN << "Can't read data to create texture" << ENDL;
+		GCLE_WARN << "Can't read data to create texture" << ENDL;
 		return;
 	}
 
 	SDL_Surface* surface = IMG_Load_RW(rw, 1);
 	if (surface == NULL)
 	{
-		DEBUG_WARN << "Can't Create Surface" << ENDL;
+		GCLE_WARN << "Can't Create Surface" << ENDL;
 		return;
 	}
 
@@ -39,7 +39,7 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 	if (texture == NULL)
-		DEBUG_WARN << "Error during creation of the texture" << ENDL;
+		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
 	SDL_FreeSurface(surface);
 	mp_texture = texture;

@@ -13,12 +13,13 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, { 40, 40 }, 50);
 
-	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	pEntity = CreateEntity<Player>(gcle::Shapes::Circle);
 	pEntity->SetPosition(0, 0); 
 	pEntity->Rotate(0);
 	pEntity->SetRigidBody(true);  
 	pEntity->GetRigidBody().SetDampingStrenght(0.9f);
-	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	pEntity->SetTexture("image");
+	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
 	mp_mainCamera->SetFollowing(pEntity);
