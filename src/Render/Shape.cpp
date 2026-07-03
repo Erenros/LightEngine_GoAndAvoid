@@ -349,16 +349,25 @@ namespace gcle
 
 		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
 
-		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {1, 1} };
+		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {0.5f, 0.5f} };
 		m_localPositions.push_back({ 0.f, 0.f });
 
-		for (int i = 0; i < _smoothness; i++) {
+		for (int i = 0; i < _smoothness; i++)
+		{
 			Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 
 			float cx = sin(radian) * radius;
 			float cy = cos(radian) * radius;
 
-			m_verticies[i + 1] = new SDL_Vertex{ {x + radius + cx, y + radius + cy}, sdl_color, {1, 1} };
+			float u = 0.5f + (cx / radius) * 0.5f;
+			float v = 0.5f + (cy / radius) * 0.5f;
+
+			m_verticies[i + 1] = new SDL_Vertex{
+				{x + radius + cx, y + radius + cy},
+				sdl_color,
+				{u, v}
+			};
+
 			m_localPositions.push_back({ cx, cy });
 
 			m_indicies[i * 3] = 0;

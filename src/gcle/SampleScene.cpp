@@ -20,8 +20,8 @@ void SampleScene::OnInitialize()
 	entity1->SetRigidBody(true); 
 	entity1->GetShape()->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
-	//entity1->SetTexture("images");
-	entity1->SetTexture("test");
+	entity1->SetTexture("images");
+	//entity1->SetTexture("test");
 ;
 }
 
