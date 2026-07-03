@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Core/include.h"
 #include <unordered_map>
+#include <functional>
 
 namespace gcle
 {
@@ -21,6 +22,7 @@ struct Animation
 	
 	float32 m_duration = 0;
 
+
 	Animation(int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f) :
 		m_firstFrame(firstFrame),
 		m_lastFrame(lastFrame),
@@ -29,6 +31,9 @@ struct Animation
 		m_tileH(tileHeight),
 		m_duration(duration)
 	{}
+	std::unordered_map<int, std::function<void*()>> m_animationFunction;
+	int m_frameId = 0;
+
 };
 
 
@@ -46,6 +51,7 @@ private:
 	int32 m_currentFrameY = 0;
 
 	float32 m_timer = 0.f;
+
 
 
 public:
@@ -66,4 +72,7 @@ public:
 		float32 duration = 0.5f);
 
 	void PlayAnimation(const std::string& id);
+
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
+	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
 };
