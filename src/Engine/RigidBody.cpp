@@ -35,6 +35,11 @@ void RigidBody2D::Update(float32 dt)
 	mp_Transform->UpdateChildPosition();
 }
 
+bool RigidBody2D::UseContinuousCollision() const
+{
+	return m_CollisionDetectionMode == CollisionDetectionMode::Continuous;
+}
+
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
 {
 	m_Velocity += direction.Normalized() * (strength / m_Mass) * dt;
@@ -106,6 +111,13 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	{
 		m_Velocity -= n * dot;
 	}
+}
+
+Vector2f RigidBody2D::CalculateNextPosition(float32 dt)
+{
+	Vector2f pos = mp_Transform->GetPosition();
+	Vector2f nextPos = pos + m_Velocity * dt;
+	return nextPos;
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)

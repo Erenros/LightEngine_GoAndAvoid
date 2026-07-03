@@ -21,9 +21,13 @@ void GameManager::Loop()
 	{
  
 
-		PROFILER_START("Colliders", "Colliders Update");
+		//PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
+		
+		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+		InputManager::GetInstance().Update();
+		 
 		while (m_accDt >= fixedUpdateDT) 
 		{
 			m_accDt -= static_cast<float32>(fixedUpdateDT);
@@ -31,15 +35,14 @@ void GameManager::Loop()
 				m_loopTour++;
 			else
 			{
-				PhysicsManager::GetInstance().Update(m_Time.GetDeltaTime());
-				InputManager::GetInstance().Update();
-				SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+				UpdateRigidBodies(static_cast<float32> (fixedUpdateDT));
+				PhysicsManager::GetInstance().Update(fixedUpdateDT);
 			}
 			exec += 1;
 		}
 		PROFILER_END("Colliders");
 	
-		PROFILER_START("Entity", "Entity Creation / Deletion");
+		//PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
 		PROFILER_END("Entity");
 
@@ -144,6 +147,15 @@ void GameManager::Close()
 
 	delete mp_window;
 
+}
+
+void GameManager::UpdateRigidBodies(float32 dt)
+{
+	for (auto& entity : GetActiveEntities(SceneManager::GetInstance().m_CurrentSceneTag))
+	{
+		if (entity->IsRigidBody())
+			entity->GetRigidBody().Update(dt);
+	}
 }
 
 std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)

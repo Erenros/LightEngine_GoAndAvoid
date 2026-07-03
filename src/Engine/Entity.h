@@ -11,13 +11,6 @@
 
 class Collider;
 
-struct Target
-{
-	Vector2f position;
-	float distance = 0.f;
-	bool isSet = false;
-};
-
 class Entity
 {
 public:
@@ -41,7 +34,7 @@ public:
 	void SetStatic(bool isStatic);
 	void SetRenderSize(int shapeType, std::vector<float32> points);
 
-	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
+	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }  
 
 	void SetScale(Vector2f scale);
 	void ScaleBy(Vector2f factor);
@@ -83,6 +76,7 @@ public:
 public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
 	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, float32 rotation, Vector2f scale);
 

@@ -10,12 +10,8 @@ static int64 sId = 0;
 
 void Entity::Initialize(gcle::Shapes shape)
 {
-	m_Direction = { 0.0f, 0.0f };
-	m_Speed = 0.f;
 	m_ToDestroy = false;
 	m_Tag = -1;
-	m_Target;
-
 
 
 	mp_RenderShape = GetBaseShape(shape);
@@ -44,8 +40,6 @@ void Entity::Initialize() {
 
 	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
-
-	m_Target.isSet = false;
 
 	m_Id = sId++;
 
@@ -145,11 +139,16 @@ void Entity::RemoveCollider(Collider* pCollider)
 
 Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
 {
-	Collider* collider = GCLE_NEW  Collider();
-	collider->Initialize(GetBaseShape(shape), GetPosition() + relativePosition, rotation, this);
+	Collider* collider = GCLE_NEW Collider();
+
+	gcle::Shape* colliderShape = GetBaseShape(shape);
+	colliderShape->SetScale(scale);
+
+	collider->Initialize(colliderShape, mp_Shape->GetPosition() + relativePosition, rotation, this);
+
 	AddCollider(collider);
 	collider->SetActive(isActive);
-	collider->GetShape()->SetScale(scale);
+
 	return collider;
 }
 
@@ -197,16 +196,6 @@ bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 Vector2f Entity::GetPosition()
 {
 	return m_Transform.GetPosition();
-}
-
-void Entity::SetDirection(float32 x, float32 y, float32 speed)
-{
-	if (speed > 0)
-	{
-		m_Speed = speed;
-	}
-
-	m_Direction = { x, y };
 }
 
 void Entity::SetRigidBody(bool isRigidBody)

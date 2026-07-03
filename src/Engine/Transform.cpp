@@ -116,6 +116,17 @@ void Transform2D::SetPosition(Vector2f position)
 void Transform2D::SetScale(Vector2f scale)
 {
     m_Scale = scale;
+
+    if (mp_Parent != nullptr)
+    {
+        Vector2f parentScale = mp_Parent->GetScale();
+
+        m_ScaleRatioToParent = {
+            parentScale.x != 0.0f ? m_Scale.x / parentScale.x : 1.0f,
+            parentScale.y != 0.0f ? m_Scale.y / parentScale.y : 1.0f
+        };
+    }
+
     SetDirty();
 }
 
