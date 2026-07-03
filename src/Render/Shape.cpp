@@ -436,7 +436,16 @@ namespace gcle
 		}
 		else if (m_shape == Shapes::Circle)
 		{
-			//NON LES CERCLES C'EST PAS MARRANTS
+			float32 u0 = x / static_cast<float32>(textW);
+			float32 v0 = y / static_cast<float32>(textH);
+			float32 u1 = (x + w) / static_cast<float32>(textW);
+			float32 v1 = (y + h) / static_cast<float32>(textH);
+			m_verticies[0]->tex_coord = { (u0 + u1) * 0.5f, (v0 + v1) * 0.5f };
+			for (int i = 1; i < m_smoothness + 1; i++)
+			{
+				m_verticies[i]->tex_coord = { u0 + (u1 - u0) * 0.5f * (1.f + m_localPositions[i].x / m_radius),
+											  v0 + (v1 - v0) * 0.5f * (1.f + m_localPositions[i].y / m_radius) };
+			}
 		}
 	}
 }
