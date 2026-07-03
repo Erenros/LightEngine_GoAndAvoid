@@ -47,6 +47,7 @@ public:
 	bool IsColliding(Collider* pCollider1, Collider* pCollider2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
 	void ThrowRepulse(Collider* pCollider1, Collider* pCollider2);
+	bool IsQuadTreeActive() const;
 
 private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);

@@ -343,8 +343,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 	Entity* entityA = colliderA->GetOwner();
 	Entity* entityB = colliderB->GetOwner();
 
-	bool coliding = IsColliding(colliderA, colliderB);
-	std::cout << colliderA->GetShape()->GetWidth() << " " << colliderB->GetShape()->GetWidth() << std::endl;
+	bool coliding = IsColliding(colliderA, colliderB); 
 
 	if (coliding)
 	{
@@ -683,12 +682,12 @@ void PhysicsManager::ApplyContinuousCollisionResponse(Collider* movingCollider, 
 	float32 safeTime = std::max(0.0f, hit.time - 0.001f);
 	Vector2f safeCenter = start + motion * safeTime;
 
-	Vector2f ownerCenter = movingEntity->GetShape()->GetPosition(0.5f, 0.5f);
+	Vector2f ownerCenter = movingEntity->GetPosition();
 	Vector2f colliderCenter = movingCollider->GetShape()->GetPosition(0.5f, 0.5f);
 	Vector2f ownerToCollider = colliderCenter - ownerCenter;
 	Vector2f safeOwnerCenter = safeCenter - ownerToCollider;
 
-	movingEntity->SetPosition(safeOwnerCenter.x, safeOwnerCenter.y, 0.5f, 0.5f);
+	movingEntity->SetPosition(safeOwnerCenter.x, safeOwnerCenter.y);
 	movingEntity->GetRigidBody().RemoveVelocityAlongNormal(hit.normal);
 	movingCollider->CollidingOn(hit.normal);
 }

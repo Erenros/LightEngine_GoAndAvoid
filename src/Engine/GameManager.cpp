@@ -21,7 +21,7 @@ void GameManager::Loop()
 	{
  
 
-		//PROFILER_START("Colliders", "Colliders Update");
+		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
 		
@@ -35,14 +35,14 @@ void GameManager::Loop()
 				m_loopTour++;
 			else
 			{
-				UpdateRigidBodies(static_cast<float32> (fixedUpdateDT));
-				PhysicsManager::GetInstance().Update(fixedUpdateDT);
+				UpdateRigidBodies(static_cast<float32>(fixedUpdateDT));
+				PhysicsManager::GetInstance().Update(static_cast<float32>(fixedUpdateDT));
 			}
 			exec += 1;
 		}
 		PROFILER_END("Colliders");
 	
-		//PROFILER_START("Entity", "Entity Creation / Deletion");
+		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
 		PROFILER_END("Entity");
 

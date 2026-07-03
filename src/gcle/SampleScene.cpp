@@ -16,10 +16,10 @@ void SampleScene::OnInitialize()
 	pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetPosition(0, 0); 
 	pEntity->Rotate(0);
-	pEntity->SetRigidBody(true); 
-	pEntity->SetIsKinematic(true); 
+	pEntity->SetRigidBody(true);  
 	pEntity->GetRigidBody().SetDampingStrenght(0.9f);
-	pEntity->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
 	mp_mainCamera->SetFollowing(pEntity);
 
@@ -33,15 +33,14 @@ void SampleScene::OnInitialize()
 			entity->SetScale(0.2f);
 			entity->SetPosition(0.0f + i * 100, 0.0f + y * 100);
 			entity->SetRigidBody(true);
-			entity->GetRigidBody().SetGravity(false);
-			entity->SetIsKinematic(true);
+			entity->GetRigidBody().SetGravity(false); 
 			entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1.0f, 1.0f });
 			entity->SetStatic(true);
 		}
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
-	PhysicsManager::GetInstance().SetActivateQuadTree(false);
+	PhysicsManager::GetInstance().SetActivateQuadTree(true);
 	PhysicsManager::GetInstance().SetQuadTreePos1({ -50000, -50000 });
 	PhysicsManager::GetInstance().SetQuadTreePos2({ 50000, 50000 });
 }

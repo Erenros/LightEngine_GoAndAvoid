@@ -11,6 +11,13 @@
 
 class Collider;
 
+struct Target
+{
+	Vector2f position;
+	float distance = 0.f;
+	bool isSet = false;
+};
+
 class Entity
 {
 public:
@@ -32,9 +39,7 @@ public:
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 
 	void SetStatic(bool isStatic);
-	void SetRenderSize(int shapeType, std::vector<float32> points);
-
-	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }  
+	void SetRenderSize(int shapeType, std::vector<float32> points); 
 
 	void SetScale(Vector2f scale);
 	void ScaleBy(Vector2f factor);
@@ -68,17 +73,15 @@ public:
 	bool IsStatic() const;
 	bool IsColliding(Entity* other);
 	bool IsInside(Vector2f position);
-	bool ToDestroy() const { return m_ToDestroy; }
-	bool IsKinematic() const { return m_IsKinematic; }
+	bool ToDestroy() const { return m_ToDestroy; } 
 	bool IsTag(int32 tag) const { return m_Tag == tag; }
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 
 public:
 	void AddCollider(Collider* pCollider);
-	void RemoveCollider(Collider* pCollider);
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
+	void RemoveCollider(Collider* pCollider); 
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, float32 rotation, Vector2f scale);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
 
 public:
 	void AddActiveScene(const std::string& sceneTag);
@@ -114,8 +117,7 @@ protected:
 	int64			m_Id			= 0;
 	int32			m_Tag			= -1;
 	float32			m_Speed			= 0.f;
-	bool			m_ToDestroy		= false;
-	bool			m_IsKinematic	= true;
+	bool			m_ToDestroy		= false; 
 	Vector2f		m_Direction		= { 0.0f, 0.0f };
 
 private:

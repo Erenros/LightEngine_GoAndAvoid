@@ -142,9 +142,11 @@ Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f rel
 	Collider* collider = GCLE_NEW Collider();
 
 	gcle::Shape* colliderShape = GetBaseShape(shape);
-	colliderShape->SetScale(scale);
 
-	collider->Initialize(colliderShape, mp_Shape->GetPosition() + relativePosition, rotation, this);
+	Vector2f entityScale = m_Transform.GetScale();
+	colliderShape->SetScale({ scale.x * entityScale.x, scale.y * entityScale.y }); 
+
+	collider->Initialize(colliderShape, m_Transform.GetPosition() + relativePosition, rotation, this);
 
 	AddCollider(collider);
 	collider->SetActive(isActive);
@@ -198,6 +200,16 @@ Vector2f Entity::GetPosition()
 	return m_Transform.GetPosition();
 }
 
+void Entity::SetDirection(float32 x, float32 y, float32 speed)
+{
+	if (speed > 0)
+	{
+		m_Speed = speed;
+	}
+
+	m_Direction = { x, y };
+}
+
 void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
@@ -248,7 +260,12 @@ void Entity::SetRotation(Degrees angle)
 
 void Entity::Rotate(Degrees delta)
 {
-	m_Transform.SetDegAngle(static_cast<float32>(static_cast<int32>(m_Transform.GetDegAngle() + delta) % 360));
+	Degrees newAngle = m_Transform.GetDegAngle() + delta;
+	newAngle = std::fmod(newAngle, 360.0f);
+	if (newAngle < 0.0f)
+		newAngle += 360.0f;
+
+	m_Transform.SetDegAngle(newAngle);
 }
 
 void Entity::SetTexture(const std::string& id) {
@@ -326,7 +343,7 @@ Vector2f Entity::GetRenderPosition()
 
 bool Entity::IsStatic() const
 {
-	return m_isStatic;
+	return !m_isStatic;
 }
 
 bool Entity::IsColliding(Entity* other)
