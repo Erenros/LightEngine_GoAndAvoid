@@ -4,13 +4,7 @@
 
 SceneManager::~SceneManager()
 {
-    for (auto& scene : m_Scenes)
-    {
-        delete scene.second;
-        scene.second = nullptr;
-    }
-
-    m_Scenes.clear();
+    DeleteAllScenes();
 }
 
 Scene* SceneManager::GetCurrentScene() {
@@ -122,6 +116,18 @@ void SceneManager::DrawCurrentSceneDebug(Window* pWindow)
     }
 }
 
+void SceneManager::DeleteAllScenes()
+{
+    for (auto& scene : m_Scenes)
+    {
+        delete scene.second;
+        scene.second = nullptr;
+    }
+    m_Scenes.clear();
+    m_CurrentSceneTag = "";
+    m_PreviousSceneTag = "";
+}
+
 void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
     Scene* currentScene = m_Scenes[m_CurrentSceneTag];
     Scene* newScene = m_Scenes[newSceneId];
@@ -129,8 +135,7 @@ void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
 
     for (auto& texture : currentScene->m_activeTextures) {
         if (std::find(newScene->m_activeTextures.begin(), newScene->m_activeTextures.end(), texture) != newScene->m_activeTextures.end()) {
-            m_activatedTextures.push_back(texture);
-            GCLE_INFO << "don't change " << texture << ENDL;
+            m_activatedTextures.push_back(texture); 
             continue;
         }
         else {

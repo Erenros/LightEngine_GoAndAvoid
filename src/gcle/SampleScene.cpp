@@ -9,35 +9,35 @@
 void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
-	 
-	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	pEntity->SetTexture(tex);
-	pEntity->SetScale(0.5f);
-	pEntity->SetRigidBody(true);*/
-	 
+	 	 
 	std::string text = "Test";
-	CreateText(text, 40, 40, 20, 20);
+	CreateText(text, { 40, 40 }, 50);
 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->SetPosition(0, 0); 
-	entity1->Rotate(45);
-	entity1->SetRigidBody(true); 
-	entity1->SetIsKinematic(true); 
-	entity1->GetRigidBody().SetDampingStrenght(0.9);
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 45.0f, { 1.0f, 1.0f }); 
+	pEntity = CreateEntity<Player>(gcle::Shapes::Circle);
+	pEntity->SetPosition(0, 0); 
+	pEntity->Rotate(0);
+	pEntity->SetRigidBody(true);  
+	pEntity->GetRigidBody().SetDampingStrenght(0.9f);
+	pEntity->SetTexture("images");
+	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
-	mp_mainCamera->SetFollowing(entity1);
+	mp_mainCamera->SetFollowing(pEntity);
 
 	pSceneCamera = CreateCamera();
 
-
-	for (int32 i = 0; i < 500; i++) {
-		Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-		entity->SetPosition(-49000.0f + (i * 100.0f), -49000.0f + (i * 100.0f));
-		entity->SetRigidBody(true);
-		entity->GetRigidBody().SetGravity(false);
-		entity->SetIsKinematic(true);
-		entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0,  { 1, 1 });
+	for (int32 i = 0; i < 50; i++) 
+	{
+		for (int32 y = 0; y < 10; y++)
+		{
+			Entity* entity = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+			entity->SetScale(0.2f);
+			entity->SetPosition(0.0f + i * 100, 0.0f + y * 100);
+			entity->SetRigidBody(true);
+			entity->GetRigidBody().SetGravity(false); 
+			entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1.0f, 1.0f });
+			entity->SetStatic(true);
+		}
 	}
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
@@ -59,6 +59,6 @@ void SampleScene::OnUpdate(Clock& time)
 		else
 		{
 			SwitchCamera(pSceneCamera);
-		}
+		} 
 	}
 } 

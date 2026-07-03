@@ -66,6 +66,9 @@ namespace GCLE
 		void Output(const std::string& str);
 
 		void OutputError(const ErrorReport& report);
+
+		void OutputSysConfig();
+
 	public:
 
 		static void Init(DebuggerDesc* pDesc);

@@ -1,10 +1,22 @@
 #include "Debugger.h"
 
+#include "include.h"
 #include <iostream>
 
 #include <sstream>
+#include <iomanip>
+
 #include <windows.h>
+#include <iphlpapi.h>
+#include <stdio.h>
+
+#include <d3d11.h>
+#include <dxgi.h>
+
 #pragma comment(lib, "user32.lib")
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
 
 namespace GCLE
 {
@@ -22,7 +34,7 @@ namespace GCLE
 		{
 			std::cout << str;
 		}
-		if (m_CurrentInputMode == DebuggerInputMode::ERR) m_Errors.back().msg += str;
+		if (m_CurrentInputMode & DebuggerInputMode::ERR) m_Errors.back().msg += str;
 		if (m_Output & DebuggerOutput::LOGS)
 		{
 			m_LogFile << str;
@@ -41,6 +53,137 @@ namespace GCLE
 		SelfRef() << "==================================" << ENDL;
 	}
 
+	void Debugger::OutputSysConfig()
+	{
+		Debugger& ref = Debugger::SelfRef();
+		GCLE_INFO << "Hardware information:\n";
+
+#ifdef WIN32
+
+
+		// CPU name
+		char cpuName[256]{};
+		DWORD size = sizeof(cpuName);
+
+		RegGetValueA(
+			HKEY_LOCAL_MACHINE,
+			"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+			"ProcessorNameString",
+			RRF_RT_REG_SZ,
+			nullptr,
+			cpuName,
+			&size
+		);
+
+		GCLE_INFO << "  CPU name: " << cpuName << ENDL;
+		 
+		// Processor number
+		SYSTEM_INFO siSysInfo{};
+		GetSystemInfo(&siSysInfo);
+		GCLE_INFO << "  Number of logical core: " << siSysInfo.dwNumberOfProcessors << ENDL;
+		
+		DWORD length = 0;
+		 
+		GetLogicalProcessorInformationEx(RelationProcessorCore, nullptr, &length);
+
+		std::vector<BYTE> buffer(length);
+
+		PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX info =
+			reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer.data());
+
+		if (GetLogicalProcessorInformationEx(RelationProcessorCore, info, &length))
+		{
+			DWORD physicalCores = 0;
+
+			BYTE* ptr = buffer.data();
+			BYTE* end = ptr + length;
+
+			while (ptr < end)
+			{
+				auto* entry = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(ptr);
+
+				++physicalCores;
+
+				ptr += entry->Size;
+			}
+
+			GCLE_INFO << "  Number of physical cores : " << physicalCores << ENDL;
+		}
+		 
+		// MAC Address
+		GCLE_INFO << "  MAC Address: " << ENDL;
+		ULONG bufferSize = 0;
+		 
+		if (GetAdaptersInfo(nullptr, &bufferSize) == ERROR_BUFFER_OVERFLOW)
+		{
+			PIP_ADAPTER_INFO adapterInfo = (PIP_ADAPTER_INFO)malloc(bufferSize);
+
+			if (adapterInfo)
+			{
+				if (GetAdaptersInfo(adapterInfo, &bufferSize) == NO_ERROR)
+				{
+					for (PIP_ADAPTER_INFO adapter = adapterInfo; adapter != nullptr; adapter = adapter->Next)
+					{
+						GCLE_INFO << "		Name : " << adapter->Description << ENDL;
+
+						std::ostringstream mac;
+
+						for (UINT i = 0; i < adapter->AddressLength; ++i)
+						{
+							if (i != 0)
+								mac << ":";
+
+							mac << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(adapter->Address[i]);
+						}
+
+						std::string macAddress = mac.str();
+
+						GCLE_INFO << "		MAC : " << macAddress << ENDL;
+					}
+				}
+
+				free(adapterInfo);
+			}
+		}  
+
+		// GPU
+		IDXGIFactory1* factory = nullptr;
+		CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+
+		IDXGIAdapter1* adapter = nullptr;
+
+
+		for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i)
+		{
+			DXGI_ADAPTER_DESC1 desc;
+			adapter->GetDesc1(&desc);
+
+			std::wstring ws(desc.Description);
+			std::string name(ws.begin(), ws.end());
+
+			if (strcmp(name.c_str(), "Microsoft Basic Render Driver") == 0)
+			{
+				GCLE_INFO << "	GPU : Couldn't be found !" << ENDL;
+				GCLE_INFO << "	Look if your GPU drivers are installed or if a graphic card is detected in the task manager" << ENDL;
+			}
+			else
+			{
+				GCLE_INFO << "	GPU : " << name << ENDL;
+				GCLE_INFO << "	VRAM : " << desc.DedicatedVideoMemory / (static_cast<uint64>(1024) * 1024) << " MB" << ENDL;
+				GCLE_INFO << "	Flags : " << desc.Flags << ENDL;
+			}
+
+			adapter->Release();
+			break;
+		}
+
+		factory->Release();
+
+#else
+GCLE_INFO << "	Debug System was only defined for windows" << ENDL;
+#endif
+	}
+
 	void Debugger::Init(DebuggerDesc* pDesc)
 	{
 		if (m_IsInit) return;
@@ -54,20 +197,9 @@ namespace GCLE
 		}
 
 		m_IsInit = true;
-
-		SYSTEM_INFO siSysInfo{};
-		GetSystemInfo(&siSysInfo);
-
+		 
 		Debugger& ref = Debugger::SelfRef();
-		GCLE_INFO << "Hardware information:\n";
-		GCLE_INFO << "  OEM ID: " << siSysInfo.dwOemId << ENDL;
-		GCLE_INFO << "  Number of processors: " << siSysInfo.dwNumberOfProcessors << ENDL;
-		GCLE_INFO << "  Page size: " << siSysInfo.dwPageSize << ENDL;
-		GCLE_INFO << "  Processor type: " << siSysInfo.dwProcessorType << ENDL;
-		GCLE_INFO << "  Minimum application address: " << siSysInfo.lpMinimumApplicationAddress << ENDL;
-		GCLE_INFO << "  Maximum application address: " << siSysInfo.lpMaximumApplicationAddress << ENDL;
-		GCLE_INFO << "  Active processor mask: " << static_cast<unsigned long long>(siSysInfo.dwActiveProcessorMask) << ENDL;
-
+		ref.OutputSysConfig();
 	}
 
 	Debugger& Debugger::StartWithInputMode(DebuggerInputMode inputMode)

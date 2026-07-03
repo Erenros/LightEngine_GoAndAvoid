@@ -2,6 +2,7 @@
 #include "Font.h"
 #include <string>
 #include "PrimitiveTypes.h"
+#include "include.h"
 
 class Window;
 struct SDL_Texture;
@@ -22,21 +23,26 @@ private:
 	SDL_Rect* mp_rect = nullptr;
 	
 	bool m_needToChange = false;
-
+	int32 m_fontSize = 24;
 public:
 
 	SDL_Texture* CreateTexture(Window* window);
 	SDL_Rect* GetSDLRect() { return mp_rect; };
 
-	Text(Font* font,const std::string& text, int x, int y, int w, int h, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	Text(Font* font,const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	
 	~Text();
 
-	void SetColor(byte r = 255,byte g = 255, byte b = 255, byte a = 255);
+	void SetColor(byte r,byte g, byte b, byte a = 255);
 	void SetFont(const std::string& id);
 	void SetText(const std::string& text);
 
 	void SetPosition(int x, int y);
-	void SetWidth(int w)		  ;
-	void SetHeight(int h);
+
+
+	Font* GetFont();
+	void SetFontSize(int32 size);
+	int32 GetFontSize();
+
+	Vector2f GetSizes();
 };

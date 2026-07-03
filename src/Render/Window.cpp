@@ -1,21 +1,17 @@
-#include "Window.h"
+#include "Window.h" 
 #include <iostream>
 #include <vector>
+
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
 #include "SDL_video.h"
 #include "SDL_image.h"
-#include "Render/Text.h"
-#include "Texture.h"
- 
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <backends/imgui_impl_sdl2.h> 
-#include <backends/imgui_impl_sdlrenderer2.h> 
 
-#include "Engine/Entity.h"
 #include "Shape.h"
+#include "Texture.h" 
+#include "Render/Text.h"
+#include "Engine/Entity.h"
 #include "Engine/GameManager.h"
 
 constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
@@ -82,125 +78,20 @@ void Window::Create(const char* pName,int32 width, int32 height, uint32 windowFl
 
 	SDL_SetRenderTarget(mp_Renderer, NULL);
 
-
-	//InitImGUI();
+	mp_dst = new SDL_Rect(); 
 }
 
 Vector2f Window::GetMousePositionOnRenderTarget()
 {
-	Vector2u mousePos = GetMousePosition(); 
-	Vector2f windowSize = GetWindowSize();   
+	Vector2u mousePos = GetMousePosition();
 
-	float32 scaleX = RENDER_TARGET_WIDTH / windowSize.x;
-	float32 scaleY = RENDER_TARGET_HEIGHT / windowSize.y;
+	float32 scaleX = RENDER_TARGET_WIDTH / static_cast<float32>(mp_dst->w);
+	float32 scaleY = RENDER_TARGET_HEIGHT / static_cast<float32>(mp_dst->h);
 
-	return Vector2f{
-		static_cast<float32>(mousePos.x) * scaleX,
-		static_cast<float32>(mousePos.y) * scaleY
-	};
-}
+	float32 x = (static_cast<float32>(mousePos.x) - mp_dst->x) * scaleX;
+	float32 y = (static_cast<float32>(mousePos.y) - mp_dst->y) * scaleY;
 
-void Window::InitImGUI()
-{
-	IMGUI_CHECKVERSION();
-
-	ImGui::CreateContext();
-	 
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-	ImGui::StyleColorsDark();
-
-	ImGui_ImplSDL2_InitForSDLRenderer(mp_Window, mp_Renderer);
-	ImGui_ImplSDLRenderer2_Init(mp_Renderer);
-}
-
-void Window::StartImGUIFrame()
-{
-	/*ImGui_ImplSDLRenderer2_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-
-	ImGui::NewFrame();*/
-}
-
-void Window::ImGUIUpdate()
-{
-	/*ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
-	ImGui::SetNextWindowViewport(viewport->ID);
-
-	ImGuiWindowFlags flags =
-		ImGuiWindowFlags_NoDocking |
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_MenuBar;
-
-	ImGui::Begin("DockRoot", nullptr, flags);
-	 
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("Debug"))
-		{
-			if (ImGui::MenuItem("Gizmo"))
-				GameManager::GetInstance().SetGizmoVisualState();
-
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
-	 
-	ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-	ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
-
-	static bool init = false;
-	if (!init)
-	{
-		init = true;
-		ImGui::DockBuilderRemoveNode(dockspace_id);
-		ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
-
-		ImGuiID center = dockspace_id;
-
-		ImGui::DockBuilderDockWindow("Scene", center);
-
-		ImGui::DockBuilderFinish(dockspace_id);
-	}
-	 
-	ImGui::End();
-
-
-	if (ImGui::Begin("Scene"))
-	{
-		ImVec2 avail = ImGui::GetContentRegionAvail();
-
-		const float aspect = 1920.0f / 1080.0f;
-
-		float width = avail.x;
-		float height = width / aspect;
-
-		if (height > avail.y)
-		{
-			height = avail.y;
-			width = height * aspect;
-		}
-
-		ImVec2 cursor = ImGui::GetCursorPos();
-
-		ImGui::SetCursorPos(ImVec2(
-			cursor.x + (avail.x - width) * 0.5f,
-			cursor.y + (avail.y - height) * 0.5f
-		));
-
-		ImGui::Image((ImTextureID)mp_RenderTarget, ImVec2(width, height));
-	}
-
-	ImGui::End();
-
-	ImGui::Render();*/
+	return Vector2f{ x, y };
 }
 
 void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
@@ -208,12 +99,8 @@ void Window::ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a)
 	SDL_SetRenderDrawColor(mp_Renderer, r, g, b, a); 
 }
 
-void Window::End(){
-
-	//ImGui_ImplSDLRenderer2_Shutdown();
-	//ImGui_ImplSDL2_Shutdown();
-	//ImGui::DestroyContext();
-
+void Window::End()
+{ 
 
 	SDL_DestroyTexture(mp_RenderTarget);
 	SDL_DestroyRenderer(mp_Renderer);
@@ -223,20 +110,39 @@ void Window::End(){
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
+
+	delete mp_dst;
+	mp_dst = nullptr;
 }
 
 void Window::Present()
-{ 
-	//SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
-	//SDL_RenderClear(mp_Renderer);
-
-	//ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mp_Renderer);
+{
 	SDL_SetRenderTarget(mp_Renderer, nullptr);
-	 
+
 	SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
 	SDL_RenderClear(mp_Renderer);
-	 
-	SDL_RenderCopy(mp_Renderer, mp_RenderTarget, nullptr, nullptr);
+
+	int windowW, windowH;
+	SDL_GetWindowSize(mp_Window, &windowW, &windowH);
+
+	constexpr float32 aspect = 1920.f / 1080.f; 
+
+	if (static_cast<float32>(windowW) / windowH > aspect)
+	{
+		mp_dst->h = windowH;
+		mp_dst->w = static_cast<int32>(windowH * aspect);
+		mp_dst->x = (windowW - mp_dst->w) / 2;
+		mp_dst->y = 0;
+	}
+	else
+	{
+		mp_dst->w = windowW;
+		mp_dst->h = static_cast<int32>(windowW / aspect);
+		mp_dst->x = 0;
+		mp_dst->y = (windowH - mp_dst->h) / 2;
+	}
+
+	SDL_RenderCopy(mp_Renderer, mp_RenderTarget, nullptr, mp_dst);
 
 	SDL_RenderPresent(mp_Renderer);
 }
@@ -256,7 +162,7 @@ void Window::DrawTextOnRenderer(Text* text)
 	if (texture == nullptr)
 		return;
 
-	DrawOnRenderer(texture, nullptr,text->GetSDLRect());
+	DrawOnRenderer(texture, nullptr, text->GetSDLRect());
 }
 
 void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_Rect* srcrect, SDL_Rect* dstrect){
@@ -284,7 +190,8 @@ void Window::Draw(gcle::Shape* pShape)
 }
 
 bool Window::IsInsideWindow(Entity* entity){ 
-
+	if (entity->GetRenderShape() == nullptr)
+		return false;
 	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 	
@@ -302,7 +209,7 @@ bool Window::IsInsideWindow(Entity* entity){
 	return windowAABB.overlaps(entityAABB);
 }
 
-void Window::DrawDebug(gcle::Shape* pShape)
+void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
 {
 	std::vector<SDL_FPoint*> pointsPtr;
 
@@ -313,29 +220,26 @@ void Window::DrawDebug(gcle::Shape* pShape)
 		auto pSh = static_cast<gcle::Rectangle*>(pShape);
 		pointsPtr = pSh->GetHollow();
 		break;
-	} 
+	}
 	case gcle::Shapes::Circle:
 	{
 		pointsPtr = (static_cast<gcle::Circle*>(pShape))->GetHollow();
 		break;
-	} 
+	}
 	case gcle::Shapes::Triangle:
 	{
 		pointsPtr = (static_cast<gcle::Triangle*>(pShape))->GetHollow();
 		break;
 	}
-
 	default:
 		break;
 	}
-
-
 
 	std::vector<SDL_FPoint> points;
 	points.reserve(pointsPtr.size());
 	for (SDL_FPoint* p : pointsPtr)
 	{
-		points.push_back(*p);
+		points.push_back(SDL_FPoint{ p->x + offset.x, p->y + offset.y });
 	}
 
 	SDL_RenderDrawLinesF(mp_Renderer, points.data(), static_cast<int32>(points.size()));

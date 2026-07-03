@@ -1,10 +1,7 @@
 #include "Event.h"
 
 #include <SDL.h>
-#include "Engine/GameManager.h"
-
-#include <imgui.h>
-#include <backends/imgui_impl_sdl2.h> 
+#include "Engine/GameManager.h" 
 
 bool Event::WindowEvent()
 {
@@ -24,9 +21,7 @@ bool Event::WindowEvent()
 				pWindow->m_width = static_cast<uint32>(pWindow->GetWindowSize().x);
 				pWindow->m_height = static_cast<uint32>(pWindow->GetWindowSize().y);
 			}
-		}
-
-		//ImGui_ImplSDL2_ProcessEvent(&event);
+		} 
 	}
 	return false;
 }

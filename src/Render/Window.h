@@ -52,10 +52,7 @@ public:
 		uint32 rendererFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED,
 		int32 x = 0, 
 		int32 y = 0
-	);
-
-	void StartImGUIFrame();
-	void ImGUIUpdate();
+	); 
 
 	void ClearWindowWithColor(uint8 r, uint8 g, uint8 b, uint8 a);
 
@@ -72,7 +69,7 @@ public:
 	void DrawOnRenderer(SDL_Texture* texture, SDL_Rect* srcrect, SDL_Rect* dstrect); 
 	void Draw(gcle::Shape* pShape);
 	
-	void DrawDebug(gcle::Shape* pShape);
+	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f });
 
 public: 
 	Vector2u GetMousePosition();
@@ -82,13 +79,13 @@ public:
 public:
 	bool IsInsideWindow(Entity* entity);
 	
-private:
-	void InitImGUI();
+private: 
 
 private:
 	SDL_Window* mp_Window = nullptr;
 	SDL_Renderer* mp_Renderer = nullptr;
 	SDL_Texture* mp_RenderTarget = nullptr;
+	SDL_Rect* mp_dst;
 	uint32 m_width, m_height = 0;
 
 private:

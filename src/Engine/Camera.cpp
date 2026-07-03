@@ -1,7 +1,14 @@
 #include "GameManager.h"
 #include "Camera.h"
+#include "WorldText.h"
 
 static uint64 sId = 0;
+
+Camera::~Camera()
+{
+	mp_Window = nullptr;
+	m_followingEntity = nullptr;
+}
 
 void Camera::Init(Window* pWindow)
 {
@@ -46,12 +53,19 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 		for (Entity* entity : layer)
 		{
 			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
-				entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
+				if (entity->GetRenderShape() != nullptr) {
+					entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
 
-				Vector2f realScale = entity->GetScale();
-				entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
-				entity->GetRenderShape()->SetRotation(entity->GetRotation());
+					Vector2f realScale = entity->GetScale();
+					entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+					entity->GetRenderShape()->SetRotation(entity->GetRotation());
+				}
+				else if (entity->IsWorldText()) {
+					WorldText* text = static_cast<WorldText*>(entity);
+					text->SetRenderPosition((text->GetPosition() - GetPosition()) + screenMiddle);
+				}
 			}
+			
 		}
 	}
 }

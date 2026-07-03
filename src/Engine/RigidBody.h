@@ -6,6 +6,12 @@
 
 #undef max
 
+enum class CollisionDetectionMode
+{
+	Discrete,
+	Continuous
+};
+
 class RigidBody2D
 {
 public:
@@ -41,8 +47,8 @@ public:
 	void ZeroVelocityX(bool right);
 	void ZeroVelocityY(bool down);
 
-	void ZeroVelocityX() { m_Velocity.x = 0; /*m_TempVelHasChanged = true;*/ }
-	void ZeroVelocityY() { m_Velocity.y = 0; /*m_TempVelHasChanged = true; */}
+	void ZeroVelocityX() { m_Velocity.x = 0;}
+	void ZeroVelocityY() { m_Velocity.y = 0;}
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
@@ -50,10 +56,20 @@ public:
 	void SetDampingOnXAxis(Vector2f strenght) { m_Friction = strenght; }
 	void SetDampingOnYAxis(Vector2f strenght) { m_Friction = strenght; }
 
+	Vector2f CalculateNextPosition(float32 dt);
+	bool UseContinuousCollision() const;
+
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
 	void ApplyGravity(float32 dt);
+
+private:
+	CollisionDetectionMode m_CollisionDetectionMode = CollisionDetectionMode::Discrete;
+
+public:
+	void SetCollisionDetectionMode(CollisionDetectionMode mode) {m_CollisionDetectionMode = mode;}
+	void SetCollisionOnContinuous() {m_CollisionDetectionMode = CollisionDetectionMode::Continuous;}
 
 private:
 	Vector2f m_Position;

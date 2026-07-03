@@ -4,7 +4,6 @@
 #include "Debugger.h"
 #include "Vector2.hpp"
 
-using Vector2f = Vector2<float32>;
 using Radians = float32;
 
 
@@ -116,5 +115,5 @@ struct AABB {
     }
 };
 
-AABB GetRotatedAABB(Vector2f center, Vector2f halfSize, Radians rotation);
+AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians rotation);
 

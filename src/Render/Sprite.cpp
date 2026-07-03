@@ -13,10 +13,13 @@ Sprite::Sprite(Window* window, const std::string& path)
 	if (!IsTextureInit())
 		return;
 
-	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
+	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height); 
 }
 
+Sprite::Sprite(Window* window, Asset* asset)
+{
+	InitTextureWithBuffer(window, asset);
+}
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
@@ -41,6 +44,13 @@ void Sprite::PlayAnimation(const std::string& id)
 }
 
 
+Sprite::~Sprite()
+{
+	for (auto& pair : m_animationMap)
+		delete pair.second;
+	m_animationMap.clear();
+}
+
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 {
 	Animation* anim = mp_currentAnimation;
@@ -53,13 +63,46 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 		return;
 
 	m_timer = 0;
+	anim->m_frameId++;
 
 	m_currentFrameX++;
-	if (m_currentFrameX > anim->m_lastFrame)
+	if (m_currentFrameX > anim->m_lastFrame) {
 		m_currentFrameX = anim->m_firstFrame;
+		anim->m_frameId = 0;
+	}
 
-	int x = m_currentFrameX * anim->m_tileW;
-	int y = m_currentFrameY * anim->m_tileH;
+
+	int32 x = m_currentFrameX * anim->m_tileW;
+	int32 y = m_currentFrameY * anim->m_tileH;
+
+	if (anim->m_animationFunction.find(anim->m_frameId) != anim->m_animationFunction.end()) {
+		anim->m_animationFunction[anim->m_frameId]();
+	}
 
 	shape->SetTextureRect(x, y, anim->m_tileW, anim->m_tileH, m_width, m_height);
+}
+
+
+void Sprite::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+	auto it = m_animationMap.find(animation);
+	if (it == m_animationMap.end())
+		return;
+	
+	Animation* anim = m_animationMap[animation];
+	if (anim->m_animationFunction.find(frame) != anim->m_animationFunction.end())
+		return;
+	anim->m_animationFunction[frame] = function;
+}
+
+void Sprite::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
+	auto it = m_animationMap.find(animation);
+	if (it == m_animationMap.end())
+		return;
+
+	Animation* anim = it->second;
+
+	auto itFunction = anim->m_animationFunction.find(frame);
+	if (itFunction != anim->m_animationFunction.end()) {
+		anim->m_animationFunction.erase(itFunction);
+	}
 }
