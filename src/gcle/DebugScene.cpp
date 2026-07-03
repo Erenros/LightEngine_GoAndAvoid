@@ -20,7 +20,7 @@ void DebugScene::OnInitialize()
 	entity1->SetRotation(0);
 	entity1->SetRigidBody(true);
 	entity1->GetRigidBody().SetGravity(10, true);
-	entity1->GetRigidBody().SetMaxSpeed(10000);
+	entity1->GetRigidBody().SetMaxSpeed(1000000);
 	entity1->SetIsStatic(true);
 	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {1, 1});
 	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
@@ -32,7 +32,7 @@ void DebugScene::OnInitialize()
 	entity2->SetRotation(0);
 	entity2->SetRigidBody(true);
 	entity2->SetIsStatic(false);
-	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 0.3});
+	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 1});
 	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
 
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
