@@ -81,7 +81,7 @@ private:
 	void	EntityInfoVisibility(const int32 debugConstant);
 	void	DebugSetEntityInfo();
 
-	void	SetDebugInfo(DebugInformation& info) const;
+	void	SetDebugInfo() const;
 
 
 protected:
@@ -100,15 +100,16 @@ private:
 
 private:
 	// DEBUG
-	bool m_isVisualDebugActive = false;
-	bool m_debug = false;
-	bool m_debugPerf = false;
-	bool m_frustrumCulling = true;
-	int32 m_updateDebug = 0;
+	bool	m_debug = false;
+	int32	m_updateDebug = 0;
+	uint64	m_numberOfDraw = 0;
+	bool	m_debugPerf = false;
+	bool	m_frustrumCulling = true;
+	bool	m_isVisualDebugActive = false;
 
-	std::vector<Text*> m_debugInfoTexts;
-	std::vector<Text*> m_debugTexts;
-	Entity* m_selectedEntity = nullptr;
+	std::vector<Text*>	m_debugTexts;
+	std::vector<Text*>	m_debugInfoTexts;
+	Entity*				m_selectedEntity = nullptr;
 
 	Text* mp_Position			= nullptr;
 	Text* mp_PosX				= nullptr;
@@ -141,6 +142,9 @@ private:
 
 	Text*  mp_QuadTree			= nullptr;
 	Text*  mp_FrustrumCulling	= nullptr;
+
+	Text*  mp_NumberDraw		= nullptr;
+	Text*  mp_NumberDrawP	= nullptr;
 
 private: 
 	friend class GameManager;

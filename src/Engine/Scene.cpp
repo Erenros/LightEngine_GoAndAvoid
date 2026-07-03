@@ -39,8 +39,9 @@ void Scene::DrawDebug(Window* window)
 }
 
 
-void Scene::Draw(Window* window) {
-	int i = 0;
+void Scene::Draw(Window* window) 
+{
+	m_numberOfDraw = 0;
 	for (auto& layer : GameManager::GetInstance().m_entities) {
 		for(Entity* e : layer){
 			if (window->IsInsideWindow(e) && e->GetRenderShape() != nullptr && m_frustrumCulling) 
@@ -48,7 +49,7 @@ void Scene::Draw(Window* window) {
 				if (e->IsActiveIn(m_tag)) 
 				{
 					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
-					i++;
+					m_numberOfDraw++;
 				}
 			}
 			else if (e->GetRenderShape() != nullptr)
@@ -56,7 +57,7 @@ void Scene::Draw(Window* window) {
 				if (e->IsActiveIn(m_tag))
 				{
 					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
-					i++;
+					m_numberOfDraw++;
 				}
 			}
 			else if (e->IsWorldText()) 
@@ -65,14 +66,17 @@ void Scene::Draw(Window* window) {
 				{
 					WorldText* text = static_cast<WorldText*>(e);
 					GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(text->GetText());
-					i++;
+					m_numberOfDraw++;
 				}
 			}
 		}
 	}
 
 	for (Text* t : m_texts)
+	{
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+		m_numberOfDraw++;
+	}
 
 	if (m_debug && m_selectedEntity != nullptr)
 	{
@@ -331,6 +335,9 @@ void Scene::OnInitialize()
 
 	mp_QuadTree				= CreateDebugText("QuadTree"		, { 1280,	1000 },		25,		0  , 225, 0);
 	mp_FrustrumCulling      = CreateDebugText("FrustrumCulling"	, { 1420,	1000 },		25,		0  , 225, 0);
+
+	mp_NumberDraw			= CreateDebugText("Number To Draw: ", {1085, 1050},			25,		255, 255, 255);
+	mp_NumberDrawP			= CreateDebugText(""				, {1350, 1050},			25,		255, 255, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
@@ -384,6 +391,9 @@ void Scene::OnUpdate(Clock& time)
 	{
 		mp_FPS->SetText(std::to_string(time.GetFramePerSecond()));
 	}
+
+	if (m_debugPerf)
+		SetDebugInfo();
 	
 	EntityInfoVisibility(DEBUG_UPDATE);
 	DebugSetEntityInfo(); 
@@ -418,14 +428,10 @@ void Scene::SwitchCamera(Camera* pCamera)
 	}
 }
 
-void Scene::SetDebugInfo(DebugInformation& info) const
+void Scene::SetDebugInfo() const
 {
 	if (m_debugPerf && m_updateDebug >= 4)
 	{
-		float32 totalTime = info.Colliders + info.Draw + info.Entity + info.Input + info.SceneUpdate;
-
-
-
 		auto FormatMs = +[](float value)
 		{
 			std::ostringstream oss;
@@ -433,11 +439,13 @@ void Scene::SetDebugInfo(DebugInformation& info) const
 			return oss.str();
 		};
 
-		mp_CollidersP->SetText(	FormatMs(info.Colliders)	+ "ms");
-		mp_DrawP->SetText(		FormatMs(info.Draw)			+ "ms");
-		mp_EntityP->SetText(	FormatMs(info.Entity)		+ "ms");
-		mp_InputP->SetText(		FormatMs(info.Input)		+ "ms");
-		mp_UpdateP->SetText(	FormatMs(info.SceneUpdate)	+ "ms");
+		mp_CollidersP->SetText(	FormatMs(PROFILER_GET("Colliders"))	+ "ms");
+		mp_EntityP->SetText(	FormatMs(PROFILER_GET("Entity"))	+ "ms");
+		mp_InputP->SetText(		FormatMs(PROFILER_GET("Input"))		+ "ms");
+		mp_UpdateP->SetText(	FormatMs(PROFILER_GET("SceneU"))	+ "ms");
+		mp_DrawP->SetText(		FormatMs(PROFILER_GET("SceneD"))	+ "ms");
+
+		mp_NumberDrawP->SetText(std::to_string(m_numberOfDraw));
 	}
 }
 

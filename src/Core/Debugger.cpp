@@ -58,6 +58,9 @@ namespace GCLE
 		Debugger& ref = Debugger::SelfRef();
 		GCLE_INFO << "Hardware information:\n";
 
+#ifdef WIN32
+
+
 		// CPU name
 		char cpuName[256]{};
 		DWORD size = sizeof(cpuName);
@@ -121,7 +124,7 @@ namespace GCLE
 				{
 					for (PIP_ADAPTER_INFO adapter = adapterInfo; adapter != nullptr; adapter = adapter->Next)
 					{
-						GCLE_INFO << "   Name : " << adapter->Description << ENDL;
+						GCLE_INFO << "		Name : " << adapter->Description << ENDL;
 
 						std::ostringstream mac;
 
@@ -135,7 +138,7 @@ namespace GCLE
 
 						std::string macAddress = mac.str();
 
-						GCLE_INFO << "   MAC : " << macAddress << ENDL;
+						GCLE_INFO << "		MAC : " << macAddress << ENDL;
 					}
 				}
 
@@ -149,6 +152,7 @@ namespace GCLE
 
 		IDXGIAdapter1* adapter = nullptr;
 
+
 		for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i)
 		{
 			DXGI_ADAPTER_DESC1 desc;
@@ -159,20 +163,25 @@ namespace GCLE
 
 			if (strcmp(name.c_str(), "Microsoft Basic Render Driver") == 0)
 			{
-				GCLE_INFO << "GPU : Couldn't be found !" << ENDL;
-				GCLE_INFO << "Look if your GPU drivers are installed or if a graphic card is detected in the task manager" << ENDL;
+				GCLE_INFO << "	GPU : Couldn't be found !" << ENDL;
+				GCLE_INFO << "	Look if your GPU drivers are installed or if a graphic card is detected in the task manager" << ENDL;
 			}
 			else
 			{
-				GCLE_INFO << "GPU : " << name << ENDL;
-				GCLE_INFO << "VRAM : " << desc.DedicatedVideoMemory / (static_cast<uint64>(1024) * 1024) << " MB" << ENDL;
-				GCLE_INFO << "Flags : " << desc.Flags << ENDL;
+				GCLE_INFO << "	GPU : " << name << ENDL;
+				GCLE_INFO << "	VRAM : " << desc.DedicatedVideoMemory / (static_cast<uint64>(1024) * 1024) << " MB" << ENDL;
+				GCLE_INFO << "	Flags : " << desc.Flags << ENDL;
 			}
 
 			adapter->Release();
+			break;
 		}
 
 		factory->Release();
+
+#else
+GCLE_INFO << "	Debug System was only defined for windows" << ENDL;
+#endif
 	}
 
 	void Debugger::Init(DebuggerDesc* pDesc)

@@ -15,9 +15,7 @@
 void GameManager::Loop()
 {
 	isRunning = true;   
-
-	Scene::DebugInformation debugInfo{};
-
+	 
 	timeBeginPeriod(1);
 	while (isRunning == true)
 	{
@@ -39,19 +37,19 @@ void GameManager::Loop()
 			}
 			exec += 1;
 		}
-		debugInfo.Colliders = PROFILER_END("Colliders");
+		PROFILER_END("Colliders");
 	
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
-		debugInfo.Entity = PROFILER_END("Entity");
+		PROFILER_END("Entity");
 
 		PROFILER_START("Input", "Input Update");
 		InputManager::GetInstance().Update();
-		debugInfo.Input = PROFILER_END("Input");
+		PROFILER_END("Input");
 
 		PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		debugInfo.SceneUpdate = PROFILER_END("SceneU");
+		PROFILER_END("SceneU");
 		 
 		PROFILER_START("SceneD", "Scene Draw");
 		for (auto& cam : m_camera)
@@ -68,7 +66,7 @@ void GameManager::Loop()
 		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);  
 	
 		mp_window->Present();
-		debugInfo.Draw = PROFILER_END("SceneD");
+		PROFILER_END("SceneD");
 
 		if (Event::WindowEvent())
 		{
@@ -85,9 +83,7 @@ void GameManager::Loop()
 
 		//PROFILER_START("time", "Timer Update");
 		m_Time.Update();
-		//PROFILER_END("time");
-
-		SceneManager::GetInstance().GetCurrentScene()->SetDebugInfo(debugInfo);
+		//PROFILER_END("time"); 
 	
 		// GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
 		// PROFILER_END("Update");

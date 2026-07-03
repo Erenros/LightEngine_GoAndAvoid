@@ -13,11 +13,13 @@
 
 #define PROFILER_START(name, message) gcle::Profiler::NewTask(name, message)
 #define PROFILER_END(name) gcle::Profiler::EndTask(name)
-#define PROFILER_CLEAR(name) gcle::Profiler::Clear()
+#define PROFILER_CLEAR() gcle::Profiler::Clear()
+#define PROFILER_GET(name) gcle::Profiler::GetTask(name)
 #else
 #define PROFILER_START(name, message) {}
-#define PROFILER_END(name) {0}
-#define PROFILER_CLEAR(name) {}
+#define PROFILER_END(name) {}
+#define PROFILER_CLEAR() {}
+#define PROFILER_GET(name) {0}
 #endif // _DEBUG
 
 namespace gcle
@@ -35,9 +37,11 @@ namespace gcle
         static void Clear();
 
         static void NewTask(std::string id, std::string message = "");
-        static float32 EndTask(std::string id);
+        static void EndTask(std::string id);
+        static float32 GetTask(std::string id);
 
     private:
         static std::unordered_map<std::string, Task>* m_tasks;
+        static std::unordered_map<std::string, float32>* m_tasksTime;
     };
 }
