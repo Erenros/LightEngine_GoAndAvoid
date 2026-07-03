@@ -62,6 +62,7 @@ public:
 	bool IsAnimationPlaying() { return mp_currentAnimation == nullptr ? false : true; };
 
 	Sprite(Window* window, const std::string& path);
+	Sprite(Window* window, Asset* asset);
 
 	void AddAnimation(const std::string& id, 
 		int32 firstFrame, 

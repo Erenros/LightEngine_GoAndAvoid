@@ -17,6 +17,10 @@ Sprite::Sprite(Window* window, const std::string& path)
 	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
 }
 
+Sprite::Sprite(Window* window, Asset* asset)
+{
+	InitTextureWithBuffer(window, asset);
+}
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
