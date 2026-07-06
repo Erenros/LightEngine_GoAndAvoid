@@ -27,7 +27,9 @@ Sprite::Sprite(Window* window, Asset* asset)
 Sprite::Sprite(Window* window, Surface* surface)
 {
 	InitTextureWithSurface(window, surface);
-	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
+	//SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
+	m_width = surface->GetSDL_Surface()->w;
+	m_height = surface->GetSDL_Surface()->h;
 	m_isSprite = true;
 }
 
@@ -59,14 +61,6 @@ void Sprite::PlayAnimation(const std::string& id)
 	m_currentFrameX = mp_currentAnimation->m_firstFrame;
 	m_currentFrameY = mp_currentAnimation->m_line;
 	m_timer = mp_currentAnimation->m_duration;
-}
-
-
-Sprite::~Sprite()
-{
-	for (auto& pair : m_animationMap)
-		delete pair.second;
-	m_animationMap.clear();
 }
 
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)

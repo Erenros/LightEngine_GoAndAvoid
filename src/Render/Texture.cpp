@@ -14,7 +14,7 @@ SDL_Texture* Texture::CreateTexture(Window* window)
 
 	if (mp_surface == nullptr || !mp_surface->IsSurfaceInit())
 	{
-		DEBUG_WARN << "Surface is null" << ENDL;
+		GCLE_WARN << "Surface is null" << ENDL;
 		return mp_texture;
 	}
 
@@ -23,7 +23,7 @@ SDL_Texture* Texture::CreateTexture(Window* window)
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), mp_surface->GetSDL_Surface());
 	if (texture == NULL)
 	{
-		DEBUG_WARN << "Error during creation of the texture" << ENDL;
+		GCLE_WARN << "Error during creation of the texture" << ENDL;
 		return nullptr;
 	}
 
@@ -71,7 +71,7 @@ void Texture::InitTextureWithSurface(Window* window, Surface* surface)
 {
 	if (surface == nullptr || !surface->IsSurfaceInit())
 	{
-		DEBUG_WARN << "Surface is null" << ENDL;
+		GCLE_WARN << "Surface is null" << ENDL;
 		return;
 	}
 
@@ -79,7 +79,7 @@ void Texture::InitTextureWithSurface(Window* window, Surface* surface)
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface->GetSDL_Surface());
 	if (texture == NULL)
-		DEBUG_WARN << "Error during creation of the texture" << ENDL;
+		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
 	mp_texture = texture;
 

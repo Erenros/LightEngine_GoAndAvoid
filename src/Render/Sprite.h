@@ -64,7 +64,6 @@ public:
 	Sprite(Window* window, const std::string& path);
 	Sprite(Window* window, Asset* asset);
 	Sprite(Window* window, Surface* surface);
-	~Sprite();
 
 	void AddAnimation(const std::string& id, 
 		int32 firstFrame, 

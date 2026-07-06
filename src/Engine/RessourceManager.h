@@ -37,9 +37,9 @@ public:
 	}
 
 	void UnloadTexture() {
-		if (mp_texture != nullptr)
-			delete mp_texture;
-		mp_texture = nullptr;
+		if (mp_surface != nullptr)
+			delete mp_surface;
+		mp_surface = nullptr;
 	}
 
 	bool IsLoaded() {

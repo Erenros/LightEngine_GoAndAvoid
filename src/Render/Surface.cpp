@@ -1,6 +1,6 @@
 #include "Surface.h"
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <include.h>
 #include "Window.h"
 #include "Engine/AssetEngine.h"
@@ -32,26 +32,24 @@ Surface::Surface(Window* window, const std::string& path)
 
 Surface::~Surface()
 {
-	SDL_FreeSurface(mp_surface);
+	SDL_DestroySurface(mp_surface);
 }
 
 void Surface::InitSurfaceWithBuffer(Window* window, Asset* asset)
 {
-	SDL_RWops* rw = SDL_RWFromMem(asset->data.data(), static_cast<int>(asset->data.size()));
+	SDL_IOStream* rw = SDL_IOFromMem(asset->data.data(), static_cast<int>(asset->data.size()));
 	if (rw == NULL)
 	{
-		DEBUG_WARN << "Can't read data to create surface" << ENDL;
+		GCLE_WARN << "Can't read data to create surface" << ENDL;
 		return;
 	}
 
-	SDL_Surface* surface = IMG_Load_RW(rw, 1);
+	SDL_Surface* surface = IMG_Load_IO(rw, true); //ca free rw tout seul yay
 	if (surface == NULL)
 	{
-		DEBUG_WARN << "Can't Create Surface" << ENDL;
+		GCLE_WARN << "Can't Create Surface" << ENDL;
 		return;
 	}
-
-	SDL_FreeRW(rw);
 
 	asset->width = surface->w;
 	asset->height = surface->h;
@@ -65,7 +63,9 @@ void Surface::InitSurface(Window* window, const std::string& path)
 {
 	SDL_Surface* surface = IMG_Load(path.c_str());
 	if (surface == NULL)
-		DEBUG_WARN << "Couldn't initialize surface for texture with path : " + path << ENDL;
+		GCLE_WARN << "Couldn't initialize surface for texture with path : " + path << ENDL;
+
+	mp_surface = surface;
 
 	std::filesystem::path path2(path);
 	m_id = path2.stem().string();

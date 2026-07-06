@@ -275,9 +275,6 @@ void Entity::SetTexture(const std::string& id)
 
 	RessourceManager& RM  = RessourceManager::GetInstance();
 
-	mp_RenderShape->SetTexture(GameManager::GetInstance().GetWindow(), RM.GetSurface(id));
-	RM.AddTexture(id, mp_RenderShape->GetTexture());
-
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
 		for (auto& sId : m_activeScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
@@ -286,6 +283,9 @@ void Entity::SetTexture(const std::string& id)
 			RM.LoadSurface(GameManager::GetInstance().GetWindow(), path, id);
 		}
 	}
+	
+	mp_RenderShape->SetTexture(GameManager::GetInstance().GetWindow(), RM.GetSurface(id));
+	RM.AddTexture(id, mp_RenderShape->GetTexture());
 }
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)

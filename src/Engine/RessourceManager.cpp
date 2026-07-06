@@ -49,7 +49,7 @@ Surface* RessourceManager::LoadSurface(Window* window, const std::string& path, 
 	}
 
 	GCLE_INFO << "Surface created" << ENDL;
-	m_textureMap[id].mp_texture = texture;
+	m_surfaceMap[id].mp_surface = texture;
 	AssetEngine::GetInstance().AddAsset(id);
 	return texture;
 }

@@ -13,6 +13,20 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, { 40, 40 }, 50);
 
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity1->SetPosition(-400, 0);
+	entity1->SetRigidBody(true);
+	entity1->SetTexture("test");
+	entity1->AddAnimation("anim1", 0, 3, 0, 32, 32, 1.f);
+	entity1->PlayAnimation("anim1");
+
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity2->SetPosition(-300, 0);
+	entity2->SetRigidBody(true);
+	entity2->SetTexture("test");
+	entity2->AddAnimation("anim1", 0, 3, 0, 32, 32, 0.2f);
+	entity2->PlayAnimation("anim1");
+
 	pEntity = CreateEntity<Player>(gcle::Shapes::Circle);
 	pEntity->SetPosition(0, 0); 
 	pEntity->Rotate(0);
