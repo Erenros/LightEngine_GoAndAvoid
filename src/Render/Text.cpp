@@ -3,14 +3,14 @@
 #include "Window.h"
 #include "Engine/RessourceManager.h"
 
-#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include <SDL.h>
 
-
-SDL_Texture* Text::CreateTexture(Window* window)
+SDL_Texture* Text::GetTexture(Window* window)
 {
 	if (mp_texture != nullptr && !m_needToChange)
 		return mp_texture;
-	
+
 	m_needToChange = false;
 	SDL_DestroyTexture(mp_texture);
 
@@ -20,18 +20,37 @@ SDL_Texture* Text::CreateTexture(Window* window)
 		return nullptr;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
-	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 
-	mp_texture = text_texture;
+	//SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
+	int32 width = 0;
+	int32 height = 0;
 
-	SDL_FreeSurface(surface);
+	mp_font->GetTextSize(m_text, width, height);
+
+	float32 factor = static_cast<float32>(m_fontSize) / static_cast<float32>(mp_font->GetFontSize());
+
+	mp_rect->w = width * factor;
+	mp_rect->h = height * factor;
+
+	SDL_Surface* textSurface = SDL_CreateRGBSurfaceWithFormat(0, width * factor, height * factor, 32, SDL_PIXELFORMAT_RGBA32);
+	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_ADD);
 	
-	mp_rect->w = m_text.size() * m_fontSize * 0.6;
-	mp_rect->h = m_fontSize;
+	int x = 0;
+	for (auto& charactere : m_text) {
+		GlyphInfo& info = mp_font->GetGlypInfo(charactere);
+		SDL_Rect SrcRect = { info.x, info.y, info.advanceX, info.height };
+		SDL_Rect DistRect = {x * factor, 0, info.advanceX * factor, info.height * factor};
 
+		SDL_BlitScaled(mp_font->GetFontSurface(), &SrcRect, textSurface, &DistRect);
+		x += info.advanceX;
+	}
+	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_BLEND);
 
-	return text_texture;
+	mp_texture = SDL_CreateTextureFromSurface(window->GetRenderer(), textSurface);
+
+	SDL_FreeSurface(textSurface);
+
+	return mp_texture;
 }
 
 Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b, byte a) :
@@ -40,7 +59,14 @@ Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, by
 	m_fontSize(fontSize)
 {
 	mp_color = GCLE_NEW SDL_Color(r, g, b, a);
-	mp_rect = GCLE_NEW SDL_Rect(pos.x, pos.y,text.size() * fontSize * 0.6, fontSize);
+
+	int32 width = 0;
+	int32 height = 0;
+
+	mp_font->GetTextSize(m_text, width, height);
+
+	float32 factor = static_cast<float32>(m_fontSize) / static_cast<float32>(mp_font->GetFontSize());
+	mp_rect = GCLE_NEW SDL_Rect(pos.x, pos.y,width * factor, height * factor);
 }
 
 Text::~Text()
@@ -85,7 +111,6 @@ void Text::SetPosition(int x, int y)
 	mp_rect->x = x;
 	mp_rect->y = y;
 }
-
 
 void Text::SetFontSize(int32 size) {
 	m_fontSize = size;

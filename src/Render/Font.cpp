@@ -2,7 +2,9 @@
 #include "Utils.h"
 
 #include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include <filesystem>
+#include <iostream>
 
 Font::Font(const std::string& path)
 {
@@ -11,13 +13,12 @@ Font::Font(const std::string& path)
 
 Font::~Font()
 {
-    TTF_CloseFont(mp_font);
+    SDL_FreeSurface(mp_font);
 }
 
 void Font::InitFont(const std::string& path)
 {
-    TTF_Font* font = TTF_OpenFont(path.c_str(), 72);
-    TTF_SetFontSize(font, 72);
+    SDL_Surface* font = IMG_Load(path.c_str());
     if (font == NULL)
     {
         GCLE_WARN << "Couldn't initialize font with path" + path << ENDL;
@@ -25,10 +26,80 @@ void Font::InitFont(const std::string& path)
     }
     
     mp_font = font;
+	ReadFromAtlasChunk(path.c_str());
     return;
 }
 
-void Font::SetFontSize(int size)
-{
-    TTF_SetFontSize(mp_font, size);
+
+
+uint32 Font::ReadBigEndian(const uint8* data) {
+	return(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+}
+
+bool Font::ReadFromAtlasChunk(const std::string& path) {
+	std::filesystem::path pngPath = path;
+	std::ifstream in(pngPath, std::ios::binary);
+	if (!in)
+		return false;
+
+	std::vector<uint8> fileData((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	in.close();
+
+	size_t pos = 8;
+	while (pos + 8 <= fileData.size()) {
+		uint32 lenght = ReadBigEndian(&fileData[pos]);
+		std::string type(fileData.begin() + pos + 4, fileData.begin() + pos + 8);
+		if (type == "gAtl") {
+			const uint8* d = &fileData[pos + 8];
+			fontSize = static_cast<int32>(ReadBigEndian(d));
+			uint32 glyphCount = ReadBigEndian(d + 4);
+
+			size_t offset = 8;
+			for (uint32 i = 0; i < glyphCount; i++) {
+				GlyphInfo g;
+				g.charactere = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				g.x = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				g.y = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				g.width = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				g.height = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				g.advanceX = static_cast<wchar_t>(ReadBigEndian(d + offset));
+				offset += 4;
+				m_glyphs[g.charactere] = g;
+			}
+			return true;
+		}
+		pos += 12 + lenght;
+	}
+	return false;
+}
+
+GlyphInfo& Font::GetGlypInfo(char& charactere){
+	return m_glyphs[charactere];
+}
+
+void Font::GetTextSize(const std::string& text, int32& width, int32& height){
+	for (auto& charactere : text) {
+		GlyphInfo& info = m_glyphs[charactere];
+		height = std::max(height, info.height);
+		width += info.advanceX;
+	}
+}
+
+
+void GlyphInfo::DrawData() {
+	std::wcout << "charactere : " << charactere << std::endl;
+	std::cout << "x : " << std::to_string(x) << std::endl;
+	std::cout << "y : " << std::to_string(y) << std::endl;
+	std::cout << "width : " << std::to_string(width) << std::endl;
+	std::cout << "height : " << std::to_string(height) << std::endl;
+	std::cout << "advanceX : " << std::to_string(advanceX) << std::endl;
+}
+
+void GlyphInfo::DrawCharacter() {
+	std::wcout << "charactere : " << charactere << std::endl;
 }

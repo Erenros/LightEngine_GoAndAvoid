@@ -41,14 +41,6 @@ Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, c
     return texture;
 }
 
-void RessourceManager::SetFontSize(const std::string& id, int size)
-{
-    if (!m_fontMap.contains(id))
-        return;
-
-    m_fontMap[id]->SetFontSize(size);
-}
-
 bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 {
     Music* music = GCLE_NEW Music(path);
@@ -124,6 +116,7 @@ void RessourceManager::InitTextureFolder(Window* window)
         }
 
         //LoadTexture(window,entry.path().string(), entry.path().stem().string());
+        Font* font;
         m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
     }
 
@@ -209,13 +202,13 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        if (entry.path().extension() != ".ttf" && entry.path().extension() != ".otf")
+        if (entry.path().extension() != ".png")
         {
-            std::cout << "Extension is not correct, expected : .ttf, receive" + entry.path().extension().string();
+            std::cout << "Extension is not correct, expected : .png, receive" + entry.path().extension().string();
             continue;
         }
 
-        LoadFont(entry.path().string(), entry.path().stem().string());
+        m_fontMap[entry.path().stem().string()] = GCLE_NEW Font(filename.string() +"/" + entry.path().filename().string());
     }
 }
 

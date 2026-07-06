@@ -108,10 +108,6 @@ public:
 	TextureStruct* GetTexture(const std::string& id) { return (m_textureMap.count(id) ? &m_textureMap[id] : nullptr); };
 	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
 
-	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
-
-	void SetFontSize(const std::string& id, int size);
-
 	void SetMusicVolume(int32 volume) { Audio::SetMusicVolume(volume); };
 
 	void StopMusic() { Audio::StopMusic(); };

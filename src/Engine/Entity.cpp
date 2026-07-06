@@ -41,7 +41,7 @@ void Entity::Initialize() {
 
 
 	mp_RenderShape = nullptr;
-
+	m_Transform.Initialize({ 0, 0 }, 0);
 	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
 
@@ -408,7 +408,7 @@ void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
-	sprite->AddFunctionInFrame(animation, frame, function);
+	sprite->AddFunctionInFrameSprite(animation, frame, function);
 }
 
 void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {

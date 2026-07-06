@@ -72,6 +72,6 @@ public:
 
 	void PlayAnimation(const std::string& id);
 
-	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
+	void AddFunctionInFrameSprite(const std::string& animation, int32 frame, std::function<void*()> function);
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
 };

@@ -226,19 +226,19 @@ void Scene::OnInitialize()
 	mp_mainCamera->SetActive(true);
 	mp_activeCamera = mp_mainCamera;
 
-	mp_Position		= CreateDebugText("Pos: ",		{ 0,	0},		50, 255, 225, 255);
-	mp_PosX			= CreateDebugText("",			{125,	0},		50,	255, 225, 255);
-	mp_PosY			= CreateDebugText("",			{250,	0},		50,	255, 225, 255); 
+	mp_Position		= CreateDebugText("Pos: ",		{ 0,	0},		40, 255, 225, 255);
+	mp_PosX			= CreateDebugText("",			{200,	5},		30,	255, 225, 255);
+	mp_PosY			= CreateDebugText("",			{600,	5},		30,	255, 225, 255); 
 													
-	mp_Rotation		= CreateDebugText("Rot: ",		{0,		75},	50,	255, 225, 255);
-	mp_RotZ			= CreateDebugText("",			{125,	75},	50, 255, 225, 255);
+	mp_Rotation		= CreateDebugText("Rot: ",		{0,		75},	40,	255, 225, 255);
+	mp_RotZ			= CreateDebugText("",			{200,	80},	30, 255, 225, 255);
 													
-	mp_Scale		= CreateDebugText("Scale: ",	{0,		150 },  50, 255, 225, 255);
-	mp_ScaleX		= CreateDebugText("",			{125,	150 },  50, 255, 225, 255);
-	mp_ScaleY		= CreateDebugText("",			{250,	150 },  50, 255, 225, 255);
+	mp_Scale		= CreateDebugText("Scale: ",	{0,		150 },  40, 255, 225, 255);
+	mp_ScaleX		= CreateDebugText("",			{300,	155 },  30, 255, 225, 255);
+	mp_ScaleY		= CreateDebugText("",			{700,	155 },  30, 255, 225, 255);
 
-	mp_Frame		= CreateText("FPS: ",			{ 1600, 0 },	50, 255, 225, 255);
-	mp_FPS			= CreateText("",				{ 1750, 0 },	50, 255, 225, 255);
+	mp_Frame		= CreateText("FPS: ",			{ 1600, 0 },	40, 255, 225, 255);
+	mp_FPS			= CreateText("",				{ 1800, 5 },	30, 255, 225, 255);
 }
 
 void Scene::OnUpdate(Clock& time)

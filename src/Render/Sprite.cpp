@@ -73,7 +73,7 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 }
 
 
-void Sprite::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+void Sprite::AddFunctionInFrameSprite(const std::string& animation, int32 frame, std::function<void*()> function) {
 	auto it = m_animationMap.find(animation);
 	if (it == m_animationMap.end())
 		return;

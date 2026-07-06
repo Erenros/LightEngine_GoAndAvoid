@@ -253,7 +253,7 @@ void Window::Clear()
 
 void Window::DrawTextOnRenderer(Text* text)
 {
-	SDL_Texture* texture = text->CreateTexture(this);
+	SDL_Texture* texture = text->GetTexture(this);
 	if (texture == nullptr)
 		return;
 

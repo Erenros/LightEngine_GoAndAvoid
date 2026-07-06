@@ -13,12 +13,12 @@ void SampleScene::OnInitialize()
 	std::string text = "Test";
 	CreateText(text, { 40, 40 }, 50);
 
-	Entity* entity1 = CreateWorldText("Test", 50, "Hack-Regular");
-	entity1->SetPosition(-200, 0); 
-	//entity1->Rotate(45);
-	entity1->SetRigidBody(true); 
-	entity1->SetIsKinematic(true); 
-	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.f, 0.f }, 0.f, { 1.f, 1.f });
+	//Entity* entity1 = CreateWorldText("Test", 50, "Hack-Regular");
+	//entity1->SetPosition(-200, 0); 
+	////entity1->Rotate(45);
+	//entity1->SetRigidBody(true); 
+	//entity1->SetIsKinematic(true); 
+	//entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.f, 0.f }, 0.f, { 1.f, 1.f });
 
 	Entity* entity2 = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(0, 0); 
