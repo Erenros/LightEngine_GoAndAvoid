@@ -2,17 +2,19 @@
 
 #include <string>
 
-struct Mix_Music;
+struct MIX_Audio;
+struct MIX_Track;
 
 class Music
 {
 private:
 
-	Mix_Music* mp_music = nullptr;
+	MIX_Audio* mp_audio = nullptr;
+	MIX_Track* mp_track = nullptr;
 
 public:
 
-	bool IsMusicInit() { return mp_music == nullptr ? false : true; };
+	bool IsMusicInit() { return mp_audio == nullptr ? false : true; };
 
 	Music(const std::string& path);
 	Music() = default;

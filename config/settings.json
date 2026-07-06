@@ -34,19 +34,19 @@
     "5486424A-3498-2513-4EE0-2B6D64DE7470": {
       "config-debug": {
         "additionalDependencies": [
-          "SDL2.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;%(AdditionalDependencies)"
+          "SDL3.lib;SDL3_ttf.lib;SDL3_mixer.lib;SDL3_image.lib;%(AdditionalDependencies)"
         ],
         "additionalIncludeDirectories": [
-          "$(SolutionDir)../lib/SDL2/include",
-          "$(SolutionDir)../lib/SDL2_ttf/include",
-          "$(SolutionDir)../lib/SDL2_mixer/include",
-          "$(SolutionDir)../lib/SDL2_image/include"
+          "$(SolutionDir)../lib/SDL3/include",
+          "$(SolutionDir)../lib/SDL3_ttf/include",
+          "$(SolutionDir)../lib/SDL3_mixer/include",
+          "$(SolutionDir)../lib/SDL3_image/include"
         ],
         "additionalLibraryDirectories": [
-          "$(SolutionDir)../lib/SDL2/lib/x64",
-          "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
-          "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
-          "$(SolutionDir)../lib/SDL2_image/lib/x64"
+          "$(SolutionDir)../lib/SDL3/lib/x64",
+          "$(SolutionDir)../lib/SDL3_ttf/lib/x64",
+          "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
+          "$(SolutionDir)../lib/SDL3_image/lib/x64"
         ],
         "preprocessorDefinitions": []
       },
@@ -101,19 +101,19 @@
     "74C953F4-397E-34EF-5EE4-6ADB4D5E66D1": {
       "config-debug": {
         "additionalDependencies": [
-          "SDL2.lib",
-          "SDL2_ttf.lib",
-          "SDL2_mixer.lib",
-          "SDL2_image.lib",
+          "SDL3.lib",
+          "SDL3_ttf.lib",
+          "SDL3_mixer.lib",
+          "SDL3_image.lib",
           "%(AdditionalDependencies)"
         ],
         "additionalIncludeDirectories": [
         ],
         "additionalLibraryDirectories": [
-          "$(SolutionDir)../lib/SDL2/lib/x64",
-          "$(SolutionDir)../lib/SDL2_ttf/lib/x64",
-          "$(SolutionDir)../lib/SDL2_mixer/lib/x64",
-          "$(SolutionDir)../lib/SDL2_image/lib/x64"
+          "$(SolutionDir)../lib/SDL3/lib/x64",
+          "$(SolutionDir)../lib/SDL3_ttf/lib/x64",
+          "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
+          "$(SolutionDir)../lib/SDL3_image/lib/x64"
         ],
         "preprocessorDefinitions": [
         ]

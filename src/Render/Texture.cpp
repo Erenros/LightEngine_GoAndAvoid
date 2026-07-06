@@ -2,8 +2,8 @@
 #include "Utils.h"
 #include "Window.h"
 #include "Engine/AssetEngine.h"
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <filesystem>
 
 Texture::Texture(Window* window, const std::string& path)
@@ -20,14 +20,14 @@ Texture::~Texture() { SDL_DestroyTexture(mp_texture); }
 
 void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 {
-	SDL_RWops* rw = SDL_RWFromMem(asset->data.data(), static_cast<int>(asset->data.size()));
-	if (rw == NULL)
+	SDL_IOStream* io = SDL_IOFromConstMem(asset->data.data(), asset->data.size());
+	if (io == NULL)
 	{
 		GCLE_WARN << "Can't read data to create texture" << ENDL;
 		return;
 	}
 
-	SDL_Surface* surface = IMG_Load_RW(rw, 1);
+	SDL_Surface* surface = IMG_Load_IO(io, true); 
 	if (surface == NULL)
 	{
 		GCLE_WARN << "Can't Create Surface" << ENDL;
@@ -41,7 +41,7 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 	if (texture == NULL)
 		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
-	SDL_FreeSurface(surface);
+	SDL_DestroySurface(surface);
 	mp_texture = texture;
 
 	id = asset->name;
@@ -49,19 +49,19 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 
 void Texture::InitTexture(Window* window, const std::string& path)
 {
-    SDL_Surface* surface = IMG_Load(path.c_str());
-    if (surface == NULL)
-        GCLE_WARN << "Couldn't initialize surface for texture with path : " + path << ENDL;
+	SDL_Surface* surface = IMG_Load(path.c_str());
+	if (surface == NULL)
+		GCLE_WARN << "Couldn't initialize surface for texture with path : " + path << ENDL;
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
-    if (texture == NULL)
-        GCLE_WARN << "Error during creation of the texture with path : " + path << ENDL;
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
+	if (texture == NULL)
+		GCLE_WARN << "Error during creation of the texture with path : " + path << ENDL;
 
-	SDL_FreeSurface(surface);
+	SDL_DestroySurface(surface);
 
 
 	mp_texture = texture;
-	
+
 	std::filesystem::path path2(path);
 	id = path2.stem().string();
 }

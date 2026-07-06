@@ -3,14 +3,15 @@
 #include "Window.h"
 #include "Engine/RessourceManager.h"
 
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 SDL_Texture* Text::CreateTexture(Window* window)
 {
 	if (mp_texture != nullptr && !m_needToChange)
 		return mp_texture;
-	
+
 	m_needToChange = false;
 	SDL_DestroyTexture(mp_texture);
 
@@ -20,15 +21,16 @@ SDL_Texture* Text::CreateTexture(Window* window)
 		return nullptr;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
+	// 0 = chaîne C terminée par un \0, comme avant
+	SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), 0, *mp_color);
 	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 
 	mp_texture = text_texture;
 
-	SDL_FreeSurface(surface);
-	
-	mp_rect->w = static_cast<int32>(m_text.size() * m_fontSize * 0.6f);
-	mp_rect->h = m_fontSize;
+	SDL_DestroySurface(surface);
+
+	mp_rect->w = static_cast<float32>(m_text.size()) * static_cast<float32>(m_fontSize) * 0.6f;
+	mp_rect->h = static_cast<float32>(m_fontSize);
 
 
 	return text_texture;
@@ -40,12 +42,12 @@ Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, by
 	m_fontSize(fontSize)
 {
 	mp_color = GCLE_NEW SDL_Color(r, g, b, a);
-	mp_rect = GCLE_NEW SDL_Rect(static_cast<int32>(pos.x), static_cast<int32>(pos.y), static_cast<int32>(text.size()) * static_cast<float32>(fontSize) * 0.6f, fontSize);
+	mp_rect = GCLE_NEW SDL_FRect{ pos.x, pos.y, static_cast<float32>(text.size()) * static_cast<float32>(fontSize) * 0.6f, static_cast<float32>(fontSize) };
 }
 
 Text::~Text()
 {
-	if (mp_texture != nullptr) 
+	if (mp_texture != nullptr)
 		SDL_DestroyTexture(mp_texture);
 
 	delete mp_color;
@@ -82,8 +84,8 @@ void Text::SetText(const std::string& text)
 
 void Text::SetPosition(int x, int y)
 {
-	mp_rect->x = x;
-	mp_rect->y = y;
+	mp_rect->x = static_cast<float32>(x);
+	mp_rect->y = static_cast<float32>(y);
 }
 
 
@@ -96,8 +98,8 @@ int32 Text::GetFontSize() {
 	return m_fontSize;
 }
 
-Vector2f Text::GetSizes(){
-	return { static_cast<float32>(mp_rect->w), static_cast<float32>(mp_rect->h)};
+Vector2f Text::GetSizes() {
+	return { mp_rect->w, mp_rect->h };
 }
 
 Font* Text::GetFont() {

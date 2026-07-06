@@ -1,9 +1,14 @@
 #include "Shape.h" 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include "Engine/Entity.h"
 
 namespace gcle
 {
+	SDL_FColor ToSDLColor(Color c)
+	{
+		return SDL_FColor{ c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, c.a / 255.0f };
+	}
+
 	Shape::~Shape()
 	{
 		for (SDL_Vertex* vertex : m_verticies)
@@ -172,7 +177,7 @@ namespace gcle
 			m_height = height;
 			m_width = width;
 
-			SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+			SDL_FColor sdl_color = ToSDLColor(color);
 
 			m_verticies[0] = GCLE_NEW SDL_Vertex{ {x, y}, sdl_color, {0.f, 0.f} };
 			m_verticies[1] = GCLE_NEW SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
@@ -258,7 +263,7 @@ namespace gcle
 		m_hollowPoints.resize(3);
 		m_indicies.resize(3);
 
-		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+		SDL_FColor sdl_color = ToSDLColor(color);
 
 		m_verticies[0] = GCLE_NEW SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
 		m_verticies[1] = GCLE_NEW SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
@@ -357,7 +362,7 @@ namespace gcle
 
 		Degrees degreesBetweenPoints = 360.0f / _smoothness;
 
-		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+		SDL_FColor sdl_color = ToSDLColor(color);
 
 		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {0.5f, 0.5f} };
 		m_localPositions.push_back({ 0.f, 0.f });
