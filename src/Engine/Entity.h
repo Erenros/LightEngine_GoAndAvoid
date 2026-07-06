@@ -22,42 +22,31 @@ class Entity
 {
 public:
 	void Destroy();
+	void Move(Vector2f translation);
 	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
 	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
 public:
-	//void SetRenderShape(gcle::Shapes);
-	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
-	Vector2f GetPosition();
-	int64 GetId() const { return m_Id; }
-	Vector2f GetScale();
-	Degrees GetRotation();
-	RigidBody2D& GetRigidBody() { return m_RigidBody; }
-	Transform2D& GetTransform2D() { return m_Transform; }
-
-public:
 	void SetTag(int32 tag) { m_Tag = tag; }
+	
 	void SetSpeed(float32 speed) { m_Speed = speed; }
 	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
+
 	void SetRigidBody(bool isRigidBody);
+
 	void SetPosition(float32 x, float32 y);
-	void Move(Vector2f translation);
-
-	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
+	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 
-	void SetRenderSize(int shapeType, std::vector<float32> points);
-
-	Vector2f GetRenderPosition();
-	bool IsKinematic() { return m_IsKinematic; }
-	void SetIsKinematic(bool isKinematic) { m_IsKinematic = isKinematic; }
+	void SetStatic(bool isStatic);
+	void SetRenderSize(int shapeType, std::vector<float32> points); 
 
 	void SetScale(Vector2f scale);
-	void SetScale(float32 scale) { SetScale({ scale, scale }); }
 	void ScaleBy(Vector2f factor);
+	void SetScale(float32 scale) { SetScale({ scale, scale }); }
 
-	void SetRotation(Degrees angle);
 	void Rotate(Degrees delta);
+	void SetRotation(Degrees angle);
 
 	void SetTexture(const std::string& id);
 
@@ -66,87 +55,93 @@ public:
 	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
 
-	int32 GetLayer() { return m_layer; };
 	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };
 
 public:
-	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
-	bool ToDestroy() const { return m_ToDestroy; }
-	bool IsTag(int32 tag) const { return m_Tag == tag; }
+	//void SetRenderShape(gcle::Shapes);
+	Vector2f GetScale();
+	Degrees GetRotation();
+	Vector2f GetPosition();
+	Vector2f GetRenderPosition();
+	int64 GetId() const { return m_Id; }
+	int32 GetLayer() const { return m_layer; };
+	RigidBody2D& GetRigidBody() { return m_RigidBody; }
+	Transform2D& GetTransform2D() { return m_Transform; }
+	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
+
+public:
+	bool IsStatic() const;
 	bool IsColliding(Entity* other);
 	bool IsInside(Vector2f position);
+	bool ToDestroy() const { return m_ToDestroy; } 
+	bool IsTag(int32 tag) const { return m_Tag == tag; }
+	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
 
 public:
 	void AddCollider(Collider* pCollider);
-	void RemoveCollider(Collider* pCollider);
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f position, float32 rotation, Vector2f scale);
+	void RemoveCollider(Collider* pCollider); 
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
 
 public:
-	bool isWorldText() { return m_isWorldText; }
+	void AddActiveScene(const std::string& sceneTag);
+	void RemoveActiveScene(const std::string& sceneTag); 
+	bool IsActiveIn(const std::string& sceneTag);
+
+public:
+	bool IsWorldText() const { return m_isWorldText; }
 
 protected:
 	Entity() = default;
 	~Entity();
-
-
+	 
 	virtual void OnUpdate() {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {};
+	virtual void OnDestroy() {};
+	virtual void OnInitialize() {};
 	virtual void OnCollision(Entity* collidedWith) {};
 	virtual void OnCollisionExit(Entity* collidedWith) {};
-	virtual void OnInitialize() {};
-	virtual void OnDestroy() {};
+	virtual void OnCollisionEnter(Entity* collidedWith) {};
 
 private:
+	void Initialize();
 	void Update(float32 dt);
 	void Initialize(gcle::Shapes shape);
-	void Initialize();
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 
 private:
-	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
-
-public:
-	void AddActiveScene(const std::string& sceneTag);
-	void RemoveActiveScene(const std::string& sceneTag);
-
-	bool IsActiveIn(const std::string& sceneTag);
-
+	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); } 
 
 protected:
 
-	int64			m_Id = 0;
-	Vector2f		m_Direction = { 0.0f, 0.0f };
-	float32			m_Speed = 0.f;
-	bool			m_ToDestroy = false;
-	bool			m_IsKinematic = true;
-	int32			m_Tag = -1;
 	Target			m_Target;
+	int64			m_Id			= 0;
+	int32			m_Tag			= -1;
+	float32			m_Speed			= 0.f;
+	bool			m_ToDestroy		= false; 
+	Vector2f		m_Direction		= { 0.0f, 0.0f };
 
 private:
-	bool m_isHighlighted = false;
+	bool m_isStatic			= false;
+	bool m_isHighlighted	= false;
 
 protected:
 	bool m_isWorldText = false;
 
 private:
-	Transform2D m_Transform;
+	Transform2D  m_Transform;
 	gcle::Shape* mp_RenderShape = nullptr;
-	RigidBody2D		m_RigidBody;
+	RigidBody2D	 m_RigidBody;
 
 private:
-	std::unordered_map<int64, Entity*> CollidingEntity;
-	std::unordered_set<Collider*> mp_Colliders;
-	std::vector<std::string> m_activeScenes;
-	
 	int32 m_layer = 0;
+	std::vector<std::string> m_activeScenes;
+	std::unordered_set<Collider*> mp_Colliders;
+	std::unordered_map<int64, Entity*> CollidingEntity;
 
-private:
-	 
+private: 
 	friend class Scene;
-	friend class GameManager;
 	friend class Camera;
-	friend class PhysicsManager;
-
+	friend class GameManager;
+	friend class PhysicsManager; 
 
 };

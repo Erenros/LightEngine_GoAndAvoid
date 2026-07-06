@@ -6,6 +6,12 @@
 
 #undef max
 
+enum class CollisionDetectionMode
+{
+	Discrete,
+	Continuous
+};
+
 class RigidBody2D
 {
 public:
@@ -41,19 +47,31 @@ public:
 	void ZeroVelocityX(bool right);
 	void ZeroVelocityY(bool down);
 
-	void ZeroVelocityX() { m_Velocity.x = 0; /*m_TempVelHasChanged = true;*/ }
-	void ZeroVelocityY() { m_Velocity.y = 0; /*m_TempVelHasChanged = true; */}
+	void ZeroVelocityX() { m_Velocity.x = 0;}
+	void ZeroVelocityY() { m_Velocity.y = 0;}
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
 	void SetDampingStrenght(float32 strenght) { m_Friction = { strenght, strenght }; }
-	void SetDampingOnXAxis(Vector2f strenght) { m_Friction = strenght; }
-	void SetDampingOnYAxis(Vector2f strenght) { m_Friction = strenght; }
+	void SetDampingOnXAxis(float32 strenght) { m_Friction = { strenght, 0 }; }
+	void SetDampingOnYAxis(float32 strenght) { m_Friction = { 0, strenght }; }
+
+	void ActivateDamping(bool isActive) { m_UseFriction = isActive; }
+
+	Vector2f CalculateNextPosition(float32 dt);
+	bool UseContinuousCollision() const;
 
 private:
 	void ApplyVelocity(float32 dt);
 	void ApplyFriction(float32 dt);
 	void ApplyGravity(float32 dt);
+
+private:
+	CollisionDetectionMode m_CollisionDetectionMode = CollisionDetectionMode::Discrete;
+
+public:
+	void SetCollisionDetectionMode(CollisionDetectionMode mode) {m_CollisionDetectionMode = mode;}
+	void SetCollisionOnContinuous() {m_CollisionDetectionMode = CollisionDetectionMode::Continuous;}
 
 private:
 	Vector2f m_Position;
@@ -62,6 +80,8 @@ private:
 	Vector2f m_TempVelocity;
 	float32 m_Mass = 1.0f;
 	Vector2f m_Friction = {0.1f, 0.1f};
+
+	bool m_UseFriction = false;
 
 	float32 m_MaxSpeed = 500.0f;
 

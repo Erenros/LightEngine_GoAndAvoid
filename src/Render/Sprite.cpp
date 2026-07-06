@@ -1,6 +1,6 @@
 #include "Sprite.h"
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include "Utils.h"
 #include "Shape.h"
 
@@ -9,14 +9,20 @@ Sprite::Sprite(Window* window, const std::string& path)
 	m_isSprite = true;
 
 	InitTexture(window, path);
-	
+
 	if (!IsTextureInit())
 		return;
 
-	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	GCLE_INFO << "width : " << m_width << " / Height : " << m_height << ENDL; //A virer 
+	float32 texW = 0.f, texH = 0.f;
+	SDL_GetTextureSize(GetSDLTexture(), &texW, &texH); 
+	m_width = static_cast<int32>(texW);
+	m_height = static_cast<int32>(texH);
 }
 
+Sprite::Sprite(Window* window, Asset* asset)
+{
+	InitTextureWithBuffer(window, asset);
+}
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
@@ -32,14 +38,19 @@ void Sprite::PlayAnimation(const std::string& id)
 		return;
 	}
 
-
-	//Yea it sucks but for now i don't want to think of how to do smooth transition
 	mp_currentAnimation = m_animationMap[id];
 	m_currentFrameX = mp_currentAnimation->m_firstFrame;
 	m_currentFrameY = mp_currentAnimation->m_line;
 	m_timer = mp_currentAnimation->m_duration;
 }
 
+
+Sprite::~Sprite()
+{
+	for (auto& pair : m_animationMap)
+		delete pair.second;
+	m_animationMap.clear();
+}
 
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 {
@@ -49,7 +60,7 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 		return;
 
 	m_timer += deltatime;
-	if(m_timer < mp_currentAnimation->m_duration)
+	if (m_timer < mp_currentAnimation->m_duration)
 		return;
 
 	m_timer = 0;
@@ -77,7 +88,7 @@ void Sprite::AddFunctionInFrameSprite(const std::string& animation, int32 frame,
 	auto it = m_animationMap.find(animation);
 	if (it == m_animationMap.end())
 		return;
-	
+
 	Animation* anim = m_animationMap[animation];
 	if (anim->m_animationFunction.find(frame) != anim->m_animationFunction.end())
 		return;

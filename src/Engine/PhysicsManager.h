@@ -21,6 +21,12 @@ struct CollisionInfo {
 	Vector2f orientation{ 0.f, 0.f };
 };
 
+struct ContinuousCollisionHit
+{
+	bool hit = false;
+	float32 time = 1.0f;
+	Vector2f normal{ 0.0f, 0.0f };
+};
 
 enum class RepulseTypes {
 	AABB,
@@ -37,10 +43,11 @@ public:
 
 	void AddEntity(Entity* pEntity);
 	void RemoveEntity(Entity* pEntity);
-	void Update(float64 deltaTime);
+	void Update(float32 deltaTime);
 	bool IsColliding(Collider* pCollider1, Collider* pCollider2);
 	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
 	void ThrowRepulse(Collider* pCollider1, Collider* pCollider2);
+	bool IsQuadTreeActive() const;
 
 private:
 	bool CheckAABBAABBCollision(gcle::Rectangle* pRect1, gcle::Rectangle* pRect2);
@@ -63,12 +70,45 @@ private:
 	void RepulseCircleRect(Collider* a, Collider* b);
 
 	float32 GetRepulseCorrectionMultiplyer(Collider* a, Collider* b);
-
 	void AccumulateCorrection(Entity* pEntity, Vector2f delta);
-
 	void RepulseOBB(Collider* colA, Collider* colB);
 
-private: 
+private:
+	bool ShouldUseContinuousCollision(Collider* collider) const;
+	bool TryResolveContinuousCollision(Collider* colliderA, Collider* colliderB, float64 deltaTime);
+	ContinuousCollisionHit SweepColliderAgainstAABB(Collider* movingCollider, Collider* obstacleCollider, float64 deltaTime);
+	ContinuousCollisionHit SegmentAABBIntersection(Vector2f start, Vector2f end, const AABB& target);
+	void ApplyContinuousCollisionResponse(Collider* movingCollider, const ContinuousCollisionHit& hit, float64 deltaTime);
+	AABB ComputeCurrentAABB(Collider* collider);
+	AABB ExpandAABB(const AABB& aabb, Vector2f amount);
+	AABB TranslateAABB(const AABB& aabb, Vector2f delta);
+	AABB UnionAABB(const AABB& a, const AABB& b);
+	AABB ComputePredictedAABB(Collider* collider, const AABB& currentAABB, float32 dt);
+	bool TestAxis(float32 startAxis, float32 deltaAxis, float32 minAxis, float32 maxAxis, Vector2f negativeNormal, Vector2f positiveNormal);
+
+public:
+	void SetActivateQuadTree(bool activate);
+	void SetDynamicQuadTreeSize(bool activate);
+	void SetQuadTreePos1(Vector2f pos1);
+	void SetQuadTreePos2(Vector2f pos2);
+	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
+
+private:
+	void EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate);
+
+private:
+	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void GenerateQuadTree(std::vector<Collider*>* activeColliders, float32 dt);
+	void PendingCorrections();
+	void HandleCollision(std::pair<Collider*, Collider*> collider, float32 dt);
+	void MakeTreePairs(std::vector<Collider*>* activeColliders);
+	void MakePairs(std::vector<Collider*>* activeColliders);
+
+	void UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt);
+	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders, float32 dt);
+
+private:
 	std::vector<EntityInfo> m_EntitiesToAdd;
 	std::vector<EntityInfo> m_EntitiesToUpdate;
 	std::vector<EntityInfo> m_EntitiesToRemove;
@@ -89,9 +129,9 @@ private:
 private:
 	bool m_activateQuadTree = true;
 	bool m_dynamicQuadTreeSize = false;
-	
+
 	Vector2f m_quadTreePos1{ -50000, -50000 };
-	Vector2f m_quadTreePos2{50000, 50000};
+	Vector2f m_quadTreePos2{ 50000, 50000 };
 
 	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
 
@@ -101,24 +141,10 @@ private:
 	std::vector<std::pair<Collider*, Collider*>> m_pairs;
 	std::vector<Collider*> m_queryResult;
 
-public:
-	void SetActivateQuadTree(bool activate);
-	void SetDynamicQuadTreeSize(bool activate);
-	void SetQuadTreePos1(Vector2f pos1);
-	void SetQuadTreePos2(Vector2f pos2);
-	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
-
-private:
-	void EntityToRemove(std::vector<EntityInfo>& m_EntitiesToRemove, std::vector<EntityInfo>& m_EntitiesToUpdate);
-	void EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate);
-	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
-	void GenerateQuadTree(std::vector<Collider*>* activeColliders);
-	void PendingCorrections();
-	void MakeTreePairs(std::vector<Collider*>* activeColliders);
-	void MakePairs(std::vector<Collider*>* activeColliders);
-
-	void UpdateQuadTree(std::vector<Collider*> activeColliders);
-	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders);
+private: 
+	float32 m_entryTime = 0.0f;
+	float32 m_exitTime = 1.0f;
+	Vector2f m_entryNormal{ 0.0f, 0.0f };
 
 public : 
 	~PhysicsManager();

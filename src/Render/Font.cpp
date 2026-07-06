@@ -8,7 +8,7 @@
 
 Font::Font(const std::string& path)
 {
-	InitFont(path);
+    InitFont(path);
 }
 
 Font::~Font()
@@ -24,7 +24,8 @@ void Font::InitFont(const std::string& path)
         GCLE_WARN << "Couldn't initialize font with path" + path << ENDL;
         return;
     }
-    
+
+    TTF_SetFontSize(font, 72);
     mp_font = font;
 	ReadFromAtlasChunk(path.c_str());
     return;

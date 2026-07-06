@@ -1,6 +1,15 @@
 #include "Collider.h"
 #include "Entity.h"
 
+Collider::~Collider()
+{
+    if (m_shape != nullptr)
+    {
+        delete m_shape;
+        m_shape = nullptr;
+    }
+}
+
 void Collider::Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner)
 {
     m_shape = shape;

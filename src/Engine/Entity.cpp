@@ -10,12 +10,8 @@ static int64 sId = 0;
 
 void Entity::Initialize(gcle::Shapes shape)
 {
-	m_Direction = { 0.0f, 0.0f };
-	m_Speed = 0.f;
 	m_ToDestroy = false;
 	m_Tag = -1;
-	m_Target;
-
 
 
 	mp_RenderShape = GetBaseShape(shape);
@@ -44,8 +40,6 @@ void Entity::Initialize() {
 	m_Transform.Initialize({ 0, 0 }, 0);
 	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
-
-	m_Target.isSet = false;
 
 	m_Id = sId++;
 
@@ -85,36 +79,41 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 
 void Entity::Update(float32 dt)
 {
-	if (IsRigidBody())
+	if (m_RigidBody.IsActive())
 		m_RigidBody.Update(dt);
 
-	float32 distance = dt * m_Speed;
-	Vector2f translation = m_Direction * distance;
+	m_Transform.UpdateChildPosition();
 
-	Move(translation);
-	if (mp_RenderShape != nullptr) {
-		Texture* tex = mp_RenderShape->GetTexture();
-		if (tex != nullptr)
-		{
-			if (tex->IsSprite())
-				static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
-		}
-	}
-	if (m_Target.isSet)
+	if (m_isStatic == false)
 	{
-		float32 x1 = GetPosition().x;
-		float32 y1 = GetPosition().y;
+		float32 distance = dt * m_Speed;
+		Vector2f translation = m_Direction * distance;
 
-		float32 x2 = x1 + m_Direction.x * m_Target.distance;
-		float32 y2 = y1 + m_Direction.y * m_Target.distance;
-
-		m_Target.distance -= distance;
-
-		if (m_Target.distance <= 0)
+		Move(translation);
+		if (mp_RenderShape != nullptr) {
+			Texture* tex = mp_RenderShape->GetTexture();
+			if (tex != nullptr)
+			{
+				if (tex->IsSprite())
+					static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+			}
+		}
+		if (m_Target.isSet)
 		{
-			SetPosition(m_Target.position.x, m_Target.position.y);
-			m_Direction = Vector2f({ 0.f, 0.f });
-			m_Target.isSet = false;
+			float32 x1 = GetPosition().x;
+			float32 y1 = GetPosition().y;
+
+			float32 x2 = x1 + m_Direction.x * m_Target.distance;
+			float32 y2 = y1 + m_Direction.y * m_Target.distance;
+
+			m_Target.distance -= distance;
+
+			if (m_Target.distance <= 0)
+			{
+				SetPosition(m_Target.position.x, m_Target.position.y);
+				m_Direction = Vector2f({ 0.f, 0.f });
+				m_Target.isSet = false;
+			}
 		}
 	}
 
@@ -140,19 +139,29 @@ void Entity::RemoveCollider(Collider* pCollider)
 
 Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
 {
-	Collider* collider = new Collider();
-	collider->Initialize(GetBaseShape(shape), GetPosition() + relativePosition, rotation, this);
+	Collider* collider = GCLE_NEW Collider();
+
+	gcle::Shape* colliderShape = GetBaseShape(shape);
+
+	Vector2f entityScale = m_Transform.GetScale();
+	colliderShape->SetScale({ scale.x * entityScale.x, scale.y * entityScale.y }); 
+
+	collider->Initialize(colliderShape, m_Transform.GetPosition() + relativePosition, rotation, this);
+
 	AddCollider(collider);
 	collider->SetActive(isActive);
-	collider->GetShape()->SetScale(scale);
+
 	return collider;
 }
 
 void Entity::Destroy()
 {
-	m_ToDestroy = true;
-	PhysicsManager::GetInstance().RemoveEntity(this);
-	OnDestroy();
+	if (this != nullptr)
+	{
+		m_ToDestroy = true;
+		PhysicsManager::GetInstance().RemoveEntity(this);
+		OnDestroy();
+	}
 }
 
 bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
@@ -251,7 +260,12 @@ void Entity::SetRotation(Degrees angle)
 
 void Entity::Rotate(Degrees delta)
 {
-	m_Transform.SetDegAngle(static_cast<int32>((m_Transform.GetDegAngle() + delta)) % 360);
+	Degrees newAngle = m_Transform.GetDegAngle() + delta;
+	newAngle = std::fmod(newAngle, 360.0f);
+	if (newAngle < 0.0f)
+		newAngle += 360.0f;
+
+	m_Transform.SetDegAngle(newAngle);
 }
 
 void Entity::SetTexture(const std::string& id) {
@@ -314,10 +328,22 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 	}
 }
 
+void Entity::SetStatic(bool isStatic)
+{
+	m_isStatic = isStatic;
+}
+
 Vector2f Entity::GetRenderPosition()
 {
-	if(mp_RenderShape != nullptr)
+	if (mp_RenderShape != nullptr)
 		return mp_RenderShape->GetPosition();
+	else
+		return Vector2f();
+}
+
+bool Entity::IsStatic() const
+{
+	return !m_isStatic;
 }
 
 bool Entity::IsColliding(Entity* other)
@@ -350,6 +376,13 @@ Entity::~Entity() {
 		delete mp_RenderShape;
 		mp_RenderShape = nullptr;
 	}
+
+	for (auto& collider : mp_Colliders)
+	{
+		delete collider;
+	}
+	mp_Colliders.clear();
+
 }
 
 void Entity::AddActiveScene(const std::string& sceneTag) {

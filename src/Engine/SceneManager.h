@@ -63,6 +63,7 @@ public:
 	void SetCurrentSceneToPreviousScene();
 
 	//Scene
+	void DeleteAllScenes();
 
 	template <typename S>
 	Scene* CreateScene(const std::string& tag);

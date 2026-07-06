@@ -71,7 +71,7 @@ Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, by
 
 Text::~Text()
 {
-	if (mp_texture != nullptr) 
+	if (mp_texture != nullptr)
 		SDL_DestroyTexture(mp_texture);
 
 	delete mp_color;
@@ -83,7 +83,7 @@ void Text::SetColor(byte r, byte g, byte b, byte a)
 	mp_color->r = r;
 	mp_color->g = g;
 	mp_color->b = b;
-	mp_color->a = a;
+	mp_color->a = 255;
 	m_needToChange = true;
 }
 
@@ -108,8 +108,8 @@ void Text::SetText(const std::string& text)
 
 void Text::SetPosition(int x, int y)
 {
-	mp_rect->x = x;
-	mp_rect->y = y;
+	mp_rect->x = static_cast<float32>(x);
+	mp_rect->y = static_cast<float32>(y);
 }
 
 void Text::SetFontSize(int32 size) {
@@ -121,8 +121,8 @@ int32 Text::GetFontSize() {
 	return m_fontSize;
 }
 
-Vector2f Text::GetSizes(){
-	return { static_cast<float32>(mp_rect->w), static_cast<float32>(mp_rect->h)};
+Vector2f Text::GetSizes() {
+	return { mp_rect->w, mp_rect->h };
 }
 
 Font* Text::GetFont() {

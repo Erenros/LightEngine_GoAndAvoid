@@ -16,16 +16,20 @@
 
 int main(int argc, char** argv)
 { 
+    //_CrtSetBreakAlloc(29164);
+
     GameManager& gm = GameManager::GetInstance();
 
     gm.Init(640, 480, 120);
 
-    SceneManager::GetInstance().CreateScene<SampleScene>("SampleScene");
+    SceneManager::GetInstance().CreateScene<SampleScene>("DebugScene");
 
-    SceneManager::GetInstance().SetCurrentSceneWithTag("SampleScene");
+    SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 
     
     gm.Loop();
+
+    SceneManager::GetInstance().DeleteAllScenes();
     gm.Close();
 
     _CrtDumpMemoryLeaks();

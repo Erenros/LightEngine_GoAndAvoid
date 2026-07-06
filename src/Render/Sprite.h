@@ -56,11 +56,13 @@ private:
 
 public:
 	
+	~Sprite() override;
 	void UpdateAnimation(float32 deltatime, gcle::Shape* shape);
 
 	bool IsAnimationPlaying() { return mp_currentAnimation == nullptr ? false : true; };
 
 	Sprite(Window* window, const std::string& path);
+	Sprite(Window* window, Asset* asset);
 
 	void AddAnimation(const std::string& id, 
 		int32 firstFrame, 
