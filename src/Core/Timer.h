@@ -17,13 +17,19 @@ class Clock
 
     Seconds m_DeltaTime;
     Seconds m_UnscaleDeltaTime;
+
+    // FPS
+    float32 m_fpsTimer = 0;
+    int16   m_fpsCount = 0;
+    Seconds m_rawDeltaTime;
 public:
     Clock() :
         m_TimeScale(1.0),
         m_UnscaleTime(0.0),
         m_Time(0.0),
         m_DeltaTime(0.0),
-        m_UnscaleDeltaTime(0.0)
+        m_UnscaleDeltaTime(0.0),
+        m_rawDeltaTime(0.f)
     {
         m_LastUpdateTime = clock::now();
     }
@@ -39,6 +45,15 @@ public:
     [[nodiscard]] Seconds GetTime() const;
     [[nodiscard]] Seconds GetTimeUnscaled() const;
 
+    [[nodiscard]] int16 GetFramePerSecond() const;
+
     [[nodiscard]] float64 GetTimeScale() const;
     void SetTimeScale(float64 scale);
+
+    clock::time_point GetLastUpdateTime() const;
+    Seconds GetRawDT() const;
+
+    void ClockSleep(Seconds time);
+    void SmartSleep(Seconds time);
+    void PreciseSleep(Seconds time);
 };

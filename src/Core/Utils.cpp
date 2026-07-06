@@ -1,7 +1,12 @@
 #include "Utils.h"
 #include <string>
 
-int8 GenerateRandomNumer(int8 min, int8 max){
+
+
+int8 GenerateRandomNumber(int8 min, int8 max){
+	if (max == 0) {
+		max += 1;
+	}
 	return (rand() % max) + min;
 }
  
@@ -61,6 +66,11 @@ std::string RemoveZeroes(std::string string)
 	return string;
 }
 
+std::string RemoveZeroes(float64 value)
+{
+	return std::string();
+}
+
 std::string RemoveZeroes(long double value)
 {
 	return RemoveZeroes(NumberToString(value));
@@ -68,9 +78,7 @@ std::string RemoveZeroes(long double value)
 
 std::string ChangeUnit(std::string string, int32 precision)
 {
-	string = RemoveZeroes(string);
-
-	std::cout << string << std::endl;
+	string = RemoveZeroes(string); 
 
 	int amountOfDigits = 0;
 	int amountOfDigitsAfterDot = 0;
@@ -175,4 +183,33 @@ std::string ChangeUnit(float64 value, int32 precision)
 	string = ChangeUnit(string, precision);
 
 	return string;
+}
+
+
+AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians rotation) {
+
+	float32 c = std::cos(rotation);
+	float32 s = std::sin(rotation);
+
+	Vector2<float32> localCorners[4]{
+		{-halfSize.x, -halfSize.y},
+		{halfSize.x, -halfSize.y},
+		{halfSize.x, halfSize.y},
+		{-halfSize.x, halfSize.y}
+	};
+
+	float32 minX = FLT_MAX, maxX = -FLT_MAX;
+	float32 minY = FLT_MAX, maxY = -FLT_MAX;
+
+	for (auto& corner : localCorners) {
+		float32 worldX = center.x + (corner.x * c - corner.y * s);
+		float32 worldY = center.y + (corner.x * s + corner.y * c);
+
+		minX = std::min(minX, worldX);
+		maxX = std::max(maxX, worldX);
+		minY = std::min(minY, worldY);
+		maxY = std::max(maxY, worldY);
+	}
+
+	return { minX, minY, maxX, maxY };
 }

@@ -16,23 +16,19 @@ public:
 		T coord[2];
 	};
 
-	Vector2()
+	constexpr Vector2() : x(0), y(0) {}
+
+	constexpr explicit Vector2(T value) : x(value), y(value)
 	{
-		x = T(0);
-		y = T(0);
 	}
 
-	explicit Vector2(const T& value)
+	constexpr Vector2(T x_, T y_) : x(x_), y(y_)
 	{
-		x = value;
-		y = value;
-	};
+	}
 
-	Vector2(std::initializer_list<T> list)
+	constexpr Vector2(std::initializer_list<T> list) : x(*list.begin()), y(*(list.begin() + 1))
 	{
-		x = *list.begin();
-		y = *(list.end() - 1);
-	};
+	} 
 
 	Vector2(const Vector2& other)
 	{ 

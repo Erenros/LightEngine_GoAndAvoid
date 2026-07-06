@@ -4,6 +4,7 @@
 #include "SceneManager.h"
 #include "AssetEngine.h"
 
+
 #undef PlaySound
 
 
@@ -42,13 +43,13 @@ Surface* RessourceManager::LoadSurface(Window* window, const std::string& path, 
 	Surface* texture = new Surface(window, path);
 	if (texture == nullptr || !texture->IsSurfaceInit())
 	{
-		DEBUG_WARN << "Got a nullptr Surface for path : " + path << ENDL;
+		GCLE_WARN << "Got a nullptr Surface for path : " + path << ENDL;
 		delete texture;
 		return nullptr;
 	}
-	 
-	DEBUG_INFO << "Surface created" << ENDL;
-	m_surfaceMap[id].mp_surface = texture;
+
+	GCLE_INFO << "Surface created" << ENDL;
+	m_textureMap[id].mp_texture = texture;
 	AssetEngine::GetInstance().AddAsset(id);
 	return texture;
 }
@@ -71,7 +72,7 @@ bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 	Music* music = new Music(path);
 	if (music == nullptr || !music->IsMusicInit())
 	{
-		DEBUG_WARN << "Got nullptr music for path " + path << ENDL;
+		GCLE_WARN << "Got nullptr music for path " + path << ENDL;
 		delete music;
 		return false;
 	}
@@ -85,7 +86,7 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 	Sound* sound = new Sound(path);
 	if (sound == nullptr || !sound->IsSoundInit())
 	{
-		DEBUG_WARN << "Got a nullptr sound for path : " + path << ENDL;
+		GCLE_WARN << "Got a nullptr sound for path : " + path << ENDL;
 		delete sound;
 		return false;
 	}
@@ -94,16 +95,16 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 	return true;
 }
 
-bool RessourceManager::LoadFont(const std::string& path, const std::string& id, int size)
+bool RessourceManager::LoadFont(const std::string& path, const std::string& id)
 {
-	Font* font = new Font(path, size);
+	Font* font = new Font(path);
 	if (font == NULL)
 	{
-		DEBUG_WARN << "Got a nullptr font for path " + path << ENDL;
+		GCLE_WARN << "Got a nullptr font for path " + path << ENDL;
 		delete font;
 		return false;
 	}
-	
+
 	m_fontMap[id] = font;
 	return true;
 }
@@ -122,7 +123,7 @@ void RessourceManager::InitTextureFolder(Window* window)
 
 	if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
 	{
-		DEBUG_WARN << "Directory " + filename.string() + " does not exits" << ENDL;
+		GCLE_WARN << "Directory " + filename.string() + "  does not exist" << ENDL;
 		return;
 	}
 
@@ -130,19 +131,19 @@ void RessourceManager::InitTextureFolder(Window* window)
 	{
 		if (!entry.is_regular_file())
 		{
-			DEBUG_WARN << "File is not valid : " + entry.path().filename().string() << ENDL;
+			GCLE_WARN << "File is not valid : " + entry.path().filename().string() << ENDL;
 			continue;
 		}
 
 		if (entry.path().extension() != ".png")
 		{
-			DEBUG_WARN << "Extension is not correct, expected '.png' receive : " + entry.path().extension().string() << ENDL;
+			GCLE_WARN << "Extension is not correct, expected '.png' receive : " + entry.path().extension().string() << ENDL;
 			continue;
 		}
 
 		if (m_surfaceMap.contains(entry.path().stem().string()))
 		{
-			DEBUG_INFO << "Texture '" << entry.path().stem().string() << "' already loaded" << ENDL;
+			GCLE_INFO << "Texture '" << entry.path().stem().string() << "' already loaded" << ENDL;
 			continue;
 		}
 
@@ -237,7 +238,7 @@ void RessourceManager::InitFont()
 			continue;
 		}
 
-		LoadFont(entry.path().string(), entry.path().stem().string(), 25);
+		LoadFont(entry.path().string(), entry.path().stem().string());
 	}
 }
 

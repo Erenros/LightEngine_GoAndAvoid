@@ -41,6 +41,8 @@ namespace Keyboard {
 	#define F11 VK_F11
 	#define F12 VK_F12
 
+	#define NUM1 VK_NUMPAD1
+
 
 }
 
@@ -78,5 +80,7 @@ public:
 
 	Vector2<long> GetMouseRelativePosition();
 	Vector2<long> GetMouseWorldPosition();
+
+	
 };
 

@@ -3,12 +3,32 @@
 #include "RessourceManager.h"
 #include "PhysicsManager.h"
 #include "SceneManager.h"
+#include "Collider.h"
 
 
 static int64 sId = 0;
 
 void Entity::Initialize(gcle::Shapes shape)
-{ 
+{
+	m_ToDestroy = false;
+	m_Tag = -1;
+
+
+	mp_RenderShape = GetBaseShape(shape);
+
+
+	m_RigidBody.Initialize(&m_Transform);
+	m_RigidBody.SetActive(true);
+
+	m_Target.isSet = false;
+
+	m_Id = sId++;
+
+	OnInitialize();
+}
+
+void Entity::Initialize() {
+
 	m_Direction = { 0.0f, 0.0f };
 	m_Speed = 0.f;
 	m_ToDestroy = false;
@@ -16,12 +36,10 @@ void Entity::Initialize(gcle::Shapes shape)
 	m_Target;
 
 
-	mp_Shape = GetBaseShape(shape); 
-	mp_RenderShape = mp_Shape->Clone(); 
+	mp_RenderShape = nullptr;
 
-	m_RigidBody.Initialize(&mp_Shape->GetTransform()); 
-
-	m_Target.isSet = false;
+	m_RigidBody.Initialize(&m_Transform);
+	m_RigidBody.SetActive(true);
 
 	m_Id = sId++;
 
@@ -34,19 +52,19 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	{
 	case gcle::Shapes::Rectangle:
 	{
-		gcle::Rectangle* pRect = new gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Rectangle* pRect = GCLE_NEW gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pRect;
 		break;
 	}
 	case gcle::Shapes::Circle:
 	{
-		gcle::Circle* pCircle = new gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
+		gcle::Circle* pCircle = GCLE_NEW gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
 		return pCircle;
 		break;
 	}
 	case gcle::Shapes::Triangle:
 	{
-		gcle::Triangle* pTriangle = new gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
+		gcle::Triangle* pTriangle = GCLE_NEW gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
 		return pTriangle;
 		break;
 	}
@@ -59,49 +77,91 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	return nullptr;
 }
 
-void Entity::Update(Clock& timer)
+void Entity::Update(float32 dt)
 {
-	float32 dt = static_cast<float32>(timer.GetTimeScale());
-	
-	if (IsRigidBody())
-		m_RigidBody.Update(timer);
+	if (m_RigidBody.IsActive())
+		m_RigidBody.Update(dt);
 
-	float32 distance = dt * m_Speed;
-	Vector2f translation = m_Direction * distance;
+	m_Transform.UpdateChildPosition();
 
-	mp_Shape->Move(translation);
-	Texture* tex = mp_RenderShape->GetTexture();
-	if (tex != nullptr)
+	if (m_isStatic == false)
 	{
-		if (tex->IsSprite())
-			static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
-	}
-	if (m_Target.isSet)
-	{
-		float32 x1 = GetPosition(0.5f, 0.5f).x;
-		float32 y1 = GetPosition(0.5f, 0.5f).y;
+		float32 distance = dt * m_Speed;
+		Vector2f translation = m_Direction * distance;
 
-		float32 x2 = x1 + m_Direction.x * m_Target.distance;
-		float32 y2 = y1 + m_Direction.y * m_Target.distance;
-
-		m_Target.distance -= distance;
-
-		if (m_Target.distance <= 0)
+		Move(translation);
+		if (mp_RenderShape != nullptr) {
+			Texture* tex = mp_RenderShape->GetTexture();
+			if (tex != nullptr)
+			{
+				if (tex->IsSprite())
+					static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+			}
+		}
+		if (m_Target.isSet)
 		{
-			SetPosition(m_Target.position.x, m_Target.position.y, 0.5f, 0.5f);
-			m_Direction = Vector2f({ 0.f, 0.f });
-			m_Target.isSet = false;
+			float32 x1 = GetPosition().x;
+			float32 y1 = GetPosition().y;
+
+			float32 x2 = x1 + m_Direction.x * m_Target.distance;
+			float32 y2 = y1 + m_Direction.y * m_Target.distance;
+
+			m_Target.distance -= distance;
+
+			if (m_Target.distance <= 0)
+			{
+				SetPosition(m_Target.position.x, m_Target.position.y);
+				m_Direction = Vector2f({ 0.f, 0.f });
+				m_Target.isSet = false;
+			}
 		}
 	}
 
 	OnUpdate();
 }
 
+void Entity::AddCollider(Collider* pCollider)
+{
+	if (pCollider == nullptr)
+		return;
+
+	pCollider->SetOwner(this);
+	mp_Colliders.insert(pCollider);
+}
+
+void Entity::RemoveCollider(Collider* pCollider)
+{
+	if (pCollider == nullptr)
+		return;
+
+	mp_Colliders.erase(pCollider);
+}
+
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
+{
+	Collider* collider = GCLE_NEW Collider();
+
+	gcle::Shape* colliderShape = GetBaseShape(shape);
+
+	Vector2f entityScale = m_Transform.GetScale();
+	colliderShape->SetScale({ scale.x * entityScale.x, scale.y * entityScale.y }); 
+
+	collider->Initialize(colliderShape, m_Transform.GetPosition() + relativePosition, rotation, this);
+
+	AddCollider(collider);
+	collider->SetActive(isActive);
+
+	return collider;
+}
+
 void Entity::Destroy()
 {
-	m_ToDestroy = true;
-	PhysicsManager::GetInstance().RemoveEntity(this);
-	OnDestroy();
+	if (this != nullptr)
+	{
+		m_ToDestroy = true;
+		PhysicsManager::GetInstance().RemoveEntity(this);
+		OnDestroy();
+	}
 }
 
 bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
@@ -109,18 +169,23 @@ bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
 	if (GoToDirection(x, y, speed) == false)
 		return false;
 
-	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+	Vector2f position = m_Transform.GetPosition();
 
-	m_Target.position = { x, y }; 
-	m_Target.distance = position.GetDistance({ x, y }); 
+	m_Target.position = { x, y };
+	m_Target.distance = position.GetDistance({ x, y });
 	m_Target.isSet = true;
 
 	return true;
 }
 
+void Entity::Move(Vector2f translation) {
+	Vector2f pivot = m_Transform.GetPosition();
+	m_Transform.SetPosition({ pivot.x + translation.x, pivot.y + translation.y });
+}
+
 bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 {
-	Vector2f position = mp_Shape->GetPosition(0.5f, 0.5f);
+	Vector2f position = m_Transform.GetPosition();
 	Vector2f direction = Vector2f({ x - position.x, y - position.y });
 
 	direction = direction.Normalized();
@@ -128,11 +193,11 @@ bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 	SetDirection(direction.x, direction.y, speed);
 
 	return true;
-} 
- 
-Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
+}
+
+Vector2f Entity::GetPosition()
 {
-	return mp_Shape->GetPosition(ratioX, ratioY);
+	return m_Transform.GetPosition();
 }
 
 void Entity::SetDirection(float32 x, float32 y, float32 speed)
@@ -150,56 +215,71 @@ void Entity::SetRigidBody(bool isRigidBody)
 	m_RigidBody.SetActive(isRigidBody);
 
 	if (isRigidBody)
+	{
 		PhysicsManager::GetInstance().AddEntity(this);
+		m_isHighlighted = true;
+	}
 
 	if (!isRigidBody)
+	{
 		PhysicsManager::GetInstance().RemoveEntity(this);
+		m_isHighlighted = false;
+	}
 }
 
-void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
+void Entity::SetPosition(float32 x, float32 y)
 {
-	mp_Shape->SetPosition(x, y, ratioX, ratioY);
+	m_Transform.SetPosition({ x, y });
 }
 
 Vector2f Entity::GetScale()
 {
-	return mp_Shape->GetScale();
+	return m_Transform.GetScale();
 }
 
 Degrees Entity::GetRotation()
 {
-	return mp_Shape->GetRotation();
+	return m_Transform.GetDegAngle();
 }
 
 void Entity::SetScale(Vector2f scale)
 {
-	mp_Shape->SetScale(scale);
+	m_Transform.SetScale(scale);
 }
 
 void Entity::ScaleBy(Vector2f factor)
 {
-	mp_Shape->ScaleBy(factor);
+	Vector2f current = m_Transform.GetScale();
+	m_Transform.SetScale({ current.x * factor.x, current.y * factor.y });
 }
 
 void Entity::SetRotation(Degrees angle)
 {
-	mp_Shape->SetRotation(angle);
+	m_Transform.SetDegAngle(angle);
 }
 
 void Entity::Rotate(Degrees delta)
 {
-	mp_Shape->Rotate(delta);
+	Degrees newAngle = m_Transform.GetDegAngle() + delta;
+	newAngle = std::fmod(newAngle, 360.0f);
+	if (newAngle < 0.0f)
+		newAngle += 360.0f;
+
+	m_Transform.SetDegAngle(newAngle);
 }
 
 void Entity::SetTexture(const std::string& id)
 {
+	if (mp_RenderShape == nullptr)
+		return;
+
 	RessourceManager& RM  = RessourceManager::GetInstance();
 
 	mp_RenderShape->SetTexture(GameManager::GetInstance().GetWindow(), RM.GetSurface(id));
 	RM.AddTexture(id, mp_RenderShape->GetTexture());
 
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
-		for(auto& sId : m_activeScenes)
+		for (auto& sId : m_activeScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
 		if (RM.GetSurface(id)->mp_surface == nullptr) {
 			std::string path = "../../assets/textures/" + id + ".png";
@@ -210,20 +290,24 @@ void Entity::SetTexture(const std::string& id)
 
 void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
 {
-	mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
+	if(mp_RenderShape != nullptr)
+		mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
 void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
 {
-	mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
+	if(mp_RenderShape != nullptr)
+		mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
 void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 {
+	if (mp_RenderShape == nullptr)
+		return;
 	if (shapeType == 0)
 	{
-		
-		
+
+
 		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
 
 
@@ -250,14 +334,42 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 	}
 }
 
+void Entity::SetStatic(bool isStatic)
+{
+	m_isStatic = isStatic;
+}
+
 Vector2f Entity::GetRenderPosition()
 {
-	return mp_RenderShape->GetPosition();
+	if (mp_RenderShape != nullptr)
+		return mp_RenderShape->GetPosition();
+	else
+		return Vector2f();
+}
+
+bool Entity::IsStatic() const
+{
+	return !m_isStatic;
 }
 
 bool Entity::IsColliding(Entity* other)
 {
-	return PhysicsManager::GetInstance().IsColliding(this, other);
+	for (Collider* pCollider : mp_Colliders)
+	{
+		if (!pCollider->IsActive())
+			continue;
+
+		for (Collider* pOtherCollider : other->mp_Colliders)
+		{
+			if (!pOtherCollider->IsActive())
+				continue;
+
+			if (PhysicsManager::GetInstance().IsColliding(pCollider, pOtherCollider))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 bool Entity::IsInside(Vector2f position)
@@ -265,9 +377,18 @@ bool Entity::IsInside(Vector2f position)
 	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 
-Entity::~Entity(){
-	delete mp_Shape;
-	delete mp_RenderShape;
+Entity::~Entity() {
+	if (mp_RenderShape != nullptr) {
+		delete mp_RenderShape;
+		mp_RenderShape = nullptr;
+	}
+
+	for (auto& collider : mp_Colliders)
+	{
+		delete collider;
+	}
+	mp_Colliders.clear();
+
 }
 
 void Entity::AddActiveScene(const std::string& sceneTag) {
@@ -300,7 +421,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 
@@ -312,9 +433,29 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
-		DEBUG_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
 
 	sprite->PlayAnimation(id);
+}
+
+void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->AddFunctionInFrame(animation, frame, function);
+}
+
+void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->RemoveFunctionInFrame(animation, frame);
 }

@@ -1,45 +1,61 @@
 #include "Shape.h" 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include "Engine/Entity.h"
 
 namespace gcle
 {
+	SDL_FColor ToSDLColor(Color c)
+	{
+		return SDL_FColor{ c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, c.a / 255.0f };
+	}
+
 	Shape::~Shape()
 	{
-		for (auto* vertex : m_verticies)
+		for (SDL_Vertex* vertex : m_verticies)
 		{
-			if (vertex != nullptr)
-			{
-				delete vertex;
-			}
+			delete vertex;
 		}
-
 		m_verticies.clear();
-
-		for (auto* hollow : m_hollowPoints)
+		 
+		for (SDL_FPoint* point : m_hollowPoints)
 		{
-			if (hollow != nullptr)
-			{
-				delete hollow;
-			}
+			delete point;
 		}
-
 		m_hollowPoints.clear();
+
+		m_debugContour.clear();
+		m_localPositions.clear();
+		m_indicies.clear();
+		m_trianglepoints.clear();
 	}
 
-	Shape::Shape(Entity* owner) : mp_Owner(owner), m_IsKinematic(false)
+	Shape::Shape(Entity* owner) : mp_Owner(owner)
 	{
 	}
 
-	Shape::Shape(Shape* pShape) : mp_texture(pShape->mp_texture), m_Transform(pShape->m_Transform), m_radius(pShape->m_radius), m_center(pShape->m_center),
-		m_smoothness(pShape->m_smoothness), m_height(pShape->m_height), m_width(pShape->m_width), m_origin(pShape->m_origin), m_trianglepoints(pShape->m_trianglepoints),
-		m_shape(pShape->m_shape), m_localPositions(pShape->m_localPositions), m_indicies(pShape->m_indicies)
+	Shape::Shape(const Shape& pShape) : mp_texture(pShape.mp_texture), m_Transform(pShape.m_Transform), m_radius(pShape.m_radius), m_center(pShape.m_center),
+		m_smoothness(pShape.m_smoothness), m_height(pShape.m_height), m_width(pShape.m_width), m_origin(pShape.m_origin), m_trianglepoints(pShape.m_trianglepoints),
+		m_shape(pShape.m_shape), m_localPositions(pShape.m_localPositions), m_indicies(pShape.m_indicies), mp_Owner(pShape.mp_Owner)
 	{
-		m_verticies.resize(pShape->m_verticies.size());
-		for (size_t i = 0; i < m_verticies.size(); i++)
+
+		m_verticies.resize(pShape.m_verticies.size());
+		for (uint64 i = 0; i < pShape.m_verticies.size(); ++i)
 		{
-			m_verticies[i] = new SDL_Vertex(*pShape->m_verticies[i]);
+			if (pShape.m_verticies[i])
+				m_verticies[i] = GCLE_NEW SDL_Vertex(*pShape.m_verticies[i]);
+			else
+				m_verticies[i] = nullptr;
 		}
+
+		m_hollowPoints.resize(pShape.m_hollowPoints.size());
+		for (uint64 i = 0; i < pShape.m_hollowPoints.size(); ++i)
+		{
+			if (pShape.m_hollowPoints[i])
+				m_hollowPoints[i] = GCLE_NEW SDL_FPoint(*pShape.m_hollowPoints[i]);
+			else
+				m_hollowPoints[i] = nullptr;
+		}
+
 		m_Transform.SetDirty();
 	}
 
@@ -109,7 +125,6 @@ namespace gcle
 	void Shape::SetRotation(Degrees angle)
 	{
 		m_Transform.SetDegAngle(angle);
-		m_Transform.SetRadAngle(MathGC::DegToRad(angle));
 	}
 
 	void Shape::Rotate(Degrees delta)
@@ -167,16 +182,16 @@ namespace gcle
 			m_height = height;
 			m_width = width;
 
-			SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+			SDL_FColor sdl_color = ToSDLColor(color);
 
-			m_verticies[0] = new SDL_Vertex{ {x, y}, sdl_color, {0.f, 0.f} };
-			m_verticies[1] = new SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
-			m_verticies[2] = new SDL_Vertex{ {x, y + m_height}, sdl_color, {0.f, 1.f} };
-			m_verticies[3] = new SDL_Vertex{ {x + m_width, y + m_height}, sdl_color, {1.f, 1.f} };
+			m_verticies[0] = GCLE_NEW SDL_Vertex{ {x, y}, sdl_color, {0.f, 0.f} };
+			m_verticies[1] = GCLE_NEW SDL_Vertex{ {x + m_width, y}, sdl_color, {1.f, 0.f} };
+			m_verticies[2] = GCLE_NEW SDL_Vertex{ {x, y + m_height}, sdl_color, {0.f, 1.f} };
+			m_verticies[3] = GCLE_NEW SDL_Vertex{ {x + m_width, y + m_height}, sdl_color, {1.f, 1.f} };
 
 			for (int32 i = 0; i < static_cast<int32>(m_verticies.size()); i++)
 			{
-				m_hollowPoints[i] = new SDL_FPoint{ m_verticies[i]->position.x, m_verticies[i]->position.y };
+				m_hollowPoints[i] = GCLE_NEW SDL_FPoint{ m_verticies[i]->position.x, m_verticies[i]->position.y };
 			}
 
 			m_indicies = {
@@ -253,16 +268,16 @@ namespace gcle
 		m_hollowPoints.resize(3);
 		m_indicies.resize(3);
 
-		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+		SDL_FColor sdl_color = ToSDLColor(color);
 
-		m_verticies[0] = new SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
-		m_verticies[1] = new SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
-		m_verticies[2] = new SDL_Vertex{ {x3, y3}, sdl_color, {1.f, 1.f} };
+		m_verticies[0] = GCLE_NEW SDL_Vertex{ {x1, y1}, sdl_color, {0.f, 0.f} };
+		m_verticies[1] = GCLE_NEW SDL_Vertex{ {x2, y2}, sdl_color, {1.f, 0.f} };
+		m_verticies[2] = GCLE_NEW SDL_Vertex{ {x3, y3}, sdl_color, {1.f, 1.f} };
 
 
 		for (int i = 0; i < 3; ++i)
 		{
-			m_hollowPoints[i] = new SDL_FPoint{};
+			m_hollowPoints[i] = GCLE_NEW SDL_FPoint{};
 		}
 
 		m_indicies = { 0, 1, 2 };
@@ -352,18 +367,27 @@ namespace gcle
 
 		Degrees degreesBetweenPoints = 360.0f / _smoothness;
 
-		SDL_Color sdl_color{ color.r, color.g, color.b, color.a };
+		SDL_FColor sdl_color = ToSDLColor(color);
 
-		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {1, 1} };
+		m_verticies[0] = new SDL_Vertex{ {x + radius, y + radius}, sdl_color, {0.5f, 0.5f} };
 		m_localPositions.push_back({ 0.f, 0.f });
 
-		for (int i = 0; i < _smoothness; i++) {
+		for (int i = 0; i < _smoothness; i++)
+		{
 			Radians radian = MathGC::DegToRad(degreesBetweenPoints * i);
 
 			float cx = sin(radian) * radius;
 			float cy = cos(radian) * radius;
 
-			m_verticies[i + 1] = new SDL_Vertex{ {x + radius + cx, y + radius + cy}, sdl_color, {1, 1} };
+			float u = 0.5f + (cx / radius) * 0.5f;
+			float v = 0.5f + (cy / radius) * 0.5f;
+
+			m_verticies[i + 1] = new SDL_Vertex{
+				{x + radius + cx, y + radius + cy},
+				sdl_color,
+				{u, v}
+			};
+
 			m_localPositions.push_back({ cx, cy });
 
 			m_indicies[i * 3] = 0;
@@ -374,7 +398,7 @@ namespace gcle
 
 		for (int i = 0; i < _smoothness + 1; ++i)
 		{
-			m_hollowPoints[i] = new SDL_FPoint{};
+			m_hollowPoints[i] = GCLE_NEW SDL_FPoint{};
 		}
 
 		m_Transform.SetDirty();
@@ -441,7 +465,16 @@ namespace gcle
 		}
 		else if (m_shape == Shapes::Circle)
 		{
-			//NON LES CERCLES C'EST PAS MARRANTS
+			float32 u0 = x / static_cast<float32>(textW);
+			float32 v0 = y / static_cast<float32>(textH);
+			float32 u1 = (x + w) / static_cast<float32>(textW);
+			float32 v1 = (y + h) / static_cast<float32>(textH);
+			m_verticies[0]->tex_coord = { (u0 + u1) * 0.5f, (v0 + v1) * 0.5f };
+			for (int i = 1; i < m_smoothness + 1; i++)
+			{
+				m_verticies[i]->tex_coord = { u0 + (u1 - u0) * 0.5f * (1.f + m_localPositions[i].x / m_radius),
+											  v0 + (v1 - v0) * 0.5f * (1.f + m_localPositions[i].y / m_radius) };
+			}
 		}
 	}
 }

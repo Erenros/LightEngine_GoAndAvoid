@@ -16,6 +16,7 @@ public:
     void Forward();
 
     void UpdatePositionWithParentPosition();
+    void UpdateChildPosition();
 
 public:
     void SetPosition(Vector2f);
@@ -71,6 +72,7 @@ private:
     float m_DistanceFromParent = 0;
     Radians m_AngleDifferenceToParent = 0;
     Radians m_OffsetAngle = 0;
+    Vector2f m_ScaleRatioToParent = { 1.0f, 1.0f };
 
     Radians m_ParentAncientAngle = 0;
 

@@ -17,13 +17,12 @@ void RigidBody2D::Initialize(Transform2D* transform)
 	mp_Transform = transform;
 }
 
-void RigidBody2D::Update(Clock& timer)
+void RigidBody2D::Update(float32 dt)
 {
+	if (m_UseFriction) {
+		ApplyFriction(dt);
+	}
 
-	float32 dt = static_cast<float32>(timer.GetDeltaTime());
-	dt = 0.016f;
-
-	ApplyFriction(dt);
 	ApplyGravity(dt);
 
 	if (m_TempVelHasChanged) {
@@ -35,6 +34,16 @@ void RigidBody2D::Update(Clock& timer)
 	ApplyVelocity(dt);
 
 	m_TempVelocity = m_Velocity;
+
+	mp_Transform->UpdateChildPosition();
+
+	if (!m_UseFriction)
+		m_Velocity = {0, 0};
+}
+
+bool RigidBody2D::UseContinuousCollision() const
+{
+	return m_CollisionDetectionMode == CollisionDetectionMode::Continuous;
 }
 
 void RigidBody2D::AddForce(Vector2f direction, float32 strength, float32 dt)
@@ -79,22 +88,18 @@ Vector2f RigidBody2D::GetVelocity() const
 
 void RigidBody2D::ZeroVelocityX(bool right)
 {
-	if (right && m_TempVelocity.x < 0)
-		m_TempVelocity.x = 0;
-	if (!right && m_TempVelocity.x > 0)
-		m_TempVelocity.x = 0;
-
-	m_TempVelHasChanged = true;
+	if (right && m_Velocity.x < 0)
+		m_Velocity.x = 0;
+	if (!right && m_Velocity.x > 0)
+		m_Velocity.x = 0;
 }
 
 void RigidBody2D::ZeroVelocityY(bool down)
 {
-	if (down && m_TempVelocity.y < 0)
-		m_TempVelocity.y = 0;
-	if (!down && m_TempVelocity.y > 0)
-		m_TempVelocity.y = 0;
-
-	m_TempVelHasChanged = true;
+	if (down && m_Velocity.y < 0)
+		m_Velocity.y = 0;
+	if (!down && m_Velocity.y > 0)
+		m_Velocity.y = 0;
 }
 
 void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
@@ -106,15 +111,19 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 
 	Vector2f n = normal / std::sqrt(lengthSq);
 
-	float32 dot = m_TempVelocity.Dot(n);
+	float32 dot = m_Velocity.Dot(n);
 
 	if (dot < 0.0f)
 	{
-		m_TempVelocity -= n * dot;
+		m_Velocity -= n * dot;
 	}
+}
 
-	m_TempVelHasChanged = true;
-
+Vector2f RigidBody2D::CalculateNextPosition(float32 dt)
+{
+	Vector2f pos = mp_Transform->GetPosition();
+	Vector2f nextPos = pos + m_Velocity * dt;
+	return nextPos;
 }
 
 void RigidBody2D::ApplyVelocity(float32 dt)

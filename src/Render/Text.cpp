@@ -3,44 +3,51 @@
 #include "Window.h"
 #include "Engine/RessourceManager.h"
 
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 SDL_Texture* Text::CreateTexture(Window* window)
 {
 	if (mp_texture != nullptr && !m_needToChange)
 		return mp_texture;
-	
+
 	m_needToChange = false;
 	SDL_DestroyTexture(mp_texture);
 
 	if (mp_font == nullptr || !mp_font->IsFontInit())
 	{
-		DEBUG_WARN << "Font is nullptr can't create texture for text" << ENDL;
+		GCLE_WARN << "Font is nullptr can't create texture for text" << ENDL;
 		return nullptr;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Solid(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
+	// 0 = chaîne C terminée par un \0, comme avant
+	SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), 0, *mp_color);
 	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
 
 	mp_texture = text_texture;
 
-	SDL_FreeSurface(surface);
+	SDL_DestroySurface(surface);
+
+	mp_rect->w = static_cast<float32>(m_text.size()) * static_cast<float32>(m_fontSize) * 0.6f;
+	mp_rect->h = static_cast<float32>(m_fontSize);
+
 
 	return text_texture;
 }
 
-Text::Text(Font* font, const std::string& text, int x, int y, int w, int h, byte r, byte g, byte b, byte a) :
+Text::Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b, byte a) :
 	mp_font(font),
-	m_text(text)
+	m_text(text),
+	m_fontSize(fontSize)
 {
-	mp_color = new SDL_Color(r, g, b, a);
-	mp_rect = new SDL_Rect(x, y, w, h);
+	mp_color = GCLE_NEW SDL_Color(r, g, b, a);
+	mp_rect = GCLE_NEW SDL_FRect{ pos.x, pos.y, static_cast<float32>(text.size()) * static_cast<float32>(fontSize) * 0.6f, static_cast<float32>(fontSize) };
 }
 
 Text::~Text()
 {
-	if (mp_texture != nullptr) 
+	if (mp_texture != nullptr)
 		SDL_DestroyTexture(mp_texture);
 
 	delete mp_color;
@@ -49,8 +56,11 @@ Text::~Text()
 
 void Text::SetColor(byte r, byte g, byte b, byte a)
 {
-	delete mp_color;
-	mp_color = new SDL_Color(r, g, b, a);
+	mp_color->r = r;
+	mp_color->g = g;
+	mp_color->b = b;
+	mp_color->a = 255;
+	m_needToChange = true;
 }
 
 void Text::SetFont(const std::string& id)
@@ -58,11 +68,12 @@ void Text::SetFont(const std::string& id)
 	Font* font = RessourceManager::GetInstance().GetFont(id);
 	if (font == nullptr)
 	{
-		DEBUG_WARN << "Font : " << id << " doesn't exist" << ENDL;
+		GCLE_WARN << "Font : " << id << " doesn't exist" << ENDL;
 		return;
 	}
 
 	mp_font = font;
+	m_needToChange = true;
 }
 
 void Text::SetText(const std::string& text)
@@ -73,14 +84,24 @@ void Text::SetText(const std::string& text)
 
 void Text::SetPosition(int x, int y)
 {
-	mp_rect->x = x;
-	mp_rect->y = y;
+	mp_rect->x = static_cast<float32>(x);
+	mp_rect->y = static_cast<float32>(y);
 }
-void Text::SetWidth(int w)
-{
-	mp_rect->w = w;
+
+
+void Text::SetFontSize(int32 size) {
+	m_fontSize = size;
+	m_needToChange = true;
 }
-void Text::SetHeight(int h)
-{
-	mp_rect->h = h;
-} 
+
+int32 Text::GetFontSize() {
+	return m_fontSize;
+}
+
+Vector2f Text::GetSizes() {
+	return { mp_rect->w, mp_rect->h };
+}
+
+Font* Text::GetFont() {
+	return mp_font;
+}

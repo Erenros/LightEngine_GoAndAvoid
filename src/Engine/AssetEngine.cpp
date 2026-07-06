@@ -28,13 +28,13 @@ bool AssetEngine::LoadFile(const std::string& path)
 	std::ifstream file(path, std::ios::binary);
 	if (!file)
 	{
-		DEBUG_WARN << "Can't open file with path : " << path << ENDL;
+		GCLE_WARN << "Can't open file with path : " << path << ENDL;
 		return false;
 	}
 
 	if (!ReadHeader(file))
 	{
-		DEBUG_WARN << "Can't read Header" << ENDL;
+		GCLE_WARN << "Can't read Header" << ENDL;
 		return false;
 	}
 
@@ -44,7 +44,7 @@ bool AssetEngine::LoadFile(const std::string& path)
 	{
 		if (entry.flag == 0x01)
 		{
-			DEBUG_INFO << "Entry " << entry.id << " Deleted " << "| size : " << entry.size << " byte" << ENDL;
+			GCLE_INFO << "Entry " << entry.id << " Deleted " << "| size : " << entry.size << " byte" << ENDL;
 			file.seekg(entry.size, std::ios::cur); // std::ios::cur = current pos 
 			continue;
 		}
@@ -55,11 +55,11 @@ bool AssetEngine::LoadFile(const std::string& path)
 		std::vector<byte> data;
 		if (!ReadData(file, entry, data))
 		{
-			DEBUG_WARN << "Si ce message s'affiche gg well play c'est casser donc recommance ta mal fait un truc" << ENDL;
+			GCLE_WARN << "Si ce message s'affiche gg well play c'est casser donc recommance ta mal fait un truc" << ENDL;
 			return false;
 		};
 
-		DEBUG_INFO << "File '" << name << "' load with a size of : " << data.size() << " byte" << ENDL;
+		GCLE_INFO << "File '" << name << "' load with a size of : " << data.size() << " byte" << ENDL;
 
 		Asset* asset = new Asset;
 
@@ -135,11 +135,11 @@ bool AssetEngine::ReadHeader(std::ifstream& file)
 
 	if (file.gcount() == 0 || memcmp(signature, "GCLE", 4) != 0)
 	{
-		DEBUG_WARN << "Invalid Signature" << ENDL;
+		GCLE_WARN << "Invalid Signature" << ENDL;
 		return false;
 	}
 
-	DEBUG_INFO << "Open file -> version : " << static_cast<int>(version)  << ENDL;
+	GCLE_INFO << "Open file -> version : " << static_cast<int>(version)  << ENDL;
 	return true;
 }
 
@@ -158,14 +158,14 @@ bool AssetEngine::ReadData(std::ifstream& file, Entry& entry, std::vector<byte>&
 	outData.resize(entry.size);
 	if (entry.size == 0)
 	{
-		DEBUG_WARN << "Size is 0" << ENDL;
+		GCLE_WARN << "Size is 0" << ENDL;
 		return true;
 	}
 
 	file.read(reinterpret_cast<char*>(outData.data()), entry.size);
 	if (file.gcount() != entry.size)
 	{
-		DEBUG_WARN << "Error reading data" << ENDL;
+		GCLE_WARN << "Error reading data" << ENDL;
 		return false;
 	}
 
@@ -197,7 +197,7 @@ void AssetEngine::SaveInFile(const std::string& path)
 	std::ofstream file(path, std::ios::binary);
 	if (!file)
 	{
-		DEBUG_WARN << "Can't open file with path : " << path << ENDL;
+		GCLE_WARN << "Can't open file with path : " << path << ENDL;
 		return;
 	}
 
@@ -253,7 +253,7 @@ void AssetEngine::ReadFile(const std::string& path, std::vector<byte>& data)
 {
 	std::ifstream file(path, std::ios::binary);
 	if (!file)
-		DEBUG_ERROR << "Can't read file with path : " << path << ENDL;
+		GCLE_ERROR << "Can't read file with path : " << path << ENDL;
 
 	file.seekg(0, std::ios::end);
 	std::streamsize size = file.tellg();

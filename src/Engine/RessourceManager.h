@@ -22,7 +22,7 @@ private:
 	int32 m_useCount = 0;
 	bool m_destroyWhenUnused = true;
 	uint32 m_flag = 0b0;
-		
+
 public:
 	void SetFlag(uint32 flag) {
 		m_flag = flag;
@@ -35,11 +35,11 @@ public:
 	uint32 GetFlag() {
 		return m_flag;
 	}
-	
+
 	void UnloadTexture() {
-		if(mp_surface != nullptr)
-			delete mp_surface;
-			mp_surface = nullptr;
+		if (mp_texture != nullptr)
+			delete mp_texture;
+		mp_texture = nullptr;
 	}
 
 	bool IsLoaded() {
@@ -67,8 +67,8 @@ private:
 	std::unordered_map<std::string, std::vector<Texture*>> m_textures;
 
 	friend class SceneManager;
-	
-private: 
+
+private:
 
 	void ForcePutSurface(Surface* text, std::string id);
 	friend class AssetEngine;
@@ -117,7 +117,7 @@ public:
 	bool LoadMusic(const std::string& path, const std::string& id);
 	bool LoadSound(const std::string& path, const std::string& id);
 
-	bool LoadFont(const std::string& path, const std::string& id, int size);
+	bool LoadFont(const std::string& path, const std::string& id);
 
 	void Init(Window* window);
 

@@ -1,5 +1,10 @@
 #pragma once
 #include "include.h"
+#include "Render/Shape.h"
+
+using namespace gcle;
+
+class Entity;   // <-- AJOUT : forward declaration
 
 struct CollisionDirection
 {
@@ -14,7 +19,9 @@ class Collider
 {
 public:
 	Collider() = default;
-	~Collider() = default;
+	~Collider();
+
+	void Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner);
 
 	void CollidingOn(Vector2f direction);
 	void CollidingOnX(float32 direction);
@@ -25,9 +32,31 @@ public:
 	bool IsActive() { return m_IsActive; }
 	void SetActive(bool activate) { m_IsActive = activate; }
 
+	Shape* GetShape() { return m_shape; }
+	const Shape* GetShape() const { return m_shape; }
+
+	const CollisionDirection& GetCollisionDirection() const { return m_CollisionDirection; }
+
+	Entity* GetOwner() const { return mp_Owner; }
+	void SetOwner(Entity* pOwner) { mp_Owner = pOwner; }
+
 private:
+	Shape* m_shape = nullptr;
+
+	Entity* mp_Owner = nullptr;
+
 	bool m_IsActive = false;
 
-	bool IsColliding = false;
 	CollisionDirection m_CollisionDirection;
+
+private:
+	bool m_inQuerySeen = false;
+	AABB m_aabb{};
+
+public:
+	bool GetInQuerySeen();
+	void SetInQuerySeen(bool seen);
+
+	AABB GetAABB();
+	void SetAABB(AABB aabb);
 };
