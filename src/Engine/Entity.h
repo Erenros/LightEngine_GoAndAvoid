@@ -11,26 +11,14 @@
 
 class Collider;
 
-struct Target
-{
-	Vector2f position;
-	float distance = 0.f;
-	bool isSet = false;
-};
-
 class Entity
 {
 public:
 	void Destroy();
 	void Move(Vector2f translation);
-	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
-	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
 
 public:
 	void SetTag(int32 tag) { m_Tag = tag; }
-	
-	void SetSpeed(float32 speed) { m_Speed = speed; }
-	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
 
 	void SetRigidBody(bool isRigidBody);
 
@@ -59,6 +47,7 @@ public:
 
 public:
 	//void SetRenderShape(gcle::Shapes);
+	int32* GetCollisionLayer() { return &m_CollisionLayer; }
 	Vector2f GetScale();
 	Degrees GetRotation();
 	Vector2f GetPosition();
@@ -113,12 +102,12 @@ private:
 
 protected:
 
-	Target			m_Target;
 	int64			m_Id			= 0;
 	int32			m_Tag			= -1;
 	float32			m_Speed			= 0.f;
 	bool			m_ToDestroy		= false; 
-	Vector2f		m_Direction		= { 0.0f, 0.0f };
+
+	int32			m_CollisionLayer = 0;
 
 private:
 	bool m_isStatic			= false;

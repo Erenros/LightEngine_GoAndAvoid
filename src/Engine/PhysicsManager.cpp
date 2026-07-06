@@ -4,6 +4,7 @@
 #include "PhysicsManager.h"
 #include "SceneManager.h"
 #include "MathGC.h"
+#include "Mask.h"
 
 #undef min
 #undef max
@@ -329,7 +330,7 @@ void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
 			bool greater = collider < c;
 			bool notTheSameEntity = collider->GetOwner()->GetId() != c->GetOwner()->GetId();
 
-			bool onSameLayer = (collider->GetOwner()->GetLayer() == c->GetOwner()->GetLayer());
+			bool onSameLayer = (Mask::AreOnASameLayer(collider->GetOwner()->GetCollisionLayer(), c->GetOwner()->GetCollisionLayer()));
 
 			if (greater && notTheSameEntity && onSameLayer) {
 				m_pairs.push_back({ collider, c });

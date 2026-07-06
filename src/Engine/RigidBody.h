@@ -52,11 +52,11 @@ public:
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
-	void SetDampingStrenght(float32 strenght) { m_Friction = { strenght, strenght }; }
-	void SetDampingOnXAxis(float32 strenght) { m_Friction = { strenght, 0 }; }
-	void SetDampingOnYAxis(float32 strenght) { m_Friction = { 0, strenght }; }
+	void SetDampingStrenght(float32 velocityDampingFactor) { m_Friction = { velocityDampingFactor, velocityDampingFactor }; }
+	void SetDampingOnXAxis(float32 velocityDampingFactor) { m_Friction = { velocityDampingFactor, 0 }; }
+	void SetDampingOnYAxis(float32 velocityDampingFactor) { m_Friction = { 0, velocityDampingFactor }; }
 
-	void ActivateDamping(bool isActive) { m_UseFriction = isActive; }
+	void ActivateDamping(bool UseFriction) { m_UseFriction = UseFriction; }
 
 	Vector2f CalculateNextPosition(float32 dt);
 	bool UseContinuousCollision() const;
