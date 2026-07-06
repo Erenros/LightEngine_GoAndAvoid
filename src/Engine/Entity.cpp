@@ -5,73 +5,46 @@
 #include "SceneManager.h"
 #include "Collider.h"
 
-
 static int64 sId = 0;
+
+Entity::~Entity() {
+	if (mp_RenderShape != nullptr) {
+		delete mp_RenderShape;
+		mp_RenderShape = nullptr;
+	}
+
+	for (auto& collider : mp_Colliders)
+	{
+		delete collider;
+	}
+	mp_Colliders.clear();
+
+}
 
 void Entity::Initialize(gcle::Shapes shape)
 {
-	m_ToDestroy = false;
-	m_Tag = -1;
+	GameObject::Initialize(shape);
 
-	mp_RenderShape = GetBaseShape(shape);
+	m_Tag = -1;
 
 	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
 
-	m_Id = sId++;
-
 	OnInitialize();
 
-	m_CollisionLayer = 1;
-}
-
-void Entity::Initialize() {
-
-	m_ToDestroy = false;
-	m_Tag = -1;
-
-	mp_RenderShape = nullptr;
-
-	m_RigidBody.Initialize(&m_Transform);
-	m_RigidBody.SetActive(true);
-
 	m_Id = sId++;
-
-	OnInitialize();
-
-	m_CollisionLayer = 1;
-
 }
 
-gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
+void Entity::Initialize()
 {
-	switch (shape)
-	{
-	case gcle::Shapes::Rectangle:
-	{
-		gcle::Rectangle* pRect = GCLE_NEW gcle::Rectangle(0.0f, 0.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
-		return pRect;
-		break;
-	}
-	case gcle::Shapes::Circle:
-	{
-		gcle::Circle* pCircle = GCLE_NEW gcle::Circle(0.0f, 0.0f, 100.0f, 32, Color{ 255, 255, 255, 255 }, this);
-		return pCircle;
-		break;
-	}
-	case gcle::Shapes::Triangle:
-	{
-		gcle::Triangle* pTriangle = GCLE_NEW gcle::Triangle(0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, Color{ 255, 255, 255, 255 }, this);
-		return pTriangle;
-		break;
-	}
-	case gcle::Shapes::Count:
-		break;
-	default:
-		break;
-	}
+	m_Tag = -1;
 
-	return nullptr;
+	m_RigidBody.Initialize(&m_Transform);
+	m_RigidBody.SetActive(true);
+
+	OnInitialize();
+
+	m_Id = sId++;
 }
 
 void Entity::Update(float32 dt)
@@ -79,16 +52,7 @@ void Entity::Update(float32 dt)
 	if (m_RigidBody.IsActive())
 		m_RigidBody.Update(dt);
 
-	m_Transform.UpdateChildPosition();
-
-	if (mp_RenderShape != nullptr) {
-		Texture* tex = mp_RenderShape->GetTexture();
-		if (tex != nullptr)
-		{
-			if (tex->IsSprite())
-				static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
-		}
-	}
+	GameObject::Update(dt);
 
 	OnUpdate();
 }
@@ -137,16 +101,6 @@ void Entity::Destroy()
 	}
 }
 
-void Entity::Move(Vector2f translation) {
-	Vector2f pivot = m_Transform.GetPosition();
-	m_Transform.SetPosition({ pivot.x + translation.x, pivot.y + translation.y });
-}
-
-Vector2f Entity::GetPosition()
-{
-	return m_Transform.GetPosition();
-}
-
 void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
@@ -164,118 +118,9 @@ void Entity::SetRigidBody(bool isRigidBody)
 	}
 }
 
-void Entity::SetPosition(float32 x, float32 y)
-{
-	m_Transform.SetPosition({ x, y });
-}
-
-Vector2f Entity::GetScale()
-{
-	return m_Transform.GetScale();
-}
-
-Degrees Entity::GetRotation()
-{
-	return m_Transform.GetDegAngle();
-}
-
-void Entity::SetScale(Vector2f scale)
-{
-	m_Transform.SetScale(scale);
-}
-
-void Entity::ScaleBy(Vector2f factor)
-{
-	Vector2f current = m_Transform.GetScale();
-	m_Transform.SetScale({ current.x * factor.x, current.y * factor.y });
-}
-
-void Entity::SetRotation(Degrees angle)
-{
-	m_Transform.SetDegAngle(angle);
-}
-
-void Entity::Rotate(Degrees delta)
-{
-	Degrees newAngle = m_Transform.GetDegAngle() + delta;
-	newAngle = std::fmod(newAngle, 360.0f);
-	if (newAngle < 0.0f)
-		newAngle += 360.0f;
-
-	m_Transform.SetDegAngle(newAngle);
-}
-
-void Entity::SetTexture(const std::string& id) {
-	if (mp_RenderShape == nullptr)
-		return;
-	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
-	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
-		for (auto& sId : m_activeScenes)
-			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
-		if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
-			std::string path = "../../assets/textures/" + id + ".png";
-			RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
-		}
-	}
-}
-
-void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
-{
-	if(mp_RenderShape != nullptr)
-		mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
-}
-
-void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
-{
-	if(mp_RenderShape != nullptr)
-		mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
-}
-
-void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
-{
-	if (mp_RenderShape == nullptr)
-		return;
-	if (shapeType == 0)
-	{
-
-
-		static_cast<gcle::Rectangle*>(mp_RenderShape)->SetWidth(points[0]);
-
-
-		float a = static_cast<gcle::Rectangle*>(mp_RenderShape)->GetWidth();
-
-
-
-		mp_RenderShape->SetHeight(points[1]);
-	}
-
-	else if (shapeType == 1)
-	{
-		mp_RenderShape->SetRadius(points[0]);
-	}
-
-	else if (shapeType == 2)
-	{
-		std::vector<Vector2f> newTrianglePoints;
-		newTrianglePoints.push_back({ points[0], points[1] });
-		newTrianglePoints.push_back({ points[2], points[3] });
-		newTrianglePoints.push_back({ points[4], points[5] });
-
-		mp_RenderShape->SetTrianglePoints(newTrianglePoints);
-	}
-}
-
 void Entity::SetStatic(bool isStatic)
 {
 	m_isStatic = isStatic;
-}
-
-Vector2f Entity::GetRenderPosition()
-{
-	if (mp_RenderShape != nullptr)
-		return mp_RenderShape->GetPosition();
-	else
-		return Vector2f();
 }
 
 bool Entity::IsStatic() const
@@ -303,90 +148,3 @@ bool Entity::IsColliding(Entity* other)
 	return false;
 }
 
-bool Entity::IsInside(Vector2f position)
-{
-	return PhysicsManager::GetInstance().IsInside(this, position);
-}
-
-Entity::~Entity() {
-	if (mp_RenderShape != nullptr) {
-		delete mp_RenderShape;
-		mp_RenderShape = nullptr;
-	}
-
-	for (auto& collider : mp_Colliders)
-	{
-		delete collider;
-	}
-	mp_Colliders.clear();
-
-}
-
-void Entity::AddActiveScene(const std::string& sceneTag) {
-	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
-		std::cerr << sceneTag << "exists" << std::endl;
-		return;
-	}
-
-	m_activeScenes.push_back(sceneTag);
-	if (mp_RenderShape->GetTexture() != nullptr) {
-		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
-	}
-}
-
-void Entity::RemoveActiveScene(const std::string& sceneTag) {
-	std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
-	if (it == m_activeScenes.end()) {
-		std::cerr << sceneTag << " doesn't exists " << std::endl;
-		return;
-	}
-	m_activeScenes.erase(it);
-}
-
-bool Entity::IsActiveIn(const std::string& sceneTag) {
-	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
-}
-
-void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
-{
-	Sprite* sprite = mp_RenderShape->GetTexture();
-	if (!sprite)
-	{
-		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
-	}
-
-	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
-}
-
-void Entity::PlayAnimation(const std::string& id, int32 mode)
-{
-	Sprite* sprite = mp_RenderShape->GetTexture();
-	if (!sprite)
-	{
-		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
-	}
-
-	sprite->PlayAnimation(id);
-}
-
-void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
-	Sprite* sprite = mp_RenderShape->GetTexture();
-	if (!sprite)
-	{
-		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
-	}
-	sprite->AddFunctionInFrame(animation, frame, function);
-}
-
-void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
-	Sprite* sprite = mp_RenderShape->GetTexture();
-	if (!sprite)
-	{
-		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
-	}
-	sprite->RemoveFunctionInFrame(animation, frame);
-}

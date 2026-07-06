@@ -29,7 +29,7 @@ namespace gcle
 		m_trianglepoints.clear();
 	}
 
-	Shape::Shape(Entity* owner) : mp_Owner(owner)
+	Shape::Shape(GameObject* owner) : mp_Owner(owner)
 	{
 	}
 
@@ -164,7 +164,7 @@ namespace gcle
 		return m_verticies;
 	} 
 
-	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner) : Shape(owner)
+	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, GameObject* owner) : Shape(owner)
 	{
 		{
 			m_shape = Shapes::Rectangle;
@@ -250,7 +250,7 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-	Triangle::Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner) : Shape(owner)
+	Triangle::Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, GameObject* owner) : Shape(owner)
 	{
 		m_trianglepoints.push_back({ x1, y1 });
 		m_trianglepoints.push_back({ x2, y2 });
@@ -337,7 +337,7 @@ namespace gcle
 		return m_debugContour;
 	}
 
-	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner) : Shape(owner)
+	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, GameObject* owner) : Shape(owner)
 	{
 		if (_smoothness < 3) {
 			return;

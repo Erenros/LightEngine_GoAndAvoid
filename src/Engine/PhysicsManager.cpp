@@ -419,16 +419,16 @@ bool PhysicsManager::IsColliding(Collider* pCollider1, Collider* pCollider2)
 	return (this->*collisionTable[typeA][typeB])(shapeA, shapeB);
 }
 
-bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
+bool PhysicsManager::IsInside(Shape* renderShape, Vector2f positionToCheck)
 {
-	if (pEntity == nullptr || pEntity->GetRenderShape() == nullptr)
+	if (renderShape == nullptr)
 		return false;
 
-	switch (pEntity->GetRenderShape()->GetShape())
+	switch (renderShape->GetShape())
 	{
 	case gcle::Shapes::Rectangle:
 	{
-		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(pEntity->GetRenderShape());
+		gcle::Rectangle* pRect = static_cast<gcle::Rectangle*>(renderShape);
 		return
 		{
 			positionToCheck.x >= pRect->GetPosition().x - pRect->GetWidth() * 0.5f &&
@@ -439,7 +439,7 @@ bool PhysicsManager::IsInside(Entity* pEntity, Vector2f positionToCheck)
 	}
 	case gcle::Shapes::Circle:
 	{
-		gcle::Circle* pCircle = static_cast<gcle::Circle*>(pEntity->GetRenderShape());
+		gcle::Circle* pCircle = static_cast<gcle::Circle*>(renderShape);
 		return pCircle->GetPosition().GetDistance(positionToCheck) <= pCircle->GetRadius();
 	}
 	default:

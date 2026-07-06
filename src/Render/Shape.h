@@ -6,8 +6,10 @@
 #include "Texture.h"
 #include "Engine/RessourceManager.h"
 #include "Sprite.h"
+#include "Engine/GameObject.h"
 
 class Entity;
+class UI;
 struct SDL_Vertex;
 struct SDL_FPoint;
 
@@ -33,7 +35,7 @@ namespace gcle
 
 	protected:
 		Transform2D m_Transform;
-		Entity* mp_Owner;
+		GameObject* mp_Owner;
 
 		//circle
 		float32 m_radius = 0.0f;
@@ -62,7 +64,7 @@ namespace gcle
 
 		//Constructors 
 
-		Shape(Entity* owner);
+		Shape(GameObject* owner);
 		Shape(const Shape& pShape);
 		Shape& operator=(const Shape&) = delete;
 
@@ -91,7 +93,7 @@ namespace gcle
 		virtual float32 GetHeight() { return 0.f; };
 		virtual float32 GetRadius() { return 0.f; };
 		virtual int32 GetSmoothness() { return 0; };
-		virtual Entity* GetOwner() { return mp_Owner; };
+		virtual GameObject* GetOwner() { return mp_Owner; };
 		virtual Vector2f GetCenter() { return { 0, 0 }; };
 		virtual std::vector<SDL_FPoint*>& GetHollow();
 		virtual std::vector<Vector2f> GetTrianglePoints() { return m_trianglepoints; };
@@ -131,7 +133,7 @@ namespace gcle
 	class Rectangle : public Shape {
 
 	public:
-		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* owner);
+		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, GameObject* owner);
 	
 		Shape* Clone() const override { return GCLE_NEW Rectangle(*this); }
 
@@ -161,7 +163,7 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* owner);
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, GameObject* owner);
 
 		Shape* Clone() const override { return GCLE_NEW Triangle(*this); }
 
@@ -176,7 +178,7 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* owner);
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, GameObject* owner);
 
 		Shape* Clone() const override { return GCLE_NEW Circle(*this); }
 

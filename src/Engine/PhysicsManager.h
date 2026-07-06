@@ -45,7 +45,7 @@ public:
 	void RemoveEntity(Entity* pEntity);
 	void Update(float32 deltaTime);
 	bool IsColliding(Collider* pCollider1, Collider* pCollider2);
-	bool IsInside(Entity* pEntity, Vector2f positionToCheck);
+	bool IsInside(Shape* renderShape, Vector2f positionToCheck);
 	void ThrowRepulse(Collider* pCollider1, Collider* pCollider2);
 	bool IsQuadTreeActive() const;
 

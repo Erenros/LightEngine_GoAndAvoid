@@ -72,7 +72,6 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 		anim->m_frameId = 0;
 	}
 
-
 	int32 x = m_currentFrameX * anim->m_tileW;
 	int32 y = m_currentFrameY * anim->m_tileH;
 
