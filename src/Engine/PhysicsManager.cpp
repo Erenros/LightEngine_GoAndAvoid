@@ -328,7 +328,10 @@ void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
 		for (auto& c : candidates) {
 			bool greater = collider < c;
 			bool notTheSameEntity = collider->GetOwner()->GetId() != c->GetOwner()->GetId();
-			if (greater && notTheSameEntity) {
+
+			bool onSameLayer = (collider->GetOwner()->GetLayer() == c->GetOwner()->GetLayer());
+
+			if (greater && notTheSameEntity && onSameLayer) {
 				m_pairs.push_back({ collider, c });
 			}
 		}
