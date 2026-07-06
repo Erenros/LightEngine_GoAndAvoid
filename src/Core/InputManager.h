@@ -3,10 +3,12 @@
 #include <unordered_map>
 #include "include.h"
 #include <Windows.h>
+#include <Xinput.h>
 
+#pragma comment(lib, "Xinput.lib")
 
-
-namespace Mouse{
+namespace Mouse
+{
 	#define LeftButton VK_LBUTTON
 	#define RightButton VK_RBUTTON
 	#define MiddleButton VK_MBUTTON
@@ -14,7 +16,8 @@ namespace Mouse{
 	#define Button2 VK_XBUTTON2
 }
 
-namespace Keyboard {
+namespace Keyboard
+{
 	#define Space VK_SPACE
 	#define Shift VK_SHIFT
 	#define Escape 0x1B
@@ -26,7 +29,7 @@ namespace Keyboard {
 	#define UpArrow VK_UP
 	#define DownArrow VK_DOWN
 
-    #define Delete VK_DELETE
+	#define Delete VK_DELETE
 
 	#define F1 VK_F1
 	#define F2 VK_F2
@@ -40,22 +43,54 @@ namespace Keyboard {
 	#define F10 VK_F10
 	#define F11 VK_F11
 	#define F12 VK_F12
-
-	#define NUM1 VK_NUMPAD1
-
-
 }
 
 
+
+#define XBOX_START XINPUT_GAMEPAD_START
+#define XBOX_BACK XINPUT_GAMEPAD_BACK
+
+#define XBOX_PAD_UP XINPUT_GAMEPAD_DPAD_UP
+#define XBOX_PAD_LEFT XINPUT_GAMEPAD_DPAD_LEFT
+#define XBOX_PAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
+#define XBOX_PAD_DOWN XINPUT_GAMEPAD_DPAD_DOWN
+
+#define XBOX_A XINPUT_GAMEPAD_A
+#define XBOX_B XINPUT_GAMEPAD_B
+#define XBOX_X XINPUT_GAMEPAD_X
+#define XBOX_Y XINPUT_GAMEPAD_Y
+
+#define XBOX_LJS XINPUT_GAMEPAD_LEFT_THUMB
+#define XBOX_RJS XINPUT_GAMEPAD_RIGHT_THUMB
+#define XBOX_LB XINPUT_GAMEPAD_LEFT_SHOULDER
+#define XBOX_RB XINPUT_GAMEPAD_RIGHT_SHOULDER
+
+
+class Controller
+{
+	public:
+		std::vector<short> m_LeftStickDeadzone = { 4000, -4000, 4000, -4000 };
+		std::vector<short> m_RightStickDeadzone = { 4000, -4000, 4000, -4000 };
+
+		BYTE m_LeftTriggerDeadzone = 30;
+		BYTE m_RightTriggerDeadzone = 30;
+
+		XINPUT_STATE m_State;
+};
+
+ 
 class InputManager
 {
 private:
-
+	
 	std::unordered_map<short, bool> m_keysDownReset;
+
+	std::vector<Controller*> m_Controllers;
 
 public:
 
-	static InputManager& GetInstance() {
+	static InputManager& GetInstance()
+	{
 		static InputManager instance;
 		return instance;
 	}
@@ -73,14 +108,43 @@ public:
 
 	//Input tests
 
+	Vector2<long> GetMouseRelativePosition();
+	Vector2<long> GetMouseWorldPosition();
+
 	bool IsDown(const short key);
 	bool IsHeld(const char key);
 	bool IsUp(const char key);
 
+	void AddController(Controller* c);
 
-	Vector2<long> GetMouseRelativePosition();
-	Vector2<long> GetMouseWorldPosition();
+	bool IsControllerDown(int8 controller, int16 key);
 
-	
+	void SetVibration(int8 controller, float32 powerLeft, float32 powerRight);
+
+
+	XINPUT_STATE GetGamepadState(int8 controller);
+
+
+	void SetLeftStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg);
+	void SetRightStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg);
+	std::vector<short> GetLeftStickDeadZone(int8 controller);
+	std::vector<short> GetRightStickDeadZone(int8 controller);
+
+	bool IsLeftStickInHorizontalDeadzone(int8 controller);
+	bool IsLeftStickInVerticalDeadzone(int8 controller);
+	bool IsRightStickInHorizontalDeadzone(int8 controller);
+	bool IsRightStickInVerticalDeadzone(int8 controller);
+
+	float GetLeftStickX(int8 controller);
+	float GetLeftStickY(int8 controller);
+	float GetRightStickX(int8 controller);
+	float GetRightStickY(int8 controller);
+
+	Vector2f LeftStickPressed(int8 controller);
+	Vector2f RightStickPressed(int8 controller);
+
+
+	float LeftTriggerPressed(int8 controller);
+	float RightTriggerPressed(int8 controller);
 };
 
