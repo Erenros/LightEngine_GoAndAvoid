@@ -60,7 +60,7 @@ void Scene::Draw(Window* window)
 					m_numberOfDraw++;
 				}
 			}
-			else if (e->GetRenderShape() != nullptr)
+			else if (e->GetRenderShape() != nullptr && m_frustrumCulling == false)
 			{
 				if (e->IsActiveIn(m_tag))
 				{

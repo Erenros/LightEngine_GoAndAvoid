@@ -34,17 +34,15 @@
     "5486424A-3498-2513-4EE0-2B6D64DE7470": {
       "config-debug": {
         "additionalDependencies": [
-          "SDL3.lib;SDL3_ttf.lib;SDL3_mixer.lib;SDL3_image.lib;%(AdditionalDependencies)"
+          "SDL3.lib;SDL3_mixer.lib;SDL3_image.lib;%(AdditionalDependencies)"
         ],
         "additionalIncludeDirectories": [
           "$(SolutionDir)../lib/SDL3/include",
-          "$(SolutionDir)../lib/SDL3_ttf/include",
           "$(SolutionDir)../lib/SDL3_mixer/include",
           "$(SolutionDir)../lib/SDL3_image/include"
         ],
         "additionalLibraryDirectories": [
           "$(SolutionDir)../lib/SDL3/lib/x64",
-          "$(SolutionDir)../lib/SDL3_ttf/lib/x64",
           "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
           "$(SolutionDir)../lib/SDL3_image/lib/x64"
         ],
@@ -102,7 +100,6 @@
       "config-debug": {
         "additionalDependencies": [
           "SDL3.lib",
-          "SDL3_ttf.lib",
           "SDL3_mixer.lib",
           "SDL3_image.lib",
           "%(AdditionalDependencies)"
@@ -111,7 +108,6 @@
         ],
         "additionalLibraryDirectories": [
           "$(SolutionDir)../lib/SDL3/lib/x64",
-          "$(SolutionDir)../lib/SDL3_ttf/lib/x64",
           "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
           "$(SolutionDir)../lib/SDL3_image/lib/x64"
         ],

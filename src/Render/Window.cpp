@@ -4,7 +4,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 
 #include "Shape.h"
@@ -51,12 +50,6 @@ void Window::Create(const char* pName, int32 width, int32 height, uint32 windowF
 	if (!Audio::Init())
 	{
 		std::cout << "[Initialisation] : Audio Error : " << SDL_GetError() << std::endl;
-		return;
-	}
-
-	if (!TTF_Init())
-	{
-		std::cout << "[Initialisation] : Font Error" << std::endl;
 		return;
 	}
 
@@ -109,7 +102,6 @@ void Window::End()
 	SDL_DestroyWindow(mp_Window);
 
 	Audio::Shutdown();
-	TTF_Quit();
 	SDL_Quit();
 
 	delete mp_dst;
