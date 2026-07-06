@@ -4,24 +4,24 @@
 #include "Utils.h"
 #include "Shape.h"
 
-Sprite::Sprite(Window* window, const std::string& path)
+Sprite::Sprite(Window* pWindow, const std::string& path)
 {
 	m_isSprite = true;
 
-	InitTexture(window, path);
+	InitTexture(pWindow, path);
 
 	if (!IsTextureInit())
 		return;
 
 	float32 texW = 0.f, texH = 0.f;
 	SDL_GetTextureSize(GetSDLTexture(), &texW, &texH); 
-	m_width = static_cast<int32>(texW);
-	m_height = static_cast<int32>(texH);
+	m_Width = static_cast<int32>(texW);
+	m_Height = static_cast<int32>(texH);
 }
 
-Sprite::Sprite(Window* window, Asset* asset)
+Sprite::Sprite(Window* pWindow, Asset* pAsset)
 {
-	InitTextureWithBuffer(window, asset);
+	InitTextureWithBuffer(pWindow, pAsset);
 }
 
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
@@ -38,10 +38,10 @@ void Sprite::PlayAnimation(const std::string& id)
 		return;
 	}
 
-	mp_currentAnimation = m_animationMap[id];
-	m_currentFrameX = mp_currentAnimation->m_firstFrame;
-	m_currentFrameY = mp_currentAnimation->m_line;
-	m_timer = mp_currentAnimation->m_duration;
+	mp_CurrentAnimation = m_animationMap[id];
+	m_CurrentFrameX = mp_CurrentAnimation->firstFrame;
+	m_CurrentFrameY = mp_CurrentAnimation->line;
+	m_Timer = mp_CurrentAnimation->duration;
 }
 
 
@@ -52,35 +52,40 @@ Sprite::~Sprite()
 	m_animationMap.clear();
 }
 
-void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
+void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
 {
-	Animation* anim = mp_currentAnimation;
+	Animation* anim = mp_CurrentAnimation;
 
 	if (anim == nullptr)
 		return;
 
-	m_timer += deltatime;
-	if (m_timer < mp_currentAnimation->m_duration)
+	m_Timer += deltatime;
+	if (m_Timer < mp_CurrentAnimation->duration)
 		return;
 
-	m_timer = 0;
-	anim->m_frameId++;
+	m_Timer = 0;
+	anim->frameId++;
 
-	m_currentFrameX++;
-	if (m_currentFrameX > anim->m_lastFrame) {
-		m_currentFrameX = anim->m_firstFrame;
-		anim->m_frameId = 0;
+	m_CurrentFrameX++;
+	if (m_CurrentFrameX > anim->lastFrame) {
+		m_CurrentFrameX = anim->firstFrame;
+		anim->frameId = 0;
 	}
 
 
-	int32 x = m_currentFrameX * anim->m_tileW;
-	int32 y = m_currentFrameY * anim->m_tileH;
+	int32 x = m_CurrentFrameX * anim->tileW;
+	int32 y = m_CurrentFrameY * anim->tileH;
 
-	if (anim->m_animationFunction.find(anim->m_frameId) != anim->m_animationFunction.end()) {
-		anim->m_animationFunction[anim->m_frameId]();
+	if (anim->m_animationFunction.find(anim->frameId) != anim->m_animationFunction.end()) {
+		anim->m_animationFunction[anim->frameId]();
 	}
 
-	shape->SetTextureRect(x, y, anim->m_tileW, anim->m_tileH, m_width, m_height);
+	pShape->SetTextureRect(x, y, anim->tileW, anim->tileH, m_Width, m_Height);
+}
+
+bool Sprite::IsAnimationPlaying()
+{
+	return mp_CurrentAnimation == nullptr ? false : true;
 }
 
 

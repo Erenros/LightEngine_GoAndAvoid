@@ -48,17 +48,17 @@ Matrix::Matrix(int width, int height)
 
 void Matrix::InitSize()
 {
-	m_height = static_cast<int32>(m_matrix.size());
+	height = static_cast<int32>(m_matrix.size());
 
 
-	if (m_height == 0)
+	if (height == 0)
 	{
-		m_width = 0;
+		width = 0;
 	}
 
 	else
 	{
-		m_width = static_cast<int32>(m_matrix[0].size());
+		width = static_cast<int32>(m_matrix[0].size());
 	}
 
 
@@ -94,16 +94,16 @@ void Matrix::PrintMatrix()
 	}
 
 
-	for (int i = 0; i < m_height; i++)
+	for (int i = 0; i < height; i++)
 	{
 		std::cout << "[";
 
-		for (int j = 0; j < m_width - 1; j++)
+		for (int j = 0; j < width - 1; j++)
 		{
 			std::cout << m_matrix[i][j] << ", ";
 		}
 
-		std::cout << m_matrix[i][m_width - 1] << "]" << std::endl;
+		std::cout << m_matrix[i][width - 1] << "]" << std::endl;
 	}
 }
 
@@ -113,21 +113,21 @@ Matrix Matrix::operator*(Matrix& matrix2)
 	InitSize();
 	matrix2.InitSize();
 
-	assert(m_width == matrix2.m_height);
+	assert(width == matrix2.height);
 
 	Matrix result;
-	result.m_matrix.resize(m_height);
+	result.m_matrix.resize(height);
 
 	for (auto& m : result.m_matrix)
-		m.resize(matrix2.m_width);
+		m.resize(matrix2.width);
 
 	result.InitSize();
 
-	for (int i = 0; i < m_height; i++)
+	for (int i = 0; i < height; i++)
 	{
-		for (int j = 0; j < matrix2.m_width; j++)
+		for (int j = 0; j < matrix2.width; j++)
 		{
-			for (int k = 0; k < m_width; k++)
+			for (int k = 0; k < width; k++)
 			{
 				result.m_matrix[i][j] += (m_matrix[i][k] * matrix2.m_matrix[k][j]);
 			}

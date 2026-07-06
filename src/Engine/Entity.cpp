@@ -393,7 +393,7 @@ void Entity::AddActiveScene(const std::string& sceneTag) {
 
 	m_activeScenes.push_back(sceneTag);
 	if (mp_RenderShape->GetTexture() != nullptr) {
-		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
+		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->GetId());
 	}
 }
 

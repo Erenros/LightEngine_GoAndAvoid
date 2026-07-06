@@ -21,16 +21,16 @@ class Font
 {
 private:
 
-	SDL_Surface* mp_font = nullptr;
+	SDL_Surface* mp_Font = nullptr;
 
-	std::unordered_map<char , GlyphInfo> m_glyphs;
+	std::unordered_map<char , GlyphInfo> m_Glyphs;
 
-	int32 fontSize = 0;
+	int32 m_FontSize = 0;
 public:
 	
-	SDL_Surface* GetFontSurface() { return mp_font; };
+	SDL_Surface* GetFontSurface() ;
 
-	bool IsFontInit() { return mp_font == nullptr ? false : true; };
+	bool IsFontInit() ;
 
 	Font(const std::string& path);
 	Font() = default;
@@ -48,5 +48,5 @@ public:
 
 	void GetTextSize(const std::string& text, int32& width, int32& height);
 
-	int32 GetFontSize() { return fontSize; }
+	int32 GetFontSize();
 };

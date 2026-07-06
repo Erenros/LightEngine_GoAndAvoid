@@ -6,21 +6,36 @@
 #include <SDL3_image/SDL_image.h>
 #include <filesystem>
 
-Texture::Texture(Window* window, const std::string& path)
+bool Texture::IsSprite()
+{ 
+	return m_isSprite; 
+}
+bool Texture::IsTextureInit()
 {
-	InitTexture(window, path);
+	return mp_texture == nullptr ? false : true;
+}
+;
+
+SDL_Texture* Texture::GetSDLTexture()
+{
+	return mp_texture;
 }
 
-Texture::Texture(Window* window, Asset* asset)
+Texture::Texture(Window* pWindow, const std::string& path)
 {
-	InitTextureWithBuffer(window, asset);
+	InitTexture(pWindow, path);
+}
+
+Texture::Texture(Window* pWindow, Asset* pAsset)
+{
+	InitTextureWithBuffer(pWindow, pAsset);
 }
 
 Texture::~Texture() { SDL_DestroyTexture(mp_texture); }
 
-void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
+void Texture::InitTextureWithBuffer(Window* pWindow, Asset* pAsset)
 {
-	SDL_IOStream* io = SDL_IOFromConstMem(asset->data.data(), asset->data.size());
+	SDL_IOStream* io = SDL_IOFromConstMem(pAsset->data.data(), pAsset->data.size());
 	if (io == NULL)
 	{
 		GCLE_WARN << "Can't read data to create texture" << ENDL;
@@ -34,26 +49,26 @@ void Texture::InitTextureWithBuffer(Window* window, Asset* asset)
 		return;
 	}
 
-	asset->width = surface->w;
-	asset->height = surface->h;
+	pAsset->width = surface->w;
+	pAsset->height = surface->h;
 
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(pWindow->GetRenderer(), surface);
 	if (texture == NULL)
 		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
 	SDL_DestroySurface(surface);
 	mp_texture = texture;
 
-	id = asset->name;
+	m_Id = pAsset->name;
 }
 
-void Texture::InitTexture(Window* window, const std::string& path)
+void Texture::InitTexture(Window* pWindow, const std::string& path)
 {
 	SDL_Surface* surface = IMG_Load(path.c_str());
 	if (surface == NULL)
 		GCLE_WARN << "Couldn't initialize surface for texture with path : " + path << ENDL;
 
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surface);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(pWindow->GetRenderer(), surface);
 	if (texture == NULL)
 		GCLE_WARN << "Error during creation of the texture with path : " + path << ENDL;
 
@@ -63,5 +78,10 @@ void Texture::InitTexture(Window* window, const std::string& path)
 	mp_texture = texture;
 
 	std::filesystem::path path2(path);
-	id = path2.stem().string();
+	m_Id = path2.stem().string();
+}
+
+std::string& Texture::GetId()
+{
+	return m_Id;
 }

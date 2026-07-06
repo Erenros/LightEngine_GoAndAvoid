@@ -12,26 +12,24 @@ protected:
 	SDL_Texture* mp_texture = nullptr;
 
 	bool m_isSprite = false;
+	std::string m_Id = "";
 
 public:
 
-	std::string id = "";
-	bool IsSprite() { return m_isSprite; };
+	bool IsSprite();
 
-	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
+	bool IsTextureInit();
 
 	//Temporaire
-	SDL_Texture* GetSDLTexture() 
-	{ 
-		return mp_texture; 
-	};
+	SDL_Texture* GetSDLTexture();
 
-	Texture(Window* window, const std::string& path);
-	Texture(Window* window, Asset* data);
+	Texture(Window* pWindow, const std::string& path);
+	Texture(Window* pWindow, Asset* pData);
 	Texture() = default;
 
 	virtual ~Texture() ;
 
-	void InitTextureWithBuffer(Window* window, Asset* asset);
-	void InitTexture(Window* window, const std::string& path);
+	void InitTextureWithBuffer(Window* pWindow, Asset* pAsset);
+	void InitTexture(Window* pWindow, const std::string& path);
+	std::string& GetId();
 };

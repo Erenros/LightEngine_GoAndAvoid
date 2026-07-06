@@ -6,6 +6,11 @@
 #include <SDL3_mixer/SDL_mixer.h>
 
 
+bool Sound::IsSoundInit()
+{
+	return mp_Audio == nullptr ? false : true;
+}
+
 Sound::Sound(const std::string& path)
 {
 	InitSound(path);
@@ -13,10 +18,10 @@ Sound::Sound(const std::string& path)
 
 Sound::~Sound()
 {
-	if (mp_track != nullptr)
-		MIX_DestroyTrack(mp_track);
-	if (mp_audio != nullptr)
-		MIX_DestroyAudio(mp_audio);
+	if (mp_Track != nullptr)
+		MIX_DestroyTrack(mp_Track);
+	if (mp_Audio != nullptr)
+		MIX_DestroyAudio(mp_Audio);
 }
 
 void Sound::InitSound(const std::string& path)
@@ -35,25 +40,25 @@ void Sound::InitSound(const std::string& path)
 		return;
 	}
 
-	mp_audio = audio;
-	mp_track = MIX_CreateTrack(mixer);
-	if (mp_track != nullptr)
-		MIX_TagTrack(mp_track, "sfx");
+	mp_Audio = audio;
+	mp_Track = MIX_CreateTrack(mixer);
+	if (mp_Track != nullptr)
+		MIX_TagTrack(mp_Track, "sfx");
 }
 
 void Sound::PlaySound(int mode, int volume)
 {
-	if (mp_audio == nullptr || mp_track == nullptr)
+	if (mp_Audio == nullptr || mp_Track == nullptr)
 	{
 		GCLE_WARN << "Sound doesn't have a value" << ENDL;
 		return;
 	}
 
-	MIX_SetTrackGain(mp_track, static_cast<float>(volume) / 128.0f);
-	MIX_SetTrackAudio(mp_track, mp_audio);
+	MIX_SetTrackGain(mp_Track, static_cast<float32>(volume) / 128.0f);
+	MIX_SetTrackAudio(mp_Track, mp_Audio);
 
 	SDL_PropertiesID options = SDL_CreateProperties();
 	SDL_SetNumberProperty(options, MIX_PROP_PLAY_LOOPS_NUMBER, mode);
-	MIX_PlayTrack(mp_track, options);
+	MIX_PlayTrack(mp_Track, options);
 	SDL_DestroyProperties(options);
 }

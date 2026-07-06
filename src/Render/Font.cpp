@@ -6,6 +6,16 @@
 #include <filesystem>
 #include <iostream>
 
+SDL_Surface* Font::GetFontSurface()
+{
+	return mp_Font;
+}
+
+bool Font::IsFontInit()
+{
+	return mp_Font == nullptr ? false : true;
+}
+
 Font::Font(const std::string& path)
 {
     InitFont(path);
@@ -13,7 +23,7 @@ Font::Font(const std::string& path)
 
 Font::~Font()
 {
-    SDL_DestroySurface(mp_font);
+    SDL_DestroySurface(mp_Font);
 }
 
 void Font::InitFont(const std::string& path)
@@ -26,7 +36,7 @@ void Font::InitFont(const std::string& path)
         return;
     }
 
-    mp_font = font;
+    mp_Font = font;
 	ReadFromAtlasChunk(path.c_str());
     return;
 }
@@ -52,7 +62,7 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 		std::string type(fileData.begin() + pos + 4, fileData.begin() + pos + 8);
 		if (type == "gATl") {
 			const uint8* d = &fileData[pos + 8];
-			fontSize = static_cast<int32>(ReadBigEndian(d));
+			m_FontSize = static_cast<int32>(ReadBigEndian(d));
 			uint32 glyphCount = ReadBigEndian(d + 4);
 
 			size_t offset = 8;
@@ -70,7 +80,7 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 				offset += 4;
 				g.advanceX = static_cast<wchar_t>(ReadBigEndian(d + offset));
 				offset += 4;
-				m_glyphs[g.charactere] = g;
+				m_Glyphs[g.charactere] = g;
 			}
 			return true;
 		}
@@ -80,12 +90,12 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 }
 
 GlyphInfo& Font::GetGlypInfo(char& charactere){
-	return m_glyphs[charactere];
+	return m_Glyphs[charactere];
 }
 
 void Font::GetTextSize(const std::string& text, int32& width, int32& height){
 	for (auto& charactere : text) {
-		GlyphInfo& info = m_glyphs[charactere];
+		GlyphInfo& info = m_Glyphs[charactere];
 		height = std::max(height, info.height);
 		width += info.advanceX;
 	}
@@ -103,4 +113,8 @@ void GlyphInfo::DrawData() {
 
 void GlyphInfo::DrawCharacter() {
 	std::wcout << "charactere : " << charactere << std::endl;
+}
+
+int32 Font::GetFontSize() { 
+	return m_FontSize; 
 }
