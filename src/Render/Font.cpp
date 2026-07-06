@@ -1,8 +1,8 @@
 #include "Font.h"
 #include "Utils.h"
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_Image.h>
 #include <filesystem>
 #include <iostream>
 
@@ -13,19 +13,19 @@ Font::Font(const std::string& path)
 
 Font::~Font()
 {
-    SDL_FreeSurface(mp_font);
+    SDL_DestroySurface(mp_font);
 }
 
 void Font::InitFont(const std::string& path)
 {
     SDL_Surface* font = IMG_Load(path.c_str());
+
     if (font == NULL)
     {
-        GCLE_WARN << "Couldn't initialize font with path" + path << ENDL;
+        GCLE_WARN << "Couldn't initialize font with path " + path << "  " << SDL_GetError() << ENDL;
         return;
     }
 
-    TTF_SetFontSize(font, 72);
     mp_font = font;
 	ReadFromAtlasChunk(path.c_str());
     return;
@@ -50,7 +50,7 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 	while (pos + 8 <= fileData.size()) {
 		uint32 lenght = ReadBigEndian(&fileData[pos]);
 		std::string type(fileData.begin() + pos + 4, fileData.begin() + pos + 8);
-		if (type == "gAtl") {
+		if (type == "gATl") {
 			const uint8* d = &fileData[pos + 8];
 			fontSize = static_cast<int32>(ReadBigEndian(d));
 			uint32 glyphCount = ReadBigEndian(d + 4);

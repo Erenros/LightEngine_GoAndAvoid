@@ -10,19 +10,20 @@ void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
 	 	 
-	std::string text = "Test";
-	CreateText(text, { 40, 40 }, 50);
+	//std::string text = "Test";
+	//CreateText(text, { 40, 40 }, 50);
 
-	//Entity* entity1 = CreateWorldText("Test", 50, "Hack-Regular");
-	//entity1->SetPosition(-200, 0); 
-	////entity1->Rotate(45);
-	//entity1->SetRigidBody(true); 
-	//entity1->SetIsKinematic(true); 
-	//entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.f, 0.f }, 0.f, { 1.f, 1.f });
+	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
+	entity1->SetPosition(-200, 0); 
+	//entity1->Rotate(45);
+	entity1->SetRigidBody(true); 
+	entity1->SetStatic(false); 
+	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.f, 0.f }, 0.f, { 1.f, 1.f });
 
-	mp_mainCamera->SetFollowing(pEntity);
+	mp_mainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
+	pSceneCamera->SetFollowing(entity1);
 
 	for (int32 i = 0; i < 50; i++) 
 	{

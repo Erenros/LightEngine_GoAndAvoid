@@ -129,19 +129,8 @@ void RessourceManager::InitTextureFolder(Window* window)
 		}
 
         //LoadTexture(window,entry.path().string(), entry.path().stem().string());
-        Font* font;
         m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
     }
-
-		//LoadTexture(window,entry.path().string(), entry.path().stem().string());
-		m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
-	}
-
-	//for (auto& tex : m_textureMap) {
-	//    if (tex.second.GetFlag() & SceneManager::GetInstance().GetCurrentSceneFlag() == 0b0) {
-	//        tex.second.UnloadTexture();
-	//    }
-	//}
 }
 
 void RessourceManager::InitMusicFolder()

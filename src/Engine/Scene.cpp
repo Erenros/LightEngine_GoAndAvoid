@@ -313,39 +313,40 @@ void Scene::OnInitialize()
 	mp_activeCamera = mp_mainCamera;
 
 	mp_Position				= CreateDebugInfoText("Pos: "		, { 0,		0	},		25,		255, 225, 255);
-	mp_PosX					= CreateDebugInfoText(""			, { 100,	0	},		25,		255, 225, 255);
-	mp_PosY					= CreateDebugInfoText(""			, { 300,	0	},		25,		255, 225, 255);
+	mp_PosX					= CreateDebugInfoText(""			, { 110,	0	},		25,		255, 225, 255);
+	mp_PosY					= CreateDebugInfoText(""			, { 400,	0	},		25,		255, 225, 255);
 
 	mp_Rotation				= CreateDebugInfoText("Rot: "		, { 0,		75  },		25,		255, 225, 255);
-	mp_RotZ					= CreateDebugInfoText(""			, { 100,	75  },		25,		255, 225, 255);
+	mp_RotZ					= CreateDebugInfoText(""			, { 150,	75  },		25,		255, 225, 255);
 
 	mp_Scale				= CreateDebugInfoText("Scale: "		, { 0,		150 },		25,		255, 225, 255);
-	mp_ScaleX				= CreateDebugInfoText(""			, { 100,	150 },		25,		255, 225, 255);
-	mp_ScaleY				= CreateDebugInfoText(""			, { 300,	150 },		25,		255, 225, 255);
+	mp_ScaleX				= CreateDebugInfoText(""			, { 150,	150 },		25,		255, 225, 255);
+	mp_ScaleY				= CreateDebugInfoText(""			, { 400,	150 },		25,		255, 225, 255);
 
-	mp_Frame				= CreateText("FPS"					, { 1860,	0	},		25,		255, 225, 255);
-	mp_FPS					= CreateText(""						, { 1800,	0	},		25,		255, 225, 255);
+	mp_Frame				= CreateText("FPS"					, { 1750,	0	},		25,		255, 225, 255);
+	mp_FPS					= CreateText(""						, { 1830,	0	},		25,		255, 225, 255);
 																
 	mp_Colliders			= CreateDebugText("Colliders: "		, { 0,		1000 },		25,		255, 225, 255);
-	mp_CollidersP			= CreateDebugText(""				, { 150,	1000 },		25,		255, 225, 255);
+	mp_CollidersP			= CreateDebugText(""				, { 250,	1000 },		25,		255, 225, 255);
 																
-	mp_Entity				= CreateDebugText("Entity C/D: "	, { 275,	1000 },		25,		255, 225, 255);
-	mp_EntityP				= CreateDebugText(""				, { 450,	1000 },		25,		255, 225, 255);
+	mp_Entity				= CreateDebugText("Entity C/D: "	, { 0,		1030 },		25,		255, 225, 255);
+	mp_EntityP				= CreateDebugText(""				, { 250,	1030 },		25,		255, 225, 255);
 																
-	mp_Input				= CreateDebugText("InputManager: "	, { 560,	1000 },		25,		255, 225, 255);
-	mp_InputP				= CreateDebugText(""				, { 760,	1000 },		25,		255, 225, 255);
+	mp_Input				= CreateDebugText("InputManager: "	, { 420,	1000 },		25,		255, 225, 255);
+	mp_InputP				= CreateDebugText(""				, { 740,	1000 },		25,		255, 225, 255);
 																
-	mp_Update				= CreateDebugText("Update: "		, { 870,	1000 },		25,		255, 225, 255);
-	mp_UpdateP				= CreateDebugText(""				, { 975,	1000 },		25,		255, 225, 255);
+	mp_Update				= CreateDebugText("Update: "		, { 420,	1030 },		25,		255, 225, 255);
+	mp_UpdateP				= CreateDebugText(""				, { 740,	1030 },		25,		255, 225, 255);
 																
-	mp_Draw 				= CreateDebugText("Draw: "			, { 1085,	1000 },		25,		255, 225, 255);
-	mp_DrawP				= CreateDebugText(""				, { 1160,	1000 },		25,		255, 225, 255);
+	mp_Draw 				= CreateDebugText("Draw: "			, { 900,	1000 },		25,		255, 225, 255);
+	mp_DrawP				= CreateDebugText(""				, { 1100,	1000 },		25,		255, 225, 255);
 
-	mp_QuadTree				= CreateDebugText("QuadTree"		, { 1280,	1000 },		25,		0  , 225, 0);
-	mp_FrustrumCulling      = CreateDebugText("FrustrumCulling"	, { 1420,	1000 },		25,		0  , 225, 0);
+	mp_NumberDraw			= CreateDebugText("Number To Draw: ", {900,		1030},			25,		255, 255, 255);
+	mp_NumberDrawP			= CreateDebugText(""				, {1200,	1030},			25,		255, 255, 255);
+	
+	mp_QuadTree				= CreateDebugText("QuadTree"		, { 1300,	1000 },		25,		0  , 225, 0);
+	mp_FrustrumCulling      = CreateDebugText("FrustrumCulling"	, { 1300,	1030 },		25,		0  , 225, 0);
 
-	mp_NumberDraw			= CreateDebugText("Number To Draw: ", {1085, 1050},			25,		255, 255, 255);
-	mp_NumberDrawP			= CreateDebugText(""				, {1350, 1050},			25,		255, 255, 255);
 }
 
 void Scene::OnUpdate(Clock& time)
