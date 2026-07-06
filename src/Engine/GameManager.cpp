@@ -80,10 +80,11 @@ void GameManager::Loop()
 			isRunning = false;
 		}
 
-		system("CLS");
+		//system("CLS");
 
 		fpsTimer += m_Time.GetDeltaTime();
-		if (fpsTimer >= 1.f) {
+		if (fpsTimer >= 1.f)
+		{
 			fpsTimer -= 1.f;
 			fpsCount = static_cast<int16>(1.f / m_Time.GetDeltaTime());
 		}
@@ -98,6 +99,7 @@ void GameManager::Loop()
 GameManager::~GameManager()
 {
 	UpdateEntitySystem();
+
 
 	for (auto& layer : m_entities)
 	{

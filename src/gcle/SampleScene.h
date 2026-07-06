@@ -10,5 +10,7 @@ public:
 	private:
 		Entity* pEntity = nullptr;
 		Entity* otherEntity = nullptr;
+		Controller player1;
+		Controller player2;
 };
 

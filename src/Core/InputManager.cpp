@@ -2,7 +2,8 @@
 
 
 
-void InputManager::Update() {
+void InputManager::Update()
+{
 	std::unordered_map<short, bool>::iterator it;
 
 	for (it = m_keysDownReset.begin(); it != m_keysDownReset.end(); it++)
@@ -16,7 +17,10 @@ void InputManager::Update() {
 		}
 	}
 
-	m_State = GetGamepadState();
+	for (int8 i = 0; i < m_Controllers.size(); i++)
+	{
+		m_Controllers[i]->m_State = GetGamepadState(i);
+	}
 }
 
 
@@ -77,12 +81,17 @@ bool InputManager::IsUp(const char key){
 	return ((GetAsyncKeyState(key) & 0x8000) == 0);
 }
 
+void InputManager::AddController(Controller* c)
+{
+	m_Controllers.push_back(c);
+}
 
 
-bool InputManager::IsControllerDown(int16 key)
+
+bool InputManager::IsControllerDown(int8 controller, int16 key)
 { 
 	XINPUT_STATE state;
-	if (!XInputGetState(0, &state) == ERROR_SUCCESS)
+	if (!XInputGetState(controller, &state) == ERROR_SUCCESS)
 		return false;
 	 
 	if (state.Gamepad.wButtons & key)
@@ -93,7 +102,7 @@ bool InputManager::IsControllerDown(int16 key)
 	return false;
 }
 
-void InputManager::SetVibration(float32 powerLeft, float32 powerRight)
+void InputManager::SetVibration(int8 controller, float32 powerLeft, float32 powerRight)
 {
 	XINPUT_VIBRATION VibrationState;
 
@@ -105,53 +114,53 @@ void InputManager::SetVibration(float32 powerLeft, float32 powerRight)
 	VibrationState.wLeftMotorSpeed = iLeftMotor;
 	VibrationState.wRightMotorSpeed = iRightMotor;
 
-	XInputSetState(m_GamepadIndex, &VibrationState);
+	XInputSetState(controller, &VibrationState);
 }
 
 
 
 
 
-XINPUT_STATE InputManager::GetGamepadState()
+XINPUT_STATE InputManager::GetGamepadState(int8 controller)
 {
 	XINPUT_STATE GamepadState;
 
 	ZeroMemory(&GamepadState, sizeof(XINPUT_STATE));
 
-	XInputGetState(m_GamepadIndex, &GamepadState);
+	XInputGetState(controller, &GamepadState);
 
 	return GamepadState;
 }
 
 
 
-void InputManager::SetLeftStickDeadZone(float Xpos, float Xneg, float Ypos, float Yneg)
+void InputManager::SetLeftStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg)
 {
-	m_LeftStickDeadzone = { static_cast<short>(Xpos * 32767.0f), static_cast<short>(Xneg * 32768.0f), static_cast<short>(Ypos * 32767.0f), static_cast<short>(Yneg * 32768.0f) };
+	m_Controllers[controller]->m_LeftStickDeadzone = { static_cast<short>(Xpos * 32767.0f), static_cast<short>(Xneg * 32768.0f), static_cast<short>(Ypos * 32767.0f), static_cast<short>(Yneg * 32768.0f) };
 }
 
-void InputManager::SetRightStickDeadZone(float Xpos, float Xneg, float Ypos, float Yneg)
+void InputManager::SetRightStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg)
 {
-	m_RightStickDeadzone = { static_cast<short>(Xpos * 32767.0f), static_cast<short>(Xneg * 32768.0f), static_cast<short>(Ypos * 32767.0f), static_cast<short>(Yneg * 32768.0f) };
+	m_Controllers[controller]->m_RightStickDeadzone = { static_cast<short>(Xpos * 32767.0f), static_cast<short>(Xneg * 32768.0f), static_cast<short>(Ypos * 32767.0f), static_cast<short>(Yneg * 32768.0f) };
 }
 
-std::vector<short> InputManager::GetLeftStickDeadZone()
+std::vector<short> InputManager::GetLeftStickDeadZone(int8 controller)
 {
-	return m_LeftStickDeadzone;
+	return m_Controllers[controller]->m_LeftStickDeadzone;
 }
 
-std::vector<short> InputManager::GetRightStickDeadZone()
+std::vector<short> InputManager::GetRightStickDeadZone(int8 controller)
 {
-	return m_RightStickDeadzone;
+	return m_Controllers[controller]->m_RightStickDeadzone;
 }
 
 
 
-bool InputManager::IsLeftStickInHorizontalDeadzone()
+bool InputManager::IsLeftStickInHorizontalDeadzone(int8 controller)
 {
-	short sX = m_State.Gamepad.sThumbLX;
+	short sX = m_Controllers[controller]->m_State.Gamepad.sThumbLX;
 
-	if ((sX <= m_LeftStickDeadzone[0]) and (sX >= m_LeftStickDeadzone[1]))
+	if ((sX <= m_Controllers[controller]->m_LeftStickDeadzone[0]) and (sX >= m_Controllers[controller]->m_LeftStickDeadzone[1]))
 	{
 		return true;
 	}
@@ -159,11 +168,11 @@ bool InputManager::IsLeftStickInHorizontalDeadzone()
 	return false;
 }
 
-bool InputManager::IsLeftStickInVerticalDeadzone()
+bool InputManager::IsLeftStickInVerticalDeadzone(int8 controller)
 {
-	short sY = m_State.Gamepad.sThumbLY;
+	short sY = m_Controllers[controller]->m_State.Gamepad.sThumbLY;
 
-	if ((sY <= m_LeftStickDeadzone[2]) and (sY >= m_LeftStickDeadzone[3]))
+	if ((sY <= m_Controllers[controller]->m_LeftStickDeadzone[2]) and (sY >= m_Controllers[controller]->m_LeftStickDeadzone[3]))
 	{
 		return true;
 	}
@@ -171,11 +180,11 @@ bool InputManager::IsLeftStickInVerticalDeadzone()
 	return false;
 }
 
-bool InputManager::IsRightStickInHorizontalDeadzone()
+bool InputManager::IsRightStickInHorizontalDeadzone(int8 controller)
 {
-	short sX = m_State.Gamepad.sThumbRX;
+	short sX = m_Controllers[controller]->m_State.Gamepad.sThumbRX;
 
-	if ((sX <= m_RightStickDeadzone[0]) and (sX >= m_RightStickDeadzone[1]))
+	if ((sX <= m_Controllers[controller]->m_RightStickDeadzone[0]) and (sX >= m_Controllers[controller]->m_RightStickDeadzone[1]))
 	{
 		return true;
 	}
@@ -183,11 +192,11 @@ bool InputManager::IsRightStickInHorizontalDeadzone()
 	return false;
 }
 
-bool InputManager::IsRightStickInVerticalDeadzone()
+bool InputManager::IsRightStickInVerticalDeadzone(int8 controller)
 {
-	short sY = m_State.Gamepad.sThumbRY;
+	short sY = m_Controllers[controller]->m_State.Gamepad.sThumbRY;
 
-	if ((sY <= m_RightStickDeadzone[2]) and (sY >= m_RightStickDeadzone[3]))
+	if ((sY <= m_Controllers[controller]->m_RightStickDeadzone[2]) and (sY >= m_Controllers[controller]->m_RightStickDeadzone[3]))
 	{
 		return true;
 	}
@@ -197,59 +206,59 @@ bool InputManager::IsRightStickInVerticalDeadzone()
 
 
 
-float InputManager::GetLeftStickX()
+float InputManager::GetLeftStickX(int8 controller)
 {
-	if (m_State.Gamepad.sThumbLX < 0)
+	if (m_Controllers[controller]->m_State.Gamepad.sThumbLX < 0)
 	{
-		return static_cast<float>(m_State.Gamepad.sThumbLX / 32768.0f);
+		return static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLX / 32768.0f);
 	}
 
-	return (static_cast<float>(m_State.Gamepad.sThumbLX) / 32767.0f);
+	return (static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLX) / 32767.0f);
 }
 
-float InputManager::GetLeftStickY()
+float InputManager::GetLeftStickY(int8 controller)
 {
-	if (m_State.Gamepad.sThumbLY < 0)
+	if (m_Controllers[controller]->m_State.Gamepad.sThumbLY < 0)
 	{
-		return static_cast<float>(m_State.Gamepad.sThumbLY / 32768.0f);
+		return static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLY / 32768.0f);
 	}
 
-	return (static_cast<float>(m_State.Gamepad.sThumbLY) / 32767.0f);
+	return (static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLY) / 32767.0f);
 }
 
-float InputManager::GetRightStickX()
+float InputManager::GetRightStickX(int8 controller)
 {
-	if (m_State.Gamepad.sThumbRX < 0)
+	if (m_Controllers[controller]->m_State.Gamepad.sThumbRX < 0)
 	{
-		return static_cast<float>(m_State.Gamepad.sThumbRX / 32768.0f);
+		return static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRX / 32768.0f);
 	}
 
-	return (static_cast<float>(m_State.Gamepad.sThumbRX) / 32767.0f);
+	return (static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRX) / 32767.0f);
 }
 
-float InputManager::GetRightStickY()
+float InputManager::GetRightStickY(int8 controller)
 {
-	if (m_State.Gamepad.sThumbRY < 0)
+	if (m_Controllers[controller]->m_State.Gamepad.sThumbRY < 0)
 	{
-		return static_cast<float>(m_State.Gamepad.sThumbRY / 32768.0f);
+		return static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRY / 32768.0f);
 	}
 
-	return (static_cast<float>(m_State.Gamepad.sThumbRY) / 32767.0f);
+	return (static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRY) / 32767.0f);
 }
 
 
 
-Vector2f InputManager::LeftStickPressed()
+Vector2f InputManager::LeftStickPressed(int8 controller)
 {
-	float sX = static_cast<float>(m_State.Gamepad.sThumbLX);
-	float sY = static_cast<float>(m_State.Gamepad.sThumbLY);
+	float sX = static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLX);
+	float sY = static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbLY);
 
-	if (IsLeftStickInHorizontalDeadzone() == true)
+	if (IsLeftStickInHorizontalDeadzone(controller) == true)
 	{
 		sX = 0;
 	}
 
-	if (IsLeftStickInVerticalDeadzone() == true)
+	if (IsLeftStickInVerticalDeadzone(controller) == true)
 	{
 		sY = 0;
 	}
@@ -277,17 +286,17 @@ Vector2f InputManager::LeftStickPressed()
 	return { sX, sY };
 }
 
-Vector2f InputManager::RightStickPressed()
+Vector2f InputManager::RightStickPressed(int8 controller)
 {
-	float sX = static_cast<float>(m_State.Gamepad.sThumbRX);
-	float sY = static_cast<float>(m_State.Gamepad.sThumbRY);
+	float sX = static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRX);
+	float sY = static_cast<float>(m_Controllers[controller]->m_State.Gamepad.sThumbRY);
 
-	if (IsRightStickInHorizontalDeadzone() == true)
+	if (IsRightStickInHorizontalDeadzone(controller) == true)
 	{
 		sX = 0;
 	}
 
-	if (IsRightStickInVerticalDeadzone() == true)
+	if (IsRightStickInVerticalDeadzone(controller) == true)
 	{
 		sY = 0;
 	}
@@ -315,11 +324,11 @@ Vector2f InputManager::RightStickPressed()
 	return { sX, sY };
 }
 
-float InputManager::LeftTriggerPressed()
+float InputManager::LeftTriggerPressed(int8 controller)
 {
-	BYTE Trigger = m_State.Gamepad.bLeftTrigger;
+	BYTE Trigger = m_Controllers[controller]->m_State.Gamepad.bLeftTrigger;
 
-	if (Trigger > m_LeftTriggerDeadzone)
+	if (Trigger > m_Controllers[controller]->m_LeftTriggerDeadzone)
 	{
 		return Trigger / 255.0f;
 	}
@@ -327,11 +336,13 @@ float InputManager::LeftTriggerPressed()
 	return 0.0f;
 }
 
-float InputManager::RightTriggerPressed()
+float InputManager::RightTriggerPressed(int8 controller)
 {
-	BYTE Trigger = m_State.Gamepad.bRightTrigger;
+	
 
-	if (Trigger > m_RightTriggerDeadzone)
+	BYTE Trigger = m_Controllers[controller]->m_State.Gamepad.bRightTrigger;
+
+	if (Trigger > m_Controllers[controller]->m_RightTriggerDeadzone)
 	{
 		return Trigger / 255.0f;
 	}

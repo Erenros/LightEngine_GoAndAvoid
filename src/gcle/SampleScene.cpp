@@ -6,6 +6,8 @@
 
 void SampleScene::OnInitialize()
 {
+	InputManager::GetInstance().AddController(&player1);
+	InputManager::GetInstance().AddController(&player2);
 	 
 	/*pEntity = CreateEntity<Player>(gcle::Shapes::Rectangle);
 	pEntity->SetTexture(tex);
@@ -48,9 +50,8 @@ void SampleScene::OnUpdate(Clock& time)
 {
 	InputManager IM = InputManager::GetInstance();
 
-
-	Vector2f LS = IM.LeftStickPressed();
-	Vector2f RS = IM.RightStickPressed();
+	Vector2f LS = IM.LeftStickPressed(0);
+	Vector2f RS = IM.RightStickPressed(0);
 
 	if ((LS.x != 0) and (LS.y != 0))
 	{
@@ -62,38 +63,38 @@ void SampleScene::OnUpdate(Clock& time)
 		std::cout << "Orientation of right joystick is : " << std::endl << RS.x << std::endl << RS.y << std::endl;
 	}
 
-	float LT = IM.LeftTriggerPressed();
-	float RT = IM.RightTriggerPressed();
+	float LT = IM.LeftTriggerPressed(0);
+	float RT = IM.RightTriggerPressed(0);
 
 
 	if (LT > 0)
 	{
-		std::cout << "Push on left trigger is : " << IM.LeftTriggerPressed() << std::endl;
+		std::cout << "Push on left trigger is : " << IM.LeftTriggerPressed(0) << std::endl;
 	}
 
 	if(RT > 0)
 	{
-		std::cout << "Push on right trigger is : " << IM.RightTriggerPressed() << std::endl;
+		std::cout << "Push on right trigger is : " << IM.RightTriggerPressed(0) << std::endl;
 	}
 
 
 
-	if (IM.IsControllerDown(XBOX_A))
+	if (IM.IsControllerDown(0, XBOX_A))
 	{
 		std::cout << "XBOX A is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_B))
+	if (IM.IsControllerDown(0, XBOX_B))
 	{
 		std::cout << "XBOX B is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_X))
+	if (IM.IsControllerDown(0, XBOX_X))
 	{
 		std::cout << "XBOX X is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_Y))
+	if (IM.IsControllerDown(0, XBOX_Y))
 	{
 		std::cout << "XBOX Y is down" << std::endl;
 	}
@@ -102,34 +103,34 @@ void SampleScene::OnUpdate(Clock& time)
 
 
 
-	if (IM.IsControllerDown(XBOX_BACK))
+	if (IM.IsControllerDown(0, XBOX_BACK))
 	{
 		std::cout << "XBOX BACK is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_START))
+	if (IM.IsControllerDown(0, XBOX_START))
 	{
 		std::cout << "XBOX START is down" << std::endl;
 	}
 	
 	
 	
-	if (IM.IsControllerDown(XBOX_PAD_LEFT))
+	if (IM.IsControllerDown(0, XBOX_PAD_LEFT))
 	{
 		std::cout << "XBOX PAD LEFT is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_PAD_RIGHT))
+	if (IM.IsControllerDown(0, XBOX_PAD_RIGHT))
 	{
 		std::cout << "XBOX PAD RIGHT is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_PAD_UP))
+	if (IM.IsControllerDown(0, XBOX_PAD_UP))
 	{
 		std::cout << "XBOX PAD UP is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_PAD_DOWN))
+	if (IM.IsControllerDown(0, XBOX_PAD_DOWN))
 	{
 		std::cout << "XBOX PAD DOWN is down" << std::endl;
 	}
@@ -139,30 +140,32 @@ void SampleScene::OnUpdate(Clock& time)
 
 
 
-	if (IM.IsControllerDown(XBOX_RJS))
+	if (IM.IsControllerDown(0, XBOX_RJS))
 	{
 		std::cout << "XBOX RIGHT JOYSTICK is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_LJS))
+	if (IM.IsControllerDown(0, XBOX_LJS))
 	{
 		std::cout << "XBOX LEFT JOYSTICK is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_RB))
+	if (IM.IsControllerDown(0, XBOX_RB))
 	{
 		std::cout << "XBOX RB is down" << std::endl;
 	}
 
-	if (IM.IsControllerDown(XBOX_LB))
+	if (IM.IsControllerDown(0, XBOX_LB))
 	{
 		std::cout << "XBOX LB is down" << std::endl;
 
-		IM.SetVibration(1, 1);
+		//IM.SetVibration(1, 1, 1);
+		IM.SetVibration(0, 0, 0);
 	}
 
 	else
 	{
-		IM.SetVibration(0, 0);
+		//IM.SetVibration(0, 1, 1);
+		IM.SetVibration(1, 0, 0);
 	}
 } 
