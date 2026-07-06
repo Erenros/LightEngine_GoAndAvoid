@@ -7,10 +7,10 @@ void AssetEngine::Init(Window* window,const std::string& path)
 {
 	if (LoadFile("../../test.gcle"))
 	{
-		std::unordered_map<std::string, Sprite*> loadedSprite = AssetToTexture(window);
+		std::unordered_map<std::string, Surface*> loadedSurface = AssetToSurface(window);
 
-		for (auto& pair : loadedSprite)
-			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
+		for (auto& pair : loadedSurface)
+			RessourceManager::GetInstance().ForcePutSurface(pair.second, pair.first);
 
 		ClearAsset();
 	}
@@ -78,7 +78,7 @@ bool AssetEngine::LoadFile(const std::string& path)
 	return true;
 }
 
-void AssetEngine::AddAsset(const std::string& id, Sprite* sprite)
+void AssetEngine::AddAsset(const std::string& id)
 {
 	if (m_assetMap.contains(id))
 		return;
@@ -93,12 +93,12 @@ void AssetEngine::AddAsset(const std::string& id, Sprite* sprite)
 	m_assetMap[id] = asset;
 }
 
-std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* window)
+std::unordered_map<std::string, Surface*> AssetEngine::AssetToSurface(Window* window)
 {
-	std::unordered_map< std::string, Sprite*> textureMap;
+	std::unordered_map< std::string, Surface*> textureMap;
 	
 	for (auto& pair : m_assetMap)
-		textureMap[pair.first] = new Sprite(window, pair.second);
+		textureMap[pair.first] = new Surface(window, pair.second);
 
 	return textureMap;
 }

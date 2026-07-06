@@ -17,15 +17,17 @@ void SampleScene::OnInitialize()
 	test = CreateText(text, 40, 40, 100, 60);
 	 
 	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->SetPosition(10, -200);
-	entity1->SetRotation(45);
+	entity1->SetPosition(10, 0);
+	//entity1->SetRotation(45);
 	entity1->SetRigidBody(true); 
 	entity1->GetShape()->SetIsKinematic(true);
 	entity1->GetRigidBody().SetDampingStrenght(0.9f);
 	entity1->SetTexture("test");
+	entity1->AddAnimation("anim1", 0, 3, 0, 32, 32,10.f);
+	entity1->PlayAnimation("anim1");
 
 	 
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	/*Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity2->SetPosition(10, 100);
 	entity2->SetRigidBody(true); 
 	entity2->GetShape()->SetIsKinematic(true);
@@ -41,7 +43,7 @@ void SampleScene::OnInitialize()
 	Entity* entity4 = CreateEntity<Entity>(gcle::Shapes::Circle);
 	entity4->SetPosition(-200, 100);
 	entity4->SetRigidBody(true); 
-	entity4->GetShape()->SetIsKinematic(true);
+	entity4->GetShape()->SetIsKinematic(true);*/
 }
 
 void SampleScene::OnUpdate(Clock& time)

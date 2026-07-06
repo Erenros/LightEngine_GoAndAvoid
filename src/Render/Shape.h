@@ -9,6 +9,8 @@
 #include "Sprite.h"
 
 class Entity;
+class Window;
+class Surface;
 struct SDL_Vertex;
 struct SDL_FPoint;
 
@@ -30,7 +32,7 @@ namespace gcle
 
 	class Shape {
 
-		TextureStruct* mp_texture = nullptr;
+		Sprite* mp_texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
@@ -78,7 +80,7 @@ namespace gcle
 		//Getters 
 		Shapes GetShape() { return m_shape; };
 		Vector2f GetOrigin() { return m_origin; }
-		Sprite* GetTexture() { return (mp_texture == nullptr ? nullptr : mp_texture->mp_texture);};
+		Sprite* GetTexture() { return mp_texture == nullptr ? nullptr : mp_texture;};
 		std::vector<int32>& GetIndicies() { return m_indicies; }; 
 		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
@@ -114,7 +116,7 @@ namespace gcle
 
 	public:
 
-		void SetTexture(TextureStruct* tex) { mp_texture = tex; }
+		void SetTexture(Window* window, SurfaceStruct* tex);
 		void SetOrigin(Vector2f origin) { m_origin = origin; }
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		 

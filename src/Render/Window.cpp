@@ -107,8 +107,8 @@ void Window::Draw(gcle::Shape* pShape)
 	if (pShape->GetTexture() == nullptr)
 		SDL_RenderGeometry(mp_Renderer, nullptr, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	else {
-		Texture* text = pShape->GetTexture();
-		SDL_RenderGeometry(mp_Renderer, pShape->GetTexture()->GetSDLTexture(), vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
+		SDL_Texture* texture = pShape->GetTexture()->CreateTexture(this);
+		SDL_RenderGeometry(mp_Renderer, texture, vertices.data(), static_cast<int32>(vertices.size()), pShape->GetIndicies().data(), static_cast<int32>(pShape->GetIndicies().size()));
 	}
 }
 

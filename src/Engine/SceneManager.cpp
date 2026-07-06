@@ -123,14 +123,14 @@ void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
             continue;
         }
         else {
-            RessourceManager::GetInstance().m_textureMap[texture].UnloadTexture();
+            RessourceManager::GetInstance().m_surfaceMap[texture].UnloadTexture();
             DEBUG_INFO << "unload " << texture << ENDL
         }
     }
     for (auto& texture : newScene->m_activeTextures) {
         if (std::find(m_activatedTextures.begin(),m_activatedTextures.end(), texture) == m_activatedTextures.end()) {
             std::string path = "../../assets/textures/" + texture + ".png";
-            RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, texture);
+            RessourceManager::GetInstance().LoadSurface(GameManager::GetInstance().GetWindow(), path, texture);
             m_activatedTextures.push_back(texture);
             DEBUG_INFO << "load " << texture << ENDL
         }

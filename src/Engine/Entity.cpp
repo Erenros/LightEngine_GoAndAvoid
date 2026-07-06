@@ -191,14 +191,19 @@ void Entity::Rotate(Degrees delta)
 	mp_Shape->Rotate(delta);
 }
 
-void Entity::SetTexture(const std::string& id){
-	mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
+void Entity::SetTexture(const std::string& id)
+{
+	RessourceManager& RM  = RessourceManager::GetInstance();
+
+	mp_RenderShape->SetTexture(GameManager::GetInstance().GetWindow(), RM.GetSurface(id));
+	RM.AddTexture(id, mp_RenderShape->GetTexture());
+
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
 		for(auto& sId : m_activeScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
-		if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
+		if (RM.GetSurface(id)->mp_surface == nullptr) {
 			std::string path = "../../assets/textures/" + id + ".png";
-			RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
+			RM.LoadSurface(GameManager::GetInstance().GetWindow(), path, id);
 		}
 	}
 }

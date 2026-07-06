@@ -22,6 +22,23 @@ Sprite::Sprite(Window* window, Asset* asset)
 	InitTextureWithBuffer(window, asset);
 }
 
+Sprite::Sprite(Window* window, Surface* surface)
+{
+	InitTextureWithSurface(window, surface);
+	SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
+	m_isSprite = true;
+}
+
+Sprite::~Sprite()
+{
+	SDL_DestroyTexture(mp_texture);
+
+	for (auto& anim : m_animationMap)
+		delete anim.second;
+
+	m_animationMap.clear();
+}
+
 void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
 {
 	m_animationMap[id] = new Animation(firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
@@ -56,7 +73,7 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 	if(m_timer < mp_currentAnimation->m_duration)
 		return;
 
-	m_timer = 0;
+	m_timer = 0.f;
 
 	m_currentFrameX++;
 	if (m_currentFrameX > anim->m_lastFrame)

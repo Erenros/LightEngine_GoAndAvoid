@@ -21,36 +21,41 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volu
 	m_soundMap[id]->PlaySound(mode, volume);
 }
 
-void RessourceManager::ForcePutTexture(Sprite* text, std::string id)
+void RessourceManager::ForcePutSurface(Surface* text, std::string id)
 {
-	m_textureMap[id].mp_texture = text;
+	m_surfaceMap[id].mp_surface = text;
 }
 
-TextureStruct* RessourceManager::GetTexture(const std::string& id)
+SurfaceStruct* RessourceManager::GetSurface(const std::string& id)
 {
-	if (!m_textureMap.contains(id))
+	if (!m_surfaceMap.contains(id))
 		return nullptr;
 
-	return &m_textureMap[id];
+	return &m_surfaceMap[id];
 }
 
-Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
+Surface* RessourceManager::LoadSurface(Window* window, const std::string& path, const std::string& id)
 {
-	if (m_textureMap[id].mp_texture != nullptr)
-		return m_textureMap[id].mp_texture;
+	if (m_surfaceMap[id].mp_surface != nullptr)
+		return m_surfaceMap[id].mp_surface;
 
-	Sprite* texture = new Sprite(window, path);
-	if (texture == nullptr || !texture->IsTextureInit())
+	Surface* texture = new Surface(window, path);
+	if (texture == nullptr || !texture->IsSurfaceInit())
 	{
-		DEBUG_WARN << "Got a nullptr Texture for path : " + path << ENDL;
+		DEBUG_WARN << "Got a nullptr Surface for path : " + path << ENDL;
 		delete texture;
 		return nullptr;
 	}
 	 
-	DEBUG_INFO << "Texture created" << ENDL;
-	m_textureMap[id].mp_texture = texture;
-	AssetEngine::GetInstance().AddAsset(id, texture);
+	DEBUG_INFO << "Surface created" << ENDL;
+	m_surfaceMap[id].mp_surface = texture;
+	AssetEngine::GetInstance().AddAsset(id);
 	return texture;
+}
+
+void RessourceManager::AddTexture(const std::string& id, Texture* tex)
+{
+	m_textures[id].push_back(tex);
 }
 
 void RessourceManager::SetFontSize(const std::string& id, int size)
@@ -135,14 +140,14 @@ void RessourceManager::InitTextureFolder(Window* window)
 			continue;
 		}
 
-		if (m_textureMap.contains(entry.path().stem().string()))
+		if (m_surfaceMap.contains(entry.path().stem().string()))
 		{
 			DEBUG_INFO << "Texture '" << entry.path().stem().string() << "' already loaded" << ENDL;
 			continue;
 		}
 
 		//LoadTexture(window,entry.path().string(), entry.path().stem().string());
-		m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
+		m_surfaceMap[entry.path().stem().string()].mp_surface = nullptr;
 	}
 
 	//for (auto& tex : m_textureMap) {
@@ -236,12 +241,20 @@ void RessourceManager::InitFont()
 	}
 }
 
+void RessourceManager::EraseTexture(const std::string& id)
+{
+	for (auto& tex : m_textures[id])
+		delete tex;
+
+	m_textures[id].clear();
+}
+
 void RessourceManager::DeleteAll()
 {
 	DeleteAllFont();
 	DeleteAllMusic();
 	DeleteAllSound();
-	DeleteAllTexture();
+	DeleteAllSurface();
 }
 
 void RessourceManager::DeleteFont(const std::string& id)
@@ -295,27 +308,29 @@ void RessourceManager::DeleteAllSound()
 	m_soundMap.clear();
 }
 
-void RessourceManager::DeleteTexture(const std::string& id)
+void RessourceManager::DeleteSurface(const std::string& id)
 {
-	if (!m_textureMap.count(id))
+	if (!m_surfaceMap.count(id))
 		return;
 
 	AssetEngine::GetInstance().DeleteAsset(id);
-	delete m_textureMap[id].mp_texture;
-	m_textureMap[id].mp_texture = nullptr;
-	m_textureMap.erase(id);
+	delete m_surfaceMap[id].mp_surface;
+	m_surfaceMap[id].mp_surface = nullptr;
+	m_surfaceMap.erase(id);
+	EraseTexture(id);
 }
 
-void RessourceManager::DeleteAllTexture()
+void RessourceManager::DeleteAllSurface()
 {
-	for (auto& pair : m_textureMap)
+	for (auto& pair : m_surfaceMap)
 	{
-		if (pair.second.mp_texture)
+		if (pair.second.mp_surface)
 		{
-			delete pair.second.mp_texture;
-			pair.second.mp_texture = nullptr;
+			delete pair.second.mp_surface;
+			pair.second.mp_surface = nullptr;
+			EraseTexture(pair.first);
 		}
 	}
 
-	m_textureMap.clear();
+	m_surfaceMap.clear();
 }

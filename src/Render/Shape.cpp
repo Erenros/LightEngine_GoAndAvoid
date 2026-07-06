@@ -137,6 +137,11 @@ namespace gcle
 		m_Transform.ClearDirty();
 	}
 
+	void Shape::SetTexture(Window* window, SurfaceStruct* tex)
+	{
+		mp_texture = new Sprite(window, tex->mp_surface);
+	}
+
 	std::vector<SDL_FPoint*>& Shape::GetHollow()
 	{
 		UpdateRenderVertices();

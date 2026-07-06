@@ -8,14 +8,15 @@
 #include "Render/Music.h"
 #include "Render/Font.h"
 #include "Render/GCLE_Audio.h"
+#include "Render/Surface.h"
 #include "include.h"
 
 class Window;
 //Faudra biennnn optimiser ca plus tard
 
-struct TextureStruct {
+struct SurfaceStruct {
 public:
-	Sprite* mp_texture = nullptr;
+	Surface* mp_surface = nullptr;
 	
 private:
 	int32 m_useCount = 0;
@@ -36,17 +37,17 @@ public:
 	}
 	
 	void UnloadTexture() {
-		if(mp_texture != nullptr)
-			delete mp_texture;
-			mp_texture = nullptr;
+		if(mp_surface != nullptr)
+			delete mp_surface;
+			mp_surface = nullptr;
 	}
 
 	bool IsLoaded() {
-		return mp_texture == nullptr;
+		return mp_surface == nullptr;
 	}
 
-	~TextureStruct() {
-		delete mp_texture;
+	~SurfaceStruct() {
+		delete mp_surface;
 	}
 
 };
@@ -59,15 +60,17 @@ private:
 	std::unordered_map<std::string, Sound*> m_soundMap;
 	std::unordered_map<std::string, Music*> m_musicMap;
 
-	std::unordered_map<std::string, TextureStruct> m_textureMap;
+	std::unordered_map<std::string, SurfaceStruct> m_surfaceMap;
 
 	std::unordered_map<std::string, Font*> m_fontMap;
+
+	std::unordered_map<std::string, std::vector<Texture*>> m_textures;
 
 	friend class SceneManager;
 	
 private: 
 
-	void ForcePutTexture(Sprite* text, std::string id);
+	void ForcePutSurface(Surface* text, std::string id);
 	friend class AssetEngine;
 
 public:
@@ -78,8 +81,10 @@ public:
 	}
 
 	Font* GetFont(const std::string& id) { return m_fontMap[id]; };
-	TextureStruct* GetTexture(const std::string& id);
-	Sprite* LoadTexture(Window* window, const std::string& path, const std::string& id);
+	SurfaceStruct* GetSurface(const std::string& id);
+	Surface* LoadSurface(Window* window, const std::string& path, const std::string& id);
+
+	void AddTexture(const std::string& id, Texture* tex);
 
 	//TTF_Font* GetFont(const std::string& id) { return m_fontMap.contains(id) ? m_fontMap[id] : nullptr; }
 
@@ -122,6 +127,8 @@ public:
 	void InitSoundFolder();
 	void InitFont();
 
+	void EraseTexture(const std::string& id);
+
 	void DeleteAll();
 	void DeleteFont(const std::string& id);
 	void DeleteAllFont();
@@ -129,8 +136,8 @@ public:
 	void DeleteAllMusic();
 	void DeleteSound(const std::string& id);
 	void DeleteAllSound();
-	void DeleteTexture(const std::string& id);
-	void DeleteAllTexture();
+	void DeleteSurface(const std::string& id);
+	void DeleteAllSurface();
 
 	~RessourceManager() { DeleteAll(); };
 };

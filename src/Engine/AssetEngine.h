@@ -4,6 +4,7 @@
 
 class Window;
 class Sprite;
+class Surface;
 
 struct Header
 {
@@ -67,10 +68,10 @@ public:
 	Asset* GetAsset(std::string id);
 
 	bool LoadFile(const std::string& path);
-	void AddAsset(const std::string& id, Sprite* sprite);
+	void AddAsset(const std::string& id);
 	void SaveInFile(const std::string& path);
 
-	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
+	std::unordered_map<std::string, Surface*> AssetToSurface(Window* window);
 
 	void DeleteAsset(const std::string& id);
 	void ClearAsset();
