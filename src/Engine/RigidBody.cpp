@@ -19,7 +19,10 @@ void RigidBody2D::Initialize(Transform2D* transform)
 
 void RigidBody2D::Update(float32 dt)
 {
-	ApplyFriction(dt);
+	if (m_UseFriction) {
+		ApplyFriction(dt);
+	}
+
 	ApplyGravity(dt);
 
 	if (m_TempVelHasChanged) {
@@ -33,6 +36,9 @@ void RigidBody2D::Update(float32 dt)
 	m_TempVelocity = m_Velocity;
 
 	mp_Transform->UpdateChildPosition();
+
+	if (!m_UseFriction)
+		m_Velocity = {0, 0};
 }
 
 bool RigidBody2D::UseContinuousCollision() const
