@@ -3,71 +3,89 @@
 
 Collider::~Collider()
 {
-    if (m_shape != nullptr)
+    if (mp_Shape != nullptr)
     {
-        delete m_shape;
-        m_shape = nullptr;
+        delete mp_Shape;
+        mp_Shape = nullptr;
     }
 }
 
-void Collider::Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner)
+void Collider::Initialize(Shape* pShape, Vector2f position, float32 rotation, Entity* pOwner)
 {
-    m_shape = shape;
-    mp_Owner = owner;
-    m_shape->SetPosition(position.x, position.y);
-	m_shape->SetRotation(rotation);
-    m_shape->GetTransform()->SetParent(&mp_Owner->GetTransform2D());
+    mp_Shape = pShape;
+    mp_Owner = pOwner;
+    mp_Shape->SetPosition(position.x, position.y);
+	mp_Shape->SetRotation(rotation);
+    mp_Shape->GetTransform()->SetParent(&mp_Owner->GetTransform2D());
 }
 
 void Collider::CollidingOn(Vector2f direction)
 {
     if (direction.x < 0.0f)
-        m_CollisionDirection.IsCollidingOnRight = true;
+        m_CollisionDirection.isCollidingOnRight = true;
     else if (direction.x > 0.0f)
-        m_CollisionDirection.IsCollidingOnLeft = true;
+        m_CollisionDirection.isCollidingOnLeft = true;
 
     if (direction.y > 0.0f)
-        m_CollisionDirection.IsCollidingOnTop = true;
+        m_CollisionDirection.isCollidingOnTop = true;
     else if (direction.y < 0.0f)
-        m_CollisionDirection.IsCollidingOnBottom = true;
+        m_CollisionDirection.isCollidingOnBottom = true;
 }
 
 void Collider::CollidingOnX(float32 direction)
 {
     if (direction < 0.0f)
-        m_CollisionDirection.IsCollidingOnRight = true;
+        m_CollisionDirection.isCollidingOnRight = true;
     else if (direction > 0.0f)
-        m_CollisionDirection.IsCollidingOnLeft = true;
+        m_CollisionDirection.isCollidingOnLeft = true;
 }
 
 void Collider::CollidingOnY(float32 direction)
 {
     if (direction > 0.0f)
-        m_CollisionDirection.IsCollidingOnTop = true;
+        m_CollisionDirection.isCollidingOnTop = true;
     else if (direction < 0.0f)
-        m_CollisionDirection.IsCollidingOnBottom = true;
+        m_CollisionDirection.isCollidingOnBottom = true;
 }
 
 void Collider::StoppedColliding()
 {
-    m_CollisionDirection.IsCollidingOnRight = false;
-    m_CollisionDirection.IsCollidingOnLeft = false;
-    m_CollisionDirection.IsCollidingOnTop = false;
-    m_CollisionDirection.IsCollidingOnBottom = false;
+    m_CollisionDirection.isCollidingOnRight = false;
+    m_CollisionDirection.isCollidingOnLeft = false;
+    m_CollisionDirection.isCollidingOnTop = false;
+    m_CollisionDirection.isCollidingOnBottom = false;
+}
+
+bool Collider::IsActive()
+{
+    return m_IsActive;
 }
 
 bool Collider::GetInQuerySeen() {
-    return m_inQuerySeen;
+    return m_InQuerySeen;
 }
 
 void Collider::SetInQuerySeen(bool seen) {
-    m_inQuerySeen = seen;
+    m_InQuerySeen = seen;
 }
 
 AABB Collider::GetAABB(){
-    return m_aabb;
+    return m_Aabb;
 }
 
 void Collider::SetAABB(AABB aabb){
-    m_aabb = aabb;
+    m_Aabb = aabb;
 }
+
+void Collider::SetActive(bool activate) { m_IsActive = activate; }
+
+Shape*          Collider::GetShape()         { return mp_Shape; }
+const Shape*    Collider::GetShape() const   { return mp_Shape; }
+
+const CollisionDirection& Collider::GetCollisionDirection() const
+{
+    return m_CollisionDirection;
+}
+
+Entity*   Collider::GetOwner() const           { return mp_Owner; }
+void      Collider::SetOwner(Entity* pOwner) { mp_Owner = pOwner; }

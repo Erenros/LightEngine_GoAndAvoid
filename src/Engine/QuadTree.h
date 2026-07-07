@@ -5,10 +5,10 @@
 
 class QuadTree {
 
-	QuadNode m_root;
-	QuadNodePool m_pool;
-	std::vector<Collider*> m_queryResult;
-	std::vector <Collider*> m_seenEntities;
+	QuadNode m_Root;
+	QuadNodePool m_Pool;
+	std::vector<Collider*> m_QueryResult;
+	std::vector <Collider*> m_SeenEntities;
 
 public:
 
@@ -19,10 +19,10 @@ public:
 
 	~QuadTree() = default;
 
-	void Insert(Collider* entry);
+	void Insert(Collider* pEntry);
 
 	void Clear();
 
-	std::vector<Collider*>& Query(Collider* entry);
+	std::vector<Collider*>& Query(Collider* pEntry);
 	friend class PhysicsManager;
 };

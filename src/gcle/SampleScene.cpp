@@ -10,8 +10,8 @@ void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
 	 	 
-	std::string text = "Test";
-	CreateText(text, { 40, 40 }, 50);
+	//std::string text = "Test";
+	//CreateText(text, { 40, 40 }, 50);
 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(-400, 0);
@@ -36,9 +36,10 @@ void SampleScene::OnInitialize()
 	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
-	mp_mainCamera->SetFollowing(pEntity);
+	mp_MainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
+	pSceneCamera->SetFollowing(entity1);
 
 	for (int32 i = 0; i < 50; i++) 
 	{
@@ -66,9 +67,9 @@ void SampleScene::OnUpdate(Clock& time)
 	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		if (GetCurrentCamera()->GetId() != mp_mainCamera->GetId())
+		if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
 		{
-			SwitchCamera(mp_mainCamera);
+			SwitchCamera(mp_MainCamera);
 		}
 		else
 		{

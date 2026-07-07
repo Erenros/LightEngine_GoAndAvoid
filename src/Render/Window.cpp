@@ -4,7 +4,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 
 #include "Shape.h"
@@ -16,10 +15,19 @@
 constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
 constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
 
+Window::Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
+{
+	Create(pName, width, height, windowFlags, rendererFlags, x, y);
+}
+Window::~Window()
+{
+	End();
+};
+
 void Window::Create(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
-	m_width = width;
-	m_height = height;
+	m_Width = width;
+	m_Height = height;
 
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO))
 	{
@@ -54,12 +62,6 @@ void Window::Create(const char* pName, int32 width, int32 height, uint32 windowF
 		return;
 	}
 
-	if (!TTF_Init())
-	{
-		std::cout << "[Initialisation] : Font Error" << std::endl;
-		return;
-	}
-
 	// Create a Render Target
 
 	mp_RenderTarget = SDL_CreateTexture(mp_Renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, static_cast<int32>(RENDER_TARGET_WIDTH), static_cast<int32>(RENDER_TARGET_HEIGHT));
@@ -81,18 +83,18 @@ void Window::Create(const char* pName, int32 width, int32 height, uint32 windowF
 
 	SDL_SetRenderTarget(mp_Renderer, NULL);
 
-	mp_dst = new SDL_FRect();
+	mp_Dst = new SDL_FRect();
 }
 
 Vector2f Window::GetMousePositionOnRenderTarget()
 {
 	Vector2u mousePos = GetMousePosition();
 
-	float32 scaleX = RENDER_TARGET_WIDTH / mp_dst->w;
-	float32 scaleY = RENDER_TARGET_HEIGHT / mp_dst->h;
+	float32 scaleX = RENDER_TARGET_WIDTH / mp_Dst->w;
+	float32 scaleY = RENDER_TARGET_HEIGHT / mp_Dst->h;
 
-	float32 x = (static_cast<float32>(mousePos.x) - mp_dst->x) * scaleX;
-	float32 y = (static_cast<float32>(mousePos.y) - mp_dst->y) * scaleY;
+	float32 x = (static_cast<float32>(mousePos.x) - mp_Dst->x) * scaleX;
+	float32 y = (static_cast<float32>(mousePos.y) - mp_Dst->y) * scaleY;
 
 	return Vector2f{ x, y };
 }
@@ -109,11 +111,10 @@ void Window::End()
 	SDL_DestroyWindow(mp_Window);
 
 	Audio::Shutdown();
-	TTF_Quit();
 	SDL_Quit();
 
-	delete mp_dst;
-	mp_dst = nullptr;
+	delete mp_Dst;
+	mp_Dst = nullptr;
 }
 
 void Window::Present()
@@ -123,27 +124,27 @@ void Window::Present()
 	SDL_SetRenderDrawColor(mp_Renderer, 20, 20, 20, 255);
 	SDL_RenderClear(mp_Renderer);
 
-	int windowW, windowH;
+	int32 windowW, windowH;
 	SDL_GetWindowSize(mp_Window, &windowW, &windowH);
 
-	constexpr float32 aspect = 1920.f / 1080.f;
+	constexpr float32 ASPECT = 1920.f / 1080.f;
 
-	if (static_cast<float32>(windowW) / windowH > aspect)
+	if (static_cast<float32>(windowW) / windowH > ASPECT)
 	{
-		mp_dst->h = static_cast<float32>(windowH);
-		mp_dst->w = windowH * aspect;
-		mp_dst->x = (windowW - mp_dst->w) * 0.5f;
-		mp_dst->y = 0.f;
+		mp_Dst->h = static_cast<float32>(windowH);
+		mp_Dst->w = windowH * ASPECT;
+		mp_Dst->x = (windowW - mp_Dst->w) * 0.5f;
+		mp_Dst->y = 0.f;
 	}
 	else
 	{
-		mp_dst->w = static_cast<float32>(windowW);
-		mp_dst->h = windowW / aspect;
-		mp_dst->x = 0.f;
-		mp_dst->y = (windowH - mp_dst->h) * 0.5f;
+		mp_Dst->w = static_cast<float32>(windowW);
+		mp_Dst->h = windowW / ASPECT;
+		mp_Dst->x = 0.f;
+		mp_Dst->y = (windowH - mp_Dst->h) * 0.5f;
 	}
 
-	SDL_RenderTexture(mp_Renderer, mp_RenderTarget, nullptr, mp_dst);
+	SDL_RenderTexture(mp_Renderer, mp_RenderTarget, nullptr, mp_Dst);
 
 	SDL_RenderPresent(mp_Renderer);
 }
@@ -159,15 +160,15 @@ void Window::Clear()
 
 void Window::DrawTextOnRenderer(Text* text)
 {
-	SDL_Texture* texture = text->CreateTexture(this);
+	SDL_Texture* texture = text->GetTexture(this);
 	if (texture == nullptr)
 		return;
 
 	DrawOnRenderer(texture, nullptr, text->GetSDLRect());
 }
 
-void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_FRect* srcrect, SDL_FRect* dstrect) {
-	SDL_RenderTexture(mp_Renderer, pTexture, srcrect, dstrect);
+void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_FRect* pSrcrect, SDL_FRect* pDstrect) {
+	SDL_RenderTexture(mp_Renderer, pTexture, pSrcrect, pDstrect);
 }
 
 void Window::Draw(gcle::Shape* pShape)
@@ -190,19 +191,19 @@ void Window::Draw(gcle::Shape* pShape)
 	}
 }
 
-bool Window::IsInsideWindow(Entity* entity) {
-	if (entity->GetRenderShape() == nullptr)
+bool Window::IsInsideWindow(Entity* pEntity) {
+	if (pEntity->GetRenderShape() == nullptr)
 		return false;
 	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 
 	AABB entityAABB;
-	if (static_cast<int32>(entity->GetRenderShape()->GetRotation()) % 180 != 0) {
-		entityAABB = GetRotatedAABB(entity->GetRenderPosition(), { entity->GetRenderShape()->GetWidth(), entity->GetRenderShape()->GetHeight() }, entity->GetRenderShape()->GetRotation() * DEG_TO_RAD);
+	if (static_cast<int32>(pEntity->GetRenderShape()->GetRotation()) % 180 != 0) {
+		entityAABB = GetRotatedAABB(pEntity->GetRenderPosition(), { pEntity->GetRenderShape()->GetWidth(), pEntity->GetRenderShape()->GetHeight() }, pEntity->GetRenderShape()->GetRotation() * DEG_TO_RAD);
 		entityAABB = { entityAABB.minX - margin, entityAABB.minY - margin, entityAABB.maxX + margin, entityAABB.maxY + margin };
 	}
 	else
-		entityAABB = { entity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , entity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , entity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, entity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin };
+		entityAABB = { pEntity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , pEntity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , pEntity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, pEntity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin };
 
 	AABB windowAABB = { -margin, -margin, margin + RENDER_TARGET_WIDTH , margin + RENDER_TARGET_HEIGHT };
 
@@ -258,4 +259,13 @@ Vector2f Window::GetWindowSize()
 	Vector2u size;
 	SDL_GetWindowSize(mp_Window, &size.x, &size.y);
 	return Vector2f{ static_cast<float32>(size.x), static_cast<float32>(size.y) };
+}
+
+SDL_Window* Window::GetWindow(){
+	return mp_Window; 
+}
+
+SDL_Renderer* Window::GetRenderer() 
+{
+	return mp_Renderer; 
 }

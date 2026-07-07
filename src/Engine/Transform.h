@@ -67,7 +67,7 @@ private:
     Radians m_RadAngle = 0.f;
 
     Transform2D* mp_Parent = nullptr;
-    std::vector<Transform2D*> mp_Childs;
+    std::vector<Transform2D*> m_Childs;
 
     float m_DistanceFromParent = 0;
     Radians m_AngleDifferenceToParent = 0;

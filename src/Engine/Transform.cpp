@@ -3,15 +3,15 @@
 Transform2D::~Transform2D() {
 
     if (mp_Parent != nullptr) {
-        for (auto it = mp_Parent->mp_Childs.begin(); it != mp_Parent->mp_Childs.end(); ++it) {
+        for (auto it = mp_Parent->m_Childs.begin(); it != mp_Parent->m_Childs.end(); ++it) {
             if (*it == this) {
-                mp_Parent->mp_Childs.erase(it);
+                mp_Parent->m_Childs.erase(it);
                 break;
             }
         }
     }
 
-    for (auto pChild : mp_Childs) {
+    for (auto pChild : m_Childs) {
         pChild->SetParent(nullptr);
     }
 }
@@ -25,14 +25,14 @@ void Transform2D::Initialize(Vector2f position, Degrees angle)
     isSet = true;
 }
 
-#pragma region Gets
+#pragma region Getters
 
 Transform2D* Transform2D::GetParent() {
     return mp_Parent;
 }
 
 Transform2D* Transform2D::GetChild(uint32 index) {
-    return mp_Childs[index];
+    return m_Childs[index];
 }
 
 const Transform2D* Transform2D::GetParent() const {
@@ -40,11 +40,11 @@ const Transform2D* Transform2D::GetParent() const {
 }
 
 const Transform2D* Transform2D::GetChild(uint32 index) const {
-    return mp_Childs[index];
+    return m_Childs[index];
 }
 
 uint32 Transform2D::GetChildCount() const {
-    return static_cast<uint32>(mp_Childs.size());
+    return static_cast<uint32>(m_Childs.size());
 }
 
 Vector2f& Transform2D::GetPosition()
@@ -73,11 +73,11 @@ Radians& Transform2D::GetRadAngle()
 }
 #pragma endregion
 
-#pragma region Sets
+#pragma region Setters
 
 void Transform2D::SetParent(Transform2D* pParent) {
     if (pParent == this) {
-        //GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
+        //GPC_WARNING << "incest is bad" << ENDL;
         return;
     }
     if (mp_Parent != nullptr) {
@@ -85,7 +85,7 @@ void Transform2D::SetParent(Transform2D* pParent) {
     }
     mp_Parent = pParent;
     if (mp_Parent != nullptr) {
-        mp_Parent->mp_Childs.push_back(this);
+        mp_Parent->m_Childs.push_back(this);
 
         float dx = m_Position.x - mp_Parent->GetPosition().x;
         float dy = m_Position.y - mp_Parent->GetPosition().y;
@@ -163,7 +163,7 @@ void Transform2D::SetRadAngle(Radians angle)
 
 void Transform2D::SetDirty() {
     m_IsDirty = true;
-    for (auto pChild : mp_Childs) {
+    for (auto pChild : m_Childs) {
         pChild->SetDirty();
     }
 }
@@ -186,10 +186,10 @@ Matrix3x3 Transform2D::GetMatrix() const {
 
 void Transform2D::AddChild(Transform2D* pChild) {
     if (pChild == this) {
-        //GPC_WARNING << "You are trying to create a loop in transform parent" << ENDL;
+        //GPC_WARNING << "Incest is bad" << ENDL;
         return;
     }
-    for (auto& child : mp_Childs) {
+    for (auto& child : m_Childs) {
         if (child == pChild) return;
     }
     pChild->SetParent(this);
@@ -198,9 +198,9 @@ void Transform2D::AddChild(Transform2D* pChild) {
 
 void Transform2D::RemoveParent() {
     if (mp_Parent != nullptr) {
-        for (auto it = mp_Parent->mp_Childs.begin(); it != mp_Parent->mp_Childs.end(); ++it) {
+        for (auto it = mp_Parent->m_Childs.begin(); it != mp_Parent->m_Childs.end(); ++it) {
             if (*it == this) {
-                mp_Parent->mp_Childs.erase(it);
+                mp_Parent->m_Childs.erase(it);
                 break;
             }
         }
@@ -210,10 +210,10 @@ void Transform2D::RemoveParent() {
 
 void Transform2D::RemoveChild(uint32 index) {
     if (index >= GetChildCount()) return;
-    auto it = mp_Childs.begin();
+    auto it = m_Childs.begin();
     std::advance(it, index);
-    mp_Childs[index]->mp_Parent = nullptr;
-    mp_Childs.erase(it);
+    m_Childs[index]->mp_Parent = nullptr;
+    m_Childs.erase(it);
 }
 #pragma endregion
 
@@ -250,10 +250,10 @@ void Transform2D::UpdatePositionWithParentPosition()
 
 void Transform2D::UpdateChildPosition()
 {
-    if (mp_Childs.empty())
+    if (m_Childs.empty())
         return;
 
-    for (Transform2D* child : mp_Childs)
+    for (Transform2D* child : m_Childs)
     {
         child->m_Position.x =
             m_Position.x +

@@ -37,7 +37,7 @@ void Entity::Initialize() {
 
 
 	mp_RenderShape = nullptr;
-
+	m_Transform.Initialize({ 0, 0 }, 0);
 	m_RigidBody.Initialize(&m_Transform);
 	m_RigidBody.SetActive(true);
 
@@ -77,6 +77,11 @@ gcle::Shape* Entity::GetBaseShape(gcle::Shapes shape)
 	return nullptr;
 }
 
+void Entity::SetDebugLayer(int32 layer)
+{
+	m_Layer = std::clamp(layer, 0, 31);
+}
+
 void Entity::Update(float32 dt)
 {
 	if (m_RigidBody.IsActive())
@@ -84,7 +89,7 @@ void Entity::Update(float32 dt)
 
 	m_Transform.UpdateChildPosition();
 
-	if (m_isStatic == false)
+	if (m_IsStatic == false)
 	{
 		float32 distance = dt * m_Speed;
 		Vector2f translation = m_Direction * distance;
@@ -135,6 +140,11 @@ void Entity::RemoveCollider(Collider* pCollider)
 		return;
 
 	mp_Colliders.erase(pCollider);
+}
+
+const std::unordered_set<Collider*>& Entity::GetColliders() const
+{
+	return mp_Colliders;
 }
 
 Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
@@ -195,9 +205,19 @@ bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
 	return true;
 }
 
+void Entity::SetTag(int32 tag)
+{
+	m_Tag = tag;
+}
+
 Vector2f Entity::GetPosition()
 {
 	return m_Transform.GetPosition();
+}
+
+void Entity::SetSpeed(float32 speed)
+{
+	m_Speed = speed;
 }
 
 void Entity::SetDirection(float32 x, float32 y, float32 speed)
@@ -217,13 +237,13 @@ void Entity::SetRigidBody(bool isRigidBody)
 	if (isRigidBody)
 	{
 		PhysicsManager::GetInstance().AddEntity(this);
-		m_isHighlighted = true;
+		m_IsHighlighted = true;
 	}
 
 	if (!isRigidBody)
 	{
 		PhysicsManager::GetInstance().RemoveEntity(this);
-		m_isHighlighted = false;
+		m_IsHighlighted = false;
 	}
 }
 
@@ -276,7 +296,7 @@ void Entity::SetTexture(const std::string& id)
 	RessourceManager& RM  = RessourceManager::GetInstance();
 
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
-		for (auto& sId : m_activeScenes)
+		for (auto& sId : m_ActiveScenes)
 			SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
 		if (RM.GetSurface(id)->mp_surface == nullptr) {
 			std::string path = "../../assets/textures/" + id + ".png";
@@ -288,19 +308,19 @@ void Entity::SetTexture(const std::string& id)
 	RM.AddTexture(id, mp_RenderShape->GetTexture());
 }
 
-void Entity::SetRenderPosition(float32 x, float32 y, float ratioX, float ratioY)
+void Entity::SetRenderPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 	if(mp_RenderShape != nullptr)
 		mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void Entity::SetRenderPosition(Vector2f v, float ratioX, float ratioY)
+void Entity::SetRenderPosition(Vector2f v, float32 ratioX, float32 ratioY)
 {
 	if(mp_RenderShape != nullptr)
 		mp_RenderShape->SetPosition(v.x, v.y, ratioX, ratioY);
 }
 
-void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
+void Entity::SetRenderSize(int32 shapeType, std::vector<float32> points)
 {
 	if (mp_RenderShape == nullptr)
 		return;
@@ -336,7 +356,7 @@ void Entity::SetRenderSize(int shapeType, std::vector<float32> points)
 
 void Entity::SetStatic(bool isStatic)
 {
-	m_isStatic = isStatic;
+	m_IsStatic = isStatic;
 }
 
 Vector2f Entity::GetRenderPosition()
@@ -349,17 +369,17 @@ Vector2f Entity::GetRenderPosition()
 
 bool Entity::IsStatic() const
 {
-	return !m_isStatic;
+	return !m_IsStatic;
 }
 
-bool Entity::IsColliding(Entity* other)
+bool Entity::IsColliding(Entity* pOther)
 {
 	for (Collider* pCollider : mp_Colliders)
 	{
 		if (!pCollider->IsActive())
 			continue;
 
-		for (Collider* pOtherCollider : other->mp_Colliders)
+		for (Collider* pOtherCollider : pOther->mp_Colliders)
 		{
 			if (!pOtherCollider->IsActive())
 				continue;
@@ -377,6 +397,21 @@ bool Entity::IsInside(Vector2f position)
 	return PhysicsManager::GetInstance().IsInside(this, position);
 }
 
+bool Entity::ToDestroy() const
+{
+	return m_ToDestroy;
+}
+
+bool Entity::IsTag(int32 tag) const
+{
+	return m_Tag == tag;
+}
+
+bool Entity::IsRigidBody() const
+{
+	return m_RigidBody.IsActive();
+}
+
 Entity::~Entity() {
 	if (mp_RenderShape != nullptr) {
 		delete mp_RenderShape;
@@ -392,28 +427,33 @@ Entity::~Entity() {
 }
 
 void Entity::AddActiveScene(const std::string& sceneTag) {
-	if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
+	if (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end()) {
 		std::cerr << sceneTag << "exists" << std::endl;
 		return;
 	}
 
-	m_activeScenes.push_back(sceneTag);
+	m_ActiveScenes.push_back(sceneTag);
 	if (mp_RenderShape->GetTexture() != nullptr) {
-		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
+		SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->GetId());
 	}
 }
 
 void Entity::RemoveActiveScene(const std::string& sceneTag) {
-	std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
-	if (it == m_activeScenes.end()) {
+	std::vector<std::string>::iterator it = std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag);
+	if (it == m_ActiveScenes.end()) {
 		std::cerr << sceneTag << " doesn't exists " << std::endl;
 		return;
 	}
-	m_activeScenes.erase(it);
+	m_ActiveScenes.erase(it);
 }
 
 bool Entity::IsActiveIn(const std::string& sceneTag) {
-	return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+	return (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end());
+}
+
+bool Entity::IsWorldText() const
+{
+	return m_IsWorldText;
 }
 
 void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
@@ -447,7 +487,7 @@ void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
-	sprite->AddFunctionInFrame(animation, frame, function);
+	sprite->AddFunctionInFrameSprite(animation, frame, function);
 }
 
 void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
@@ -459,3 +499,19 @@ void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	}
 	sprite->RemoveFunctionInFrame(animation, frame);
 }
+
+void Entity::SetLayer(int32 layer)
+{
+	m_Layer = std::clamp(layer, 0, 15);
+}
+
+void Entity::SetScale(float32 scale) { 
+	SetScale({ scale, scale }); 
+}
+
+
+int64			Entity::GetId() const		{ return m_Id; }
+int32			Entity::GetLayer() const	{ return m_Layer; };
+RigidBody2D&	Entity::GetRigidBody()		{ return m_RigidBody; }
+Transform2D&	Entity::GetTransform2D()	{ return m_Transform; }
+gcle::Shape*	Entity::GetRenderShape()	{ return mp_RenderShape; };

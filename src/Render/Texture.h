@@ -21,32 +21,33 @@ protected:
 
 public:
 
-	std::string id = "";
+	std::string m_Id = "";
 
 	SDL_Texture* CreateTexture(Window* window);
 
-	bool IsSprite() { return m_isSprite; };
+	bool IsSprite() { return m_isSprite; }; // a move dans le cpp
 
-	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
+	bool IsTextureInit();
 
 	bool ToDestroy();
 	void Destroy();
 
 	SDL_Texture* GetSDLTexture();
 
-	Texture(Window* window, Surface* surface);
+	Texture(Window* pWindow, Surface* pSurface);
 	Texture() = default;
 
 	virtual ~Texture() ;
 
-	void InitTextureWithSurface(Window* window, Surface* surface);
+	void InitTextureWithSurface(Window* pWindow, Surface* pSurface);
 
 
 
 	//Maybe not really usefull now
-	Texture(Window* window, const std::string& path);
+	Texture(Window* pWindow, const std::string& path);
 	//Maybe not really usefull now
-	Texture(Window* window, Asset* data);
-	void InitTextureWithBuffer(Window* window, Asset* asset);
-	void InitTexture(Window* window, const std::string& path);
+	Texture(Window* pWindow, Asset* pAsset);
+	void InitTextureWithBuffer(Window* pWindow, Asset* pAsset);
+	void InitTexture(Window* pWindow, const std::string& path);
+	std::string& GetId();
 };

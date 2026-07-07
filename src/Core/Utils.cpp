@@ -213,3 +213,13 @@ AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians 
 
 	return { minX, minY, maxX, maxY };
 }
+
+bool AABB::overlaps(const AABB& other)
+{
+	return minX < other.maxX && minY < other.maxY && maxX > other.minX && maxY > other.minY;
+}
+
+bool AABB::include(const AABB& other)
+{
+	return other.minX >= minX && other.maxX <= maxX && other.minY >= minY && other.maxY <= maxY;
+}

@@ -11,28 +11,33 @@
 #include <timeapi.h>
 #pragma comment(lib, "winmm.lib")
  
+GameManager& GameManager::GetInstance() {
+	static GameManager instance;
+	return instance;
+}
+
 
 void GameManager::Loop()
 {
-	isRunning = true;   
+	m_IsRunning = true;   
 	 
 	timeBeginPeriod(1);
-	while (isRunning == true)
+	while (m_IsRunning == true)
 	{
  
 
 		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
-		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
+		accDt += static_cast<float32>(m_Time.GetDeltaTime());
 		
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		InputManager::GetInstance().Update();
 		 
-		while (m_accDt >= fixedUpdateDT) 
+		while (accDt >= fixedUpdateDT) 
 		{
-			m_accDt -= static_cast<float32>(fixedUpdateDT);
-			if (m_loopTour < 1)
-				m_loopTour++;
+			accDt -= static_cast<float32>(fixedUpdateDT);
+			if (m_LoopTour < 1)
+				m_LoopTour++;
 			else
 			{
 				UpdateRigidBodies(static_cast<float32>(fixedUpdateDT));
@@ -55,31 +60,31 @@ void GameManager::Loop()
 		PROFILER_END("SceneU");
 		 
 		PROFILER_START("SceneD", "Scene Draw");
-		for (auto& cam : m_camera)
+		for (auto& cam : m_Camera)
 		{
 			if (cam->IsActive())
-			cam->Update(m_Time, m_entities);
+			cam->Update(m_Time, m_Entities);
 		} 
 	
-		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
-		mp_window->Clear();
+		mp_Window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
+		mp_Window->Clear();
 		 
-		SceneManager::GetInstance().DrawCurrentScene(mp_window);
+		SceneManager::GetInstance().DrawCurrentScene(mp_Window);
 		 
-		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);  
+		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_Window);  
 	
-		mp_window->Present();
+		mp_Window->Present();
 		PROFILER_END("SceneD");
 
 		if (Event::WindowEvent())
 		{
-			isRunning = false;
+			m_IsRunning = false;
 		}
 		 
 		
 		float64 rawDT = m_Time.GetRawDT();
-		if (rawDT < m_fpsDT) {
-			float64 timeToSleep = m_fpsDT - rawDT;
+		if (rawDT < fpsDT) {
+			float64 timeToSleep = fpsDT - rawDT;
 			m_Time.SmartSleep(timeToSleep);
 		}
 
@@ -93,7 +98,7 @@ void GameManager::Loop()
 		// system("CLS");
 	}
 	timeEndPeriod(1);
-	isRunning = false;
+	m_IsRunning = false;
 }
 
 GameManager::~GameManager()
@@ -113,7 +118,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 	srand(static_cast<int32>(m_Time.GetTime()));
 	
 	m_fps = FPS;
-	m_fpsDT = 1.f / m_fps;
+	fpsDT = 1.f / m_fps;
 
 	m_WindW = windowWidth;
 	m_WindH = windowHeight;
@@ -122,18 +127,18 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 	uint32 renderFlags = SDL_RENDERER_FLAGS::RENDERER_ACCELERATED;
 
 
-	mp_window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
+	mp_Window = GCLE_NEW Window("gcle", m_WindW, m_WindH, windowFlags, renderFlags, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED, SDL_WINDOW_POSITION::WINDOWPOS_UNDEFINED);
 
-	if (!mp_window)
+	if (!mp_Window)
 	{
 		std::cout << "Window Initialization";
 		return false;
 	}
 	RessourceManager& rm = RessourceManager::GetInstance();
-	RessourceManager::GetInstance().Init(mp_window);
+	RessourceManager::GetInstance().Init(mp_Window);
 
 	for (int i = 0; i < 32; i++)
-		m_entities.push_back({}); 
+		m_Entities.push_back({}); 
 
 	return true;
 }
@@ -145,9 +150,20 @@ void GameManager::Close()
 
 	PROFILER_CLEAR();
 
-	delete mp_window;
+	delete mp_Window;
 
 }
+
+Clock* GameManager::GetTime()
+{
+	return &m_Time;
+}
+
+void GameManager::SetWindowClearColor(Color color)
+{
+	m_ClearColor = color;
+}
+
 
 void GameManager::UpdateRigidBodies(float32 dt)
 {
@@ -161,7 +177,7 @@ void GameManager::UpdateRigidBodies(float32 dt)
 std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
 {
 	std::vector<Entity*> results;
-	for (auto& layer : m_entities) {
+	for (auto& layer : m_Entities) {
 		for (auto e : layer) {
 			if (e->IsActiveIn(scene))
 				results.push_back(e);
@@ -172,16 +188,16 @@ std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
 
 void GameManager::UpdateEntitySystem()
 {
-	for (int i = 0; i < m_entities.size(); i++)
+	for (int i = 0; i < m_Entities.size(); i++)
 	{
-		for (auto it = m_entities[i].begin(); it != m_entities[i].end(); )
+		for (auto it = m_Entities[i].begin(); it != m_Entities[i].end(); )
 		{
 			Entity* entity = *it;
 
 			if (entity->ToDestroy())
 			{
-				m_entitiesToDestroy.push_back(entity);
-				it = m_entities[i].erase(it);
+				m_EntitiesToDestroy.push_back(entity);
+				it = m_Entities[i].erase(it);
 			}
 			else
 			{
@@ -191,33 +207,41 @@ void GameManager::UpdateEntitySystem()
 		}
 	}
 
-	for (auto it = m_entitiesToDestroy.begin(); it != m_entitiesToDestroy.end(); ++it)
+	for (auto it = m_EntitiesToDestroy.begin(); it != m_EntitiesToDestroy.end(); ++it)
 	{
 		delete* it;
 	}
 
-	m_entitiesToDestroy.clear();
+	m_EntitiesToDestroy.clear();
 
-	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
+	for (auto it = m_EntitiesToCreate.begin(); it != m_EntitiesToCreate.end(); ++it)
 	{
 		Entity* e= *it;
-		m_entities[e->GetLayer()].push_back(*it);
+		m_Entities[e->GetLayer()].push_back(*it);
 	}
 
-	m_entitiesToCreate.clear();
+	m_EntitiesToCreate.clear();
 }
 void GameManager::DestroyAllEntitiesAndCameras()
 {
-	for (auto& layer : m_entities)
+	for (auto& layer : m_Entities)
 	{
 		for (auto& entity : layer)
 			delete entity;
 		layer.clear();
 	}
-	m_entities.clear();
+	m_Entities.clear();
 
-	for (auto& cam : m_camera)
+	for (auto& cam : m_Camera)
 		delete cam;
-	m_camera.clear();
+	m_Camera.clear();
+}
+
+void GameManager::AddEntity(Entity* pEntity) { 
+	m_EntitiesToCreate.push_back(pEntity); 
+}
+
+Window* GameManager::GetWindow() { 
+	return mp_Window; 
 }
 

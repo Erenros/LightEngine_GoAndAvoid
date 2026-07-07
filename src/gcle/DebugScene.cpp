@@ -46,7 +46,7 @@ void DebugScene::OnInitialize()
 
 
 
-	mp_mainCamera->SetFollowing(entity1);
+	mp_MainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
 
