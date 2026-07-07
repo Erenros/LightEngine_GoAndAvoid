@@ -1,6 +1,12 @@
 #pragma once
+#include <cmath>
+
 #include "include.h"
 #include "Render/Shape.h"
+#include "Transform.h"
+
+#include "Render/Texture.h"
+#include "Render/Sprite.h"
 
 class GameObject
 {

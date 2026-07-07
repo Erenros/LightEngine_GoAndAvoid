@@ -33,6 +33,8 @@ void Entity::Initialize(gcle::Shapes shape)
 	OnInitialize();
 
 	m_Id = sId++;
+
+	m_Mask = 1;
 }
 
 void Entity::Initialize()
@@ -45,6 +47,9 @@ void Entity::Initialize()
 	OnInitialize();
 
 	m_Id = sId++;
+
+	m_Mask = 1;
+
 }
 
 void Entity::Update(float32 dt)
@@ -74,16 +79,16 @@ void Entity::RemoveCollider(Collider* pCollider)
 	mp_Colliders.erase(pCollider);
 }
 
-Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 relativeRotation, Vector2f relativeScale)
 {
 	Collider* collider = GCLE_NEW Collider();
 
 	gcle::Shape* colliderShape = GetBaseShape(shape);
 
 	Vector2f entityScale = m_Transform.GetScale();
-	colliderShape->SetScale({ scale.x * entityScale.x, scale.y * entityScale.y }); 
+	colliderShape->SetScale({ relativeScale.x * entityScale.x, relativeScale.y * entityScale.y });
 
-	collider->Initialize(colliderShape, m_Transform.GetPosition() + relativePosition, rotation, this);
+	collider->Initialize(colliderShape, m_Transform.GetPosition() + relativePosition, m_Transform.GetDegAngle() + relativeRotation, this);
 
 	AddCollider(collider);
 	collider->SetActive(isActive);
@@ -121,6 +126,12 @@ void Entity::SetRigidBody(bool isRigidBody)
 void Entity::SetStatic(bool isStatic)
 {
 	m_isStatic = isStatic;
+}
+
+bool Entity::HasCollider()
+{
+	std::cout << mp_Colliders.size() << std::endl;
+	return mp_Colliders.size() > 0;
 }
 
 bool Entity::IsStatic() const

@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/include.h"
-
+#include <type_traits>
 
 class Mask
 {
@@ -23,4 +23,6 @@ public:
 private:
 
 };
+
+#include "Mask.inl"
 

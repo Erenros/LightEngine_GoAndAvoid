@@ -19,16 +19,16 @@ void RigidBody2D::Initialize(Transform2D* transform)
 
 void RigidBody2D::Update(float32 dt)
 {
-	if (m_UseFriction) {
-		ApplyFriction(dt);
+	if (m_TempVelHasChanged)
+	{
+		m_Velocity = m_TempVelocity;
+		m_TempVelHasChanged = false;
 	}
 
 	ApplyGravity(dt);
 
-	if (m_TempVelHasChanged) {
-		m_Velocity = m_TempVelocity;
-		m_TempVelHasChanged = false;
-	}
+	if (m_UseFriction)
+		ApplyFriction(dt);
 
 	ClampVelocity();
 	ApplyVelocity(dt);
@@ -36,9 +36,6 @@ void RigidBody2D::Update(float32 dt)
 	m_TempVelocity = m_Velocity;
 
 	mp_Transform->UpdateChildPosition();
-
-	if (!m_UseFriction)
-		m_Velocity = {0, 0};
 }
 
 bool RigidBody2D::UseContinuousCollision() const
@@ -149,4 +146,21 @@ void RigidBody2D::ApplyGravity(float32 dt)
 {
 	if (!m_UseGravity) return;
 	m_Velocity.y += m_Gravity * dt;
+}
+
+void RigidBody2D::Brake(float32 dt)
+{
+	float32 speed = GetSpeed();
+
+	if (speed <= 0.01f)
+	{
+		m_Velocity = { 0.f, 0.f };
+		return;
+	}
+
+	float32 newSpeed = std::max(0.f, speed - m_BrakeDeceleration * dt);
+	float32 ratio = newSpeed / speed;
+
+	m_Velocity.x *= ratio;
+	m_Velocity.y *= ratio;
 }

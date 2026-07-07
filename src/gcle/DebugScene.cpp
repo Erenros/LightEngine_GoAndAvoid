@@ -1,9 +1,10 @@
 #include "DebugScene.h"
-#include "Player.h"
+#include "DebugPlayer.h"
 #include "Render/Sprite.h"
 #include "Render/Text.h"
 #include "Engine/Collider.h"
 #include "Engine/PhysicsManager.h"
+#include "Tag.h"
 //#include "Render/Shape.h"
 
 void DebugScene::OnInitialize()
@@ -15,34 +16,63 @@ void DebugScene::OnInitialize()
 
 	Collider* setUpCollider = nullptr;
 
-	Entity* entity1 = CreateEntity<Player>(gcle::Shapes::Rectangle);
-	entity1->SetPosition(50, -200);
-	entity1->SetRotation(0);
-	entity1->SetRigidBody(true);
-	entity1->GetRigidBody().SetGravity(10, true);
-	entity1->GetRigidBody().SetMaxSpeed(1000000);
-	entity1->SetStatic(true);
-	setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {1, 1});
-	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
-	entity1->GetRigidBody().SetCollisionOnContinuous();
+	//creation d'un player classique
+	Entity* entity1 = CreateEntity<DebugPlayer>(gcle::Shapes::Rectangle);
+	{
+		entity1->SetPosition(50, -200);
+		entity1->SetRotation(0);
 
+		//tag du player
+		entity1->SetTag(Demo::Tag::Player);
+
+		entity1->SetRigidBody(true);
+		entity1->GetRigidBody().SetGravity(10, true);
+		entity1->GetRigidBody().SetMaxSpeed(100);
+
+		// appeler Brake() quand vous le souhaitez pour qu'il fasse effet (au contacte du sol en generale)
+		entity1->GetRigidBody().SetBrakeDeceleration(100);
+
+		//si l'entity est un static elle ne peut pas bouger et coupe la velocité quand un objet 
+		//entre en contacte avec (dans la direction de la normal entre eux)
+		entity1->SetStatic(false);
+
+		//permet a l'objet de ne pas clip a travers les autres entité 
+		//(mais est assez couteux donc a ne mettre que sur un player)
+		entity1->GetRigidBody().SetCollisionOnContinuous();
+
+		//creation d'un collider parametres : (
+		// forme, 
+		// si il est actif, 
+		// position relatif a l'entité, 
+		// rotation relative a l'entité, 
+		// scale relatif a l'entité
+		// )
+		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+	}
+
+	//creation d'un mur
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity2->SetPosition(0, -100);
-	entity2->SetScale({ 5, 1 });
-	entity2->SetRotation(0);
-	entity2->SetRigidBody(true);
-	entity2->SetStatic(false);
-	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {5, 1});
-	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
+	{
+		entity2->SetPosition(0, -100);
+		entity2->SetScale({ 5, 1 });
+		entity2->SetRotation(0);
+		entity2->SetRigidBody(true);
+		entity2->SetStatic(true);
+		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+	}
 
+	//creation d'un sol
 	Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	entity3->SetPosition(0, 300);
-	entity3->SetScale({10, 1});
-	entity3->SetRotation(0);
-	entity3->SetRigidBody(true);
-	entity3->SetStatic(false);
-	setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, {10, 1});
-	std::cout << setUpCollider->GetShape()->GetWidth() << std::endl;
+	{
+		entity3->SetPosition(0, 300);
+		entity3->SetScale({ 10, 1 });
+		entity3->SetTag(Demo::Tag::Ground);
+		entity3->SetRotation(0);
+		entity3->SetRigidBody(true);
+		entity3->SetStatic(true);
+		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+
+	}
 
 
 

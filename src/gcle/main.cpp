@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
     gm.Init(640, 480, 120);
 
-    SceneManager::GetInstance().CreateScene<SampleScene>("DebugScene");
+    SceneManager::GetInstance().CreateScene<DebugScene>("DebugScene");
 
     SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 

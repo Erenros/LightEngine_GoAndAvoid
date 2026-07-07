@@ -52,11 +52,17 @@ public:
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
-	void SetDampingStrenght(float32 velocityDampingFactor) { m_Friction = { velocityDampingFactor, velocityDampingFactor }; }
-	void SetDampingOnXAxis(float32 velocityDampingFactor) { m_Friction = { velocityDampingFactor, 0 }; }
-	void SetDampingOnYAxis(float32 velocityDampingFactor) { m_Friction = { 0, velocityDampingFactor }; }
+	void Brake(float32 dt);
+	void SetBrakeDeceleration(float32 deceleration) { m_BrakeDeceleration = deceleration; }
 
-	void ActivateDamping(bool UseFriction) { m_UseFriction = UseFriction; }
+	void SetFriction(Vector2f velocityFrictionFactor) { m_Friction = velocityFrictionFactor; }
+	void SetFrictionOnXAxis(float32 velocityFrictionFactor) { m_Friction = { velocityFrictionFactor, 0 }; }
+	void SetFrictionOnYAxis(float32 velocityFrictionFactor) { m_Friction = { 0, velocityFrictionFactor }; }
+	
+	void SetFrictionOnGround(float32 velocityFrictionFactor) { m_Friction = { velocityFrictionFactor, 0 }; }
+	void SetFrictionInAir(float32 velocityFrictionFactor) { m_Friction = { 0, velocityFrictionFactor }; }
+
+	void ActivateFriction(bool UseFriction) { m_UseFriction = UseFriction; }
 
 	Vector2f CalculateNextPosition(float32 dt);
 	bool UseContinuousCollision() const;
@@ -84,6 +90,7 @@ private:
 	bool m_UseFriction = false;
 
 	float32 m_MaxSpeed = 500.0f;
+	float32 m_BrakeDeceleration = 800.f;
 
 	float32 m_Gravity = GRAVITY;
 	bool m_UseGravity = false;

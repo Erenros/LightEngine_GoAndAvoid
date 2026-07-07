@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Render/Shape.h"
 #include "QuadTree.h"
+#include "Mask.h"
 
 
 
@@ -125,6 +126,7 @@ private:
 
 private:
 	CollisionInfo m_colDatas;
+
 
 private:
 	bool m_activateQuadTree = true;

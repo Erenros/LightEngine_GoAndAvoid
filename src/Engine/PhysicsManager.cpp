@@ -4,7 +4,6 @@
 #include "PhysicsManager.h"
 #include "SceneManager.h"
 #include "MathGC.h"
-#include "Mask.h"
 
 #undef min
 #undef max
@@ -313,7 +312,9 @@ void PhysicsManager::MakePairs(std::vector<Collider*>* activeColliders) {
 			Collider* colliderB = (*activeColliders)[j];
 			bool greater = colliderA < colliderB;
 			bool notTheSameEntity = colliderA->GetOwner()->GetId() != colliderB->GetOwner()->GetId();
-			if (greater && notTheSameEntity) {
+			bool onSameLayer = (Mask::AreOnASameLayer<int32>(*colliderA->GetOwner()->GetCollisionLayer(), *colliderB->GetOwner()->GetCollisionLayer()));
+
+			if (greater && notTheSameEntity && onSameLayer) {
 				m_pairs.push_back({ colliderA, colliderB });
 			}
 		}
@@ -322,18 +323,17 @@ void PhysicsManager::MakePairs(std::vector<Collider*>* activeColliders) {
 
 void PhysicsManager::MakeTreePairs(std::vector<Collider*>* activeColliders)
 {
-	for (auto& collider : *activeColliders) {
+	for (auto& colliderA : *activeColliders) {
 
-		const auto& candidates = m_quadTree->Query(collider);
+		const auto& candidates = m_quadTree->Query(colliderA);
 
-		for (auto& c : candidates) {
-			bool greater = collider < c;
-			bool notTheSameEntity = collider->GetOwner()->GetId() != c->GetOwner()->GetId();
-
-			bool onSameLayer = (Mask::AreOnASameLayer(collider->GetOwner()->GetCollisionLayer(), c->GetOwner()->GetCollisionLayer()));
+		for (auto& colliderB : candidates) {
+			bool greater = colliderA < colliderB;
+			bool notTheSameEntity = colliderA->GetOwner()->GetId() != colliderB->GetOwner()->GetId();
+			bool onSameLayer = (Mask::AreOnASameLayer<int32>(*colliderA->GetOwner()->GetCollisionLayer(), *colliderB->GetOwner()->GetCollisionLayer()));
 
 			if (greater && notTheSameEntity && onSameLayer) {
-				m_pairs.push_back({ collider, c });
+				m_pairs.push_back({ colliderA, colliderB });
 			}
 		}
 	}
@@ -351,7 +351,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 
 	if (coliding)
 	{
-		if (entityA->IsRigidBody() && entityB->IsRigidBody())
+		if (entityA->HasCollider() && entityB->HasCollider())
 		{
 			ThrowRepulse(colliderA, colliderB);
 		}
@@ -459,7 +459,7 @@ ContinuousCollisionHit PhysicsManager::SweepColliderAgainstAABB(Collider* moving
 		return {};
 
 	Entity* movingEntity = movingCollider->GetOwner();
-	if (movingEntity == nullptr || !movingEntity->IsRigidBody())
+	if (movingEntity == nullptr || !movingEntity->HasCollider())
 		return {};
 
 	AABB movingAABB = ComputeCurrentAABB(movingCollider);
@@ -627,7 +627,7 @@ bool PhysicsManager::ShouldUseContinuousCollision(Collider* collider) const
 	if (entity == nullptr)
 		return false;
 
-	if (!entity->IsRigidBody())
+	if (!entity->HasCollider())
 		return false;
 
 	return entity->GetRigidBody().UseContinuousCollision();
@@ -676,7 +676,7 @@ void PhysicsManager::ApplyContinuousCollisionResponse(Collider* movingCollider, 
 		return;
 
 	Entity* movingEntity = movingCollider->GetOwner();
-	if (movingEntity == nullptr || !movingEntity->IsRigidBody())
+	if (movingEntity == nullptr || !movingEntity->HasCollider())
 		return;
 
 	Vector2f start = movingCollider->GetShape()->GetPosition(0.5f, 0.5f);
@@ -1130,11 +1130,11 @@ void PhysicsManager::ThrowRepulse(Collider* pCollider1, Collider* pCollider2)
 
 void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 {
-	gcle::Shape* a = colA->GetShape();
-	gcle::Shape* b = colB->GetShape();
+	Entity* a = colA->GetOwner();
+	Entity* b = colB->GetOwner();
 
-	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(a);
-	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(b);
+	gcle::Rectangle* pRect1 = static_cast<gcle::Rectangle*>(colA->GetShape());
+	gcle::Rectangle* pRect2 = static_cast<gcle::Rectangle*>(colB->GetShape());
 
 	float32 x1 = pRect1->GetPosition(0.0f, 0.0f).x;
 	float32 y1 = pRect1->GetPosition(0.0f, 0.0f).y;
@@ -1163,21 +1163,21 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 
 		if (x1 < x2)
 		{
-			delta1.x -= correction * a->GetOwner()->IsStatic();
-			delta2.x += correction * b->GetOwner()->IsStatic();
+			delta1.x -= correction * a->IsStatic();
+			delta2.x += correction * b->IsStatic();
 
 		}
 		else
 		{
-			delta1.x += correction * a->GetOwner()->IsStatic();
-			delta2.x -= correction * b->GetOwner()->IsStatic();
+			delta1.x += correction * a->IsStatic();
+			delta2.x -= correction * b->IsStatic();
 
 		}
 
 		if (!colA->GetOwner()->IsStatic() || !colB->GetOwner()->IsStatic())
 		{
-			a->GetOwner()->GetRigidBody().ZeroVelocityX();
-			b->GetOwner()->GetRigidBody().ZeroVelocityX();
+			a->GetRigidBody().ZeroVelocityX();
+			b->GetRigidBody().ZeroVelocityX();
 		}
 	}
 	else
@@ -1186,29 +1186,29 @@ void PhysicsManager::RepulseRectRect(Collider* colA, Collider* colB)
 
 		if (y1 < y2)
 		{
-			delta1.y -= correction * a->GetOwner()->IsStatic();
-			delta2.y += correction * b->GetOwner()->IsStatic();
+			delta1.y -= correction * a->IsStatic();
+			delta2.y += correction * b->IsStatic();
 
 		}
 		else
 		{
-			delta1.y += correction * a->GetOwner()->IsStatic();
-			delta2.y -= correction * b->GetOwner()->IsStatic();
+			delta1.y += correction * a->IsStatic();
+			delta2.y -= correction * b->IsStatic();
 
 		}
 
-		if (!colA->GetOwner()->IsStatic() || !colB->GetOwner()->IsStatic())
+		if (!a->IsStatic() || !b->IsStatic())
 		{
-			a->GetOwner()->GetRigidBody().ZeroVelocityY();
-			b->GetOwner()->GetRigidBody().ZeroVelocityY();
+			a->GetRigidBody().ZeroVelocityY();
+			b->GetRigidBody().ZeroVelocityY();
 		}
 	}
 
 	ApplyBlockingResponse(colA, colB, delta1);
 	ApplyBlockingResponse(colB, colA, delta2);
 
-	AccumulateCorrection(a->GetOwner(), delta1);
-	AccumulateCorrection(b->GetOwner(), delta2);
+	AccumulateCorrection(a, delta1);
+	AccumulateCorrection(b, delta2);
 
 }
 
@@ -1231,11 +1231,11 @@ void PhysicsManager::RepulseCircleCircle(Collider* colA, Collider* colB)
 	Vector2f normal = SafeNormal(distance, { 1.0f, 0.0f }); // direction B -> A
 	Vector2f translation = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 
-	Vector2f delta1 = translation * KinematicFactor(a->GetOwner());
-	Vector2f delta2 = -translation * KinematicFactor(b->GetOwner());
+	Vector2f delta1 = translation * KinematicFactor(colA->GetOwner());
+	Vector2f delta2 = -translation * KinematicFactor(colB->GetOwner());
 
-	AccumulateCorrection(a->GetOwner(), delta1);
-	AccumulateCorrection(b->GetOwner(), delta2);
+	AccumulateCorrection(colA->GetOwner(), delta1);
+	AccumulateCorrection(colB->GetOwner(), delta2);
 
 	ApplyBlockingResponse(colA, colB, delta1);
 	ApplyBlockingResponse(colB, colA, delta2);
@@ -1283,14 +1283,14 @@ void PhysicsManager::RepulseRectCircle(Collider* colA, Collider* colB)
 		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
 		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
-		Vector2f deltaRect = -translation * KinematicFactor(a->GetOwner());
-		Vector2f deltaCircle = translation * KinematicFactor(b->GetOwner());
+		Vector2f deltaRect = -translation * KinematicFactor(colA->GetOwner());
+		Vector2f deltaCircle = translation * KinematicFactor(colB->GetOwner());
 
 		ApplyBlockingResponse(colA, colB, deltaRect);
 		ApplyBlockingResponse(colB, colA, deltaCircle);
 
-		AccumulateCorrection(a->GetOwner(), deltaRect);
-		AccumulateCorrection(b->GetOwner(), deltaCircle);
+		AccumulateCorrection(colA->GetOwner(), deltaRect);
+		AccumulateCorrection(colB->GetOwner(), deltaCircle);
 
 		return;
 	}
@@ -1300,14 +1300,14 @@ void PhysicsManager::RepulseRectCircle(Collider* colA, Collider* colB)
 	float32  overlap = (pCircle->GetRadius() - length) * correctionMultiplyer;
 
 	Vector2f translation = normal * overlap;
-	Vector2f deltaRect = -translation * KinematicFactor(a->GetOwner());
-	Vector2f deltaCircle = translation * KinematicFactor(b->GetOwner());
+	Vector2f deltaRect = -translation * KinematicFactor(colA->GetOwner());
+	Vector2f deltaCircle = translation * KinematicFactor(colB->GetOwner());
 
 	ApplyBlockingResponse(colA, colB, deltaRect);
 	ApplyBlockingResponse(colB, colA, deltaCircle);
 
-	AccumulateCorrection(a->GetOwner(), deltaRect);
-	AccumulateCorrection(b->GetOwner(), deltaCircle);
+	AccumulateCorrection(colA->GetOwner(), deltaRect);
+	AccumulateCorrection(colB->GetOwner(), deltaCircle);
 }
 
 void PhysicsManager::RepulseCircleRect(Collider* colA, Collider* colB)
@@ -1330,14 +1330,14 @@ void PhysicsManager::RepulseOBB(Collider* colA, Collider* colB)
 
 	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(colA, colB);
 
-	Vector2f deltaA = -correction * KinematicFactor(a->GetOwner());
-	Vector2f deltaB = correction * KinematicFactor(b->GetOwner());
+	Vector2f deltaA = -correction * KinematicFactor(colA->GetOwner());
+	Vector2f deltaB = correction * KinematicFactor(colB->GetOwner());
 
 	ApplyBlockingResponse(colA, colB, deltaA);
 	ApplyBlockingResponse(colB, colA, deltaB);
 
-	AccumulateCorrection(a->GetOwner(), deltaA);
-	AccumulateCorrection(b->GetOwner(), deltaB);
+	AccumulateCorrection(colA->GetOwner(), deltaA);
+	AccumulateCorrection(colB->GetOwner(), deltaB);
 }
 
 #pragma endregion
@@ -1349,7 +1349,7 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* colA, Collider*
 	gcle::Shape* a = colA->GetShape();
 	gcle::Shape* b = colB->GetShape();
 
-	if (a->GetOwner()->IsStatic() && b->GetOwner()->IsStatic())
+	if (colA->GetOwner()->IsStatic() && colB->GetOwner()->IsStatic())
 		return 0.5;
 	else
 		return 1.0;

@@ -6,9 +6,8 @@
 #include "Texture.h"
 #include "Engine/RessourceManager.h"
 #include "Sprite.h"
-#include "Engine/GameObject.h"
 
-class Entity;
+class GameObject;
 class UI;
 struct SDL_Vertex;
 struct SDL_FPoint;

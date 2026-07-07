@@ -4,14 +4,11 @@
 
 #include "GameObject.h"
 
-#include "include.h"
-#include "Transform.h"
-#include "Render/Texture.h"
-#include "Render/Sprite.h"
 #include "RigidBody.h"
-#include <cmath>
+
 
 class Collider;
+
 
 class Entity : public GameObject
 {
@@ -58,12 +55,13 @@ public:
 	bool ToDestroy() const { return m_ToDestroy; } 
 	bool IsTag(int32 tag) const { return m_Tag == tag; }
 	bool IsRigidBody() const { return m_RigidBody.IsActive(); }
+	bool HasCollider();
 
 public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider); 
 	const std::unordered_set<Collider*>& GetColliders() const { return mp_Colliders; }
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 relativeRotation, Vector2f relativeScale);
 
 public:
 	bool IsWorldText() const { return m_isWorldText; }
@@ -84,7 +82,6 @@ private:
 	RigidBody2D	 m_RigidBody;
 
 private:
-	std::vector<std::string> m_activeScenes;
 	std::unordered_set<Collider*> mp_Colliders;
 	std::unordered_map<int64, Entity*> CollidingEntity;
 
