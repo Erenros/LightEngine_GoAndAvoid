@@ -152,11 +152,6 @@ namespace gcle
 		m_Transform.ClearDirty();
 	}
 
-	void Shape::SetTexture(Window* window, SurfaceStruct* tex)
-	{
-		mp_texture = new Sprite(window, tex->mp_surface);
-	}
-
 	std::vector<SDL_FPoint*>& Shape::GetHollow()
 	{
 		UpdateRenderVertices();
@@ -480,7 +475,7 @@ namespace gcle
 
 	Shapes Shape::GetShape() { return m_Shape; };
 	Vector2f  Shape::GetOrigin() { return m_Origin; }
-	Sprite* Shape::GetTexture() { return (mp_Texture == nullptr ? nullptr : mp_Texture->texture); };
+	Sprite* Shape::GetTexture() { return (mp_Texture == nullptr ? nullptr : mp_Texture); };
 	std::vector<int32>& Shape::GetIndicies() { return m_Indicies; };
 
 	Vector2f Shape::GetScale() { return m_Transform.GetScale(); }
@@ -497,7 +492,7 @@ namespace gcle
 
 	std::vector<Vector2f> Shape::GetTrianglePoints() { return m_TrianglePoints; };
 
-	void Shape::SetTexture(TextureStruct* pTex) { mp_Texture = pTex; }
+	void Shape::SetTexture(Window* window, SurfaceStruct* pSurface) { mp_Texture = new Sprite(window, pSurface->mp_surface); }
 	void Shape::SetOrigin(Vector2f origin) { m_Origin = origin; }
 	void Shape::SetScale(float32 scale) { SetScale({ scale, scale }); }
 

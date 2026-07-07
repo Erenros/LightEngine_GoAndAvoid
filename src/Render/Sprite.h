@@ -52,7 +52,7 @@ private:
 
 	float32 m_Timer = 0.f;
 
-
+	int8 m_Mode = 0;
 
 public:
 	
@@ -73,7 +73,8 @@ public:
 		int32 tileHeight, 
 		float32 duration = 0.5f);
 
-	void PlayAnimation(const std::string& id);
+	void PlayAnimation(const std::string& id, int8 mode);
+	void StopAnimation();
 
 	void AddFunctionInFrameSprite(const std::string& animation, int32 frame, std::function<void*()> function);
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);

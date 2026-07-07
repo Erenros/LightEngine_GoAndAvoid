@@ -28,7 +28,7 @@ void RessourceManager::PlaySoundEffect(const std::string& id, int32 mode, int32 
 	m_SoundMap[id]->PlaySound(mode, volume);
 }
 
-void RessourceManager::ForcePutTexture(Surface* pText, std::string id)
+void RessourceManager::ForcePutSurface(Surface* pText, std::string id)
 {
 	m_surfaceMap[id].mp_surface = pText;
 }
@@ -68,14 +68,6 @@ Surface* RessourceManager::LoadSurface(Window* pWindow, const std::string& path,
 void RessourceManager::AddTexture(const std::string& id, Texture* tex)
 {
 	m_textures[id].push_back(tex);
-}
-
-void RessourceManager::SetFontSize(const std::string& id, int size)
-{
-	if (!m_fontMap.contains(id))
-		return;
-
-	m_fontMap[id]->SetFontSize(size);
 }
 
 bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
@@ -345,4 +337,37 @@ void RessourceManager::DeleteAllSurface()
 	}
 
 	m_surfaceMap.clear();
+}
+
+RessourceManager::~RessourceManager()
+{
+	DeleteAll();
+}
+
+void RessourceManager::SetMusicVolume(int32 volume) {
+	Audio::SetMusicVolume(volume);
+}
+
+void RessourceManager::StopMusic() {
+	Audio::StopMusic();
+}
+
+void RessourceManager::PauseMusic() {
+	Audio::PauseMusic();
+}
+
+void RessourceManager::ResumeMusic() {
+	Audio::ResumeMusic();
+}
+
+void RessourceManager::StopAllSound() {
+	Audio::StopAllSound();
+}
+
+bool RessourceManager::isMusicPlaying() {
+	return Audio::IsAMusicPlaying();
+}
+
+bool RessourceManager::IsMusicPaused() {
+	return Audio::IsAMusicPaused();
 }

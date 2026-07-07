@@ -199,6 +199,11 @@ void GameManager::UpdateEntitySystem()
 				m_EntitiesToDestroy.push_back(entity);
 				it = m_Entities[i].erase(it);
 			}
+			else if (entity->GetLayer() != i)
+			{
+				m_EntitiesToCreate.push_back(entity);
+				it = m_Entities[i].erase(it);
+			}
 			else
 			{
 				++it;

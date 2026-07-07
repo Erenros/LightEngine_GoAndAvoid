@@ -28,8 +28,8 @@ Sprite::Sprite(Window* window, Surface* surface)
 {
 	InitTextureWithSurface(window, surface);
 	//SDL_QueryTexture(GetSDLTexture(), NULL, NULL, &m_width, &m_height);
-	m_width = surface->GetSDL_Surface()->w;
-	m_height = surface->GetSDL_Surface()->h;
+	m_Width = surface->GetSDL_Surface()->w;
+	m_Height = surface->GetSDL_Surface()->h;
 	m_isSprite = true;
 }
 
@@ -49,7 +49,7 @@ void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 }
 
 
-void Sprite::PlayAnimation(const std::string& id)
+void Sprite::PlayAnimation(const std::string& id, int8 mode)
 {
 	if (!m_animationMap.contains(id))
 	{
@@ -61,6 +61,16 @@ void Sprite::PlayAnimation(const std::string& id)
 	m_CurrentFrameX = mp_CurrentAnimation->firstFrame;
 	m_CurrentFrameY = mp_CurrentAnimation->line;
 	m_Timer = mp_CurrentAnimation->duration;
+	m_Mode = mode;
+}
+
+void Sprite::StopAnimation()
+{
+	mp_CurrentAnimation = nullptr;
+	m_CurrentFrameX = 0;
+	m_CurrentFrameY = 0;
+	m_Timer = 0.f;
+	m_Mode = 0;
 }
 
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
@@ -78,7 +88,14 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
 	anim->frameId++;
 
 	m_CurrentFrameX++;
-	if (m_CurrentFrameX > anim->lastFrame) {
+	if (m_CurrentFrameX > anim->lastFrame) 
+	{
+		if (m_Mode == 1)
+		{
+			StopAnimation();
+			return;
+		}
+
 		m_CurrentFrameX = anim->firstFrame;
 		anim->frameId = 0;
 	}

@@ -110,7 +110,7 @@ namespace gcle
 
 	public:
 
-		void SetTexture(Window* window, SurfaceStruct* tex);
+		void SetTexture(Window* window, SurfaceStruct* pSurface);
 		void SetOrigin(Vector2f origin);
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		 

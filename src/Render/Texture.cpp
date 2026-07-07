@@ -47,16 +47,11 @@ SDL_Texture* Texture::GetSDLTexture()
 	return mp_texture;
 };
 
-Texture::Texture(Window* window, const std::string& path)
+bool Texture::IsTextureInit()
 {
 	return mp_texture == nullptr ? false : true;
 }
 ;
-
-SDL_Texture* Texture::GetSDLTexture()
-{
-	return mp_texture;
-}
 
 Texture::Texture(Window* pWindow, const std::string& path)
 {
@@ -68,9 +63,9 @@ Texture::Texture(Window* pWindow, Asset* pAsset)
 	InitTextureWithBuffer(pWindow, pAsset);
 }
 
-Texture::Texture(Window* window, Surface* surface)
+Texture::Texture(Window* pWindow, Surface* pSurface)
 {
-	InitTextureWithSurface(window, surface);
+	InitTextureWithSurface(pWindow, pSurface);
 }
 
 Texture::~Texture() 
@@ -94,7 +89,7 @@ void Texture::InitTextureWithSurface(Window* window, Surface* surface)
 
 	mp_texture = texture;
 
-	id = mp_surface->GetID();
+	m_Id = mp_surface->GetID();
 }
 
 void Texture::InitTextureWithBuffer(Window* pWindow, Asset* pAsset)

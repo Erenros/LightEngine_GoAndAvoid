@@ -104,7 +104,7 @@ std::unordered_map<std::string, Surface*> AssetEngine::AssetToSurface(Window* pW
 	std::unordered_map< std::string, Surface*> textureMap;
 	
 	for (auto& pair : m_AssetMap)
-		textureMap[pair.first] = new Surface(window, pair.second);
+		textureMap[pair.first] = new Surface(pWindow, pair.second);
 
 	return textureMap;
 }
