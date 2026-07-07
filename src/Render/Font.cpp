@@ -80,7 +80,7 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 				offset += 4;
 				g.advanceX = static_cast<wchar_t>(ReadBigEndian(d + offset));
 				offset += 4;
-				m_Glyphs[g.charactere] = g;
+				m_Glyphs[static_cast<char>(g.charactere)] = g;
 			}
 			return true;
 		}
