@@ -32,18 +32,18 @@ template<typename T>
 class SmartPtr 
 {
 public: 
-    SmartPtr(T* p = nullptr) : ptr(p)
+    SmartPtr(T* pP = nullptr) : mp_Ptr(pP)
     {
-        if (p)
-            (*refCount)++;
+        if (pP)
+            (*mp_RefCount)++;
         else
-            refCount = nullptr;
+            mp_RefCount = nullptr;
     }
      
-    SmartPtr(const SmartPtr& other) : ptr(other.ptr), refCount(other.refCount)
+    SmartPtr(const SmartPtr& other) : mp_Ptr(other.mp_Ptr), mp_RefCount(other.mp_RefCount)
     {
-        if (refCount)
-            ++(*refCount);
+        if (mp_RefCount)
+            ++(*mp_RefCount);
     }
      
     SmartPtr& operator=(const SmartPtr& other)
@@ -52,11 +52,11 @@ public:
         {
             Release();
 
-            ptr = other.ptr;
-            refCount = other.refCount;
+            mp_Ptr = other.mp_Ptr;
+            mp_RefCount = other.mp_RefCount;
 
-            if (refCount)
-                ++(*refCount);
+            if (mp_RefCount)
+                ++(*mp_RefCount);
         }
 
         return *this;
@@ -69,50 +69,45 @@ public:
 
     T& operator*() const
     {
-        return *ptr;
+        return *mp_Ptr;
     }
 
     T* operator->() const
     {
-        return ptr;
+        return mp_Ptr;
     }
 
     uint64 UseCount() const
     {
-        return refCount ? *refCount : 0;
+        return mp_RefCount ? *mp_RefCount : 0;
     }
 
 private:
     void Release()
     {
-        if (refCount)
+        if (mp_RefCount)
         {
-            --(*refCount);
+            --(*mp_RefCount);
 
-            if (*refCount == 0)
+            if (*mp_RefCount == 0)
             {
-                delete ptr;
-                delete refCount;
+                delete mp_Ptr;
+                delete mp_RefCount;
             }
         }
     }
 
 private:
-    T* ptr;
-    uint64* refCount;
+    T* mp_Ptr;
+    uint64* mp_RefCount;
 };
-
 
 struct AABB {
     float32 minX, minY, maxX, maxY;
 
-    bool overlaps(const AABB& other) {
-        return minX < other.maxX && minY < other.maxY && maxX > other.minX && maxY > other.minY;
-    }
+    bool overlaps(const AABB& other);
 
-    bool include(const AABB& other) {
-        return other.minX >= minX && other.maxX <= maxX && other.minY >= minY && other.maxY <= maxY;
-    }
+    bool include(const AABB& other);
 };
 
 AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians rotation);

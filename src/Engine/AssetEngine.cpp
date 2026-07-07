@@ -3,11 +3,17 @@
 #include "Sprite.h"
 #include <fstream>
 
-void AssetEngine::Init(Window* window,const std::string& path)
+AssetEngine& AssetEngine::GetInstance()
+{
+	 static AssetEngine instance;
+	 return instance;
+}
+
+void AssetEngine::Init(Window* pWindow,const std::string& path)
 {
 	if (LoadFile("../../test.gcle"))
 	{
-		std::unordered_map<std::string, Sprite*> loadedSprite = AssetToTexture(window);
+		std::unordered_map<std::string, Sprite*> loadedSprite = AssetToTexture(pWindow);
 
 		for (auto& pair : loadedSprite)
 			RessourceManager::GetInstance().ForcePutTexture(pair.second, pair.first);
@@ -18,9 +24,9 @@ void AssetEngine::Init(Window* window,const std::string& path)
 
 Asset* AssetEngine::GetAsset(std::string id)
 {
-	if (!m_assetMap.contains(id))
+	if (!m_AssetMap.contains(id))
 		return nullptr;
-	return m_assetMap[id];
+	return m_AssetMap[id];
 }
 
 bool AssetEngine::LoadFile(const std::string& path)
@@ -71,16 +77,16 @@ bool AssetEngine::LoadFile(const std::string& path)
 		asset->height = entry.height;
 		asset->data = std::move(data);
 
-		m_assetMap[asset->name] = asset;
+		m_AssetMap[asset->name] = asset;
 	}
 
 	file.close();
 	return true;
 }
 
-void AssetEngine::AddAsset(const std::string& id, Sprite* sprite)
+void AssetEngine::AddAsset(const std::string& id, Sprite* pSprite)
 {
-	if (m_assetMap.contains(id))
+	if (m_AssetMap.contains(id))
 		return;
 
 	Asset* asset = new Asset;
@@ -90,33 +96,33 @@ void AssetEngine::AddAsset(const std::string& id, Sprite* sprite)
 	asset->height = 0;
 	asset->type = 1;
 	asset->path = "../../assets/textures/" + id + ".png";
-	m_assetMap[id] = asset;
+	m_AssetMap[id] = asset;
 }
 
-std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* window)
+std::unordered_map<std::string, Sprite*> AssetEngine::AssetToTexture(Window* pWindow)
 {
 	std::unordered_map< std::string, Sprite*> textureMap;
 	
-	for (auto& pair : m_assetMap)
-		textureMap[pair.first] = new Sprite(window, pair.second);
+	for (auto& pair : m_AssetMap)
+		textureMap[pair.first] = new Sprite(pWindow, pair.second);
 
 	return textureMap;
 }
 
 void AssetEngine::DeleteAsset(const std::string& id)
 {
-	if (!m_assetMap.contains(id))
+	if (!m_AssetMap.contains(id))
 		return;
 
-	m_assetMap[id]->flag = 0x01;
+	m_AssetMap[id]->flag = 0x01;
 }
 
 void AssetEngine::ClearAsset()
 {
-	for (auto& pair : m_assetMap)
+	for (auto& pair : m_AssetMap)
 		delete pair.second;
 
-	m_assetMap.clear();
+	m_AssetMap.clear();
 }
 
 void AssetEngine::ReadName(std::ifstream& file, Entry& entry, std::string& name)
@@ -207,7 +213,7 @@ void AssetEngine::SaveInFile(const std::string& path)
 
 	Entry entry;
 
-	for (auto& pair : m_assetMap)
+	for (auto& pair : m_AssetMap)
 	{
 		if (pair.second->flag == 0x01)
 			continue;

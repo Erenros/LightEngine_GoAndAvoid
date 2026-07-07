@@ -5,18 +5,19 @@
 
 class WorldText : public Entity{
 
-	Text* m_text = nullptr;
+	Text* m_Text = nullptr;
 	friend class Scene;
+	Vector2f m_RenderPosition = { 0, 0 };
+
+
 public:
 	void OnInitialize() override;
 	void OnUpdate() override;
 
-	Text* GetText() { return m_text; }
-
+	Text* GetText();
 	WorldText(): Entity() {};
 	
 	void SetRenderPosition(Vector2f pos);
-private:
-	Vector2f m_renderPosition = { 0, 0 };
+
 };
 

@@ -41,7 +41,7 @@ class AssetEngine
 {
 private:
 
-	std::unordered_map<std::string, Asset*> m_assetMap;
+	std::unordered_map<std::string, Asset*> m_AssetMap;
 
 private:
 
@@ -57,20 +57,17 @@ private:
 
 public:
 
-	static AssetEngine& GetInstance() {
-		static AssetEngine instance;
-		return instance;
-	}
+	static AssetEngine& GetInstance();
 
-	void Init(Window* window,const std::string& path);
+	void Init(Window* pWindow,const std::string& path);
 
 	Asset* GetAsset(std::string id);
 
 	bool LoadFile(const std::string& path);
-	void AddAsset(const std::string& id, Sprite* sprite);
+	void AddAsset(const std::string& id, Sprite* pSprite);
 	void SaveInFile(const std::string& path);
 
-	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* window);
+	std::unordered_map<std::string, Sprite*> AssetToTexture(Window* pWindow);
 
 	void DeleteAsset(const std::string& id);
 	void ClearAsset();

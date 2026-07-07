@@ -14,11 +14,11 @@ class Collider;
 class QuadNodePool;
 
 class QuadNode {
-	AABB m_bounds;
-	int32 m_depth = 0;
+	AABB m_Bounds;
+	int32 m_Depth = 0;
 
-	std::vector<Collider*> m_entities;  //if a leaf
-	QuadNode* m_childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
+	std::vector<Collider*> m_Entities;  //if a leaf
+	QuadNode* m_Childs[4] = { nullptr, nullptr, nullptr, nullptr };   //if had children
 
 
 public:
@@ -31,7 +31,7 @@ private:
 	void Subdivide(QuadNodePool& pool);
 	bool IsLeaf();
 
-	void Insert(Collider* entity, QuadNodePool& pool);
+	void Insert(Collider* pCollider, QuadNodePool& pool);
 	void Query(AABB& range, std::vector<Collider*>& results, std::vector<Collider*>& seen);
 
 	void Clear();
@@ -45,10 +45,10 @@ private:
 
 
 class QuadNodePool {
-	std::vector<std::vector<QuadNode>> m_blocks;
-	std::vector<QuadNode>* m_currentBlock = nullptr;
-	int32 m_blockSize;
-	int32 m_index = 0;
+	std::vector<std::vector<QuadNode>> m_Blocks;
+	std::vector<QuadNode>* mp_CurrentBlock = nullptr;
+	int32 m_BlockSize;
+	int32 m_Index = 0;
 
 	void AddBlock();
 

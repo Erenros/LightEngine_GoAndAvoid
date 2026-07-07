@@ -475,7 +475,7 @@ namespace gcle
 
 	Shapes Shape::GetShape() { return m_Shape; };
 	Vector2f  Shape::GetOrigin() { return m_Origin; }
-	Sprite* Shape::GetTexture() { return (mp_Texture == nullptr ? nullptr : mp_Texture->mp_texture); };
+	Sprite* Shape::GetTexture() { return (mp_Texture == nullptr ? nullptr : mp_Texture->texture); };
 	std::vector<int32>& Shape::GetIndicies() { return m_Indicies; };
 
 	Vector2f Shape::GetScale() { return m_Transform.GetScale(); }

@@ -32,14 +32,14 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
 	mp_Rect->w = width * factor;
 	mp_Rect->h = height * factor;
 
-	SDL_Surface* textSurface = SDL_CreateSurface(width * factor, height * factor, SDL_PIXELFORMAT_RGBA32);
+	SDL_Surface* textSurface = SDL_CreateSurface(static_cast<int32>(width * factor), static_cast<int32>(height * factor), SDL_PIXELFORMAT_RGBA32);
 	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_ADD);
 	
 	int32 x = 0;
 	for (auto& charactere : m_Text) {
 		GlyphInfo& info = mp_Font->GetGlypInfo(charactere);
 		SDL_Rect SrcRect = { info.x, info.y, info.advanceX, info.height };
-		SDL_Rect DistRect = {x * factor, 0, info.advanceX * factor, info.height * factor};
+		SDL_Rect DistRect = {static_cast<int32>(x * factor), 0, static_cast<int32>(info.advanceX * factor), static_cast<int32>(info.height * factor)};
 
 		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->a);
 		SDL_SetSurfaceAlphaMod(mp_Font->GetFontSurface(), mp_Color->a);

@@ -8,39 +8,50 @@
 #undef PlaySound
 
 
-void RessourceManager::PlayMusic(const std::string& id, int mode)
-{
-	if (m_musicMap.count(id))
-		m_musicMap[id]->PlayMusic(mode);
+RessourceManager& RessourceManager::GetInstance() {
+	static RessourceManager instance;
+	return instance;
 }
 
-void RessourceManager::PlaySoundEffect(const std::string& id, int mode, int volume)
+
+void RessourceManager::PlayMusic(const std::string& id, int32 mode)
 {
-	if (!m_soundMap.count(id))
+	if (m_MusicMap.count(id))
+		m_MusicMap[id]->PlayMusic(mode);
+}
+
+void RessourceManager::PlaySoundEffect(const std::string& id, int32 mode, int32 volume)
+{
+	if (!m_SoundMap.count(id))
 		return;
 
-	m_soundMap[id]->PlaySound(mode, volume);
+	m_SoundMap[id]->PlaySound(mode, volume);
 }
 
-void RessourceManager::ForcePutTexture(Sprite* text, std::string id)
+void RessourceManager::ForcePutTexture(Sprite* pText, std::string id)
 {
-	m_textureMap[id].mp_texture = text;
+	m_TextureMap[id].texture = pText;
+}
+
+Font* RessourceManager::GetFont(const std::string& id)
+{
+	return m_FontMap[id];
 }
 
 TextureStruct* RessourceManager::GetTexture(const std::string& id)
 {
-	if (!m_textureMap.contains(id))
+	if (!m_TextureMap.contains(id))
 		return nullptr;
 
-	return &m_textureMap[id];
+	return &m_TextureMap[id];
 }
 
-Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, const std::string& id)
+Sprite* RessourceManager::LoadTexture(Window* pWindow, const std::string& path, const std::string& id)
 {
-	if (m_textureMap[id].mp_texture != nullptr)
-		return m_textureMap[id].mp_texture;
+	if (m_TextureMap[id].texture != nullptr)
+		return m_TextureMap[id].texture;
 
-	Sprite* texture = new Sprite(window, path);
+	Sprite* texture = new Sprite(pWindow, path);
 	if (texture == nullptr || !texture->IsTextureInit())
 	{
 		GCLE_WARN << "Got a nullptr Texture for path : " + path << ENDL;
@@ -49,7 +60,7 @@ Sprite* RessourceManager::LoadTexture(Window* window, const std::string& path, c
 	}
 
 	GCLE_INFO << "Texture created" << ENDL;
-	m_textureMap[id].mp_texture = texture;
+	m_TextureMap[id].texture = texture;
 	AssetEngine::GetInstance().AddAsset(id, texture);
 	return texture;
 }
@@ -64,7 +75,7 @@ bool RessourceManager::LoadMusic(const std::string& path, const std::string& id)
 		return false;
 	}
 
-	m_musicMap[id] = music;
+	m_MusicMap[id] = music;
 	return true;
 }
 
@@ -78,7 +89,7 @@ bool RessourceManager::LoadSound(const std::string& path, const std::string& id)
 		return false;
 	}
 
-	m_soundMap[id] = sound;
+	m_SoundMap[id] = sound;
 	return true;
 }
 
@@ -92,19 +103,19 @@ bool RessourceManager::LoadFont(const std::string& path, const std::string& id)
 		return false;
 	}
 
-	m_fontMap[id] = font;
+	m_FontMap[id] = font;
 	return true;
 }
 
-void RessourceManager::Init(Window* window)
+void RessourceManager::Init(Window* pWindow)
 {
-	InitTextureFolder(window);
+	InitTextureFolder(pWindow);
 	InitMusicFolder();
 	InitSoundFolder();
 	InitFont();
 }
 
-void RessourceManager::InitTextureFolder(Window* window)
+void RessourceManager::InitTextureFolder(Window* pWindow)
 {
 	std::filesystem::path filename = "../../assets/textures";
 
@@ -129,7 +140,7 @@ void RessourceManager::InitTextureFolder(Window* window)
 		}
 
         //LoadTexture(window,entry.path().string(), entry.path().stem().string());
-        m_textureMap[entry.path().stem().string()].mp_texture = nullptr;
+        m_TextureMap[entry.path().stem().string()].texture = nullptr;
     }
 }
 
@@ -213,7 +224,7 @@ void RessourceManager::InitFont()
             continue;
         }
 
-        m_fontMap[entry.path().stem().string()] = GCLE_NEW Font(filename.string() +"/" + entry.path().filename().string());
+        m_FontMap[entry.path().stem().string()] = GCLE_NEW Font(filename.string() +"/" + entry.path().filename().string());
     }
 }
 
@@ -227,76 +238,109 @@ void RessourceManager::DeleteAll()
 
 void RessourceManager::DeleteFont(const std::string& id)
 {
-	if (!m_fontMap.contains(id))
+	if (!m_FontMap.contains(id))
 		return;
 
-	delete m_fontMap[id];
-	m_fontMap.erase(id);
+	delete m_FontMap[id];
+	m_FontMap.erase(id);
 }
 
 void RessourceManager::DeleteAllFont()
 {
-	for (auto& pair : m_fontMap)
+	for (auto& pair : m_FontMap)
 		delete pair.second;
 
-	m_fontMap.clear();
+	m_FontMap.clear();
 }
 
 void RessourceManager::DeleteMusic(const std::string& id)
 {
-	if (!m_musicMap.contains(id))
+	if (!m_MusicMap.contains(id))
 		return;
 
-	delete m_musicMap[id];
-	m_musicMap.erase(id);
+	delete m_MusicMap[id];
+	m_MusicMap.erase(id);
 }
 
 void RessourceManager::DeleteAllMusic()
 {
-	for (auto& pair : m_musicMap)
+	for (auto& pair : m_MusicMap)
 		delete pair.second;
 
-	m_musicMap.clear();
+	m_MusicMap.clear();
 }
 
 void RessourceManager::DeleteSound(const std::string& id)
 {
-	if (!m_soundMap.contains(id))
+	if (!m_SoundMap.contains(id))
 		return;
 
-	delete m_soundMap[id];
-	m_soundMap.erase(id);
+	delete m_SoundMap[id];
+	m_SoundMap.erase(id);
 }
 
 void RessourceManager::DeleteAllSound()
 {
-	for (auto& pair : m_soundMap)
+	for (auto& pair : m_SoundMap)
 		delete pair.second;
 
-	m_soundMap.clear();
+	m_SoundMap.clear();
 }
 
 void RessourceManager::DeleteTexture(const std::string& id)
 {
-	if (!m_textureMap.count(id))
+	if (!m_TextureMap.count(id))
 		return;
 
 	AssetEngine::GetInstance().DeleteAsset(id);
-	delete m_textureMap[id].mp_texture;
-	m_textureMap[id].mp_texture = nullptr;
-	m_textureMap.erase(id);
+	delete m_TextureMap[id].texture;
+	m_TextureMap[id].texture = nullptr;
+	m_TextureMap.erase(id);
 }
 
 void RessourceManager::DeleteAllTexture()
 {
-	for (auto& pair : m_textureMap)
+	for (auto& pair : m_TextureMap)
 	{
-		if (pair.second.mp_texture)
+		if (pair.second.texture)
 		{
-			delete pair.second.mp_texture;
-			pair.second.mp_texture = nullptr;
+			delete pair.second.texture;
+			pair.second.texture = nullptr;
 		}
 	}
 
-	m_textureMap.clear();
+	m_TextureMap.clear();
+}
+
+RessourceManager::~RessourceManager()
+{
+	DeleteAll();
+}
+
+void RessourceManager::SetMusicVolume(int32 volume) { 
+	Audio::SetMusicVolume(volume); 
+}
+
+void RessourceManager::StopMusic() { 
+	Audio::StopMusic(); 
+}
+
+void RessourceManager::PauseMusic() { 
+	Audio::PauseMusic();
+}
+
+void RessourceManager::ResumeMusic() { 
+	Audio::ResumeMusic(); 
+}
+
+void RessourceManager::StopAllSound() { 
+	Audio::StopAllSound(); 
+}
+
+bool RessourceManager::isMusicPlaying() {
+	return Audio::IsAMusicPlaying();
+}
+
+bool RessourceManager::IsMusicPaused() { 
+	return Audio::IsAMusicPaused(); 
 }

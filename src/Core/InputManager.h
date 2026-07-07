@@ -66,16 +66,15 @@ namespace Keyboard
 #define XBOX_RB XINPUT_GAMEPAD_RIGHT_SHOULDER
 
 
-class Controller
+struct Controller
 {
-	public:
-		std::vector<short> m_LeftStickDeadzone = { 4000, -4000, 4000, -4000 };
-		std::vector<short> m_RightStickDeadzone = { 4000, -4000, 4000, -4000 };
+	std::vector<int16> leftStickDeadzone = { 4000, -4000, 4000, -4000 };
+	std::vector<int16> rightStickDeadzone = { 4000, -4000, 4000, -4000 };
 
-		BYTE m_LeftTriggerDeadzone = 30;
-		BYTE m_RightTriggerDeadzone = 30;
+	BYTE leftTriggerDeadzone = 30;
+	BYTE rightTriggerDeadzone = 30;
 
-		XINPUT_STATE m_State;
+	XINPUT_STATE state;
 };
 
  
@@ -83,17 +82,13 @@ class InputManager
 {
 private:
 	
-	std::unordered_map<short, bool> m_keysDownReset;
+	std::unordered_map<int16, bool> m_KeysDownReset;
 
 	std::vector<Controller*> m_Controllers;
 
 public:
 
-	static InputManager& GetInstance()
-	{
-		static InputManager instance;
-		return instance;
-	}
+	static InputManager& GetInstance();
 
 	void Update();
 
@@ -108,14 +103,14 @@ public:
 
 	//Input tests
 
-	Vector2<long> GetMouseRelativePosition();
-	Vector2<long> GetMouseWorldPosition();
+	Vector2<int32> GetMouseRelativePosition();
+	Vector2<int32> GetMouseWorldPosition();
 
-	bool IsDown(const short key);
+	bool IsDown(const int16 key);
 	bool IsHeld(const char key);
 	bool IsUp(const char key);
 
-	void AddController(Controller* c);
+	void AddController(Controller* pConntroller);
 
 	bool IsControllerDown(int8 controller, int16 key);
 
@@ -125,26 +120,26 @@ public:
 	XINPUT_STATE GetGamepadState(int8 controller);
 
 
-	void SetLeftStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg);
-	void SetRightStickDeadZone(int8 controller, float Xpos, float Xneg, float Ypos, float Yneg);
-	std::vector<short> GetLeftStickDeadZone(int8 controller);
-	std::vector<short> GetRightStickDeadZone(int8 controller);
+	void SetLeftStickDeadZone(int8 controller, float32 Xpos, float32 Xneg, float32 Ypos, float32 Yneg);
+	void SetRightStickDeadZone(int8 controller, float32 Xpos, float32 Xneg, float32 Ypos, float32 Yneg);
+	std::vector<int16> GetLeftStickDeadZone(int8 controller);
+	std::vector<int16> GetRightStickDeadZone(int8 controller);
 
 	bool IsLeftStickInHorizontalDeadzone(int8 controller);
 	bool IsLeftStickInVerticalDeadzone(int8 controller);
 	bool IsRightStickInHorizontalDeadzone(int8 controller);
 	bool IsRightStickInVerticalDeadzone(int8 controller);
 
-	float GetLeftStickX(int8 controller);
-	float GetLeftStickY(int8 controller);
-	float GetRightStickX(int8 controller);
-	float GetRightStickY(int8 controller);
+	float32 GetLeftStickX(int8 controller);
+	float32 GetLeftStickY(int8 controller);
+	float32 GetRightStickX(int8 controller);
+	float32 GetRightStickY(int8 controller);
 
 	Vector2f LeftStickPressed(int8 controller);
 	Vector2f RightStickPressed(int8 controller);
 
 
-	float LeftTriggerPressed(int8 controller);
-	float RightTriggerPressed(int8 controller);
+	float32 LeftTriggerPressed(int8 controller);
+	float32 RightTriggerPressed(int8 controller);
 };
 

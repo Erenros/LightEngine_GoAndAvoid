@@ -20,7 +20,7 @@ void SampleScene::OnInitialize()
 	entity1->SetStatic(false); 
 	entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.f, 0.f }, 0.f, { 1.f, 1.f });
 
-	mp_mainCamera->SetFollowing(entity1);
+	mp_MainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
 	pSceneCamera->SetFollowing(entity1);
@@ -51,9 +51,9 @@ void SampleScene::OnUpdate(Clock& time)
 	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		if (GetCurrentCamera()->GetId() != mp_mainCamera->GetId())
+		if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
 		{
-			SwitchCamera(mp_mainCamera);
+			SwitchCamera(mp_MainCamera);
 		}
 		else
 		{

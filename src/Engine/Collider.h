@@ -8,10 +8,10 @@ class Entity;   // <-- AJOUT : forward declaration
 
 struct CollisionDirection
 {
-	bool IsCollidingOnTop = false;
-	bool IsCollidingOnBottom = false;
-	bool IsCollidingOnRight = false;
-	bool IsCollidingOnLeft = false;
+	bool isCollidingOnTop = false;
+	bool isCollidingOnBottom = false;
+	bool isCollidingOnRight = false;
+	bool isCollidingOnLeft = false;
 };
 
 
@@ -21,7 +21,7 @@ public:
 	Collider() = default;
 	~Collider();
 
-	void Initialize(Shape* shape, Vector2f position, float32 rotation, Entity* owner);
+	void Initialize(Shape* pShape, Vector2f position, float32 rotation, Entity* pOwner);
 
 	void CollidingOn(Vector2f direction);
 	void CollidingOnX(float32 direction);
@@ -29,19 +29,19 @@ public:
 
 	void StoppedColliding();
 
-	bool IsActive() { return m_IsActive; }
-	void SetActive(bool activate) { m_IsActive = activate; }
+	bool IsActive();
+	void SetActive(bool activate) ;
 
-	Shape* GetShape() { return m_shape; }
-	const Shape* GetShape() const { return m_shape; }
+	Shape* GetShape()			;
+	const Shape* GetShape() const;
 
-	const CollisionDirection& GetCollisionDirection() const { return m_CollisionDirection; }
+	const CollisionDirection& GetCollisionDirection() const;
 
-	Entity* GetOwner() const { return mp_Owner; }
-	void SetOwner(Entity* pOwner) { mp_Owner = pOwner; }
+	Entity* GetOwner() const	;
+	void SetOwner(Entity* pOwner);
 
 private:
-	Shape* m_shape = nullptr;
+	Shape* mp_Shape = nullptr;
 
 	Entity* mp_Owner = nullptr;
 
@@ -50,8 +50,8 @@ private:
 	CollisionDirection m_CollisionDirection;
 
 private:
-	bool m_inQuerySeen = false;
-	AABB m_aabb{};
+	bool m_InQuerySeen = false;
+	AABB m_Aabb{};
 
 public:
 	bool GetInQuerySeen();
