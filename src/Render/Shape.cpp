@@ -2,6 +2,16 @@
 #include <SDL3/SDL.h>
 #include "Engine/Entity.h"
 
+const Color Color::White = { 255,255,255,255 };
+const Color Color::Black = { 0,0,0,255 };
+const Color Color::Red = { 255,0,0,255 };
+const Color Color::Green = { 0,255,0,255 };
+const Color Color::Blue = { 0,0,255,255 };
+const Color Color::Yellow = { 255,255,0,255 };
+const Color Color::Cyan = { 0,255,255,255 };
+const Color Color::Magenta = { 255,0,255,255 };
+const Color Color::Transparent = { 0,0,0,0 };
+
 namespace gcle
 {
 	SDL_FColor ToSDLColor(Color c)
@@ -81,6 +91,22 @@ namespace gcle
 		return pivot;
 	}
 
+	Color Shape::GetColor() const
+	{
+		if (m_verticies.empty() || m_verticies[0] == nullptr)
+			return { 255, 255, 255, 255 };
+
+		const SDL_FColor& c = m_verticies[0]->color;
+
+		return
+		{
+			static_cast<uint8>(c.r * 255.f),
+			static_cast<uint8>(c.g * 255.f),
+			static_cast<uint8>(c.b * 255.f),
+			static_cast<uint8>(c.a * 255.f)
+		};
+	}
+
 	void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	{
 		Vector2f newPivot = { x, y };
@@ -130,6 +156,19 @@ namespace gcle
 	void Shape::Rotate(Degrees delta)
 	{
 		SetRotation(m_Transform.GetDegAngle() + delta);
+	}
+
+	void Shape::SetColor(Color color)
+	{
+		SDL_FColor sdlColor = ToSDLColor(color);
+
+		for (SDL_Vertex* vertex : m_verticies)
+		{
+			if (vertex != nullptr)
+			{
+				vertex->color = sdlColor;
+			}
+		}
 	}
 
 	void Shape::UpdateRenderVertices()

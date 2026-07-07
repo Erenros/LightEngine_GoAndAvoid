@@ -11,11 +11,27 @@ class Entity;
 struct SDL_Vertex;
 struct SDL_FPoint;
 
-struct Color {
-	uint8 r;
-	uint8 g;
-	uint8 b;
-	uint8 a;
+struct Color
+{
+	uint8 r = 0;
+	uint8 g = 0;
+	uint8 b = 0;
+	uint8 a = 0;
+
+	constexpr Color() = default;
+	constexpr Color(uint8 _r, uint8 _g, uint8 _b, uint8 _a) : r(_r), g(_g), b(_b), a(_a)
+	{
+	}
+
+	static const Color White;
+	static const Color Black;
+	static const Color Red;
+	static const Color Green;
+	static const Color Blue;
+	static const Color Yellow;
+	static const Color Cyan;
+	static const Color Magenta;
+	static const Color Transparent;
 };
 
 namespace gcle
@@ -83,7 +99,22 @@ namespace gcle
 		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
 
 		Transform2D* GetTransform() { return &m_Transform; }
+		Color GetColor() const;
 
+	public:
+
+		void SetTexture(TextureStruct* tex) { mp_texture = tex; }
+		void SetOrigin(Vector2f origin) { m_origin = origin; }
+		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+		 
+		void SetScale(Vector2f scale);
+		void SetScale(float32 scale) { SetScale({ scale, scale }); } 
+		void ScaleBy(Vector2f factor);
+		 
+		void SetRotation(Degrees angle); 
+		void Rotate(Degrees delta);
+
+		void SetColor(Color color);
 
 	public:
 
@@ -106,18 +137,6 @@ namespace gcle
 		virtual void SetCenter(Vector2f center) {};
 		virtual void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) {};
 
-	public:
-
-		void SetTexture(TextureStruct* tex) { mp_texture = tex; }
-		void SetOrigin(Vector2f origin) { m_origin = origin; }
-		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-		 
-		void SetScale(Vector2f scale);
-		void SetScale(float32 scale) { SetScale({ scale, scale }); } 
-		void ScaleBy(Vector2f factor);
-		 
-		void SetRotation(Degrees angle); 
-		void Rotate(Degrees delta);
 
 	public:
 		void Move(Vector2f translation);

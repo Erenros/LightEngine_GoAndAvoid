@@ -57,6 +57,9 @@ public:
 
 	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };
 
+	void SetColor(Color color);
+	Color GetColor() const;
+
 public:
 	//void SetRenderShape(gcle::Shapes);
 	Vector2f GetScale();

@@ -453,3 +453,13 @@ void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	}
 	sprite->RemoveFunctionInFrame(animation, frame);
 }
+
+void Entity::SetColor(Color color)
+{
+	mp_RenderShape->SetColor(color);
+}
+
+Color Entity::GetColor() const
+{
+	return mp_RenderShape->GetColor();
+}
