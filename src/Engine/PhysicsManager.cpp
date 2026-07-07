@@ -147,6 +147,8 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 		if (info.pEntity->GetId() == pEntity->GetId())
 		{
 			info.toRemove = true;
+			m_forceQuadTreeRegen = true;
+			return;
 		}
 	}
 }
@@ -214,7 +216,7 @@ void PhysicsManager::Update(float32 dt)
 	}
 }
 
-void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt)
+void PhysicsManager::UpdateQuadTree(std::vector<Collider*>& activeColliders, float32 dt)
 {
 	int32 nbrTest = 0;
 
@@ -269,7 +271,7 @@ void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeCollider
 
 void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* activeColliders, float32 dt)
 {
-	if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations)
+	if (m_timeBetweenRegeneration >= m_frameBetweenQuadTreeRegenerations || m_forceQuadTreeRegen)
 	{
 		m_quadTree->Clear();
 
@@ -289,6 +291,7 @@ void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* activeColliders, f
 		}
 
 		m_timeBetweenRegeneration = 0;
+		m_forceQuadTreeRegen = false; 
 	}
 }
 

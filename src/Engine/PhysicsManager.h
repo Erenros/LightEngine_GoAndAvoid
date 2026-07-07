@@ -105,7 +105,7 @@ private:
 	void MakeTreePairs(std::vector<Collider*>* activeColliders);
 	void MakePairs(std::vector<Collider*>* activeColliders);
 
-	void UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt);
+	void UpdateQuadTree(std::vector<Collider*>& activeColliders, float32 dt);
 	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders, float32 dt);
 
 private:
@@ -129,6 +129,7 @@ private:
 private:
 	bool m_activateQuadTree = true;
 	bool m_dynamicQuadTreeSize = false;
+	bool m_forceQuadTreeRegen = false;
 
 	Vector2f m_quadTreePos1{ -50000, -50000 };
 	Vector2f m_quadTreePos2{ 50000, 50000 };

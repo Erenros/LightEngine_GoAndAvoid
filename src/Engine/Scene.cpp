@@ -224,7 +224,7 @@ void Scene::SetGizmoVisibility()
 
 void Scene::EntityInfoVisibility(const int32 debugConstant)
 {
-	if (InputManager::GetInstance().IsDown(LeftButton))
+	if (InputManager::GetInstance().IsDown(MiddleButton))
 	{
 		bool selected = false;
 		for (auto& layer : GameManager::GetInstance().m_entities)
