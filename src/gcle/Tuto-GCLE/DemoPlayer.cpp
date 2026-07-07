@@ -18,17 +18,36 @@ namespace Demo
 		float32 dt = static_cast<float32>(::GameManager::GetInstance().GetTime()->GetDeltaTime());
 
 
-		if (im.IsHeld('Q')) {
-			GetRigidBody().AddForce({ -1, 0 }, 1200, dt);
+		if (im.IsHeld('Q')) 
+		{
+			GetRigidBody().AddForce({ -1, 0 }, 1200, dt); 
+
+			PlayAnimation("Walk");
+
 		}
-		if (im.IsHeld('D')) {
-			GetRigidBody().AddForce({ 1, 0 }, 1200, dt);
+		if (im.IsHeld('D')) 
+		{
+			GetRigidBody().AddForce({ 1, 0 }, 1200, dt); 
+
+			PlayAnimation("Walk");
 		}
-		if (im.IsHeld('S')) {
+		if (im.IsHeld('S')) 
+		{
 			GetRigidBody().AddForce({ 0, 1 }, 1200, dt);
+
+			PlayAnimation("Walk");
 		}
-		if (im.IsHeld('Z')) {
+		if (im.IsHeld('Z')) 
+		{
 			GetRigidBody().AddForce({ 0, -1 }, 1200, dt);
+
+			PlayAnimation("Walk");
+		}
+
+		if (GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
+			GetRigidBody().GetVelocity().x >= -0.05f && GetRigidBody().GetVelocity().y >= -0.05f)
+		{
+			PlayAnimation("Idle");
 		}
 
 		if (im.IsDown(LeftButton))
@@ -45,10 +64,27 @@ namespace Demo
 	{
 		SetTag(GameTag::Player);
 
-		CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
+		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
 
 		SetRigidBody(true);
 		GetRigidBody().SetGravity(false);
+
+		SetTexture("player");
+
+		AddAnimation("Idle"		, 0, 3, 0, 64, 64, 0.5f);
+		AddAnimation("Walk"		, 0, 5, 3, 64, 64, 0.2f);
+		AddAnimation("Hit"		, 0, 3, 5, 64, 64, 0.2f); 
+		AddAnimation("Death"	, 0, 10, 6, 64, 64, 0.25f);
+		AddAnimation("Appear"	, 0, 11, 9, 64, 64, 0.25f);
+		AddAnimation("Teleport"	, 0, 11, 21, 64, 64, 0.25f);
+
+		AddFunctionInFrame("Appear", 11, [this]()
+			{
+				PlayAnimation("Idle");
+			});
+
+		PlayAnimation("Appear");
+
 	}
 
 	void GCPlayer::OnCollision(Entity* collidedWith)
@@ -66,6 +102,8 @@ namespace Demo
 	void GCPlayer::Death()
 	{
 		Character::Death();
+
+		Destroy();
 	}
 
 	void GCPlayer::Heal(int amount)

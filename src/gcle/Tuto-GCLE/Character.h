@@ -23,8 +23,8 @@ namespace Demo
 		virtual void Shoot() {};
 
 	private:
-		int m_MaxLife = 0.0f;
-		int m_CurrentLife = 0.0f;
+		int m_MaxLife = 20.0f;
+		int m_CurrentLife = 20.0f;
 
 		float m_baseDamageDuration = 1.0f;
 		float m_damageDuration = 0.0f; 

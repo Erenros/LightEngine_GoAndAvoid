@@ -31,9 +31,15 @@ struct Animation
 		m_tileH(tileHeight),
 		m_duration(duration)
 	{}
-	std::unordered_map<int, std::function<void*()>> m_animationFunction;
+	std::unordered_map<int, std::function<void()>> m_animationFunction;
 	int m_frameId = 0;
 
+};
+
+enum AnimationMode
+{
+	Restart,
+	KeepPlaying
 };
 
 
@@ -52,7 +58,7 @@ private:
 
 	float32 m_timer = 0.f;
 
-
+	std::string m_currentAnimationId;
 
 public:
 	
@@ -72,8 +78,8 @@ public:
 		int32 tileHeight, 
 		float32 duration = 0.5f);
 
-	void PlayAnimation(const std::string& id);
+	void PlayAnimation(const std::string& id, AnimationMode mode);
 
-	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function);
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
 };

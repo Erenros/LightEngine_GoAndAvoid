@@ -30,7 +30,7 @@ void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 }
 
 
-void Sprite::PlayAnimation(const std::string& id)
+void Sprite::PlayAnimation(const std::string& id, AnimationMode mode)
 {
 	if (!m_animationMap.contains(id))
 	{
@@ -38,10 +38,17 @@ void Sprite::PlayAnimation(const std::string& id)
 		return;
 	}
 
+	if (mode == AnimationMode::KeepPlaying && m_currentAnimationId == id)
+		return;
+
+	m_currentAnimationId = id;
+
 	mp_currentAnimation = m_animationMap[id];
+	mp_currentAnimation->m_frameId = 0;
+
 	m_currentFrameX = mp_currentAnimation->m_firstFrame;
 	m_currentFrameY = mp_currentAnimation->m_line;
-	m_timer = mp_currentAnimation->m_duration;
+	m_timer = 0.0f;
 }
 
 
@@ -84,7 +91,7 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* shape)
 }
 
 
-void Sprite::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void* ()> function) {
+void Sprite::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function) {
 	auto it = m_animationMap.find(animation);
 	if (it == m_animationMap.end())
 		return;

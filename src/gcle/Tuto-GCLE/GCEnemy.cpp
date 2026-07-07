@@ -16,10 +16,10 @@ namespace Demo
 
 		InputManager& im = InputManager::GetInstance();
 
-		if (im.IsDown(LeftButton))
+		/*if (im.IsDown(LeftButton))
 		{
 			Shoot();
-		}
+		}*/
 	}
 
 	void GCEnemy::OnDestroy()
@@ -56,7 +56,8 @@ namespace Demo
 
 	void GCEnemy::Death()
 	{
-
+		Character::Death();
+		Destroy();
 	}
 
 	void GCEnemy::Heal(int amount)

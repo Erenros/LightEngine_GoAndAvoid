@@ -200,7 +200,7 @@ void GameManager::UpdateEntitySystem()
 
 	for (auto it = m_entitiesToCreate.begin(); it != m_entitiesToCreate.end(); ++it)
 	{
-		Entity* e= *it;
+		Entity* e = *it;
 		m_entities[e->GetLayer()].push_back(*it);
 	}
 

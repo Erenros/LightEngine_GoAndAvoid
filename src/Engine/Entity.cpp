@@ -422,7 +422,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
 }
 
-void Entity::PlayAnimation(const std::string& id, int32 mode)
+void Entity::PlayAnimation(const std::string& id, AnimationMode mode)
 {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
@@ -431,10 +431,10 @@ void Entity::PlayAnimation(const std::string& id, int32 mode)
 		return;
 	}
 
-	sprite->PlayAnimation(id);
+	sprite->PlayAnimation(id, mode);
 }
 
-void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function) {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
