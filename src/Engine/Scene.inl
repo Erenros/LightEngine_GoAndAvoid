@@ -34,3 +34,36 @@ T* Scene::CreateEntity()
 
 	return new_entity;
 }
+
+template<typename T>
+T* Scene::CreateUI(gcle::Shapes shape)
+{
+	static_assert(std::is_base_of<UI, T>::value, "T must be derived from UI");
+
+	T* new_UI = GCLE_NEW T();
+	UI* ui = new_UI;
+
+	ui->m_activeScenes.push_back(m_tag);
+
+	ui->Initialize(shape);
+
+	GameManager::GetInstance().AddUI(new_UI);
+
+	return new_UI;
+}
+template<typename T>
+T* Scene::CreateUI()
+{
+	static_assert(std::is_base_of<UI, T>::value, "T must be derived from UI");
+
+	T* new_UI = GCLE_NEW T();
+	UI* ui = new_UI;
+
+	ui->m_activeScenes.push_back(m_tag);
+
+	ui->Initialize();
+
+	GameManager::GetInstance().AddEntity(new_UI);
+
+	return new_UI;
+}

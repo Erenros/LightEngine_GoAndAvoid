@@ -43,6 +43,7 @@ public:
 	Degrees GetRotation();
 	Vector2f GetPosition();
 	Vector2f GetRenderPosition();
+	int32 GetLayer() const { return m_layer; };
 	Transform2D& GetTransform2D() { return m_Transform; }
 	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
 

@@ -76,7 +76,7 @@ public:
 	Vector2f GetMousePositionOnRenderTarget();
 
 public:
-	bool IsInsideWindow(Entity* entity);
+	bool IsInsideWindow(GameObject* gm);
 
 private:
 

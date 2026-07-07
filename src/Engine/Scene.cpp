@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "WorldText.h"
 #include "RessourceManager.h"
+#include "InputManager.h"
 
 void Scene::DrawDebug(Window* window)
 {
@@ -74,6 +75,27 @@ void Scene::Draw(Window* window)
 				{
 					WorldText* text = static_cast<WorldText*>(e);
 					GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(text->GetText());
+					m_numberOfDraw++;
+				}
+			}
+		}
+	}
+
+	for (auto& layer : GameManager::GetInstance().m_UIs) {
+		for (UI* ui : layer) {
+			if (window->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_frustrumCulling)
+			{
+				if (ui->IsActiveIn(m_tag))
+				{
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
+					m_numberOfDraw++;
+				}
+			}
+			else if (ui->GetRenderShape() != nullptr)
+			{
+				if (ui->IsActiveIn(m_tag))
+				{
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
 					m_numberOfDraw++;
 				}
 			}
@@ -175,6 +197,21 @@ void Scene::Update(Clock& time) const
 				e->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
 	} 
+	for (auto& layer : GameManager::GetInstance().m_UIs) {
+		for(UI* ui : layer)
+		{
+			if (ui->IsActiveIn(m_tag))
+				ui->Update(static_cast<float32>(time.GetDeltaTime()));
+		}
+	} 
+
+	if (InputManager::GetInstance().IsDown(LeftButton))
+	{
+		for (auto it : buttons) {
+			if (it.IsInside(mp_activeCamera->GetScreenMousePosition()))
+				it.OnClick();
+		}
+	}
 }
 
 Text* Scene::CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
@@ -463,7 +500,15 @@ void Scene::SetDebugInfo() const
 	}
 }
 
-Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a) 
+Button* Scene::CreateButton(gcle::Shapes shape, std::vector<std::function<void* ()>> functions)
+{
+	Button* button = CreateUI<Button>(shape);
+	buttons.push_back(*button);
+	button->SetFunctions(functions);
+	return button;
+}
+
+Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a)
 {
 	WorldText* worldText = CreateEntity<WorldText>();
 	Font* font = RessourceManager::GetInstance().GetFont(fontId);

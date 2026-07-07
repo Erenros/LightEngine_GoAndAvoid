@@ -40,15 +40,18 @@ public:
 	void SetWindowClearColor(Color color) { m_ClearColor = color; }
 
 	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
+	void AddUI(UI* ui) { m_UIsToCreate.push_back(ui); };
 
 	void UpdateRigidBodies(float32 dt);
 	
 	Window* GetWindow() { return mp_window; }; 
 
 	std::vector<Entity*> GetActiveEntities(const std::string& scene);
+	std::vector<UI*> GetActiveUIs(const std::string& scene);
 private:
 	void UpdateEntitySystem();
-	void DestroyAllEntitiesAndCameras();
+	void UpdateUISystem();
+	void DestroyEverything();
 
 private:
 
@@ -66,6 +69,10 @@ private:
 	std::vector <std::vector<Entity*>> m_entities;
 	std::vector <Entity*> m_entitiesToDestroy;
 	std::vector <Entity*> m_entitiesToCreate;
+
+	std::vector <std::vector<UI*>> m_UIs;
+	std::vector <UI*> m_UIsToCreate;
+	std::vector <UI*> m_UIsToDestroy;
 
 	std::vector <Camera*> m_camera; 
 	

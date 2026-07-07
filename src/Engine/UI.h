@@ -1,18 +1,24 @@
-#include "GameObject.h"
-#include "Core/include.h"
-#include "Transform.h"
-#include "Render/Shape.h"
+#pragma once
 
+#include "GameObject.h"
 
 class UI : public GameObject
 {
 public:
-	UI() = default;
-	virtual ~UI() = default;
+    UI() = default;
+    virtual ~UI() = default;
 
-	/*void Initialize(gcle::Shapes shape) override;
-	void Update(float32 dt) override;*/
+protected:
+    virtual void OnActivate() {}
+    virtual void OnUpdate() override {}
+    virtual void OnInitialize() override {}
 
-	void OnActivate() {};
+private:
+    void Initialize(gcle::Shapes shape) override;
+    void Initialize();
+    void Update(float32 dt) override;
 
+private:
+    friend class Scene;
+    friend class GameManager;
 };

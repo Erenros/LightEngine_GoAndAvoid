@@ -2,9 +2,9 @@
 #include <vector>
 #include <iostream>
 #include "Entity.h"
+#include "UI.h"
 #include "Core/InputManager.h"
-
-
+#include "Button.h"
 
 //class Entity;
 class Font;
@@ -38,12 +38,18 @@ public:
 
 	template<typename T>
 	T* CreateEntity();
+	
+	template<typename T>
+	T* CreateUI(gcle::Shapes shape);
+
+	template<typename T>
+	T* CreateUI();
+
+	Button* CreateButton(gcle::Shapes shape, std::vector<std::function<void*()>> functions);
 
 	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 
-
 	Camera* CreateCamera();
-
 
 	uint32 GetFlag() const { return m_flag; }
 
@@ -96,6 +102,8 @@ private:
 	std::vector<std::string> m_activeTextures;
 
 	float32 m_test = 0;
+
+	std::vector<Button> buttons;
 
 
 private:

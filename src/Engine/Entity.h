@@ -44,7 +44,6 @@ protected:
 public:
 	int32* GetCollisionLayer() { return &m_Mask; }
 	int64 GetId() const { return m_Id; }
-	int32 GetLayer() const { return m_layer; };
 	RigidBody2D& GetRigidBody() { return m_RigidBody; }
 	Transform2D& GetTransform2D() { return m_Transform; }
 	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
