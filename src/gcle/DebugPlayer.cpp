@@ -47,7 +47,7 @@ void DebugPlayer::OnCollisionEnter(Entity* collidedWith)
 
 void DebugPlayer::OnCollision(Entity* collidedWith)
 {
-
+    std::cout << "collision" << std::endl;
 }
 
 void DebugPlayer::OnCollisionExit(Entity* collidedWith)

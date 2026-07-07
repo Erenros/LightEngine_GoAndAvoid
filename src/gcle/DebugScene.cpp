@@ -50,13 +50,14 @@ void DebugScene::OnInitialize()
 		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}
 
-	//creation d'un mur
+	//creation d'un trigger
 	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	{
-		entity2->SetPosition(0, -100);
-		entity2->SetScale({ 5, 1 });
+		entity2->SetPosition(200, -100);
+		entity2->SetScale({ 1, 5 });
 		entity2->SetRotation(0);
-		entity2->SetRigidBody(true);
+		entity2->SetTag(Demo::Tag::Trigger);
+		entity2->SetRigidBody(false);
 		entity2->SetStatic(true);
 		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}
@@ -71,7 +72,6 @@ void DebugScene::OnInitialize()
 		entity3->SetRigidBody(true);
 		entity3->SetStatic(true);
 		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
-
 	}
 
 

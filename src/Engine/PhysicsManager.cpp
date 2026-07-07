@@ -351,7 +351,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 
 	if (coliding)
 	{
-		if (entityA->HasCollider() && entityB->HasCollider())
+		if (entityA->IsRigidBody() && entityB->IsRigidBody())
 		{
 			ThrowRepulse(colliderA, colliderB);
 		}
@@ -459,7 +459,7 @@ ContinuousCollisionHit PhysicsManager::SweepColliderAgainstAABB(Collider* moving
 		return {};
 
 	Entity* movingEntity = movingCollider->GetOwner();
-	if (movingEntity == nullptr || !movingEntity->HasCollider())
+	if (movingEntity == nullptr || !movingEntity->IsRigidBody())
 		return {};
 
 	AABB movingAABB = ComputeCurrentAABB(movingCollider);
@@ -627,7 +627,7 @@ bool PhysicsManager::ShouldUseContinuousCollision(Collider* collider) const
 	if (entity == nullptr)
 		return false;
 
-	if (!entity->HasCollider())
+	if (!entity->IsRigidBody())
 		return false;
 
 	return entity->GetRigidBody().UseContinuousCollision();
@@ -676,7 +676,7 @@ void PhysicsManager::ApplyContinuousCollisionResponse(Collider* movingCollider, 
 		return;
 
 	Entity* movingEntity = movingCollider->GetOwner();
-	if (movingEntity == nullptr || !movingEntity->HasCollider())
+	if (movingEntity == nullptr || !movingEntity->IsRigidBody())
 		return;
 
 	Vector2f start = movingCollider->GetShape()->GetPosition(0.5f, 0.5f);

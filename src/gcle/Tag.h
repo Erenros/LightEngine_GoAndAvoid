@@ -7,6 +7,7 @@ namespace Demo {
 	{
 		Player,
 		Enemy,
-		Ground
+		Ground,
+		Trigger
 	};
 }

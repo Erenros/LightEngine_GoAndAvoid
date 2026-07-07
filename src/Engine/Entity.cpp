@@ -67,8 +67,15 @@ void Entity::AddCollider(Collider* pCollider)
 	if (pCollider == nullptr)
 		return;
 
+	bool hadNoCollider = mp_Colliders.empty();
+
 	pCollider->SetOwner(this);
 	mp_Colliders.insert(pCollider);
+
+	if (hadNoCollider)
+	{
+		PhysicsManager::GetInstance().AddEntity(this);
+	}
 }
 
 void Entity::RemoveCollider(Collider* pCollider)
@@ -77,6 +84,11 @@ void Entity::RemoveCollider(Collider* pCollider)
 		return;
 
 	mp_Colliders.erase(pCollider);
+
+	if (mp_Colliders.empty())
+	{
+		PhysicsManager::GetInstance().RemoveEntity(this);
+	}
 }
 
 Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 relativeRotation, Vector2f relativeScale)
@@ -110,17 +122,7 @@ void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
 
-	if (isRigidBody)
-	{
-		PhysicsManager::GetInstance().AddEntity(this);
-		m_isHighlighted = true;
-	}
-
-	if (!isRigidBody)
-	{
-		PhysicsManager::GetInstance().RemoveEntity(this);
-		m_isHighlighted = false;
-	}
+	m_isHighlighted = isRigidBody;
 }
 
 void Entity::SetStatic(bool isStatic)
@@ -130,7 +132,6 @@ void Entity::SetStatic(bool isStatic)
 
 bool Entity::HasCollider()
 {
-	std::cout << mp_Colliders.size() << std::endl;
 	return mp_Colliders.size() > 0;
 }
 
