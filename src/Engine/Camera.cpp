@@ -7,46 +7,46 @@ static uint64 sId = 0;
 Camera::~Camera()
 {
 	mp_Window = nullptr;
-	m_followingEntity = nullptr;
+	mp_FollowingEntity = nullptr;
 }
 
 void Camera::Init(Window* pWindow)
 {
-	transform.Initialize({ 0.0f, 0.0f }, 0); 
+	m_Transform.Initialize({ 0.0f, 0.0f }, 0); 
 
 	mp_Window = pWindow;
 
-	screenMiddle = { 1920.f / 2.f, 1080.f / 2.f };
+	m_ScreenMiddle = { 1920.f / 2.f, 1080.f / 2.f };
 
 	m_Id = sId++;
 }
 
-void Camera::SetFollowing(Entity* newEntity)
+void Camera::SetFollowing(Entity* pNewEntity)
 {
-	m_followingEntity = newEntity;
+	mp_FollowingEntity = pNewEntity;
 }
 
 Entity* Camera::GetFollowing()
 {
-	return m_followingEntity;
+	return mp_FollowingEntity;
 } 
 
 void Camera::SetPosition(Vector2f v)
 {
-	transform.SetPosition(v);
+	m_Transform.SetPosition(v);
 }
 
 Vector2f Camera::GetPosition()
 {
-	return transform.GetPosition();
+	return m_Transform.GetPosition();
 } 
 
 void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 {
-	if (m_followingEntity != nullptr)
-		transform.SetPosition(m_followingEntity->GetPosition());
+	if (mp_FollowingEntity != nullptr)
+		m_Transform.SetPosition(mp_FollowingEntity->GetPosition());
 
-	screenMiddle = Vector2f{ 1920.0f, 1080.0f } * 0.5f;
+	m_ScreenMiddle = Vector2f{ 1920.0f, 1080.0f } * 0.5f;
 	
 	for (auto& layer : entities)
 	{
@@ -54,7 +54,7 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 		{
 			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
 				if (entity->GetRenderShape() != nullptr) {
-					entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + screenMiddle);
+					entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + m_ScreenMiddle);
 
 					Vector2f realScale = entity->GetScale();
 					entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
@@ -62,7 +62,7 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 				}
 				else if (entity->IsWorldText()) {
 					WorldText* text = static_cast<WorldText*>(entity);
-					text->SetRenderPosition((text->GetPosition() - GetPosition()) + screenMiddle);
+					text->SetRenderPosition((text->GetPosition() - GetPosition()) + m_ScreenMiddle);
 				}
 			}
 			
@@ -72,12 +72,12 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 
 void Camera::SetZoom(float32 zoom)
 {
-	m_zoom = zoom;
+	m_Zoom = zoom;
 }
 
 float32 Camera::GetZoom()
 {
-	return m_zoom;
+	return m_Zoom;
 }
 
 Vector2f Camera::GetScreenMousePosition()
@@ -93,17 +93,17 @@ Vector2f Camera::GetMouseScreenToWorldPosition()
 	Vector2f mousePosOnTarget = mp_Window->GetMousePositionOnRenderTarget();
 	Vector2f screenCenter = Vector2f{ RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT } *0.5f;
 
-	return transform.GetPosition() + (mousePosOnTarget - screenCenter) / m_zoom;
+	return m_Transform.GetPosition() + (mousePosOnTarget - screenCenter) / m_Zoom;
 } 
 
 void Camera::SetActive(bool isActive)
 {
-	m_isActive = isActive;
+	m_IsActive = isActive;
 }
 
 bool Camera::IsActive() const
 {
-	return m_isActive;
+	return m_IsActive;
 }
 
 uint64 Camera::GetId() const

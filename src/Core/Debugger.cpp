@@ -20,6 +20,16 @@
 
 namespace GCLE
 {
+	std::string WideToUtf8(const std::wstring& wide) {
+		if (wide.empty()) return{};
+
+		int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int32>(wide.size()), nullptr, 0, nullptr, nullptr);
+		std::string result(sizeNeeded, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int32>(wide.size()), result.data(), sizeNeeded, nullptr, nullptr);
+
+		return result;
+	}
+
 	Debugger& Debugger::SelfRef()
 	{
 		static Debugger dbg;
@@ -159,7 +169,7 @@ namespace GCLE
 			adapter->GetDesc1(&desc);
 
 			std::wstring ws(desc.Description);
-			std::string name(ws.begin(), ws.end());
+			std::string name = WideToUtf8(ws);
 
 			if (strcmp(name.c_str(), "Microsoft Basic Render Driver") == 0)
 			{

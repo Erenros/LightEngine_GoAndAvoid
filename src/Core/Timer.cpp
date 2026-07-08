@@ -4,6 +4,17 @@
 #include <thread>
 #include <chrono>
 
+Clock::Clock() :
+	m_TimeScale(1.0),
+	m_UnscaleTime(0.0),
+	m_Time(0.0),
+	m_DeltaTime(0.0),
+	m_UnscaleDeltaTime(0.0),
+	m_RawDeltaTime(0.f)
+{
+	m_LastUpdateTime = clock::now();
+}
+
 void Clock::Restart(float64 t) {
 	m_DeltaTime = 0.0;
 	m_UnscaleDeltaTime = 0.0;
@@ -28,10 +39,10 @@ void Clock::Update() {
     m_LastUpdateTime = t;
 
     // FPS Count
-    m_fpsTimer += static_cast<float32>(GetDeltaTime());
-    if (m_fpsTimer >= 1.f) {
-        m_fpsTimer -= 1.f;
-        m_fpsCount = static_cast<int16>(1.f / GetDeltaTime());
+    m_FpsTimer += static_cast<float32>(GetDeltaTime());
+    if (m_FpsTimer >= 1.f) {
+        m_FpsTimer -= 1.f;
+        m_FpsCount = static_cast<int16>(1.f / GetDeltaTime());
     }
 
 }
@@ -54,7 +65,7 @@ float64 Clock::GetTimeUnscaled() const {
 
 int16 Clock::GetFramePerSecond() const
 {
-    return m_fpsCount;
+    return m_FpsCount;
 }
 
 float64 Clock::GetTimeScale() const {

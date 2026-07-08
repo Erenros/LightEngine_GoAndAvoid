@@ -31,7 +31,7 @@ private :
 public:
 
 	Text* CreateText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
-	void DestroyText(Text* text);
+	void DestroyText(Text* pText);
 
 	template<typename T>
 	T* CreateEntity(gcle::Shapes shape);
@@ -44,8 +44,6 @@ public:
 
 	Camera* CreateCamera();
 
-
-	uint32 GetFlag() const { return m_flag; }
 
 	void AddDrawnTexture(const std::string&);
 	bool isDrawn(const std::string& tag);
@@ -67,15 +65,15 @@ protected:
 
 private: 
 	void Update(Clock& time) const;
-	void Draw(Window* window);
+	void Draw(Window* pWindow);
 
 
 private:
 	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
-	void	DestroyDebugText(Text* text);
+	void	DestroyDebugText(Text* pText);
 	Text*	CreateDebugInfoText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
-	void	DestroyDebugInfoText(Text* text);
-	void	DrawDebug(Window* window);
+	void	DestroyDebugInfoText(Text* pText);
+	void	DrawDebug(Window* pWindow);
 	void	SetGizmoVisibility();
 
 	void	EntityInfoVisibility(const int32 debugConstant);
@@ -85,31 +83,30 @@ private:
 
 
 protected:
-	std::string m_tag;
-	Camera* mp_mainCamera   = nullptr;
-	Camera* mp_activeCamera = nullptr;
+	std::string m_Tag;
+	Camera* mp_MainCamera   = nullptr;
+	Camera* mp_ActiveCamera = nullptr;
 
 private:
 
-	uint32 m_flag = 0;
-	std::vector<Text*> m_texts;
-	std::vector<std::string> m_activeTextures;
+	std::vector<Text*> m_Texts;
+	std::vector<std::string> m_ActiveTextures;
 
-	float32 m_test = 0;
+	float32 m_Test = 0;
 
 
 private:
 	// DEBUG
-	bool	m_debug = false;
-	int32	m_updateDebug = 0;
-	uint64	m_numberOfDraw = 0;
-	bool	m_debugPerf = false;
-	bool	m_frustrumCulling = true;
-	bool	m_isVisualDebugActive = false;
+	bool	m_Debug = false;
+	int32	m_UpdateDebug = 0;
+	uint64	m_NumberOfDraw = 0;
+	bool	m_DebugPerf = false;
+	bool	m_FrustrumCulling = true;
+	bool	m_IsVisualDebugActive = false;
 
-	std::vector<Text*>	m_debugTexts;
-	std::vector<Text*>	m_debugInfoTexts;
-	Entity*				m_selectedEntity = nullptr;
+	std::vector<Text*>	m_DebugTexts;
+	std::vector<Text*>	m_DebugInfoTexts;
+	Entity*				mp_SelectedEntity = nullptr;
 
 	Text* mp_Position			= nullptr;
 	Text* mp_PosX				= nullptr;

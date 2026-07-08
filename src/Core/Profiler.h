@@ -41,7 +41,7 @@ namespace gcle
         static float32 GetTask(std::string id);
 
     private:
-        static std::unordered_map<std::string, Task>* m_tasks;
-        static std::unordered_map<std::string, float32>* m_tasksTime;
+        static std::unordered_map<std::string, Task>* mp_Tasks;
+        static std::unordered_map<std::string, float32>* mp_TasksTime;
     };
 }

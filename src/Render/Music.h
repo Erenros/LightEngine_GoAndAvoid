@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "include.h"
 
 struct MIX_Audio;
 struct MIX_Track;
@@ -9,12 +10,12 @@ class Music
 {
 private:
 
-	MIX_Audio* mp_audio = nullptr;
-	MIX_Track* mp_track = nullptr;
+	MIX_Audio* mp_Audio = nullptr;
+	MIX_Track* mp_Track = nullptr;
 
 public:
 
-	bool IsMusicInit() { return mp_audio == nullptr ? false : true; };
+	bool IsMusicInit() ;
 
 	Music(const std::string& path);
 	Music() = default;
@@ -23,5 +24,5 @@ public:
 
 	void InitMusic(const std::string& path);
 
-	void PlayMusic(int mode);
+	void PlayMusic(int32 mode);
 };

@@ -19,20 +19,11 @@ class Clock
     Seconds m_UnscaleDeltaTime;
 
     // FPS
-    float32 m_fpsTimer = 0;
-    int16   m_fpsCount = 0;
-    Seconds m_rawDeltaTime;
+    float32 m_FpsTimer = 0;
+    int16   m_FpsCount = 0;
+    Seconds m_RawDeltaTime;
 public:
-    Clock() :
-        m_TimeScale(1.0),
-        m_UnscaleTime(0.0),
-        m_Time(0.0),
-        m_DeltaTime(0.0),
-        m_UnscaleDeltaTime(0.0),
-        m_rawDeltaTime(0.f)
-    {
-        m_LastUpdateTime = clock::now();
-    }
+    Clock();
 
     ~Clock() = default;
 
@@ -55,5 +46,4 @@ public:
 
     void ClockSleep(Seconds time);
     void SmartSleep(Seconds time);
-    void PreciseSleep(Seconds time);
 };

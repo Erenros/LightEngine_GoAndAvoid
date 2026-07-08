@@ -10,7 +10,7 @@ T* Scene::CreateEntity(gcle::Shapes shape)
 	T* new_entity = GCLE_NEW T();
 	Entity* entity = new_entity;
 
-	entity->m_activeScenes.push_back(m_tag);
+	entity->m_ActiveScenes.push_back(m_Tag);
 
 	entity->Initialize(shape);
 
@@ -26,7 +26,7 @@ T* Scene::CreateEntity()
 	T* new_entity = GCLE_NEW T();
 	Entity* entity = new_entity;
 
-	entity->m_activeScenes.push_back(m_tag);
+	entity->m_ActiveScenes.push_back(m_Tag);
 
 	entity->Initialize();
 
