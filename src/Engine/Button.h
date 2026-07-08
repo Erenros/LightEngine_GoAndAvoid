@@ -5,13 +5,15 @@
 class Button : public UI
 {
 public:
-	Button() = default;
+	Button() ;
 	~Button() = default;
-	
-	void OnClick();
-	void SetFunctions(std::vector < std::function<void* ()>> functions) { functionToCallOnActivate = functions; }
-	void AddFunction(std::function<void* ()> function) { functionToCallOnActivate.push_back(function); }
-private:
-	std::vector<std::function<void* ()>> functionToCallOnActivate;
-};
 
+	void Click() ;
+	virtual void OnClick() {};
+
+	void SetFunctions(std::vector < std::function<void()>> functions) { m_FunctionToCallOnActivate = functions; }
+	void AddFunction(std::function<void()> function) { m_FunctionToCallOnActivate.push_back(function); }
+
+private:
+	std::vector<std::function<void()>> m_FunctionToCallOnActivate;
+};

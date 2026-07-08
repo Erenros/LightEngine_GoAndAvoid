@@ -1,5 +1,9 @@
 #include "UI.h"
 
+UI::~UI()
+{
+}
+
 void UI::Initialize(gcle::Shapes shape)
 {
     GameObject::Initialize(shape);
@@ -36,4 +40,16 @@ void UI::Update(float32 dt)
     }
 
     OnUpdate();
+}
+
+void UI::OnSetPosition(float32 x, float32 y)
+{
+    if (mp_Text != nullptr) {
+        mp_Text->SetPosition(x - (mp_Text->GetSizes().x / 2), y - (mp_Text->GetSizes().y / 2));
+    }
+}
+
+void UI::SetText(const std::string& text)
+{
+    mp_Text->SetText(text);
 }

@@ -27,6 +27,7 @@ void GameObject::Update(float32 dt)
 void GameObject::SetPosition(float32 x, float32 y)
 {
     m_Transform.SetPosition({ x, y });
+    OnSetPosition(x, y);
 }
 
 void GameObject::SetRenderPosition(Vector2f v, float ratioX, float ratioY)

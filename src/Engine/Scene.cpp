@@ -208,8 +208,8 @@ void Scene::Update(Clock& time) const
 	if (InputManager::GetInstance().IsDown(LeftButton))
 	{
 		for (auto it : buttons) {
-			if (it.IsInside(mp_activeCamera->GetScreenMousePosition()))
-				it.OnClick();
+			if (it.IsInside(mp_activeCamera->GetScreenMousePosition())){}
+				it.Click();
 		}
 	}
 }
@@ -500,11 +500,14 @@ void Scene::SetDebugInfo() const
 	}
 }
 
-Button* Scene::CreateButton(gcle::Shapes shape, std::vector<std::function<void* ()>> functions)
+Button* Scene::CreateButton(gcle::Shapes shape, std::vector<std::function<void()>> functions, std::string text)
 {
 	Button* button = CreateUI<Button>(shape);
 	buttons.push_back(*button);
+	button->Initialize();
 	button->SetFunctions(functions);
+
+	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
 	return button;
 }
 

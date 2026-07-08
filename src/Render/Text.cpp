@@ -50,8 +50,11 @@ Text::~Text()
 	if (mp_texture != nullptr)
 		SDL_DestroyTexture(mp_texture);
 
-	delete mp_color;
-	delete mp_rect;
+	if (mp_color != nullptr)
+		delete mp_color;
+
+	if (mp_rect != nullptr)
+		delete mp_rect;
 }
 
 void Text::SetColor(byte r, byte g, byte b, byte a)
@@ -91,6 +94,9 @@ void Text::SetPosition(int x, int y)
 
 void Text::SetFontSize(int32 size) {
 	m_fontSize = size;
+	//mp_rect->h = size;
+	//mp_rect->w = size;
+
 	m_needToChange = true;
 }
 

@@ -11,10 +11,11 @@
 class GameObject
 {
 
-protected:
+public:
 	GameObject() = default;
 	virtual ~GameObject() = default;
 
+protected: 
 	virtual void Update(float32 dt);
 	virtual void Initialize(gcle::Shapes shape);
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
@@ -22,6 +23,7 @@ protected:
 public:
 
 	void SetPosition(float32 x, float32 y);
+	virtual void OnSetPosition(float32 x, float32 y) {};
 	void SetRenderPosition(Vector2f v, float ratioX = 0.5f, float ratioY = 0.5f);
 	void SetRenderPosition(float32 x, float32 y, float ratioX = 0.5f, float ratioY = 0.5f);
 	void SetRenderSize(int shapeType, std::vector<float32> points);
