@@ -40,6 +40,11 @@ namespace Demo
 		default:
 			break;
 		}
+
+		if (mp_Target != nullptr && mp_Target->GetCurrentAnimation() == "Death" && mp_Target->IsAnimationAtEnd())
+		{
+			mp_Target = nullptr;
+		}
 	}
 
 	void GCEnemy::UpdateState(float32 dt)
@@ -155,7 +160,7 @@ namespace Demo
 		AddAnimation("Walk", 0, 5, 3, 64, 64, 0.2f);
 		AddAnimation("Hit", 0, 3, 5, 64, 64, 0.2f);
 		AddAnimation("Death", 0, 10, 6, 64, 64, 0.25f);
-		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.25f);
+		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.35f);
 		AddAnimation("Teleport", 0, 11, 21, 64, 64, 0.25f);
 
 		AddFunctionInFrame("Appear", 11, [this]()
@@ -167,7 +172,7 @@ namespace Demo
 			{
 				if (this->GetCurrentLife() <= 0)
 				{
-					PlayAnimation("Death");
+					PlayAnimation("Death", AnimationMode::Lock, AnimationInterrupt::Force);
 				}
 			});
 
@@ -176,7 +181,7 @@ namespace Demo
 				Destroy();
 			});
 
-		PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying);
+		PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
 
 		SetPosition(100.0f, 100.0f);
 	}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Scene.h"
+#include "Tuto-GCLE/SmoothCamera.h"
 
 namespace Demo
 {
@@ -19,6 +20,8 @@ private:
 
 	Demo::GCPlayer* mp_Player = nullptr;
 	Demo::GCEnemy*  mp_Enemy  = nullptr;
+
+	Demo::SmoothCamera m_Smooth;
 
 };
 

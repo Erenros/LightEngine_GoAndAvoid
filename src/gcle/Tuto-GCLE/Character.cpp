@@ -58,10 +58,14 @@ namespace Demo
 		m_CurrentLife -= amount;
 		m_damageDuration = m_baseDamageDuration;
 
-		PlayAnimation("Hit", AnimationMode::Reverse);
-
 		if (m_CurrentLife <= 0)
+		{
+			PlayAnimation("Hit", AnimationMode::Reverse | AnimationMode::Lock);
 			Death();
+			return;
+		}
+
+		PlayAnimation("Hit", AnimationMode::Reverse);
 	}
 
 	void Character::Death()

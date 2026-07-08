@@ -2,6 +2,7 @@
 
 #include "Engine/PhysicsManager.h"
 
+
 #include "Tuto-GCLE/DemoPlayer.h"
 #include "Tuto-GCLE/GCEnemy.h"
 #include "Tuto-GCLE/Tag.h"
@@ -14,8 +15,12 @@ void DemoScene::OnInitialize()
 	SwitchCamera(pSceneCamera);
 
 	mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
+	SetSelectedEntity(mp_Player);
 
-	mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	m_Smooth.Initialize(pSceneCamera, mp_Player);
+
+
+	/*mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
 	mp_Enemy->SetTarget(mp_Player);
 	mp_Enemy->SetDetectionRange(600.0f);
 	mp_Enemy->SetAttackRange(400.0f);
@@ -27,7 +32,7 @@ void DemoScene::OnInitialize()
 
 	Demo::GCEnemy* pEnemy3 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
 	pEnemy3->SetTarget(mp_Player);
-	pEnemy3->SetPosition(200.0f, -150.0f);
+	pEnemy3->SetPosition(200.0f, -150.0f);*/
 
 
 
@@ -73,4 +78,6 @@ void DemoScene::OnInitialize()
 void DemoScene::OnUpdate(Clock& time)
 {
 	Scene::OnUpdate(time);
+
+	m_Smooth.Update(static_cast<float>(time.GetDeltaTime())); 
 }

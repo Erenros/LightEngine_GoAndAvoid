@@ -30,8 +30,10 @@ void GameManager::Loop()
 		int32 exec = 0;
 		accDt += static_cast<float32>(m_Time.GetDeltaTime());
 		
+		PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		InputManager::GetInstance().Update();
+		PROFILER_END("SceneU");
 		 
 		while (accDt >= fixedUpdateDT) 
 		{
@@ -55,9 +57,7 @@ void GameManager::Loop()
 		InputManager::GetInstance().Update();
 		PROFILER_END("Input");
 
-		PROFILER_START("SceneU", "Scene Update");
-		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		PROFILER_END("SceneU");
+		
 		 
 		PROFILER_START("SceneD", "Scene Draw");
 		for (auto& cam : m_Camera)

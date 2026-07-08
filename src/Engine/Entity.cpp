@@ -469,7 +469,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
 }
 
-void Entity::PlayAnimation(const std::string& id, AnimationMode mode)
+void Entity::PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interupt)
 {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
@@ -478,7 +478,7 @@ void Entity::PlayAnimation(const std::string& id, AnimationMode mode)
 		return;
 	}
 
-	sprite->PlayAnimation(id, mode);
+	sprite->PlayAnimation(id, mode, interupt);
 }
 
 void Entity::StopAnimation()
@@ -519,18 +519,18 @@ const std::string& Entity::GetCurrentAnimation() const
 	if (!sprite)
 	{
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
+		return std::string();
 	}
 	sprite->GetCurrentAnimation();
 }
 
-bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const
+bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
 {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
+		return false;
 	}
 	sprite->CanInterruptCurrentAnimation(interrupt);
 }
@@ -541,7 +541,7 @@ bool Entity::IsAnimationAtStart() const
 	if (!sprite)
 	{
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
+		return false;
 	}
 	sprite->IsAnimationAtStart();
 }
@@ -552,7 +552,7 @@ bool Entity::IsAnimationAtEnd() const
 	if (!sprite)
 	{
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
-		return;
+		return false;
 	}
 	sprite->IsAnimationAtEnd();
 }

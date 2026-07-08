@@ -121,13 +121,12 @@ namespace Demo
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 			});
 
-		AddFunctionInFrame("Hit", 3, [this]()
-			{
-				m_CanMove = true;
-				
+		AddFunctionInFrame("Hit", 0, [this]()
+			{				
 				if (this->GetCurrentLife() <= 0)
 				{
-					PlayAnimation("Death");
+					m_CanMove = false;
+					PlayAnimation("Death", AnimationMode::Lock, AnimationInterrupt::Force);
 				}
 			});
 
@@ -136,7 +135,7 @@ namespace Demo
 				Destroy();
 			});
 
-		PlayAnimation("Appear", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+		PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
 	}
 
 	void GCPlayer::OnCollision(Entity* collidedWith) {}
@@ -145,8 +144,7 @@ namespace Demo
 
 	void GCPlayer::Death()
 	{
-		Character::Death();
-		PlayAnimation("Death");
+		Character::Death(); 
 	}
 
 	void GCPlayer::Heal(int amount)
@@ -173,7 +171,6 @@ namespace Demo
 
 	void GCPlayer::Damage(int amount)
 	{
-		Character::Damage(amount);
-		m_CanMove = false;
+		Character::Damage(amount); 
 	}
 }

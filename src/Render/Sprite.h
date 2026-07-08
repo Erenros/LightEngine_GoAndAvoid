@@ -36,7 +36,11 @@ struct Animation
 
 };
 
-// Mode : Loop = infinite loop | IgnoreIfAlreadyPlaying = If the same animation is already playing don't override it and let it end 
+// Mode : 
+// Loop = infinite loop
+// IgnoreIfAlreadyPlaying = If the same animation is already playing don't override it and let it end 
+// Reverse = Play the animation in the reverse order
+// Lock = Animation can't be cancel unless Animation Interrupt is set to Force
 enum class AnimationMode : uint8
 {
 	None = 0,
@@ -46,6 +50,9 @@ enum class AnimationMode : uint8
 	Lock = 1 << 3
 };
 
+// Mode : 
+// Normal = Animation can be interrupt unless the AnimationMode is Lock 
+// Override the AnimationMode lock
 enum class AnimationInterrupt : uint8
 {
 	Normal,

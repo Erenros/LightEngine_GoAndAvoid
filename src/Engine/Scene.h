@@ -58,7 +58,7 @@ private:
 #ifdef _DEBUG
 public:
 	void SetDebug();
-
+	void SetSelectedEntity(Entity* pEntity);
 private:
 	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
 	void	DestroyDebugText(Text* pText);

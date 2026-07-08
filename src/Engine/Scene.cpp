@@ -131,6 +131,11 @@ void Scene::SetDebug()
 	m_Debug = true;
 }
 
+void Scene::SetSelectedEntity(Entity* pEntity)
+{
+	mp_SelectedEntity = pEntity;
+}
+
 Text* Scene::CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
 {
 	Font* font = RessourceManager::GetInstance().GetFont("Hack-Regular");
