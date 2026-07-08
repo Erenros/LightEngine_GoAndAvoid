@@ -14,33 +14,36 @@ namespace Demo
 	{
 		Character::OnUpdate();
 
-		InputManager& im = InputManager::GetInstance(); 
+		InputManager& im = InputManager::GetInstance();
 		float32 dt = static_cast<float32>(::GameManager::GetInstance().GetTime()->GetDeltaTime());
 
+		UpdateDodgeRoll(dt);
 
-		if (im.IsHeld('Q')) 
+		if (m_IsDodging)
+			return;
+
+		if (im.IsHeld('Q'))
 		{
-			GetRigidBody().AddForce({ -1, 0 }, 600, dt); 
-
+			GetRigidBody().AddForce({ -1, 0 }, 600, dt);
+			m_LastMoveDirection = { -1.0f, 0.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
-
 		}
 		if (im.IsHeld('D'))
 		{
 			GetRigidBody().AddForce({ 1, 0 }, 600, dt);
-
+			m_LastMoveDirection = { 1.0f, 0.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('S'))
 		{
 			GetRigidBody().AddForce({ 0, 1 }, 600, dt);
-
+			m_LastMoveDirection = { 0.0f, 1.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('Z'))
 		{
 			GetRigidBody().AddForce({ 0, -1 }, 600, dt);
-
+			m_LastMoveDirection = { 0.0f, -1.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
@@ -54,18 +57,48 @@ namespace Demo
 		{
 			Shoot();
 		}
+
+		if (im.IsDown(Space) && m_DodgeCooldownTimer <= 0.0f)
+		{
+			m_IsDodging = true;
+			m_DodgeTimer = m_DodgeDuration;
+			m_DodgeCooldownTimer = m_DodgeCooldown;
+
+			// I-frames pendant toute la durée du dash
+			SetInvincible(true, m_DodgeDuration);
+			SetColor({ 255, 255, 255, 140 }); // léger effet de transparence
+
+			GetRigidBody().Stop();
+			GetRigidBody().AddImpulse(m_LastMoveDirection, m_DodgeForce);
+
+			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+		}
 	}
 
-	void GCPlayer::OnDestroy()
+	void GCPlayer::UpdateDodgeRoll(float32 dt)
 	{
+		if (m_DodgeCooldownTimer > 0.0f)
+			m_DodgeCooldownTimer -= dt;
+
+		if (!m_IsDodging)
+			return;
+
+		m_DodgeTimer -= dt;
+
+		if (m_DodgeTimer <= 0.0f)
+		{
+			m_IsDodging = false;
+			SetColor(Color::White);
+		}
 	}
+
+	void GCPlayer::OnDestroy() {}
 
 	void GCPlayer::OnInitialize()
 	{
 		SetTag(GameTag::Player);
 
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
-		
 
 		SetRigidBody(true);
 		GetRigidBody().SetGravity(false);
@@ -95,22 +128,13 @@ namespace Demo
 		PlayAnimation("Appear", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 	}
 
-	void GCPlayer::OnCollision(Entity* collidedWith)
-	{
-	}
-
-	void GCPlayer::OnCollisionExit(Entity* collidedWith)
-	{
-	}
-
-	void GCPlayer::OnCollisionEnter(Entity* collidedWith)
-	{
-	}
+	void GCPlayer::OnCollision(Entity* collidedWith) {}
+	void GCPlayer::OnCollisionExit(Entity* collidedWith) {}
+	void GCPlayer::OnCollisionEnter(Entity* collidedWith) {}
 
 	void GCPlayer::Death()
 	{
 		Character::Death();
-
 		PlayAnimation("Death");
 	}
 
@@ -120,7 +144,7 @@ namespace Demo
 	}
 
 	void GCPlayer::Shoot()
-	{ 
+	{
 		::Scene* pScene = ::SceneManager::GetInstance().GetCurrentScene();
 
 		Vector2f posToGo = pScene->GetCurrentCamera()->GetMouseScreenToWorldPosition();
@@ -133,7 +157,6 @@ namespace Demo
 		pProj->SetColor(Color::Yellow);
 
 		pProj->SetSpeed(100.0f);
-
 		pProj->GoToDirection(posToGo.x, posToGo.y);
 	}
 }

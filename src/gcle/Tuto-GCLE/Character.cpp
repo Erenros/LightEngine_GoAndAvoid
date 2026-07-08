@@ -6,15 +6,27 @@ namespace Demo
 {
 	void Character::OnUpdate()
 	{
+		float32 dt = static_cast<float32>(::GameManager::GetInstance().GetTime()->GetDeltaTime());
+
 		if (m_damageDuration > 0.0f)
 		{
-			m_damageDuration -= ::GameManager::GetInstance().GetTime()->GetDeltaTime(); 
+			m_damageDuration -= dt;
 			m_wasHit = true;
 		}
 		else if (m_CurrentLife > 0 && m_wasHit)
 		{
 			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 			m_wasHit = false;
+		}
+
+		if (m_IsInvincible)
+		{
+			m_InvincibilityTimer -= dt;
+			if (m_InvincibilityTimer <= 0.0f)
+			{
+				m_IsInvincible = false;
+				m_InvincibilityTimer = 0.0f;
+			}
 		}
 	}
 
@@ -40,6 +52,9 @@ namespace Demo
 
 	void Character::Damage(int amount)
 	{
+		if (m_IsInvincible)
+			return;
+
 		m_CurrentLife -= amount;
 		m_damageDuration = m_baseDamageDuration;
 
@@ -47,7 +62,6 @@ namespace Demo
 
 		if (m_CurrentLife <= 0)
 			Death();
-
 	}
 
 	void Character::Death()
@@ -61,5 +75,16 @@ namespace Demo
 
 		if (m_CurrentLife > m_MaxLife)
 			m_CurrentLife = m_MaxLife;
+	}
+
+	void Character::SetInvincible(bool isInvincible, float duration)
+	{
+		m_IsInvincible = isInvincible;
+		m_InvincibilityTimer = duration;
+	}
+
+	bool Character::IsInvincible() const
+	{
+		return m_IsInvincible;
 	}
 }

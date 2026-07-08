@@ -22,13 +22,25 @@ namespace Demo
 
 		virtual void Shoot() {};
 
+	protected: 
+		bool IsFlinching() const { return m_wasHit; }
+
+		void SetInvincible(bool isInvincible, float duration = 0.0f);
+		bool IsInvincible() const;
+
 	private:
 		int m_MaxLife = 20.0f;
 		int m_CurrentLife = 20.0f;
 
 		float m_baseDamageDuration = 1.0f;
-		float m_damageDuration = 0.0f; 
+		float m_damageDuration = 0.0f;
 		bool m_wasHit = false;
+
+		bool  m_IsInvincible = false;
+		float m_InvincibilityTimer = 0.0f;
+
+	protected:
+		friend class DemoScene;
 	};
 
 }
