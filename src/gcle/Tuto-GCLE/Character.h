@@ -14,7 +14,7 @@ namespace Demo
 		void SetCurrentLife(int currentLife);
 
 		int GetMaxLife(int maxLife) const;
-		int GetCurrentLife(int currentLife) const;
+		int GetCurrentLife() const;
 
 		void Damage(int amount);
 		virtual void Death();
@@ -28,6 +28,7 @@ namespace Demo
 
 		float m_baseDamageDuration = 1.0f;
 		float m_damageDuration = 0.0f; 
+		bool m_wasHit = false;
 	};
 
 }

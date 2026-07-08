@@ -147,9 +147,10 @@ const std::unordered_set<Collider*>& Entity::GetColliders() const
 	return mp_Colliders;
 }
 
-Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale, bool isTrigger)
 {
 	Collider* collider = GCLE_NEW Collider();
+	collider->SetTrigger(isTrigger);
 
 	gcle::Shape* colliderShape = GetBaseShape(shape);
 

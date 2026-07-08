@@ -87,7 +87,7 @@ public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider); 
 	const std::unordered_set<Collider*>& GetColliders() const;
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale, bool isTrigger = false);
 
 public:
 	void AddActiveScene(const std::string& sceneTag);
@@ -104,9 +104,14 @@ protected:
 	virtual void OnUpdate() {};
 	virtual void OnDestroy() {};
 	virtual void OnInitialize() {};
+
 	virtual void OnCollision(Entity* pCollidedWith) {};
 	virtual void OnCollisionExit(Entity* pCollidedWith) {};
 	virtual void OnCollisionEnter(Entity* pCollidedWith) {};
+
+	virtual void OnTrigger(Entity* pOther) {};
+	virtual void OnTriggerExit(Entity* pOther) {};
+	virtual void OnTriggerEnter(Entity* pOther) {};
 
 private:
 	void Initialize();
@@ -143,6 +148,7 @@ private:
 	std::vector<std::string> m_ActiveScenes;
 	std::unordered_set<Collider*> mp_Colliders;
 	std::unordered_map<int64, Entity*> m_CollidingEntity;
+	std::unordered_map<int64, Entity*> m_TriggeringEntity;
 
 private: 
 	friend class Scene;

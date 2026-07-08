@@ -17,18 +17,18 @@ namespace Demo
 	void Projectile::OnInitialize()
 	{
 		SetRigidBody(true);
-		CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
+		CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f }, true);
 	}
 
-	void Projectile::OnCollision(Entity* collidedWith)
+	void Projectile::OnTrigger(Entity* collidedWith)
 	{
 	}
 
-	void Projectile::OnCollisionExit(Entity* collidedWith)
+	void Projectile::OnTriggerExit(Entity* collidedWith)
 	{
 	}
 
-	void Projectile::OnCollisionEnter(Entity* pEntity)
+	void Projectile::OnTriggerEnter(Entity* pEntity)
 	{
 		if (pEntity->IsTag(GameTag::Wall))
 		{

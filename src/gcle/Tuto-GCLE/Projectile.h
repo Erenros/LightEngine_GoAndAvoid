@@ -10,9 +10,9 @@ namespace Demo
 		void OnUpdate()								override;
 		void OnDestroy()							override;
 		void OnInitialize()							override;
-		void OnCollision(Entity* collidedWith)		override;
-		void OnCollisionExit(Entity* collidedWith)	override;
-		void OnCollisionEnter(Entity* collidedWith) override;
+		void OnTrigger(Entity* collidedWith)		override;
+		void OnTriggerExit(Entity* collidedWith)	override;
+		void OnTriggerEnter(Entity* collidedWith)   override;
 
 		void SetOwner(Entity* pEntity);
 		Entity* GetOwner() const;

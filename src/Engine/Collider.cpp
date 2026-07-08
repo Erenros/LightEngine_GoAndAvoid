@@ -89,3 +89,13 @@ const CollisionDirection& Collider::GetCollisionDirection() const
 
 Entity*   Collider::GetOwner() const           { return mp_Owner; }
 void      Collider::SetOwner(Entity* pOwner) { mp_Owner = pOwner; }
+
+bool Collider::IsTrigger() const
+{
+    return m_IsTrigger;
+}
+
+void Collider::SetTrigger(bool isTrigger)
+{
+    m_IsTrigger = isTrigger;
+}

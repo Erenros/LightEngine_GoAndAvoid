@@ -87,6 +87,11 @@ namespace Demo
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 			});
 
+		AddFunctionInFrame("Death", 10, [this]()
+			{
+				Destroy();
+			});
+
 		PlayAnimation("Appear", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 	}
 
@@ -106,7 +111,7 @@ namespace Demo
 	{
 		Character::Death();
 
-		Destroy();
+		PlayAnimation("Death");
 	}
 
 	void GCPlayer::Heal(int amount)

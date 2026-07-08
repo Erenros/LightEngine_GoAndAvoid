@@ -350,10 +350,30 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 	Entity* entityA = colliderA->GetOwner();
 	Entity* entityB = colliderB->GetOwner();
 
-	bool coliding = IsColliding(colliderA, colliderB); 
+	bool coliding = IsColliding(colliderA, colliderB);
+	bool isTriggerPair = colliderA->IsTrigger() || colliderB->IsTrigger(); 
 
 	if (coliding)
 	{
+		if (isTriggerPair) 
+		{
+			if (!entityA->m_TriggeringEntity.contains(entityB->GetId()))
+			{
+				entityA->OnTriggerEnter(entityB);
+				entityA->m_TriggeringEntity.insert({ entityB->GetId(), entityB });
+
+				entityB->OnTriggerEnter(entityA);
+				entityB->m_TriggeringEntity.insert({ entityA->GetId(), entityA });
+			}
+			else
+			{
+				entityA->OnTrigger(entityB);
+				entityB->OnTrigger(entityA);
+			}
+
+			return;
+		}
+
 		if (entityA->IsRigidBody() && entityB->IsRigidBody())
 		{
 			ThrowRepulse(colliderA, colliderB);
@@ -375,8 +395,9 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 
 		return;
 	}
-
-	bool needAntiTunneling = ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB);
+	 
+	bool needAntiTunneling = !isTriggerPair &&
+		(ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB));
 
 	if (needAntiTunneling)
 	{
@@ -384,6 +405,15 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 		{
 			return;
 		}
+	}
+	 
+	if (entityA->m_TriggeringEntity.contains(entityB->GetId()))
+	{
+		entityA->OnTriggerExit(entityB);
+		entityA->m_TriggeringEntity.erase(entityB->GetId());
+
+		entityB->OnTriggerExit(entityA);
+		entityB->m_TriggeringEntity.erase(entityA->GetId());
 	}
 
 	if (entityA->m_CollidingEntity.contains(entityB->GetId()))

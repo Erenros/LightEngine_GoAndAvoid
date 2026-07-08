@@ -8,12 +8,13 @@ namespace Demo
 	{
 		if (m_damageDuration > 0.0f)
 		{
-			m_damageDuration -= ::GameManager::GetInstance().GetTime()->GetDeltaTime();
-			SetColor(Color::Red);
+			m_damageDuration -= ::GameManager::GetInstance().GetTime()->GetDeltaTime(); 
+			m_wasHit = true;
 		}
-		else
+		else if (m_CurrentLife > 0 && m_wasHit)
 		{
-			SetColor(Color::White);
+			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+			m_wasHit = false;
 		}
 	}
 
@@ -32,7 +33,7 @@ namespace Demo
 		return m_MaxLife;
 	}
 
-	int Character::GetCurrentLife(int currentLife) const
+	int Character::GetCurrentLife() const
 	{
 		return m_CurrentLife;
 	}
@@ -41,6 +42,8 @@ namespace Demo
 	{
 		m_CurrentLife -= amount;
 		m_damageDuration = m_baseDamageDuration;
+
+		PlayAnimation("Hit", AnimationMode::Reverse);
 
 		if (m_CurrentLife <= 0)
 			Death();
