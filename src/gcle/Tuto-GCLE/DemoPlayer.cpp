@@ -22,34 +22,36 @@ namespace Demo
 		if (m_IsDodging)
 			return;
 
-		if (im.IsHeld('Q'))
+		if (im.IsHeld('Q') && m_CanMove)
 		{
 			GetRigidBody().AddForce({ -1, 0 }, 600, dt);
 			m_LastMoveDirection = { -1.0f, 0.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
-		if (im.IsHeld('D'))
+		if (im.IsHeld('D') && m_CanMove)
 		{
 			GetRigidBody().AddForce({ 1, 0 }, 600, dt);
 			m_LastMoveDirection = { 1.0f, 0.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
-		if (im.IsHeld('S'))
+		if (im.IsHeld('S') && m_CanMove)
 		{
 			GetRigidBody().AddForce({ 0, 1 }, 600, dt);
 			m_LastMoveDirection = { 0.0f, 1.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
-		if (im.IsHeld('Z'))
+		if (im.IsHeld('Z') && m_CanMove)
 		{
 			GetRigidBody().AddForce({ 0, -1 }, 600, dt);
 			m_LastMoveDirection = { 0.0f, -1.0f };
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
-		if (GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
-			GetRigidBody().GetVelocity().x >= -0.05f && GetRigidBody().GetVelocity().y >= -0.05f)
-		{
+		if (
+			GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
+			GetRigidBody().GetVelocity().x >= -0.05f && GetRigidBody().GetVelocity().y >= -0.05f && 
+			m_CanMove
+		){
 			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
@@ -63,10 +65,9 @@ namespace Demo
 			m_IsDodging = true;
 			m_DodgeTimer = m_DodgeDuration;
 			m_DodgeCooldownTimer = m_DodgeCooldown;
-
-			// I-frames pendant toute la durée du dash
+			 
 			SetInvincible(true, m_DodgeDuration);
-			SetColor({ 255, 255, 255, 140 }); // léger effet de transparence
+			SetColor({ 255, 255, 255, 50 }); 
 
 			GetRigidBody().Stop();
 			GetRigidBody().AddImpulse(m_LastMoveDirection, m_DodgeForce);
@@ -120,6 +121,16 @@ namespace Demo
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 			});
 
+		AddFunctionInFrame("Hit", 3, [this]()
+			{
+				m_CanMove = true;
+				
+				if (this->GetCurrentLife() <= 0)
+				{
+					PlayAnimation("Death");
+				}
+			});
+
 		AddFunctionInFrame("Death", 10, [this]()
 			{
 				Destroy();
@@ -158,5 +169,11 @@ namespace Demo
 
 		pProj->SetSpeed(100.0f);
 		pProj->GoToDirection(posToGo.x, posToGo.y);
+	}
+
+	void GCPlayer::Damage(int amount)
+	{
+		Character::Damage(amount);
+		m_CanMove = false;
 	}
 }

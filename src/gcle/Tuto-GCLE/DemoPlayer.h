@@ -18,12 +18,14 @@ namespace Demo
 		void Death()								override;
 		void Heal(int amount)						override;
 		void Shoot()								override;
-	
+		void Damage(int amount)						override;
+
 	private:
 		void UpdateDodgeRoll(float32 dt);
 
 
 	private:
+		bool	m_CanMove = true;
 		bool	m_IsDodging = false;
 		float32 m_DodgeDuration = 0.25f;
 		float32 m_DodgeTimer = 0.0f;

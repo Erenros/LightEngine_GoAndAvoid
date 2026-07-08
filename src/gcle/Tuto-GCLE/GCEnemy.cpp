@@ -122,13 +122,13 @@ namespace Demo
 
 		Projectile* pProj = pScene->CreateEntity<Projectile>(gcle::Shapes::Circle);
 		pProj->SetOwner(this);
-		pProj->SetDamage(2);
+		pProj->SetDamage(10);
 
 		pProj->SetPosition(GetPosition().x, GetPosition().y);
-		pProj->ScaleBy({ 0.3f, 0.3f });
+		pProj->ScaleBy({ 0.1f, 0.1f });
 		pProj->SetColor(Color::Red);
 
-		pProj->SetSpeed(350.0f);
+		pProj->SetSpeed(250.0f);
 		pProj->GoToDirection(worldTarget.x, worldTarget.y);
 	}
 

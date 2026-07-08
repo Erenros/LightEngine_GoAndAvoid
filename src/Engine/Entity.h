@@ -53,10 +53,14 @@ public:
 	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
 
 	void PlayAnimation(const std::string& id, AnimationMode mode = AnimationMode::IgnoreIfAlreadyPlaying);
-	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function);
-
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function); 
 	void StopAnimation(); 
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
+	const std::string& GetCurrentAnimation() const;
+	bool CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const;
+
+	bool IsAnimationAtStart() const;
+	bool IsAnimationAtEnd() const;
 
 	void SetLayer(int32 layer);
 

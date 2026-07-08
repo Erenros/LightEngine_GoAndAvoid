@@ -16,7 +16,7 @@ namespace Demo
 		int GetMaxLife(int maxLife) const;
 		int GetCurrentLife() const;
 
-		void Damage(int amount);
+		virtual void Damage(int amount);
 		virtual void Death();
 		virtual void Heal(int amount);
 

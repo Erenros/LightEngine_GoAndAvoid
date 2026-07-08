@@ -42,7 +42,14 @@ enum class AnimationMode : uint8
 	None = 0,
 	Loop = 1 << 0,
 	IgnoreIfAlreadyPlaying = 1 << 1,
-	Reverse = 1 << 2
+	Reverse = 1 << 2,
+	Lock = 1 << 3
+};
+
+enum class AnimationInterrupt : uint8
+{
+	Normal,
+	Force
 };
 
 inline AnimationMode operator|(AnimationMode a, AnimationMode b)
@@ -98,9 +105,16 @@ public:
 		int32 tileHeight, 
 		float32 duration = 0.5f);
  
-	void PlayAnimation(const std::string& id, AnimationMode mode);
+	void PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interrupt = AnimationInterrupt::Normal);
 
 	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function); 
 	void StopAnimation();  
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
+
+
+	const std::string& GetCurrentAnimation() const;
+	bool CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const;
+
+	bool IsAnimationAtStart() const;
+	bool IsAnimationAtEnd() const;
 };

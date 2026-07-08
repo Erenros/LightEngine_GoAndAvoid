@@ -49,7 +49,7 @@ void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 }
 
 
-void Sprite::PlayAnimation(const std::string& id, AnimationMode mode)
+void Sprite::PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interrupt)
 {
 	if (!m_animationMap.contains(id))
 	{
@@ -57,7 +57,11 @@ void Sprite::PlayAnimation(const std::string& id, AnimationMode mode)
 		return;
 	}
 
-	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) && m_currentAnimationId == id)
+	if (!CanInterruptCurrentAnimation(interrupt))
+		return;
+
+	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) &&
+		m_currentAnimationId == id)
 	{
 		return;
 	}
@@ -77,7 +81,6 @@ void Sprite::PlayAnimation(const std::string& id, AnimationMode mode)
 	}
 
 	m_CurrentFrameY = mp_CurrentAnimation->line;
-
 	m_Timer = 0.f;
 	m_Mode = mode;
 }
@@ -177,4 +180,36 @@ void Sprite::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	if (itFunction != anim->m_animationFunction.end()) {
 		anim->m_animationFunction.erase(itFunction);
 	}
+}
+
+const std::string& Sprite::GetCurrentAnimation() const
+{
+	return m_currentAnimationId;
+}
+
+bool Sprite::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return true;
+
+	if (interrupt == AnimationInterrupt::Force)
+		return true;
+
+	return !HasFlag(m_Mode, AnimationMode::Lock);
+}
+
+bool Sprite::IsAnimationAtStart() const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return false;
+
+	return HasFlag(m_Mode, AnimationMode::Reverse) ? m_CurrentFrameX == mp_CurrentAnimation->lastFrame : m_CurrentFrameX == mp_CurrentAnimation->firstFrame;
+}
+
+bool Sprite::IsAnimationAtEnd() const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return false;
+
+	return HasFlag(m_Mode, AnimationMode::Reverse) ? m_CurrentFrameX == mp_CurrentAnimation->firstFrame : m_CurrentFrameX == mp_CurrentAnimation->lastFrame;
 }

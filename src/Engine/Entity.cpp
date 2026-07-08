@@ -513,6 +513,50 @@ void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	sprite->RemoveFunctionInFrame(animation, frame);
 }
 
+const std::string& Entity::GetCurrentAnimation() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->GetCurrentAnimation();
+}
+
+bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->CanInterruptCurrentAnimation(interrupt);
+}
+
+bool Entity::IsAnimationAtStart() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->IsAnimationAtStart();
+}
+
+bool Entity::IsAnimationAtEnd() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return;
+	}
+	sprite->IsAnimationAtEnd();
+}
+
 void Entity::SetColor(Color color)
 {
 	mp_RenderShape->SetColor(color);
