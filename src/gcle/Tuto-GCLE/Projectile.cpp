@@ -33,32 +33,30 @@ namespace Demo
 		if (pEntity->IsTag(GameTag::Wall))
 		{
 			Destroy();
+			return;
 		}
 
-		if (pEntity->IsTag(GameTag::Player))
+		if (pEntity->IsTag(GameTag::Player) && m_OwnerTag == GameTag::Enemy)
 		{
-			if (mp_Owner->IsTag(GameTag::Enemy))
-			{
-				GCPlayer* pPlayer = static_cast<GCPlayer*>(pEntity);
-				pPlayer->Damage(m_Damage);
-				Destroy();
-			}
+			static_cast<GCPlayer*>(pEntity)->Damage(m_Damage);
+			Destroy();
 		}
 
-		if (pEntity->IsTag(GameTag::Enemy))
+		if (pEntity->IsTag(GameTag::Enemy) && m_OwnerId != pEntity->GetId())
 		{
-			if (mp_Owner->GetId() != pEntity->GetId())
-			{
-				GCEnemy* pEnemy = static_cast<GCEnemy*>(pEntity);
-				pEnemy->Damage(m_Damage);
-				Destroy();
-			}
+			static_cast<GCEnemy*>(pEntity)->Damage(m_Damage);
+			Destroy();
 		}
 	}
 
 	void Projectile::SetOwner(Entity* pEntity)
 	{
 		mp_Owner = pEntity;
+		if (pEntity != nullptr)
+		{
+			m_OwnerTag = pEntity->IsTag(GameTag::Enemy) ? GameTag::Enemy : pEntity->IsTag(GameTag::Player) ? GameTag::Player : -1;
+			m_OwnerId = pEntity->GetId();
+		}
 	}
 
 	Entity* Projectile::GetOwner() const

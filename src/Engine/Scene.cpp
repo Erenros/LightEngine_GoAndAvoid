@@ -399,12 +399,12 @@ void Scene::OnUpdate(Clock& time)
 
 		if (isActive)
 		{
-			mp_QuadTree->SetColor(255, 0, 0, 0);
+			mp_QuadTree->SetColor(255, 0, 0, 255);
 			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		}
 		else
 		{
-			mp_QuadTree->SetColor(0, 255, 0, 0);
+			mp_QuadTree->SetColor(0, 255, 0, 255);
 			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
 		} 
 	}
@@ -415,12 +415,12 @@ void Scene::OnUpdate(Clock& time)
 		if (m_FrustrumCulling)
 		{
 			m_FrustrumCulling = false;
-			mp_FrustrumCulling->SetColor(255, 0, 0, 0); 
+			mp_FrustrumCulling->SetColor(255, 0, 0, 255); 
 		}
 		else
 		{
 			m_FrustrumCulling = true;
-			mp_FrustrumCulling->SetColor(0, 255, 0, 0);
+			mp_FrustrumCulling->SetColor(0, 255, 0, 255);
 		} 
 	}
 

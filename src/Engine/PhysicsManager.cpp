@@ -136,14 +136,19 @@ PhysicsManager& PhysicsManager::GetInstance()
 
 void PhysicsManager::AddEntity(Entity* pEntity)
 {
-	EntityInfo info = { pEntity, false };
-	m_EntitiesToUpdate.push_back(info);
+	for (auto& info : m_EntitiesToUpdate)
+	{
+		if (info.entity->GetId() == pEntity->GetId())
+			return; 
+	}
+	m_EntitiesToUpdate.push_back({ pEntity, false });
 }
 
 void PhysicsManager::RemoveEntity(Entity* pEntity)
 {
 	for (auto& info : m_EntitiesToUpdate)
 	{
+		if (info.toRemove) continue; 
 		if (info.entity->GetId() == pEntity->GetId())
 		{
 			info.toRemove = true;
@@ -198,6 +203,12 @@ void PhysicsManager::EntityToUpdate(std::vector<Collider*>* pActiveColliders, st
 
 void PhysicsManager::Update(float32 dt)
 {
+	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+	{
+		if (m_EntitiesToUpdate[i].toRemove)
+			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+	}
+
 	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
 	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
 
@@ -219,27 +230,17 @@ void PhysicsManager::Update(float32 dt)
 void PhysicsManager::UpdateQuadTree(std::vector<Collider*>& activeColliders, float32 dt)
 {
 	int32 nbrTest = 0;
-
 	m_Pairs.clear();
 	m_TimeBetweenRegeneration += 1;
 
 	GenerateQuadTree(&activeColliders, dt);
-
 	MakeTreePairs(&activeColliders);
-	for (auto& pair : m_Pairs) {
 
+	for (auto& pair : m_Pairs) 
+	{
 		nbrTest += 1;
-
 		HandleCollision(pair, dt);
-
 		PendingCorrections();
-
-		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
-		{
-			if (m_EntitiesToUpdate[i].toRemove)
-				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
-		}
-
 	}
 	m_Pairs.clear();
 }
@@ -375,8 +376,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 		return;
 	}
 
-	bool needAntiTunneling =
-		ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB);
+	bool needAntiTunneling = ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB);
 
 	if (needAntiTunneling)
 	{

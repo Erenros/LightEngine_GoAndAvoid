@@ -22,32 +22,32 @@ namespace Demo
 		{
 			GetRigidBody().AddForce({ -1, 0 }, 600, dt); 
 
-			PlayAnimation("Walk");
+			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 
 		}
-		if (im.IsHeld('D')) 
+		if (im.IsHeld('D'))
 		{
-			GetRigidBody().AddForce({ 1, 0 }, 600, dt); 
+			GetRigidBody().AddForce({ 1, 0 }, 600, dt);
 
-			PlayAnimation("Walk");
+			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
-		if (im.IsHeld('S')) 
+		if (im.IsHeld('S'))
 		{
 			GetRigidBody().AddForce({ 0, 1 }, 600, dt);
 
-			PlayAnimation("Walk");
+			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
-		if (im.IsHeld('Z')) 
+		if (im.IsHeld('Z'))
 		{
 			GetRigidBody().AddForce({ 0, -1 }, 600, dt);
 
-			PlayAnimation("Walk");
+			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
 		if (GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
 			GetRigidBody().GetVelocity().x >= -0.05f && GetRigidBody().GetVelocity().y >= -0.05f)
 		{
-			PlayAnimation("Idle");
+			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
 		if (im.IsDown(LeftButton))
@@ -65,27 +65,29 @@ namespace Demo
 		SetTag(GameTag::Player);
 
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
+		
 
 		SetRigidBody(true);
 		GetRigidBody().SetGravity(false);
 		GetRigidBody().ActivateDamping(true);
 		GetRigidBody().SetDampingStrenght(0.99f);
+		GetRigidBody().SetCollisionOnContinuous();
 
 		SetTexture("player");
 
-		AddAnimation("Idle"		, 0,	3,		0,		64,		64,		0.5f);
-		AddAnimation("Walk"		, 0,	5,		3,		64,		64,		0.2f);
-		AddAnimation("Hit"		, 0,	3,		5,		64,		64,		0.2f); 
-		AddAnimation("Death"	, 0,	10,		6,		64,		64,		0.25f);
-		AddAnimation("Appear"	, 0,	11,		9,		64,		64,		0.25f);
-		AddAnimation("Teleport"	, 0,	11,		21,		64,		64,		0.25f);
+		AddAnimation("Idle", 0, 3, 0, 64, 64, 0.5f);
+		AddAnimation("Walk", 0, 5, 3, 64, 64, 0.2f);
+		AddAnimation("Hit", 0, 3, 5, 64, 64, 0.2f);
+		AddAnimation("Death", 0, 10, 6, 64, 64, 0.25f);
+		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.25f);
+		AddAnimation("Teleport", 0, 11, 21, 64, 64, 0.25f);
 
 		AddFunctionInFrame("Appear", 11, [this]()
 			{
-				PlayAnimation("Idle");
+				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 			});
 
-		PlayAnimation("Appear"); 
+		PlayAnimation("Appear", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 	}
 
 	void GCPlayer::OnCollision(Entity* collidedWith)

@@ -22,6 +22,8 @@ namespace Demo
 
 	private:
 		Entity* mp_Owner = nullptr;
+		int32   m_OwnerTag = -1;
+		int64   m_OwnerId = -1;
 
 		int m_Damage = 10;
 	};
