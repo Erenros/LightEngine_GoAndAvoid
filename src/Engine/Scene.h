@@ -17,17 +17,7 @@ class WorldText;
 
 
 class Scene
-{
-private :
-	struct DebugInformation
-	{
-		float32 Colliders	= 0;
-		float32 Entity		= 0;
-		float32 Input		= 0;
-		float32 SceneUpdate	= 0;
-		float32 Draw		= 0;
-	};
-
+{ 
 public:
 
 	Text* CreateText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
@@ -40,17 +30,14 @@ public:
 	T* CreateEntity();
 
 	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
-
-
+	 
 	Camera* CreateCamera();
-
-
+	 
 	void AddDrawnTexture(const std::string&);
 	bool isDrawn(const std::string& tag);
-
-	void SetDebug();
-
+	 
 	Camera* GetCurrentCamera();
+
 protected: 
 	Scene() = default;
 		
@@ -68,6 +55,10 @@ private:
 	void Draw(Window* pWindow);
 
 
+#ifdef _DEBUG
+public:
+	void SetDebug();
+
 private:
 	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
 	void	DestroyDebugText(Text* pText);
@@ -81,6 +72,7 @@ private:
 
 	void	SetDebugInfo() const;
 
+#endif // _DEBUG
 
 protected:
 	std::string m_Tag;
@@ -94,14 +86,15 @@ private:
 
 	float32 m_Test = 0;
 
+	bool	m_FrustrumCulling = true;
+	uint64	m_NumberOfDraw = 0;
 
+#ifdef _DEBUG
 private:
 	// DEBUG
 	bool	m_Debug = false;
 	int32	m_UpdateDebug = 0;
-	uint64	m_NumberOfDraw = 0;
 	bool	m_DebugPerf = false;
-	bool	m_FrustrumCulling = true;
 	bool	m_IsVisualDebugActive = false;
 
 	std::vector<Text*>	m_DebugTexts;
@@ -142,6 +135,7 @@ private:
 
 	Text*  mp_NumberDraw		= nullptr;
 	Text*  mp_NumberDrawP	= nullptr;
+#endif // !_DEBUG
 
 private: 
 	friend class GameManager;

@@ -93,10 +93,10 @@ namespace gcle
 
 	Color Shape::GetColor() const
 	{
-		if (m_verticies.empty() || m_verticies[0] == nullptr)
+		if (m_Verticies.empty() || m_Verticies[0] == nullptr)
 			return { 255, 255, 255, 255 };
 
-		const SDL_FColor& c = m_verticies[0]->color;
+		const SDL_FColor& c = m_Verticies[0]->color;
 
 		return
 		{
@@ -162,7 +162,7 @@ namespace gcle
 	{
 		SDL_FColor sdlColor = ToSDLColor(color);
 
-		for (SDL_Vertex* vertex : m_verticies)
+		for (SDL_Vertex* vertex : m_Verticies)
 		{
 			if (vertex != nullptr)
 			{

@@ -57,17 +57,28 @@ void Sprite::PlayAnimation(const std::string& id, AnimationMode mode)
 		return;
 	}
 
-	if (mode == AnimationMode::KeepPlaying && m_currentAnimationId == id)
+	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) && m_currentAnimationId == id)
+	{
 		return;
+	}
 
 	m_currentAnimationId = id;
+	mp_CurrentAnimation = m_animationMap[id];
 
-	mp_currentAnimation = m_animationMap[id];
-	mp_currentAnimation->m_frameId = 0;
+	if (HasFlag(mode, AnimationMode::Reverse))
+	{
+		m_CurrentFrameX = mp_CurrentAnimation->lastFrame;
+		mp_CurrentAnimation->m_frameId = mp_CurrentAnimation->lastFrame - mp_CurrentAnimation->firstFrame;
+	}
+	else
+	{
+		m_CurrentFrameX = mp_CurrentAnimation->firstFrame;
+		mp_CurrentAnimation->m_frameId = 0;
+	}
 
-	m_currentFrameX = mp_currentAnimation->m_firstFrame;
-	m_currentFrameY = mp_currentAnimation->m_line;
-	m_timer = mp_CurrentAnimation->duration; 
+	m_CurrentFrameY = mp_CurrentAnimation->line;
+
+	m_Timer = 0.f;
 	m_Mode = mode;
 }
 
@@ -77,7 +88,7 @@ void Sprite::StopAnimation()
 	m_CurrentFrameX = 0;
 	m_CurrentFrameY = 0;
 	m_Timer = 0.f;
-	m_Mode = 0;
+	m_Mode = AnimationMode::None;
 }
 
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
@@ -92,27 +103,47 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
 		return;
 
 	m_Timer = 0.f;
-	anim->frameId++;
 
-	m_CurrentFrameX++;
-	if (m_CurrentFrameX > anim->lastFrame) 
+	int32 direction = HasFlag(m_Mode, AnimationMode::Reverse) ? -1 : 1;
+
+	m_CurrentFrameX += direction;
+	anim->m_frameId += direction;
+	 
+	if (!HasFlag(m_Mode, AnimationMode::Reverse))
 	{
-		if (m_Mode == 1)
+		if (m_CurrentFrameX > anim->lastFrame)
 		{
-			StopAnimation();
-			return;
-		}
+			if (!HasFlag(m_Mode, AnimationMode::Loop))
+			{
+				StopAnimation();
+				return;
+			}
 
-		m_CurrentFrameX = anim->firstFrame;
-		anim->frameId = 0;
+			m_CurrentFrameX = anim->firstFrame;
+			anim->m_frameId = 0;
+		}
+	}
+	else
+	{
+		if (m_CurrentFrameX < anim->firstFrame)
+		{
+			if (!HasFlag(m_Mode, AnimationMode::Loop))
+			{
+				StopAnimation();
+				return;
+			}
+
+			m_CurrentFrameX = anim->lastFrame;
+			anim->m_frameId = anim->lastFrame - anim->firstFrame;
+		}
 	}
 
 
 	int32 x = m_CurrentFrameX * anim->tileW;
 	int32 y = m_CurrentFrameY * anim->tileH;
 
-	if (anim->m_animationFunction.find(anim->frameId) != anim->m_animationFunction.end()) {
-		anim->m_animationFunction[anim->frameId]();
+	if (anim->m_animationFunction.find(anim->m_frameId) != anim->m_animationFunction.end()) {
+		anim->m_animationFunction[anim->m_frameId]();
 	}
 
 	pShape->SetTextureRect(x, y, anim->tileW, anim->tileH, m_Width, m_Height);

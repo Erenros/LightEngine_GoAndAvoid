@@ -7,46 +7,6 @@
 #include "WorldText.h"
 #include "RessourceManager.h"
 
-void Scene::DrawDebug(Window* pWindow)
-{
-	constexpr Vector2f screenMiddle({ 1920.0f / 2.0f, 1080.0f / 2.0f });
-	Vector2f camOffset = mp_ActiveCamera != nullptr ? (screenMiddle - mp_ActiveCamera->GetPosition()) : Vector2f{ 0.f, 0.f };
-
-	if (m_IsVisualDebugActive)
-	{
-		for (auto& layer : GameManager::GetInstance().m_Entities)
-		{
-			for (Entity* e : layer)
-			{
-				if (!e->IsActiveIn(m_Tag))
-					continue;
-
-				for (auto& col : e->GetColliders())
-				{
-					if (col->IsActive())
-					{
-						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-						GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
-					}
-				}
-			}
-		}
-	}
-
-	if (mp_SelectedEntity != nullptr && m_DebugPerf && mp_SelectedEntity->IsActiveIn(m_Tag))
-	{
-		GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
-		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetRenderShape()); 
-
-		for (auto& col : mp_SelectedEntity->GetColliders())
-		{
-			GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-			GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset); 
-		}
-	}
-}
-
-
 void Scene::Draw(Window* pWindow) 
 {
 	m_NumberOfDraw = 0;
@@ -85,26 +45,11 @@ void Scene::Draw(Window* pWindow)
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
 		m_NumberOfDraw++;
 	}
-
-	if (m_Debug && mp_SelectedEntity != nullptr)
-	{
-		for (Text* t : m_DebugInfoTexts)
-			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
-	}
-
-	if (m_Debug && m_DebugPerf)
-	{
-		for (Text* t : m_DebugTexts)
-			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
-	}
 }
 
 Scene::~Scene()
 {
-	for (Text* t : m_Texts)
-		delete t;
-	m_Texts.clear();
-
+#ifdef _DEBUG
 	for (Text* t : m_DebugTexts)
 		delete t;
 	m_DebugTexts.clear();
@@ -112,6 +57,13 @@ Scene::~Scene()
 	for (Text* t : m_DebugInfoTexts)
 		delete t;
 	m_DebugInfoTexts.clear();
+#endif // DEBUG
+
+
+	for (Text* t : m_Texts)
+		delete t;
+	m_Texts.clear();
+
 
 	mp_MainCamera = nullptr;
 	mp_ActiveCamera = nullptr;
@@ -161,11 +113,6 @@ bool Scene::isDrawn(const std::string& tag){
 	return (std::find(m_ActiveTextures.begin(), m_ActiveTextures.end(), tag) != m_ActiveTextures.end());
 }
 
-void Scene::SetDebug()
-{
-	m_Debug = true;
-}
-
 void Scene::Update(Clock& time) const 
 { 
 	for (auto& layer : GameManager::GetInstance().m_Entities) {
@@ -175,6 +122,13 @@ void Scene::Update(Clock& time) const
 				e->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
 	} 
+}
+
+#ifdef _DEBUG
+
+void Scene::SetDebug()
+{
+	m_Debug = true;
 }
 
 Text* Scene::CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r, byte g, byte b)
@@ -216,6 +170,58 @@ void Scene::DestroyDebugInfoText(Text* pText)
 	std::erase_if(m_DebugInfoTexts, [pText](Text* t) { return t == pText; });
 	delete pText;
 }
+
+void Scene::DrawDebug(Window* pWindow)
+{
+	constexpr Vector2f screenMiddle({ 1920.0f / 2.0f, 1080.0f / 2.0f });
+	Vector2f camOffset = mp_ActiveCamera != nullptr ? (screenMiddle - mp_ActiveCamera->GetPosition()) : Vector2f{ 0.f, 0.f };
+
+	if (m_IsVisualDebugActive)
+	{
+		for (auto& layer : GameManager::GetInstance().m_Entities)
+		{
+			for (Entity* e : layer)
+			{
+				if (!e->IsActiveIn(m_Tag))
+					continue;
+
+				for (auto& col : e->GetColliders())
+				{
+					if (col->IsActive())
+					{
+						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+						GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
+					}
+				}
+			}
+		}
+	}
+
+	if (mp_SelectedEntity != nullptr && m_DebugPerf && mp_SelectedEntity->IsActiveIn(m_Tag))
+	{
+		GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
+		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetRenderShape());
+
+		for (auto& col : mp_SelectedEntity->GetColliders())
+		{
+			GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
+			GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
+		}
+	}
+
+	if (m_Debug && mp_SelectedEntity != nullptr)
+	{
+		for (Text* t : m_DebugInfoTexts)
+			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+	}
+
+	if (m_Debug && m_DebugPerf)
+	{
+		for (Text* t : m_DebugTexts)
+			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+	}
+}
+
 
 void Scene::SetGizmoVisibility()
 {
@@ -305,8 +311,33 @@ void Scene::DebugSetEntityInfo()
 	}
 }
 
+void Scene::SetDebugInfo() const
+{
+	if (m_DebugPerf && m_UpdateDebug >= 4)
+	{
+		auto FormatMs = +[](float value)
+			{
+				std::ostringstream oss;
+				oss << std::fixed << std::setprecision(2) << value;
+				return oss.str();
+			};
+
+		mp_CollidersP->SetText(FormatMs(PROFILER_GET("Colliders")) + "ms");
+		mp_EntityP->SetText(FormatMs(PROFILER_GET("Entity")) + "ms");
+		mp_InputP->SetText(FormatMs(PROFILER_GET("Input")) + "ms");
+		mp_UpdateP->SetText(FormatMs(PROFILER_GET("SceneU")) + "ms");
+		mp_DrawP->SetText(FormatMs(PROFILER_GET("SceneD")) + "ms");
+
+		mp_NumberDrawP->SetText(std::to_string(m_NumberOfDraw));
+	}
+}
+
+#endif // _DEBUG
+
 void Scene::OnInitialize()
 {
+#ifdef _DEBUG 
+
 	SetDebug();
 	mp_MainCamera = CreateCamera();
 	mp_MainCamera->SetActive(true);
@@ -347,17 +378,16 @@ void Scene::OnInitialize()
 	mp_QuadTree				= CreateDebugText("QuadTree"		, { 1300,	1000 },		25,		0  , 225, 0);
 	mp_FrustrumCulling      = CreateDebugText("FrustrumCulling"	, { 1300,	1030 },		25,		0  , 225, 0);
 
+#endif // _DEBUG
 }
 
 void Scene::OnUpdate(Clock& time)
 { 
+#ifdef _DEBUG
+	 
 	constexpr int32 DEBUG_UPDATE = 5; 
 	
-	m_UpdateDebug++;
-
-	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().x << " " << GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget().y << ENDL;
-	//GCLE_INFO << GameManager::GetInstance().GetWindow()->GetMousePosition().x << " " << GameManager::GetInstance().GetWindow()->GetMousePosition().y << ENDL;
-	//GCLE_INFO << mp_activeCamera->GetMouseScreenToWorldPosition().x << " " << mp_activeCamera->GetMouseScreenToWorldPosition().y << ENDL;
+	m_UpdateDebug++; 
 
 	if (InputManager::GetInstance().IsDown(F1))
 		m_DebugPerf = !m_DebugPerf;
@@ -376,9 +406,7 @@ void Scene::OnUpdate(Clock& time)
 		{
 			mp_QuadTree->SetColor(0, 255, 0, 0);
 			PhysicsManager::GetInstance().SetActivateQuadTree(!isActive);
-		}
-
-		
+		} 
 	}
 	
 	// Frustrum Culling
@@ -412,6 +440,7 @@ void Scene::OnUpdate(Clock& time)
 	
 	EntityInfoVisibility(DEBUG_UPDATE);
 	DebugSetEntityInfo(); 
+#endif // _DEBUG
 }
 
 void Scene::OnExit()
@@ -440,27 +469,6 @@ void Scene::SwitchCamera(Camera* pCamera)
 			cam->SetActive(true);
 			mp_ActiveCamera = cam;
 		}
-	}
-}
-
-void Scene::SetDebugInfo() const
-{
-	if (m_DebugPerf && m_UpdateDebug >= 4)
-	{
-		auto FormatMs = +[](float value)
-		{
-			std::ostringstream oss;
-			oss << std::fixed << std::setprecision(2) << value;
-			return oss.str();
-		};
-
-		mp_CollidersP->SetText(	FormatMs(PROFILER_GET("Colliders"))	+ "ms");
-		mp_EntityP->SetText(	FormatMs(PROFILER_GET("Entity"))	+ "ms");
-		mp_InputP->SetText(		FormatMs(PROFILER_GET("Input"))		+ "ms");
-		mp_UpdateP->SetText(	FormatMs(PROFILER_GET("SceneU"))	+ "ms");
-		mp_DrawP->SetText(		FormatMs(PROFILER_GET("SceneD"))	+ "ms");
-
-		mp_NumberDrawP->SetText(std::to_string(m_NumberOfDraw));
 	}
 }
 

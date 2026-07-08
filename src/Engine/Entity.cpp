@@ -499,7 +499,7 @@ void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
-	sprite->AddFunctionInFrameSprite(animation, frame, function);
+	sprite->AddFunctionInFrame(animation, frame, function);
 }
 
 void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {

@@ -100,7 +100,7 @@ namespace gcle
 		Vector2f GetScale();
 		Degrees GetRotation();
 
-		Transform2D* GetTransform() { return &m_Transform; }
+		Transform2D* GetTransform();
 		Color GetColor() const;
  
 		public:

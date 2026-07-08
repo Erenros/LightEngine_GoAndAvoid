@@ -36,11 +36,29 @@ struct Animation
 
 };
 
-enum AnimationMode
+// Mode : Loop = infinite loop | IgnoreIfAlreadyPlaying = If the same animation is already playing don't override it and let it end 
+enum class AnimationMode : uint8
 {
-	Restart,
-	KeepPlaying
+	None = 0,
+	Loop = 1 << 0,
+	IgnoreIfAlreadyPlaying = 1 << 1,
+	Reverse = 1 << 2
 };
+
+inline AnimationMode operator|(AnimationMode a, AnimationMode b)
+{
+	return static_cast<AnimationMode>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+}
+
+inline AnimationMode operator&(AnimationMode a, AnimationMode b)
+{
+	return static_cast<AnimationMode>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+}
+
+inline bool HasFlag(AnimationMode value, AnimationMode flag)
+{
+	return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
+}
 
 
 class Sprite : public Texture
@@ -59,7 +77,7 @@ private:
 	std::string m_currentAnimationId;
 	float32 m_Timer = 0.f;
 
-	int8 m_Mode = 0;
+	AnimationMode m_Mode = AnimationMode::None;
 
 public:
 	

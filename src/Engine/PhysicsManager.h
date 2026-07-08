@@ -127,9 +127,9 @@ private:
 	CollisionInfo m_ColDatas;
 
 private:
-	bool m_activateQuadTree = true;
-	bool m_dynamicQuadTreeSize = false;
-	bool m_forceQuadTreeRegen = false;
+	bool m_ActivateQuadTree = true;
+	bool m_DynamicQuadTreeSize = false;
+	bool m_ForceQuadTreeRegen = false;
 
 	Vector2f m_QuadTreePos1{ -50000, -50000 };
 	Vector2f m_QuadTreePos2{ 50000, 50000 };

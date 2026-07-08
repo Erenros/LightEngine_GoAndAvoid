@@ -52,8 +52,7 @@ public:
 
 	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
 
-	// Mode : 0 = infinite loop | 1 = play animation only 1 time
-	void PlayAnimation(const std::string& id, AnimationMode mode = AnimationMode::KeepPlaying);
+	void PlayAnimation(const std::string& id, AnimationMode mode = AnimationMode::IgnoreIfAlreadyPlaying);
 	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function);
 
 	void StopAnimation(); 

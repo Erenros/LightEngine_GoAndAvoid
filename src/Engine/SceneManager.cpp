@@ -106,9 +106,11 @@ void SceneManager::DrawCurrentScene(Window* pWindow) {
 
 void SceneManager::DrawCurrentSceneDebug(Window* pWindow)
 {
+#ifdef _DEBUG
     if (m_CurrentSceneTag != "") {
         m_Scenes[m_CurrentSceneTag]->DrawDebug(pWindow);
     }
+#endif // _DEBUG
 }
 
 void SceneManager::DeleteAllScenes()
