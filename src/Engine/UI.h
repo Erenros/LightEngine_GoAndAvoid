@@ -21,7 +21,7 @@ private:
     void OnSetPosition(float32 x, float32 y) override;
 public: 
     void SetText(const std::string& text);
-    void SetTextObject(Text* text) { mp_Text = text; }
+    void SetTextObject(Text* pText) { mp_Text = pText; }
 
     Text* GetText() { return mp_Text; }
 

@@ -28,7 +28,7 @@ public:
 
 	void SetStatic(bool isStatic);
 
-	void SetLayer(int32 layer) { m_layer = std::clamp(layer, 0, 15); };
+	void SetLayer(int32 layer) { m_Layer = std::clamp(layer, 0, 15); };
 
 protected:
 	Entity() = default;
@@ -63,7 +63,7 @@ public:
 	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 relativeRotation, Vector2f relativeScale);
 
 public:
-	bool IsWorldText() const { return m_isWorldText; }
+	bool IsWorldText() const { return m_IsWorldText; }
 
 protected:
 	int64			m_Id			= 0;
@@ -75,7 +75,7 @@ private:
 	bool m_isHighlighted	= false;
 
 protected:
-	bool m_isWorldText = false;
+	bool m_IsWorldText = false;
 
 private:
 	RigidBody2D	 m_RigidBody;

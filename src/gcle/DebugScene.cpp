@@ -74,12 +74,14 @@ void DebugScene::OnInitialize()
 		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}*/
 
-	Button* ui = CreateButton(gcle::Shapes::Rectangle, {}, "hey");
+	Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");
 	ui->SetScale({ 10, 1 });
-	ui->SetPosition(500, 200);
 	ui->GetText()->SetFontSize(300);
 	ui->GetText()->SetColor(0, 0, 0, 0);
 	ui->SetPosition(1000, 500);
+	ui->SetFunctions({});
+	//ou 
+	//ui->AddFunction();
 
 	mp_mainCamera->SetFollowing(entity1);
 

@@ -500,12 +500,11 @@ void Scene::SetDebugInfo() const
 	}
 }
 
-Button* Scene::CreateButton(gcle::Shapes shape, std::vector<std::function<void()>> functions, std::string text)
+Button* Scene::CreateButton(gcle::Shapes shape, std::string text)
 {
 	Button* button = CreateUI<Button>(shape);
 	buttons.push_back(*button);
 	button->Initialize();
-	button->SetFunctions(functions);
 
 	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
 	return button;

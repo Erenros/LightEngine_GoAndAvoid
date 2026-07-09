@@ -106,7 +106,7 @@ void GameObject::SetTexture(const std::string& id)
         return;
     mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
     if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
-        for (auto& sId : m_activeScenes)
+        for (auto& sId : m_ActiveScenes)
             SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
         if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
             std::string path = "../../assets/textures/" + id + ".png";
@@ -166,12 +166,12 @@ bool GameObject::IsInside(Vector2f position)
 
 void GameObject::AddActiveScene(const std::string& sceneTag)
 {
-    if (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end()) {
+    if (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end()) {
         std::cerr << sceneTag << "exists" << std::endl;
         return;
     }
 
-    m_activeScenes.push_back(sceneTag);
+    m_ActiveScenes.push_back(sceneTag);
     if (mp_RenderShape->GetTexture() != nullptr) {
         SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
     }
@@ -179,17 +179,17 @@ void GameObject::AddActiveScene(const std::string& sceneTag)
 
 void GameObject::RemoveActiveScene(const std::string& sceneTag)
 {
-    std::vector<std::string>::iterator it = std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag);
-    if (it == m_activeScenes.end()) {
+    std::vector<std::string>::iterator it = std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag);
+    if (it == m_ActiveScenes.end()) {
         std::cerr << sceneTag << " doesn't exists " << std::endl;
         return;
     }
-    m_activeScenes.erase(it);
+    m_ActiveScenes.erase(it);
 }
 
 bool GameObject::IsActiveIn(const std::string& sceneTag)
 {
-    return (std::find(m_activeScenes.begin(), m_activeScenes.end(), sceneTag) != m_activeScenes.end());
+    return (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end());
 }
 
 gcle::Shape* GameObject::GetBaseShape(gcle::Shapes shape)

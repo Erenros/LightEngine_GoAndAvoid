@@ -94,8 +94,8 @@ void Text::SetPosition(int x, int y)
 
 void Text::SetFontSize(int32 size) {
 	m_fontSize = size;
-	//mp_rect->h = size;
-	//mp_rect->w = size;
+	mp_rect->h = size;
+	mp_rect->w = static_cast<float32>(m_text.size()) * static_cast<float32>(size) * 0.6f;
 
 	m_needToChange = true;
 }

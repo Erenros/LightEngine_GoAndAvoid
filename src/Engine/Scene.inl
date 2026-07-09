@@ -10,7 +10,7 @@ T* Scene::CreateEntity(gcle::Shapes shape)
 	T* new_entity = GCLE_NEW T();
 	Entity* entity = new_entity;
 
-	entity->m_activeScenes.push_back(m_tag);
+	entity->m_ActiveScenes.push_back(m_tag);
 
 	entity->Initialize(shape);
 
@@ -26,7 +26,7 @@ T* Scene::CreateEntity()
 	T* new_entity = GCLE_NEW T();
 	Entity* entity = new_entity;
 
-	entity->m_activeScenes.push_back(m_tag);
+	entity->m_ActiveScenes.push_back(m_tag);
 
 	entity->Initialize();
 
@@ -43,7 +43,7 @@ T* Scene::CreateUI(gcle::Shapes shape)
 	T* new_UI = GCLE_NEW T();
 	UI* ui = new_UI;
 
-	ui->m_activeScenes.push_back(m_tag);
+	ui->m_ActiveScenes.push_back(m_tag);
 
 	ui->Initialize(shape);
 
@@ -59,7 +59,7 @@ T* Scene::CreateUI()
 	T* new_UI = GCLE_NEW T();
 	UI* ui = new_UI;
 
-	ui->m_activeScenes.push_back(m_tag);
+	ui->m_ActiveScenes.push_back(m_tag);
 
 	ui->Initialize();
 

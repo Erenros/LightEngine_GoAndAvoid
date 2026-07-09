@@ -1,7 +1,7 @@
 #include "WorldText.h"
 
 void WorldText::OnInitialize(){
-	m_isWorldText = true;
+	m_IsWorldText = true;
 }
 
 void WorldText::OnUpdate(){

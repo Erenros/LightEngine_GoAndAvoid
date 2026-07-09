@@ -45,7 +45,7 @@ public:
 	Degrees GetRotation();
 	Vector2f GetPosition();
 	Vector2f GetRenderPosition();
-	int32 GetLayer() const { return m_layer; };
+	int32 GetLayer() const { return m_Layer; };
 	Transform2D& GetTransform2D() { return m_Transform; }
 	gcle::Shape* GetRenderShape() { return mp_RenderShape; };
 
@@ -66,12 +66,12 @@ protected:
 	virtual void OnInitialize() {};
 
 protected:
-	void SetDebugLayer(int32 layer) { m_layer = std::clamp(layer, 0, 31); }
+	void SetDebugLayer(int32 layer) { m_Layer = std::clamp(layer, 0, 31); }
 
 protected:
 	Transform2D m_Transform;
 	gcle::Shape* mp_RenderShape = nullptr;
-	std::vector<std::string> m_activeScenes;
+	std::vector<std::string> m_ActiveScenes;
 
 protected:
 	int64 m_Id = 0;
@@ -79,7 +79,7 @@ protected:
 
 protected:
 	int32 m_Mask = 0;
-	int32 m_layer = 0;
+	int32 m_Layer = 0;
 
 private:
 	friend class Scene;
