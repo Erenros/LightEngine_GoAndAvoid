@@ -93,7 +93,7 @@ void Texture::InitTextureWithSurface(Window* window, Surface* surface)
 	mp_texture = texture; 
 
 	m_Id = mp_surface->GetID();
-}
+} 
 
 void Texture::InitTextureWithBuffer(Window* pWindow, Asset* pAsset)
 {

@@ -480,6 +480,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[3]->tex_coord = { u1, v1 };
@@ -493,6 +499,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[2]->tex_coord = { u1, v1 };
@@ -503,6 +515,13 @@ namespace gcle
 			float32 v0 = y / static_cast<float32>(textH);
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { (u0 + u1) * 0.5f, (v0 + v1) * 0.5f };
 			for (int i = 1; i < m_Smoothness + 1; i++)
 			{
@@ -536,6 +555,17 @@ namespace gcle
 	void Shape::SetScale(float32 scale) { SetScale({ scale, scale }); }
 
 	Shape* Rectangle::Clone() const { return GCLE_NEW Rectangle(*this); }
+
+	void Shape::SetFlip(TextureFlipMode mode)
+	{
+		m_FlipMode = mode;
+	}
+
+	TextureFlipMode Shape::GetFlip() const
+	{
+		return m_FlipMode;
+	}
+
 	Shape* Circle::Clone() const { return GCLE_NEW Circle(*this); }
 	Shape* Triangle::Clone() const { return GCLE_NEW Triangle(*this); }
 

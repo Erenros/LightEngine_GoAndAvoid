@@ -25,7 +25,7 @@ namespace Demo
 
 
 	private:
-		bool	m_CanMove = true;
+		bool	m_CanMove	= false;
 		bool	m_IsDodging = false;
 		float32 m_DodgeDuration = 0.25f;
 		float32 m_DodgeTimer = 0.0f;

@@ -437,7 +437,7 @@ void Scene::OnUpdate(Clock& time)
 
 	if (m_UpdateDebug >= 1)
 	{
-		mp_FPS->SetText(std::to_string(time.GetFramePerSecond()));
+		mp_FPS->SetText(std::to_string(time.GetFramePerSecond() + 1));
 	}
 
 	if (m_DebugPerf)

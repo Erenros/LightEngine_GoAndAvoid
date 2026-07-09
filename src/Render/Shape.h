@@ -36,6 +36,24 @@ struct Color
 	static const Color Transparent;
 };
 
+enum class TextureFlipMode : int32
+{
+	FLIP_NONE,                                                                  /*	Do not flip			*/
+	FLIP_HORIZONTAL,                                                            /*	Flip horizontally	*/
+	FLIP_VERTICAL,                                                              /*	Flip vertically		*/
+	FLIP_HORIZONTAL_AND_VERTICAL = (FLIP_HORIZONTAL | FLIP_VERTICAL)
+};
+
+inline TextureFlipMode operator|(TextureFlipMode a, TextureFlipMode b)
+{
+	return static_cast<TextureFlipMode>(static_cast<int32>(a) | static_cast<int32>(b));
+}
+
+inline bool HasFlipFlag(TextureFlipMode value, TextureFlipMode flag)
+{
+	return (static_cast<int32>(value) & static_cast<int32>(flag)) != 0;
+}
+
 namespace gcle
 {
 	enum class Shapes {
@@ -145,6 +163,13 @@ namespace gcle
 		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH);
 
 		virtual Shape* Clone() const = 0;
+
+		protected:
+			TextureFlipMode m_FlipMode = TextureFlipMode::FLIP_NONE;
+
+	public:
+		void SetFlip(TextureFlipMode mode);
+		TextureFlipMode GetFlip() const;
 	};
 
 

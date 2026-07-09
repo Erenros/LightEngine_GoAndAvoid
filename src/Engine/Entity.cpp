@@ -309,6 +309,14 @@ void Entity::SetTexture(const std::string& id)
 	RM.AddTexture(id, mp_RenderShape->GetTexture());
 }
 
+void Entity::SetTextureFlip(TextureFlipMode mode)
+{
+	if (mp_RenderShape == nullptr)
+		return;
+
+	mp_RenderShape->SetFlip(mode);
+}
+
 void Entity::SetRenderPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 	if(mp_RenderShape != nullptr)
@@ -521,7 +529,7 @@ const std::string& Entity::GetCurrentAnimation() const
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return std::string();
 	}
-	sprite->GetCurrentAnimation();
+	return sprite->GetCurrentAnimation();
 }
 
 bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
@@ -532,7 +540,7 @@ bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return false;
 	}
-	sprite->CanInterruptCurrentAnimation(interrupt);
+	return sprite->CanInterruptCurrentAnimation(interrupt);
 }
 
 bool Entity::IsAnimationAtStart() const
@@ -543,7 +551,7 @@ bool Entity::IsAnimationAtStart() const
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return false;
 	}
-	sprite->IsAnimationAtStart();
+	return sprite->IsAnimationAtStart();
 }
 
 bool Entity::IsAnimationAtEnd() const
@@ -554,7 +562,7 @@ bool Entity::IsAnimationAtEnd() const
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return false;
 	}
-	sprite->IsAnimationAtEnd();
+	return sprite->IsAnimationAtEnd();
 }
 
 void Entity::SetColor(Color color)

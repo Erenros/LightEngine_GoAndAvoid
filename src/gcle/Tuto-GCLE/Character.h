@@ -28,6 +28,9 @@ namespace Demo
 		void SetInvincible(bool isInvincible, float duration = 0.0f);
 		bool IsInvincible() const;
 
+	protected:
+		bool m_CanShoot = false;
+
 	private:
 		int m_MaxLife = 20.0f;
 		int m_CurrentLife = 20.0f;

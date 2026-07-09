@@ -24,28 +24,28 @@ namespace Demo
 
 		if (im.IsHeld('Q') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ -1, 0 }, 600, dt);
-			m_LastMoveDirection = { -1.0f, 0.0f };
+			GetRigidBody().AddForce({ -1, 0 }, 1200, dt);
+			SetTextureFlip(TextureFlipMode::FLIP_HORIZONTAL);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('D') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 1, 0 }, 600, dt);
-			m_LastMoveDirection = { 1.0f, 0.0f };
+			GetRigidBody().AddForce({ 1, 0 }, 1200, dt); 
+			SetTextureFlip(TextureFlipMode::FLIP_NONE);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('S') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 0, 1 }, 600, dt);
-			m_LastMoveDirection = { 0.0f, 1.0f };
+			GetRigidBody().AddForce({ 0, 1 }, 1200, dt); 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('Z') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 0, -1 }, 600, dt);
-			m_LastMoveDirection = { 0.0f, -1.0f };
+			GetRigidBody().AddForce({ 0, -1 }, 1200, dt); 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
+
+		m_LastMoveDirection = GetRigidBody().GetVelocity();
 
 		if (
 			GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
@@ -60,7 +60,7 @@ namespace Demo
 			Shoot();
 		}
 
-		if (im.IsDown(Space) && m_DodgeCooldownTimer <= 0.0f)
+		if (im.IsDown(Space) && m_DodgeCooldownTimer <= 0.0f && m_CanMove)
 		{
 			m_IsDodging = true;
 			m_DodgeTimer = m_DodgeDuration;
@@ -118,7 +118,9 @@ namespace Demo
 
 		AddFunctionInFrame("Appear", 11, [this]()
 			{
+				m_CanMove = true;
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+				m_CanShoot = true;
 			});
 
 		AddFunctionInFrame("Hit", 0, [this]()
@@ -127,6 +129,7 @@ namespace Demo
 				{
 					m_CanMove = false;
 					PlayAnimation("Death", AnimationMode::Lock, AnimationInterrupt::Force);
+					m_CanShoot = false;
 				}
 			});
 
@@ -154,6 +157,9 @@ namespace Demo
 
 	void GCPlayer::Shoot()
 	{
+		if (!m_CanShoot)
+			return;
+
 		::Scene* pScene = ::SceneManager::GetInstance().GetCurrentScene();
 
 		Vector2f posToGo = pScene->GetCurrentCamera()->GetMouseScreenToWorldPosition();
@@ -163,9 +169,10 @@ namespace Demo
 
 		pProj->SetPosition(GetPosition().x, GetPosition().y);
 		pProj->ScaleBy({ 0.1f, 0.1f });
-		pProj->SetColor(Color::Yellow);
+		pProj->GetTransform2D().UpdateChildPosition();
 
-		pProj->SetSpeed(100.0f);
+		pProj->SetColor(Color::Yellow);
+		pProj->SetSpeed(400.0f);
 		pProj->GoToDirection(posToGo.x, posToGo.y);
 	}
 

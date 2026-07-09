@@ -75,6 +75,11 @@ namespace Demo
 		Vector2f direction = mp_Target->GetPosition() - GetPosition();
 		direction = direction.Normalized();
 
+		if (direction.x < 0)
+			SetTextureFlip(TextureFlipMode::FLIP_HORIZONTAL);
+		else
+			SetTextureFlip(TextureFlipMode::FLIP_NONE);
+
 		GetRigidBody().AddForce(direction, m_MoveForce, dt);
 
 		PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
@@ -107,7 +112,7 @@ namespace Demo
 		{
 			m_IsTelegraphing = true;
 			m_TelegraphTimer = m_TelegraphDuration;
-			SetColor({ 255, 0, 0, 150 });
+			SetColor({ 255, 255, 255, 180 });
 		}
 	}
 
@@ -123,6 +128,9 @@ namespace Demo
 
 	void GCEnemy::ShootAt(Vector2f worldTarget)
 	{
+		if (!m_CanShoot)
+			return;
+
 		::Scene* pScene = ::SceneManager::GetInstance().GetCurrentScene();
 
 		Projectile* pProj = pScene->CreateEntity<Projectile>(gcle::Shapes::Circle);
@@ -131,9 +139,10 @@ namespace Demo
 
 		pProj->SetPosition(GetPosition().x, GetPosition().y);
 		pProj->ScaleBy({ 0.1f, 0.1f });
-		pProj->SetColor(Color::Red);
+		pProj->GetTransform2D().UpdateChildPosition();
 
-		pProj->SetSpeed(250.0f);
+		pProj->SetColor(Color::Red);
+		pProj->SetSpeed(700.0f);
 		pProj->GoToDirection(worldTarget.x, worldTarget.y);
 	}
 
@@ -156,23 +165,25 @@ namespace Demo
 
 		SetTexture("enemy");
 
-		AddAnimation("Idle", 0, 3, 0, 64, 64, 0.5f);
-		AddAnimation("Walk", 0, 5, 3, 64, 64, 0.2f);
-		AddAnimation("Hit", 0, 3, 5, 64, 64, 0.2f);
-		AddAnimation("Death", 0, 10, 6, 64, 64, 0.25f);
-		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.35f);
-		AddAnimation("Teleport", 0, 11, 21, 64, 64, 0.25f);
+		AddAnimation("Idle", 0, 3, 0, 64, 64, 0.09f);
+		AddAnimation("Walk", 0, 5, 3, 64, 64, 0.05f);
+		AddAnimation("Hit", 0, 3, 5, 64, 64, 0.05f);
+		AddAnimation("Death", 0, 10, 6, 64, 64, 0.095f);
+		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.095f);
+		AddAnimation("Teleport", 0, 11, 21, 64, 64, 0.075f);
 
 		AddFunctionInFrame("Appear", 11, [this]()
 			{
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+				m_CanShoot = true;
 			});
 
-		AddFunctionInFrame("Hit", 0, [this]()
+		AddFunctionInFrame("Hit", 2, [this]()
 			{
 				if (this->GetCurrentLife() <= 0)
 				{
 					PlayAnimation("Death", AnimationMode::Lock, AnimationInterrupt::Force);
+					m_CanShoot = false;
 				}
 			});
 
