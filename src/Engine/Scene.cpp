@@ -96,6 +96,9 @@ Camera* Scene::CreateCamera()
 
 	GameManager::GetInstance().m_Camera.push_back(pCamera);
 
+	if (mp_ActiveCamera != nullptr)
+		mp_ActiveCamera->SetActive(false);
+
 	pCamera->SetActive(true);
 	mp_ActiveCamera = pCamera;
 
@@ -107,6 +110,14 @@ void Scene::AddDrawnTexture(const std::string& textureName){
 		return;
 	}
 	m_ActiveTextures.push_back(textureName);
+}
+
+void Scene::AddActiveCamera(Camera* pCam)
+{
+	if (std::find(m_ActiveCamera.begin(), m_ActiveCamera.end(), pCam) != m_ActiveCamera.end()) {
+		return;
+	}
+	m_ActiveCamera.push_back(pCam);
 }
 
 bool Scene::isDrawn(const std::string& tag){
@@ -340,7 +351,7 @@ void Scene::SetDebugInfo() const
 #endif // _DEBUG
 
 void Scene::OnInitialize()
-{
+{ 
 #ifdef _DEBUG 
 
 	SetDebug();
@@ -453,6 +464,19 @@ void Scene::OnExit()
 
 }
 
+void Scene::OnPause()
+{
+}
+
+void Scene::OnResume()
+{
+}
+
+bool Scene::IsPaused() const
+{
+	return m_IsPaused;
+}
+
 Camera* Scene::GetMainCamera()
 {
 	return mp_MainCamera;
@@ -465,7 +489,7 @@ Camera* Scene::GetCurrentCamera()
 
 void Scene::SwitchCamera(Camera* pCamera)
 {
-	for (auto& cam : GameManager::GetInstance().m_Camera)
+	for (auto& cam : m_ActiveCamera)
 	{
 		cam->SetActive(false);
 

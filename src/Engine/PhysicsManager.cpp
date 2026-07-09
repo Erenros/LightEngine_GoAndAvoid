@@ -1399,10 +1399,19 @@ void PhysicsManager::SetDynamicQuadTreeSize(bool activate) {
 
 void PhysicsManager::SetQuadTreePos1(Vector2f pos1) {
 	m_QuadTreePos1 = pos1;
+	RebuildQuadTree();
 }
 
 void PhysicsManager::SetQuadTreePos2(Vector2f pos2) {
 	m_QuadTreePos2 = pos2;
+	RebuildQuadTree();
+}
+
+void PhysicsManager::RebuildQuadTree()
+{
+	delete mp_QuadTree;
+	mp_QuadTree = new QuadTree(m_QuadTreePos1.x, m_QuadTreePos1.y, m_QuadTreePos2.x, m_QuadTreePos2.y);
+	m_ForceQuadTreeRegen = true;
 }
 
 void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame) {

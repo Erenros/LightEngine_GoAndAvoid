@@ -460,6 +460,11 @@ bool Entity::IsActiveIn(const std::string& sceneTag) {
 	return (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end());
 }
 
+bool Entity::HasActiveScenes() const
+{
+	return !m_ActiveScenes.empty();
+}
+
 bool Entity::IsWorldText() const
 {
 	return m_IsWorldText;

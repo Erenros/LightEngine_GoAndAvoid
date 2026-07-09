@@ -12,6 +12,8 @@ Camera::~Camera()
 
 void Camera::Init(Window* pWindow)
 {
+	AddActiveScene(SceneManager::GetInstance().GetCurrentSceneTag());
+
 	m_Transform.Initialize({ 0.0f, 0.0f }, 0); 
 
 	mp_Window = pWindow;
@@ -109,4 +111,32 @@ bool Camera::IsActive() const
 uint64 Camera::GetId() const
 {
 	return m_Id;
+}
+
+void Camera::AddActiveScene(const std::string& sceneTag) {
+	if (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end()) {
+		std::cerr << sceneTag << "exists" << std::endl;
+		return;
+	}
+
+	m_ActiveScenes.push_back(sceneTag);
+	SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddActiveCamera(this);
+}
+
+void Camera::RemoveActiveScene(const std::string& sceneTag) {
+	std::vector<std::string>::iterator it = std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag);
+	if (it == m_ActiveScenes.end()) {
+		std::cerr << sceneTag << " doesn't exists " << std::endl;
+		return;
+	}
+	m_ActiveScenes.erase(it);
+}
+
+bool Camera::IsActiveIn(const std::string& sceneTag) {
+	return (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end());
+}
+
+bool Camera::HasActiveScenes() const
+{
+	return !m_ActiveScenes.empty();
 }

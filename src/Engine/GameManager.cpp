@@ -8,6 +8,8 @@
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
 
+#include <algorithm>
+
 #include <timeapi.h>
 #pragma comment(lib, "winmm.lib")
  
@@ -62,8 +64,8 @@ void GameManager::Loop()
 		PROFILER_START("SceneD", "Scene Draw");
 		for (auto& cam : m_Camera)
 		{
-			if (cam->IsActive())
-			cam->Update(m_Time, m_Entities);
+			if (cam->IsActive() && cam->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag()))
+				cam->Update(m_Time, m_Entities);
 		} 
 	
 		mp_Window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
@@ -184,6 +186,27 @@ std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
 		}
 	}
 	return results;
+}
+
+std::vector<Camera*> GameManager::GetCamerasInScene(const std::string& scene)
+{
+	std::vector<Camera*> results;
+	for (auto cam : m_Camera)
+		if (cam->IsActiveIn(scene))
+			results.push_back(cam);
+	return results;
+}
+
+void GameManager::RemoveCamera(Camera* pCamera)
+{
+	if (pCamera == nullptr)
+		return;
+
+	auto it = std::find(m_Camera.begin(), m_Camera.end(), pCamera);
+	if (it != m_Camera.end())
+		m_Camera.erase(it);
+
+	delete pCamera;
 }
 
 void GameManager::UpdateEntitySystem()

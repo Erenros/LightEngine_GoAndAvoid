@@ -91,6 +91,7 @@ public:
 	void SetDynamicQuadTreeSize(bool activate);
 	void SetQuadTreePos1(Vector2f pos1);
 	void SetQuadTreePos2(Vector2f pos2);
+	void RebuildQuadTree();
 	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
 
 private:

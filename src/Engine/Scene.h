@@ -34,9 +34,12 @@ public:
 	Camera* CreateCamera();
 	 
 	void AddDrawnTexture(const std::string&);
+	void AddActiveCamera(Camera* pCam);
 	bool isDrawn(const std::string& tag);
 	 
 	Camera* GetCurrentCamera();
+
+	bool IsPaused() const;
 
 protected: 
 	Scene() = default;
@@ -46,6 +49,8 @@ protected:
 	virtual void OnInitialize();
 	virtual void OnUpdate(Clock& time);
 	virtual void OnExit();
+	virtual void OnPause();
+	virtual void OnResume();
 
 	Camera* GetMainCamera();
 	void SwitchCamera(Camera* pCamera);
@@ -83,11 +88,14 @@ private:
 
 	std::vector<Text*> m_Texts;
 	std::vector<std::string> m_ActiveTextures;
+	std::vector<Camera*> m_ActiveCamera;
 
 	float32 m_Test = 0;
 
 	bool	m_FrustrumCulling = true;
 	uint64	m_NumberOfDraw = 0;
+
+	bool m_IsPaused = false;
 
 #ifdef _DEBUG
 private:

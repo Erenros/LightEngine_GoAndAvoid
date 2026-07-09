@@ -6,18 +6,31 @@
 template <typename S>
 Scene* SceneManager::CreateScene(const std::string& tag) {
     static_assert(std::is_base_of<Scene, S>::value, "S must be derived from Scene");
+     
+    m_SceneFactories[tag] = []() -> Scene* { return GCLE_NEW S(); };
 
     if (m_Scenes[tag] == nullptr) {
-        m_Scenes[tag] = GCLE_NEW S();
+        m_Scenes[tag] = m_SceneFactories[tag]();
         Scene* scene = m_Scenes[tag];
         scene->m_Tag = tag;
-        if (m_CurrentSceneTag == "") {
+
+        std::string previousSceneTag = m_CurrentSceneTag;
+        m_CurrentSceneTag = tag;
+
+        scene->OnInitialize();
+
+        if (previousSceneTag == "")
+        {
+            m_CurrentSceneTag = previousSceneTag;
             SetCurrentSceneWithTag(tag);
         }
-        scene->OnInitialize();        
+        else
+        {
+            m_CurrentSceneTag = previousSceneTag;
+        }
 
         return m_Scenes[tag];
     }
     std::cerr << "Scene " << tag << "already exists" << std::endl;
-    return nullptr;
+    return m_Scenes[tag];
 }

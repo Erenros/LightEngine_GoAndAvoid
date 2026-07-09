@@ -85,4 +85,7 @@ void SampleScene::OnUpdate(Clock& time)
 	{
 		pEntity->StopAnimation();
 	}
+
+	if (InputManager::GetInstance().IsDown('O'))
+		SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene", false);
 } 
