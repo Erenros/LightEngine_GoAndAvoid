@@ -11,6 +11,12 @@
 #include <timeapi.h>
 #pragma comment(lib, "winmm.lib")
 
+GameManager& GameManager::GetInstance()
+{
+	static GameManager instance;
+	return instance;
+}
+
 GameManager::~GameManager()
 {
 	UpdateEntitySystem();
@@ -49,7 +55,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 
 	for (int i = 0; i < 32; i++)
 	{
-		m_entities.push_back({});
+		m_Entities.push_back({});
 		m_UIs.push_back({});
 	}
 
@@ -58,23 +64,23 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 
 void GameManager::Loop()
 {
-	isRunning = true;
+	m_IsRunning = true;
 
 	timeBeginPeriod(1);
-	while (isRunning == true)
+	while (m_IsRunning == true)
 	{
 		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
-		m_accDt += static_cast<float32>(m_Time.GetDeltaTime());
+		accDt += static_cast<float32>(m_Time.GetDeltaTime());
 
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		InputManager::GetInstance().Update();
 
-		while (m_accDt >= fixedUpdateDT)
+		while (accDt >= fixedUpdateDT)
 		{
-			m_accDt -= static_cast<float32>(fixedUpdateDT);
-			if (m_loopTour < 1)
-				m_loopTour++;
+			accDt -= static_cast<float32>(fixedUpdateDT);
+			if (m_LoopTour < 1)
+				m_LoopTour++;
 			else
 			{
 				UpdateRigidBodies(static_cast<float32>(fixedUpdateDT));
@@ -102,31 +108,31 @@ void GameManager::Loop()
 		PROFILER_END("SceneU");
 
 		PROFILER_START("SceneD", "Scene Draw");
-		for (auto& cam : m_camera)
+		for (auto& cam : m_Camera)
 		{
 			if (cam->IsActive())
-				cam->Update(m_Time, m_entities);
+				cam->Update(m_Time, m_Entities);
 		}
 
-		mp_window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
-		mp_window->Clear();
+		mp_Window->ClearWindowWithColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
+		mp_Window->Clear();
 
-		SceneManager::GetInstance().DrawCurrentScene(mp_window);
+		SceneManager::GetInstance().DrawCurrentScene(mp_Window);
 
-		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_window);
+		SceneManager::GetInstance().DrawCurrentSceneDebug(mp_Window);
 
-		mp_window->Present();
+		mp_Window->Present();
 		PROFILER_END("SceneD");
 
 		if (Event::WindowEvent())
 		{
-			isRunning = false;
+			m_IsRunning = false;
 		}
 
 
 		float64 rawDT = m_Time.GetRawDT();
-		if (rawDT < m_fpsDT) {
-			float64 timeToSleep = m_fpsDT - rawDT;
+		if (rawDT < fpsDT) {
+			float64 timeToSleep = fpsDT - rawDT;
 			m_Time.SmartSleep(timeToSleep);
 		}
 
@@ -140,7 +146,7 @@ void GameManager::Loop()
 		// system("CLS");
 	}
 	timeEndPeriod(1);
-	isRunning = false;
+	m_IsRunning = false;
 }
 
 
@@ -234,7 +240,7 @@ void GameManager::UpdateEntitySystem()
 	for (auto it = m_EntitiesToCreate.begin(); it != m_EntitiesToCreate.end(); ++it)
 	{
 		Entity* e = *it;
-		m_entities[e->GetLayer()].push_back(*it);
+		m_Entities[e->GetLayer()].push_back(*it);
 	}
 
 	m_EntitiesToCreate.clear();
@@ -299,6 +305,11 @@ void GameManager::DestroyEverything()
 
 void GameManager::AddEntity(Entity* pEntity) { 
 	m_EntitiesToCreate.push_back(pEntity); 
+}
+
+void GameManager::AddUI(UI* ui)
+{
+	m_UIsToCreate.push_back(ui);
 }
 
 Window* GameManager::GetWindow() { 

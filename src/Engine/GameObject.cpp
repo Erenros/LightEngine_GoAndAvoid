@@ -100,19 +100,29 @@ void GameObject::SetRotation(Degrees angle)
     m_Transform.SetDegAngle(angle);
 }
 
+void GameObject::SetDebugLayer(int32 layer)
+{
+    m_Layer = std::clamp(layer, 0, 31);
+}
+
 void GameObject::SetTexture(const std::string& id)
 {
     if (mp_RenderShape == nullptr)
         return;
-    mp_RenderShape->SetTexture(RessourceManager::GetInstance().GetTexture(id));
+
+    RessourceManager& RM = RessourceManager::GetInstance();
+
     if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
         for (auto& sId : m_ActiveScenes)
             SceneManager::GetInstance().GetSceneWithTag(sId)->AddDrawnTexture(id);
-        if (RessourceManager::GetInstance().GetTexture(id)->mp_texture == nullptr) {
+        if (RM.GetSurface(id)->mp_surface == nullptr) {
             std::string path = "../../assets/textures/" + id + ".png";
-            RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, id);
+            RM.LoadSurface(GameManager::GetInstance().GetWindow(), path, id);
         }
     }
+
+    mp_RenderShape->SetTexture(GameManager::GetInstance().GetWindow(), RM.GetSurface(id));
+    RM.AddTexture(id, mp_RenderShape->GetTexture());
 }
 
 void GameObject::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration)
@@ -136,7 +146,7 @@ void GameObject::PlayAnimation(const std::string& id, int32 mode)
         return;
     }
 
-    sprite->PlayAnimation(id);
+    sprite->PlayAnimation(id, mode);
 }
 
 Vector2f GameObject::GetScale()
@@ -173,7 +183,7 @@ void GameObject::AddActiveScene(const std::string& sceneTag)
 
     m_ActiveScenes.push_back(sceneTag);
     if (mp_RenderShape->GetTexture() != nullptr) {
-        SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->id);
+        SceneManager::GetInstance().GetSceneWithTag(sceneTag)->AddDrawnTexture(mp_RenderShape->GetTexture()->GetId());
     }
 }
 
@@ -230,7 +240,7 @@ void GameObject::AddFunctionInFrame(const std::string& animation, int32 frame, s
         GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
         return;
     }
-    sprite->AddFunctionInFrame(animation, frame, function);
+    sprite->AddFunctionInFrameSprite(animation, frame, function);
 }
 
 void GameObject::RemoveFunctionInFrame(const std::string& animation, int32 frame) {

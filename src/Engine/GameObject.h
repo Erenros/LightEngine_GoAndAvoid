@@ -66,7 +66,7 @@ protected:
 	virtual void OnInitialize() {};
 
 protected:
-	void SetDebugLayer(int32 layer) { m_Layer = std::clamp(layer, 0, 31); }
+	void SetDebugLayer(int32 layer);
 
 protected:
 	Transform2D m_Transform;

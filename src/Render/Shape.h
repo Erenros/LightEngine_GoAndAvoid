@@ -90,20 +90,17 @@ namespace gcle
 
 
 	public:
-
-		virtual float32 GetWidth() { return 0.f; };
-		virtual float32 GetHeight() { return 0.f; };
-		virtual float32 GetRadius() { return 0.f; };
-		virtual int32 GetSmoothness() { return 0; };
-		virtual GameObject* GetOwner() { return mp_Owner; };
-		virtual Vector2f GetCenter() { return { 0, 0 }; };
+		virtual float32 GetWidth();
+		virtual float32 GetHeight();
+		virtual float32 GetRadius();
+		virtual int32 GetSmoothness();
+		virtual GameObject* GetOwner();
+		virtual Vector2f GetCenter();
 		virtual std::vector<SDL_FPoint*>& GetHollow();
 		virtual std::vector<Vector2f> GetTrianglePoints();
 
 
 	public:
-		//Setters 
-
 		virtual void SetRadius(float32 radius) {};
 		virtual void SetHeight(float32 height) {};
 		virtual void SetWidth(float32 width) {};

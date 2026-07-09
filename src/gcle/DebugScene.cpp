@@ -51,7 +51,7 @@ void DebugScene::OnInitialize()
 	}
 
 	//creation d'un trigger
-	/*Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	{
 		entity2->SetPosition(200, -100);
 		entity2->SetScale({ 1, 5 });
@@ -60,7 +60,7 @@ void DebugScene::OnInitialize()
 		entity2->SetRigidBody(false);
 		entity2->SetStatic(true);
 		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
-	}*/
+	}
 
 	//creation d'un sol
 	/*Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -74,18 +74,18 @@ void DebugScene::OnInitialize()
 		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}*/
 
-	Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");
-	ui->SetScale({ 10, 1 });
-	ui->GetText()->SetFontSize(300);
-	ui->GetText()->SetColor(0, 0, 0, 0);
-	ui->SetPosition(1000, 500);
-	ui->SetFunctions({});
+	//Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");
+	//ui->SetScale({ 10, 1 });
+	//ui->GetText()->SetFontSize(300);
+	//ui->GetText()->SetColor(0, 0, 0, 0);
+	//ui->SetPosition(1000, 500);
+	//ui->SetFunctions({});
 	//ou 
 	//ui->AddFunction();
 
 	mp_MainCamera->SetFollowing(entity1);
 
-	pSceneCamera = CreateCamera();
+	//pSceneCamera = CreateCamera();
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
 	PhysicsManager::GetInstance().SetActivateQuadTree(true);

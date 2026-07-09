@@ -53,10 +53,9 @@ public:
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
 	void Brake(float32 dt);
+	void SetBrakeDeceleration(float32 deceleration);
 
-	// void SetFriction(Vector2f velocityFrictionFactor) { m_Friction = velocityFrictionFactor; }
-
-	void SetFriction(Vector2f velocityFrictionFactor)
+	void SetFriction(Vector2f velocityFrictionFactor);
 	void SetFrictionOnXAxis(float32 strenght);
 	void SetFrictionOnYAxis(float32 strenght);
 

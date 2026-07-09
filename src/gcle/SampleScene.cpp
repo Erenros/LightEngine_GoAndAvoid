@@ -71,18 +71,5 @@ void SampleScene::OnUpdate(Clock& time)
 	if (InputManager::GetInstance().IsDown('A'))
 	{
 		pEntity->PlayAnimation("anim2", 1);
-		/*if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
-		{
-			SwitchCamera(mp_MainCamera);
-		}
-		else
-		{
-			SwitchCamera(pSceneCamera);
-		} */
-	}
-
-	if (InputManager::GetInstance().IsDown('E'))
-	{
-		pEntity->StopAnimation();
 	}
 } 

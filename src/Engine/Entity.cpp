@@ -52,11 +52,6 @@ void Entity::Initialize()
 
 }
 
-void Entity::SetDebugLayer(int32 layer)
-{
-	m_Layer = std::clamp(layer, 0, 31);
-}
-
 void Entity::Update(float32 dt)
 {
 	if (m_RigidBody.IsActive())
@@ -127,7 +122,7 @@ void Entity::SetRigidBody(bool isRigidBody)
 {
 	m_RigidBody.SetActive(isRigidBody);
 
-	m_isHighlighted = isRigidBody;
+	m_IsHighlighted = isRigidBody;
 }
 
 void Entity::SetStatic(bool isStatic)

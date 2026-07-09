@@ -34,10 +34,10 @@ public:
 
 	Clock* GetTime();
 
-	void SetWindowClearColor(Color color) { m_ClearColor = color; }
+	void SetWindowClearColor(Color color);
 
-	void AddEntity(Entity* entity) { m_EntitiesToCreate.push_back(entity); };
-	void AddUI(UI* ui) { m_UIsToCreate.push_back(ui); };
+	void AddEntity(Entity* entity);
+	void AddUI(UI* ui);
 
 	void UpdateRigidBodies(float32 dt);
 	
@@ -45,6 +45,7 @@ public:
 
 	std::vector<Entity*> GetActiveEntities(const std::string& scene);
 	std::vector<UI*> GetActiveUIs(const std::string& scene);
+
 private:
 	void UpdateEntitySystem();
 	void UpdateUISystem();

@@ -43,7 +43,7 @@ T* Scene::CreateUI(gcle::Shapes shape)
 	T* new_UI = GCLE_NEW T();
 	UI* ui = new_UI;
 
-	ui->m_ActiveScenes.push_back(m_tag);
+	ui->m_ActiveScenes.push_back(m_Tag);
 
 	ui->Initialize(shape);
 
@@ -59,7 +59,7 @@ T* Scene::CreateUI()
 	T* new_UI = GCLE_NEW T();
 	UI* ui = new_UI;
 
-	ui->m_ActiveScenes.push_back(m_tag);
+	ui->m_ActiveScenes.push_back(m_Tag);
 
 	ui->Initialize();
 

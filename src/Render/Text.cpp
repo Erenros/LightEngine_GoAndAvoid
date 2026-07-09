@@ -21,7 +21,7 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
 	}
 
 
-	//SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
+	//SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_Text.c_str(), *mp_color);
 	int32 width = 0;
 	int32 height = 0;
 
@@ -123,8 +123,8 @@ void Text::SetPosition(int32 x, int32 y)
 void Text::SetFontSize(int32 size) {
 	m_FontSize = size;
 	
-	mp_rect->h = size;
-	mp_rect->w = static_cast<float32>(m_text.size()) * static_cast<float32>(size) * 0.6f;
+	mp_Rect->h = size;
+	mp_Rect->w = static_cast<float32>(m_Text.size()) * static_cast<float32>(size) * 0.6f;
 
 	m_NeedToChange = true;
 }

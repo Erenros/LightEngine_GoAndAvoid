@@ -152,11 +152,6 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	}
 }
 
-void RigidBody2D::SetDampingStrenght(float32 strenght)
-{
-	m_Friction = { strenght, strenght };
-}
-
 Vector2f RigidBody2D::CalculateNextPosition(float32 dt)
 {
 	Vector2f pos = mp_Transform->GetPosition();
@@ -237,11 +232,18 @@ void RigidBody2D::ZeroVelocityY() {
 	m_Velocity.y = 0; 
 }
 
-void RigidBody2D::SetFrictionOnXAxis(float32 strenght) { 
-m_Friction.x = strenght; 
+void RigidBody2D::SetFriction(Vector2f velocityFrictionFactor)
+{
+	m_Friction = velocityFrictionFactor;
 }
 
-void RigidBody2D::SetFrictionOnYAxis(float32 strenght) { 
+void RigidBody2D::SetFrictionOnXAxis(float32 strenght) 
+{
+	m_Friction.x = strenght; 
+}
+
+void RigidBody2D::SetFrictionOnYAxis(float32 strenght) 
+{ 
 	m_Friction.y = strenght; 
 }
 

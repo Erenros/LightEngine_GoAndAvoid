@@ -4,6 +4,8 @@
 
 namespace gcle
 {
+#pragma region Shape
+
 	SDL_FColor ToSDLColor(Color c)
 	{
 		return SDL_FColor{ c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, c.a / 255.0f };
@@ -59,50 +61,6 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-
-	Vector2f Shape::GetPosition(float32 ratioX, float32 ratioY)
-	{
-		Vector2f pivot = m_Transform.GetPosition();
-
-		if (m_Shape == Shapes::Circle)
-		{
-			float32 size = GetRadius() * 2.f;
-			Vector2f topLeft = { pivot.x - size * 0.5f, pivot.y - size * 0.5f };
-			return { topLeft.x + size * ratioX, topLeft.y + size * ratioY };
-		}
-		else if (m_Shape == Shapes::Rectangle)
-		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			Vector2f topLeft = { pivot.x - sizeX * 0.5f, pivot.y - sizeY * 0.5f };
-			return { topLeft.x + sizeX * ratioX, topLeft.y + sizeY * ratioY };
-		}
-
-		return pivot;
-	}
-
-	void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
-	{
-		Vector2f newPivot = { x, y };
-
-		if (m_Shape == Shapes::Circle)
-		{
-			float32 size = GetRadius() * 2.f;
-			newPivot.x = x - size * ratioX + size * 0.5f;
-			newPivot.y = y - size * ratioY + size * 0.5f;
-		}
-		else if (m_Shape == Shapes::Rectangle)
-		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			newPivot.x = x - sizeX * ratioX + sizeX * 0.5f;
-			newPivot.y = y - sizeY * ratioY + sizeY * 0.5f;
-		}
-
-		m_Transform.SetPosition(newPivot);
-		m_Center = newPivot;
-	}
-
 	void Shape::Move(Vector2f translation)
 	{
 		Vector2f pivot = m_Transform.GetPosition();
@@ -111,20 +69,10 @@ namespace gcle
 		m_Center.y += translation.y;
 	}
 
-	void Shape::SetScale(Vector2f scale)
-	{
-		m_Transform.SetScale(scale);
-	}
-
 	void Shape::ScaleBy(Vector2f factor)
 	{
 		Vector2f current = m_Transform.GetScale();
 		m_Transform.SetScale({ current.x * factor.x, current.y * factor.y });
-	}
-
-	void Shape::SetRotation(Degrees angle)
-	{
-		m_Transform.SetDegAngle(angle);
 	}
 
 	void Shape::Rotate(Degrees delta)
@@ -152,17 +100,9 @@ namespace gcle
 		m_Transform.ClearDirty();
 	}
 
-	std::vector<SDL_FPoint*>& Shape::GetHollow()
-	{
-		UpdateRenderVertices();
-		return m_HollowPoints;
-	}
+#pragma endregion
 
-	std::vector<SDL_Vertex*>& Shape::GetVerticies()
-	{
-		UpdateRenderVertices();
-		return m_Verticies;
-	} 
+#pragma region Rectangle
 
 	Rectangle::Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, GameObject* owner) : Shape(owner)
 	{
@@ -210,45 +150,14 @@ namespace gcle
 		}
 	}
 
-	std::vector<SDL_FPoint*>& Rectangle::GetHollow()
-	{
-		UpdateRenderVertices();
-
-		if (m_DebugContour.size() != 5)
-			m_DebugContour.resize(5);
-
-		m_DebugContour[0] = m_HollowPoints[0];
-		m_DebugContour[1] = m_HollowPoints[1];
-		m_DebugContour[2] = m_HollowPoints[3];
-		m_DebugContour[3] = m_HollowPoints[2];
-		m_DebugContour[4] = m_HollowPoints[0];
-
-		return m_DebugContour;
+	Shape* Rectangle::Clone() const
+	{ 
+		return GCLE_NEW Rectangle(*this); 
 	}
 
-	void Rectangle::SetHeight(float32 height)
-	{
-		m_Height = height;
-		m_LocalPositions = {
-			{ -m_Width * 0.5f, -m_Height * 0.5f },
-			{  m_Width * 0.5f, -m_Height * 0.5f },
-			{ -m_Width * 0.5f,  m_Height * 0.5f },
-			{  m_Width * 0.5f,  m_Height * 0.5f }
-		};
-		m_Transform.SetDirty();
-	}
+#pragma endregion
 
-	void Rectangle::SetWidth(float32 width)
-	{
-		m_Width = width;
-		m_LocalPositions = {
-			{ -m_Width * 0.5f, -m_Height * 0.5f },
-			{  m_Width * 0.5f, -m_Height * 0.5f },
-			{ -m_Width * 0.5f,  m_Height * 0.5f },
-			{  m_Width * 0.5f,  m_Height * 0.5f }
-		};
-		m_Transform.SetDirty();
-	}
+#pragma region Circle
 
 	Triangle::Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, GameObject* owner) : Shape(owner)
 	{
@@ -297,45 +206,14 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-	void Triangle::SetTrianglePoints(std::vector<Vector2f> newTrianglePoints)
+	Shape* Triangle::Clone() const
 	{
-		if (newTrianglePoints.size() < 3)
-			return;
-
-		m_TrianglePoints = newTrianglePoints;
-
-		float32 minX = std::min({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
-		float32 maxX = std::max({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
-		float32 minY = std::min({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
-		float32 maxY = std::max({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
-		Vector2f pivot = { (minX + maxX) * 0.5f, (minY + maxY) * 0.5f };
-
-		m_Transform.SetPosition(pivot);
-		m_Center = pivot;
-
-		m_LocalPositions.clear();
-		for (int i = 0; i < 3; i++)
-		{
-			m_LocalPositions.push_back({ newTrianglePoints[i].x - pivot.x, newTrianglePoints[i].y - pivot.y });
-		}
-
-		m_Transform.SetDirty();
+		return GCLE_NEW Triangle(*this);
 	}
 
-	std::vector<SDL_FPoint*>& Triangle::GetHollow()
-	{
-		UpdateRenderVertices();
+#pragma endregion
 
-		if (m_DebugContour.size() != 4)
-			m_DebugContour.resize(4);
-
-		m_DebugContour[0] = m_HollowPoints[0];
-		m_DebugContour[1] = m_HollowPoints[1];
-		m_DebugContour[2] = m_HollowPoints[2];
-		m_DebugContour[3] = m_HollowPoints[0]; 
-
-		return m_DebugContour;
-	}
+#pragma region Triangle
 
 	Circle::Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, GameObject* owner) : Shape(owner)
 	{
@@ -399,37 +277,17 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
-	std::vector<SDL_FPoint*>& Circle::GetHollow()
+	Shape* Circle::Clone() const
 	{
-		UpdateRenderVertices();
-
-		int32 count = m_Smoothness + 1; 
-
-		if (static_cast<int32>(m_DebugContour.size()) != count)
-			m_DebugContour.resize(count);
-
-		for (int32 i = 0; i < m_Smoothness; i++)
-			m_DebugContour[i] = m_HollowPoints[i + 1]; 
-
-		m_DebugContour[m_Smoothness] = m_HollowPoints[1]; 
-
-		return m_DebugContour;
+		return GCLE_NEW Circle(*this);
 	}
 
-	void Circle::SetRadius(float32 radius)
-	{
-		m_Radius = radius;
+#pragma endregion
 
-		Degrees degreesBetweenPoints = 360.0f / m_Smoothness;
 
-		for (int32 i = 0; i < m_Smoothness; i++)
-		{
-			Radians rad = MathGC::DegToRad(degreesBetweenPoints * i);
-			m_LocalPositions[i + 1] = { sin(rad) * radius, cos(rad) * radius };
-		}
+#pragma region Sets
 
-		m_Transform.SetDirty();
-	}
+#pragma region Shape
 
 	void Shape::SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH)
 	{
@@ -473,32 +331,243 @@ namespace gcle
 		}
 	}
 
-	Shapes Shape::GetShape() { return m_Shape; };
-	Vector2f  Shape::GetOrigin() { return m_Origin; }
-	Sprite* Shape::GetTexture() { return (mp_Texture == nullptr ? nullptr : mp_Texture); };
-	std::vector<int32>& Shape::GetIndicies() { return m_Indicies; };
+	void Shape::SetTexture(Window* window, SurfaceStruct* pSurface) 
+	{ 
+		mp_Texture = new Sprite(window, pSurface->mp_surface); 
+	}
 
-	Vector2f Shape::GetScale() { return m_Transform.GetScale(); }
-	Degrees Shape::GetRotation() { return m_Transform.GetDegAngle(); }
+	void Shape::SetOrigin(Vector2f origin)
+	{
+		m_Origin = origin;
+	}
 
-	Transform2D* Shape::GetTransform() { return &m_Transform; }
+	void Shape::SetScale(float32 scale) 
+	{ 
+		m_Transform.SetScale({ scale, scale });
+	}
 
-	float32 Shape::GetWidth() { return 0.f; };
-	float32 Shape::GetHeight() { return 0.f; };
-	float32 Shape::GetRadius() { return 0.f; };
-	int32 Shape::GetSmoothness() { return 0; };
-	Entity* Shape::GetOwner() { return mp_Owner; };
-	Vector2f Shape::GetCenter() { return { 0, 0 }; };
+	void Shape::SetScale(Vector2f scale) 
+	{ 
+		m_Transform.SetScale(scale);
+	}
 
-	std::vector<Vector2f> Shape::GetTrianglePoints() { return m_TrianglePoints; };
+	void Shape::SetRotation(Degrees angle)
+	{
+		m_Transform.SetDegAngle(angle);
+	}
 
-	void Shape::SetTexture(Window* window, SurfaceStruct* pSurface) { mp_Texture = new Sprite(window, pSurface->mp_surface); }
-	void Shape::SetOrigin(Vector2f origin) { m_Origin = origin; }
-	void Shape::SetScale(float32 scale) { SetScale({ scale, scale }); }
+	void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
+	{
+		Vector2f newPivot = { x, y };
 
-	Shape* Rectangle::Clone() const { return GCLE_NEW Rectangle(*this); }
-	Shape* Circle::Clone() const { return GCLE_NEW Circle(*this); }
-	Shape* Triangle::Clone() const { return GCLE_NEW Triangle(*this); }
+		if (m_Shape == Shapes::Circle)
+		{
+			float32 size = GetRadius() * 2.f;
+			newPivot.x = x - size * ratioX + size * 0.5f;
+			newPivot.y = y - size * ratioY + size * 0.5f;
+		}
+		else if (m_Shape == Shapes::Rectangle)
+		{
+			float32 sizeX = GetWidth();
+			float32 sizeY = GetHeight();
+			newPivot.x = x - sizeX * ratioX + sizeX * 0.5f;
+			newPivot.y = y - sizeY * ratioY + sizeY * 0.5f;
+		}
+
+		m_Transform.SetPosition(newPivot);
+		m_Center = newPivot;
+	}
+
+#pragma endregion
+
+#pragma region Rectangle
+
+	void Rectangle::SetHeight(float32 height)
+	{
+		m_Height = height;
+		m_LocalPositions = {
+			{ -m_Width * 0.5f, -m_Height * 0.5f },
+			{  m_Width * 0.5f, -m_Height * 0.5f },
+			{ -m_Width * 0.5f,  m_Height * 0.5f },
+			{  m_Width * 0.5f,  m_Height * 0.5f }
+		};
+		m_Transform.SetDirty();
+	}
+
+	void Rectangle::SetWidth(float32 width)
+	{
+		m_Width = width;
+		m_LocalPositions = {
+			{ -m_Width * 0.5f, -m_Height * 0.5f },
+			{  m_Width * 0.5f, -m_Height * 0.5f },
+			{ -m_Width * 0.5f,  m_Height * 0.5f },
+			{  m_Width * 0.5f,  m_Height * 0.5f }
+		};
+		m_Transform.SetDirty();
+	}
+
+#pragma endregion
+
+#pragma region Circle
+
+	void Circle::SetRadius(float32 radius)
+	{
+		m_Radius = radius;
+
+		Degrees degreesBetweenPoints = 360.0f / m_Smoothness;
+
+		for (int32 i = 0; i < m_Smoothness; i++)
+		{
+			Radians rad = MathGC::DegToRad(degreesBetweenPoints * i);
+			m_LocalPositions[i + 1] = { sin(rad) * radius, cos(rad) * radius };
+		}
+
+		m_Transform.SetDirty();
+	}
+
+#pragma endregion
+
+#pragma region Triangle
+
+	void Triangle::SetTrianglePoints(std::vector<Vector2f> newTrianglePoints)
+	{
+		if (newTrianglePoints.size() < 3)
+			return;
+
+		m_TrianglePoints = newTrianglePoints;
+
+		float32 minX = std::min({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
+		float32 maxX = std::max({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
+		float32 minY = std::min({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
+		float32 maxY = std::max({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
+		Vector2f pivot = { (minX + maxX) * 0.5f, (minY + maxY) * 0.5f };
+
+		m_Transform.SetPosition(pivot);
+		m_Center = pivot;
+
+		m_LocalPositions.clear();
+		for (int i = 0; i < 3; i++)
+		{
+			m_LocalPositions.push_back({ newTrianglePoints[i].x - pivot.x, newTrianglePoints[i].y - pivot.y });
+		}
+
+		m_Transform.SetDirty();
+	}
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Gets
+
+#pragma region Shape
+
+	Shapes Shape::GetShape()
+	{
+		return m_Shape;
+	};
+
+	Vector2f  Shape::GetOrigin()
+	{
+		return m_Origin;
+	}
+
+	Vector2f Shape::GetPosition(float32 ratioX, float32 ratioY)
+	{
+		Vector2f pivot = m_Transform.GetPosition();
+
+		if (m_Shape == Shapes::Circle)
+		{
+			float32 size = GetRadius() * 2.f;
+			Vector2f topLeft = { pivot.x - size * 0.5f, pivot.y - size * 0.5f };
+			return { topLeft.x + size * ratioX, topLeft.y + size * ratioY };
+		}
+		else if (m_Shape == Shapes::Rectangle)
+		{
+			float32 sizeX = GetWidth();
+			float32 sizeY = GetHeight();
+			Vector2f topLeft = { pivot.x - sizeX * 0.5f, pivot.y - sizeY * 0.5f };
+			return { topLeft.x + sizeX * ratioX, topLeft.y + sizeY * ratioY };
+		}
+
+		return pivot;
+	}
+
+	Vector2f Shape::GetScale()
+	{
+		return m_Transform.GetScale();
+	}
+
+	Sprite* Shape::GetTexture()
+	{
+		return (mp_Texture == nullptr ? nullptr : mp_Texture);
+	};
+
+	Degrees Shape::GetRotation()
+	{
+		return m_Transform.GetDegAngle();
+	}
+
+	Transform2D* Shape::GetTransform()
+	{
+		return &m_Transform;
+	}
+
+	GameObject* Shape::GetOwner()
+	{
+		return mp_Owner;
+	};
+
+	float32 Shape::GetWidth() 
+	{ 
+		return 0.f; 
+	};
+
+	float32 Shape::GetHeight() 
+	{ 
+		return 0.f;
+	};
+
+	float32 Shape::GetRadius()
+	{
+		return 0.f; 
+	};
+
+	int32 Shape::GetSmoothness() 
+	{
+		return 0;
+	};
+
+	Vector2f Shape::GetCenter()
+	{ 
+		return { 0, 0 };
+	};
+
+	std::vector<int32>& Shape::GetIndicies()
+	{
+		return m_Indicies;
+	};
+
+	std::vector<Vector2f> Shape::GetTrianglePoints()
+	{
+		return m_TrianglePoints;
+	};
+	
+	std::vector<SDL_FPoint*>& Shape::GetHollow()
+	{
+		UpdateRenderVertices();
+		return m_HollowPoints;
+	}
+
+	std::vector<SDL_Vertex*>& Shape::GetVerticies()
+	{
+		UpdateRenderVertices();
+		return m_Verticies;
+	}
+
+#pragma endregion
+
+#pragma region Rectangle
 
 	float32 Rectangle::GetHeight() {
 		return m_Height * m_Transform.GetScale().y;
@@ -509,8 +578,79 @@ namespace gcle
 		return m_Width * m_Transform.GetScale().x;
 	}
 
-	float32 Circle::GetRadius() { return m_Radius * m_Transform.GetScale().x; };
-	int32 Circle::GetSmoothness() { return m_Smoothness; };
-	Vector2f Circle::GetCenter() { return m_Center; };
+	std::vector<SDL_FPoint*>& Rectangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_DebugContour.size() != 5)
+			m_DebugContour.resize(5);
+
+		m_DebugContour[0] = m_HollowPoints[0];
+		m_DebugContour[1] = m_HollowPoints[1];
+		m_DebugContour[2] = m_HollowPoints[3];
+		m_DebugContour[3] = m_HollowPoints[2];
+		m_DebugContour[4] = m_HollowPoints[0];
+
+		return m_DebugContour;
+	}
+
+#pragma endregion
+
+#pragma region Circle
+
+	float32 Circle::GetRadius() 
+	{
+		return m_Radius * m_Transform.GetScale().x; 
+	};
+
+	int32 Circle::GetSmoothness() 
+	{ 
+		return m_Smoothness; 
+	};
+
+	Vector2f Circle::GetCenter() 
+	{ 
+		return m_Center; 
+	};
+
+	std::vector<SDL_FPoint*>& Circle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		int32 count = m_Smoothness + 1;
+
+		if (static_cast<int32>(m_DebugContour.size()) != count)
+			m_DebugContour.resize(count);
+
+		for (int32 i = 0; i < m_Smoothness; i++)
+			m_DebugContour[i] = m_HollowPoints[i + 1];
+
+		m_DebugContour[m_Smoothness] = m_HollowPoints[1];
+
+		return m_DebugContour;
+	}
+
+#pragma endregion
+
+#pragma region Triangle
+
+	std::vector<SDL_FPoint*>& Triangle::GetHollow()
+	{
+		UpdateRenderVertices();
+
+		if (m_DebugContour.size() != 4)
+			m_DebugContour.resize(4);
+
+		m_DebugContour[0] = m_HollowPoints[0];
+		m_DebugContour[1] = m_HollowPoints[1];
+		m_DebugContour[2] = m_HollowPoints[2];
+		m_DebugContour[3] = m_HollowPoints[0];
+
+		return m_DebugContour;
+	}
+
+#pragma endregion
+
+#pragma endregion
 
 }
