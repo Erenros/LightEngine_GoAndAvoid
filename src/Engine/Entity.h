@@ -37,9 +37,9 @@ protected:
 	virtual void OnUpdate() {};
 	virtual void OnDestroy() {};
 	virtual void OnInitialize() {};
-	virtual void OnCollision(Entity* collidedWith) {};
-	virtual void OnCollisionExit(Entity* collidedWith) {};
-	virtual void OnCollisionEnter(Entity* collidedWith) {};
+	virtual void OnCollision(Entity* pCollidedWith) {};
+	virtual void OnCollisionExit(Entity* pCollidedWith) {};
+	virtual void OnCollisionEnter(Entity* pCollidedWith) {};
 
 public:
 	int32* GetCollisionLayer() { return &m_Mask; }
@@ -71,8 +71,8 @@ protected:
 	bool			m_ToDestroy		= false; 
 
 private:
-	bool m_isStatic			= false;
-	bool m_isHighlighted	= false;
+	bool m_IsStatic			= false;
+	bool m_IsHighlighted	= false;
 
 protected:
 	bool m_IsWorldText = false;
@@ -82,7 +82,7 @@ private:
 
 private:
 	std::unordered_set<Collider*> mp_Colliders;
-	std::unordered_map<int64, Entity*> CollidingEntity;
+	std::unordered_map<int64, Entity*> m_CollidingEntity;
 
 private:
 	friend class Scene;

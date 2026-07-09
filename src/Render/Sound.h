@@ -9,12 +9,12 @@ class Sound
 {
 private:
 
-	MIX_Audio* mp_audio = nullptr;
-	MIX_Track* mp_track = nullptr;
+	MIX_Audio* mp_Audio = nullptr;
+	MIX_Track* mp_Track = nullptr;
 
 public:
 
-	bool IsSoundInit() { return mp_audio == nullptr ? false : true; }
+	bool IsSoundInit();
 
 	Sound(const std::string& path);
 	Sound() = default;

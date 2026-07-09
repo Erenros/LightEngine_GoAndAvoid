@@ -9,6 +9,9 @@
 
 class GameObject;
 class UI;
+class Entity;
+class Window;
+class Surface;
 struct SDL_Vertex;
 struct SDL_FPoint;
 
@@ -30,34 +33,34 @@ namespace gcle
 
 	class Shape {
 
-		TextureStruct* mp_texture = nullptr;
+		Sprite* mp_Texture = nullptr;
 
 	protected:
 		Transform2D m_Transform;
 		GameObject* mp_Owner;
 
 		//circle
-		float32 m_radius = 0.0f;
-		Vector2f m_center = { 0.0f, 0.0f };
-		int32 m_smoothness = 16;
+		float32 m_Radius = 0.0f;
+		Vector2f m_Center = { 0.0f, 0.0f };
+		int32 m_Smoothness = 16;
 
 		//rectangle
-		float32 m_height = 0.0f;
-		float32 m_width = 0.0f;
-		Vector2f m_origin = { 0.0f, 0.0f };
+		float32 m_Height = 0.0f;
+		float32 m_Width = 0.0f;
+		Vector2f m_Origin = { 0.0f, 0.0f };
 
 		//triangle
-		std::vector<Vector2f> m_trianglepoints;
+		std::vector<Vector2f> m_TrianglePoints;
 
-		Shapes m_shape = Shapes::Triangle;
+		Shapes m_Shape = Shapes::Triangle;
 		 
-		std::vector<Vector2f> m_localPositions;
+		std::vector<Vector2f> m_LocalPositions;
 
-		std::vector<SDL_Vertex*> m_verticies;
-		std::vector<int32> m_indicies;
+		std::vector<SDL_Vertex*> m_Verticies;
+		std::vector<int32> m_Indicies;
 
-		std::vector<SDL_FPoint*> m_hollowPoints;
-		std::vector<SDL_FPoint*> m_debugContour;
+		std::vector<SDL_FPoint*> m_HollowPoints;
+		std::vector<SDL_FPoint*> m_DebugContour;
 		 
 		void UpdateRenderVertices();
 
@@ -73,17 +76,17 @@ namespace gcle
 	public:
 
 		//Getters 
-		Shapes GetShape() { return m_shape; };
-		Vector2f GetOrigin() { return m_origin; }
-		Sprite* GetTexture() { return (mp_texture == nullptr ? nullptr : mp_texture->mp_texture);};
-		std::vector<int32>& GetIndicies() { return m_indicies; }; 
+		Shapes GetShape();
+		Vector2f GetOrigin();
+		Sprite* GetTexture();
+		std::vector<int32>& GetIndicies(); 
 		std::vector<SDL_Vertex*>& GetVerticies();
 		Vector2f GetPosition(float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
-		Vector2f GetScale() { return m_Transform.GetScale(); }
-		Degrees GetRotation() { return m_Transform.GetDegAngle(); }
+		Vector2f GetScale();
+		Degrees GetRotation();
 
-		Transform2D* GetTransform() { return &m_Transform; }
+		Transform2D* GetTransform();
 
 
 	public:
@@ -95,7 +98,7 @@ namespace gcle
 		virtual GameObject* GetOwner() { return mp_Owner; };
 		virtual Vector2f GetCenter() { return { 0, 0 }; };
 		virtual std::vector<SDL_FPoint*>& GetHollow();
-		virtual std::vector<Vector2f> GetTrianglePoints() { return m_trianglepoints; };
+		virtual std::vector<Vector2f> GetTrianglePoints();
 
 
 	public:
@@ -109,12 +112,12 @@ namespace gcle
 
 	public:
 
-		void SetTexture(TextureStruct* tex) { mp_texture = tex; }
-		void SetOrigin(Vector2f origin) { m_origin = origin; }
+		void SetTexture(Window* window, SurfaceStruct* pSurface);
+		void SetOrigin(Vector2f origin);
 		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 		 
 		void SetScale(Vector2f scale);
-		void SetScale(float32 scale) { SetScale({ scale, scale }); } 
+		void SetScale(float32 scale);
 		void ScaleBy(Vector2f factor);
 		 
 		void SetRotation(Degrees angle); 
@@ -134,16 +137,12 @@ namespace gcle
 	public:
 		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, GameObject* owner);
 	
-		Shape* Clone() const override { return GCLE_NEW Rectangle(*this); }
+		Shape* Clone() const override;
 
 		//Getters
 		 
-		float32 GetHeight() override {
-			return m_height * m_Transform.GetScale().y;
-		}
-		float32 GetWidth() override {
-			return m_width * m_Transform.GetScale().x;
-		}
+		float32 GetHeight() override;
+		float32 GetWidth() override;
 
 		std::vector<SDL_FPoint*>& GetHollow() override;
 
@@ -153,8 +152,6 @@ namespace gcle
 		void SetHeight(float32 height) override;
 		void SetWidth(float32 width) override;
 
-
-		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 	};
 
 	class Triangle : public Shape {
@@ -164,9 +161,8 @@ namespace gcle
 
 		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, GameObject* owner);
 
-		Shape* Clone() const override { return GCLE_NEW Triangle(*this); }
+		Shape* Clone() const override;
 
-		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) override;
 
 		std::vector<SDL_FPoint*>& GetHollow() override;
@@ -179,15 +175,14 @@ namespace gcle
 
 		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, GameObject* owner);
 
-		Shape* Clone() const override { return GCLE_NEW Circle(*this); }
+		Shape* Clone() const override;
 
-		float32 GetRadius() override { return m_radius * m_Transform.GetScale().x; };
-		int32 GetSmoothness() override { return m_smoothness; };
-		Vector2f GetCenter() override { return m_center; };
+		float32 GetRadius() override;
+		int32 GetSmoothness() override;
+		Vector2f GetCenter() override;
 
 		std::vector<SDL_FPoint*>& GetHollow() override;
 
-		//void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH) override;
 		void SetRadius(float32 radius) override;
 
 	};

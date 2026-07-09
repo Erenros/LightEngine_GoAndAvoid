@@ -10,21 +10,39 @@ void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
 	 	 
-	std::string text = "Test";
-	CreateText(text, { 40, 40 }, 50);
+	//std::string text = "Test";
+	//CreateText(text, { 40, 40 }, 50);
 
-	pEntity = CreateEntity<Player>(gcle::Shapes::Circle);
-	pEntity->SetPosition(0, 0); 
-	pEntity->Rotate(0);
-	pEntity->SetRigidBody(true);  
-	pEntity->GetRigidBody().SetFriction({ 0.15, 0.15 });
-	pEntity->SetTexture("images");
-	Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
+	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	entity1->SetPosition(-400, 0);
+	entity1->SetRigidBody(true);
+	entity1->SetTexture("test");
+	entity1->AddAnimation("anim1", 0, 3, 0, 32, 32, 1.f);
+	entity1->AddAnimation("anim2", 0, 3, 0, 32, 32, 0.2f);
+	entity1->PlayAnimation("anim1");
+
+	//Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	//entity2->SetPosition(-300, 0);
+	//entity2->SetRigidBody(true);
+	//entity2->SetTexture("test");
+	//entity2->AddAnimation("anim1", 0, 3, 0, 32, 32, 0.2f);
+	//entity2->PlayAnimation("anim1");
+
+	//pEntity = CreateEntity<Player>(gcle::Shapes::Circle);
+	//pEntity->SetPosition(0, 0); 
+	//pEntity->Rotate(0);
+	//pEntity->SetRigidBody(true);  
+	//pEntity->GetRigidBody().SetDampingStrenght(0.9f);
+	//pEntity->SetTexture("images");
+	//Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
 	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
-	mp_mainCamera->SetFollowing(pEntity);
+	pEntity = entity1;
+
+	mp_MainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();
+	pSceneCamera->SetFollowing(entity1);
 
 	for (int32 i = 0; i < 50; i++) 
 	{
@@ -52,13 +70,19 @@ void SampleScene::OnUpdate(Clock& time)
 	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		if (GetCurrentCamera()->GetId() != mp_mainCamera->GetId())
+		pEntity->PlayAnimation("anim2", 1);
+		/*if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
 		{
-			SwitchCamera(mp_mainCamera);
+			SwitchCamera(mp_MainCamera);
 		}
 		else
 		{
 			SwitchCamera(pSceneCamera);
-		} 
+		} */
+	}
+
+	if (InputManager::GetInstance().IsDown('E'))
+	{
+		pEntity->StopAnimation();
 	}
 } 

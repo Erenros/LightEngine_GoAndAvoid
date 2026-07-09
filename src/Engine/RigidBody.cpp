@@ -12,9 +12,9 @@ RigidBody2D::~RigidBody2D()
 {
 }
 
-void RigidBody2D::Initialize(Transform2D* transform)
+void RigidBody2D::Initialize(Transform2D* pTransform)
 {
-	mp_Transform = transform;
+	mp_Transform = pTransform;
 }
 
 void RigidBody2D::Update(float32 dt)
@@ -60,6 +60,11 @@ void RigidBody2D::AddImpulse(Vector2f direction, float32 strength)
 	m_Velocity += dir * strength / m_Mass;
 }
 
+void RigidBody2D::SetMass(float32 mass)
+{
+	m_Mass = std::max(0.0001f, mass);
+}
+
 void RigidBody2D::ClampVelocity()
 {
 	float32 speedSq = m_Velocity.x * m_Velocity.x + m_Velocity.y * m_Velocity.y;
@@ -73,6 +78,32 @@ void RigidBody2D::ClampVelocity()
 	}
 }
 
+void RigidBody2D::Stop()
+{
+	m_Velocity = { 0,0 };
+
+}
+
+void RigidBody2D::SetMaxSpeed(float32 speed)
+{
+	m_MaxSpeed = speed;
+}
+
+void RigidBody2D::SetGravity(float32 strenght, bool isActive)
+{
+	m_Gravity = strenght; m_UseGravity = isActive;
+}
+
+void RigidBody2D::SetGravity(bool isActive)
+{
+	m_UseGravity = isActive;
+}
+
+void RigidBody2D::SetGravity(float32 strenght)
+{
+	m_Gravity = strenght;
+}
+
 float32 RigidBody2D::GetSpeed() const
 {
 	return std::sqrt(m_Velocity.x * m_Velocity.x + m_Velocity.y * m_Velocity.y);
@@ -81,6 +112,11 @@ float32 RigidBody2D::GetSpeed() const
 Vector2f RigidBody2D::GetVelocity() const
 {
 	return m_Velocity;
+}
+
+void RigidBody2D::SetVelocity(Vector2f velocity)
+{
+	m_TempVelocity = velocity; m_TempVelHasChanged = true;
 }
 
 void RigidBody2D::ZeroVelocityX(bool right)
@@ -114,6 +150,11 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	{
 		m_Velocity -= n * dot;
 	}
+}
+
+void RigidBody2D::SetDampingStrenght(float32 strenght)
+{
+	m_Friction = { strenght, strenght };
 }
 
 Vector2f RigidBody2D::CalculateNextPosition(float32 dt)
@@ -163,4 +204,48 @@ void RigidBody2D::Brake(float32 dt)
 
 	m_Velocity.x *= ratio;
 	m_Velocity.y *= ratio;
+}
+
+void RigidBody2D::SetBrakeDeceleration(float32 deceleration)
+{
+	m_BrakeDeceleration = deceleration; 
+}
+
+void RigidBody2D::SetCollisionDetectionMode(CollisionDetectionMode mode)
+{
+	m_CollisionDetectionMode = mode;
+}
+
+void RigidBody2D::SetCollisionOnContinuous()
+{
+	m_CollisionDetectionMode = CollisionDetectionMode::Continuous;
+}
+
+bool RigidBody2D::IsActive() const { 
+	return IsRigidBody; 
+}
+
+void RigidBody2D::SetActive(bool Active) { 
+	IsRigidBody = Active; 
+}
+
+void RigidBody2D::ZeroVelocityX() { 
+	m_Velocity.x = 0; 
+}
+
+void RigidBody2D::ZeroVelocityY() { 
+	m_Velocity.y = 0; 
+}
+
+void RigidBody2D::SetFrictionOnXAxis(float32 strenght) { 
+m_Friction.x = strenght; 
+}
+
+void RigidBody2D::SetFrictionOnYAxis(float32 strenght) { 
+	m_Friction.y = strenght; 
+}
+
+void RigidBody2D::ActivateFriction(bool isActive)
+{
+	m_UseFriction = isActive;
 }

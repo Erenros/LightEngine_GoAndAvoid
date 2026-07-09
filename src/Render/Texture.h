@@ -2,36 +2,52 @@
 #include <string>
 
 class Window;
+class Surface;
 struct Asset;
 struct SDL_Texture;
+struct SDL_Surface;
 
 class Texture
 {
 protected:
 
 	SDL_Texture* mp_texture = nullptr;
+	Surface* mp_surface;
 
 	bool m_isSprite = false;
+	bool m_textureChanged = false;
+
+	bool m_toDestroy = false;
 
 public:
 
-	std::string id = "";
-	bool IsSprite() { return m_isSprite; };
+	std::string m_Id = "";
 
-	bool IsTextureInit() { return mp_texture == nullptr ? false : true; }
+	SDL_Texture* CreateTexture(Window* window);
 
-	//Temporaire
-	SDL_Texture* GetSDLTexture() 
-	{ 
-		return mp_texture; 
-	};
+	bool IsSprite() { return m_isSprite; }; // a move dans le cpp
 
-	Texture(Window* window, const std::string& path);
-	Texture(Window* window, Asset* data);
+	bool IsTextureInit();
+
+	bool ToDestroy();
+	void Destroy();
+
+	SDL_Texture* GetSDLTexture();
+
+	Texture(Window* pWindow, Surface* pSurface);
 	Texture() = default;
 
 	virtual ~Texture() ;
 
-	void InitTextureWithBuffer(Window* window, Asset* asset);
-	void InitTexture(Window* window, const std::string& path);
+	void InitTextureWithSurface(Window* pWindow, Surface* pSurface);
+
+
+
+	//Maybe not really usefull now
+	Texture(Window* pWindow, const std::string& path);
+	//Maybe not really usefull now
+	Texture(Window* pWindow, Asset* pAsset);
+	void InitTextureWithBuffer(Window* pWindow, Asset* pAsset);
+	void InitTexture(Window* pWindow, const std::string& path);
+	std::string& GetId();
 };

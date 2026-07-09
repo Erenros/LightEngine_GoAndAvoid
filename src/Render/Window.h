@@ -33,14 +33,10 @@ class Window
 public:
 
 	Window() = default;
-	Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
-	{
-		Create(pName, width, height, windowFlags, rendererFlags, x, y);
-	};
+	Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y);
 
-	~Window() {
-		End();
-	};
+
+	~Window();
 
 
 
@@ -61,11 +57,11 @@ public:
 
 	void End();
 
-	SDL_Window* GetWindow() { return mp_Window; }
-	SDL_Renderer* GetRenderer() { return mp_Renderer; }
+	SDL_Window* GetWindow();
+	SDL_Renderer* GetRenderer();
 
-	void DrawTextOnRenderer(Text* text);
-	void DrawOnRenderer(SDL_Texture* texture, SDL_FRect* srcrect, SDL_FRect* dstrect);
+	void DrawTextOnRenderer(Text* pText);
+	void DrawOnRenderer(SDL_Texture* pTexture, SDL_FRect* pSrcrect, SDL_FRect* pDstrect);
 	void Draw(gcle::Shape* pShape);
 
 	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f });
@@ -84,8 +80,8 @@ private:
 	SDL_Window* mp_Window = nullptr;
 	SDL_Renderer* mp_Renderer = nullptr;
 	SDL_Texture* mp_RenderTarget = nullptr;
-	SDL_FRect* mp_dst;
-	uint32 m_width, m_height = 0;
+	SDL_FRect* mp_Dst;
+	uint32 m_Width, m_Height = 0;
 
 private:
 	friend class Event;

@@ -26,43 +26,41 @@ public:
 
 	void SetForce(Vector2f direction, float32 speed);
 	void AddImpulse(Vector2f direction, float32 strength);
-	void SetMass(float32 mass) { m_Mass = std::max(0.0001f, mass); }
+	void SetMass(float32 mass);
 
-	bool IsActive() const { return IsRigidBody; }
-	void SetActive(bool Active) { IsRigidBody = Active; }
+	bool IsActive() const;
+	void SetActive(bool Active);
 
 	void ClampVelocity();
-	void Stop() { m_Velocity = { 0,0 }; }
-	void SetMaxSpeed(float32 speed) { m_MaxSpeed = speed; }
+	void Stop();
+	void SetMaxSpeed(float32 speed);
 
-	void SetGravity(float32 strenght, bool isActive) { m_Gravity = strenght; m_UseGravity = isActive; }
-	void SetGravity(bool isActive) { m_UseGravity = isActive; }
-	void SetGravity(float32 strenght) { m_Gravity = strenght; }
+	void SetGravity(float32 strenght, bool isActive);
+	void SetGravity(bool isActive);
+	void SetGravity(float32 strenght);
 
 	float32 GetSpeed() const;
 	Vector2f GetVelocity() const;
 
-	void SetVelocity(Vector2f velocity) { m_TempVelocity = velocity; m_TempVelHasChanged = true; }
+	void SetVelocity(Vector2f velocity);
 
 	void ZeroVelocityX(bool right);
 	void ZeroVelocityY(bool down);
 
-	void ZeroVelocityX() { m_Velocity.x = 0;}
-	void ZeroVelocityY() { m_Velocity.y = 0;}
+	void ZeroVelocityX();
+	void ZeroVelocityY();
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
 	void Brake(float32 dt);
-	void SetBrakeDeceleration(float32 deceleration) { m_BrakeDeceleration = deceleration; }
 
-	void SetFriction(Vector2f velocityFrictionFactor) { m_Friction = velocityFrictionFactor; }
-	void SetFrictionOnXAxis(float32 velocityFrictionFactor) { m_Friction = { velocityFrictionFactor, 0 }; }
-	void SetFrictionOnYAxis(float32 velocityFrictionFactor) { m_Friction = { 0, velocityFrictionFactor }; }
-	
-	void SetFrictionOnGround(float32 velocityFrictionFactor) { m_Friction = { velocityFrictionFactor, 0 }; }
-	void SetFrictionInAir(float32 velocityFrictionFactor) { m_Friction = { 0, velocityFrictionFactor }; }
+	// void SetFriction(Vector2f velocityFrictionFactor) { m_Friction = velocityFrictionFactor; }
 
-	void ActivateFriction(bool UseFriction) { m_UseFriction = UseFriction; }
+	void SetFriction(Vector2f velocityFrictionFactor)
+	void SetFrictionOnXAxis(float32 strenght);
+	void SetFrictionOnYAxis(float32 strenght);
+
+	void ActivateFriction(bool isActive);
 
 	Vector2f CalculateNextPosition(float32 dt);
 	bool UseContinuousCollision() const;
@@ -76,8 +74,8 @@ private:
 	CollisionDetectionMode m_CollisionDetectionMode = CollisionDetectionMode::Discrete;
 
 public:
-	void SetCollisionDetectionMode(CollisionDetectionMode mode) {m_CollisionDetectionMode = mode;}
-	void SetCollisionOnContinuous() {m_CollisionDetectionMode = CollisionDetectionMode::Continuous;}
+	void SetCollisionDetectionMode(CollisionDetectionMode mode);
+	void SetCollisionOnContinuous();
 
 private:
 	Vector2f m_Position;
@@ -103,6 +101,6 @@ private:
 
 	Transform2D* mp_Transform = nullptr;
 
-	float64 dt = 0.0f;
+	float64 m_Dt = 0.0f;
 
 };

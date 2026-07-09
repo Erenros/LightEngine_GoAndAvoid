@@ -9,8 +9,8 @@ public:
 	static bool Init(); 
 	static void Shutdown();
 
-	static MIX_Mixer* GetMixer() { return s_mixer; } 
-	static void SetCurrentMusicTrack(MIX_Track* track) { s_musicTrack = track; }
+	static MIX_Mixer* GetMixer();
+	static void SetCurrentMusicTrack(MIX_Track* track);
 
 	static void SetMusicVolume(int volume);
 	static void StopMusic();
@@ -20,7 +20,7 @@ public:
 	static bool IsAMusicPlaying();
 	static bool IsAMusicPaused();
 
-private:
-	static MIX_Mixer* s_mixer;
-	static MIX_Track* s_musicTrack;
+public:
+	static MIX_Mixer* Mixer;
+	static MIX_Track* MusicTrack;
 };

@@ -52,6 +52,11 @@ void Entity::Initialize()
 
 }
 
+void Entity::SetDebugLayer(int32 layer)
+{
+	m_Layer = std::clamp(layer, 0, 31);
+}
+
 void Entity::Update(float32 dt)
 {
 	if (m_RigidBody.IsActive())
@@ -127,7 +132,7 @@ void Entity::SetRigidBody(bool isRigidBody)
 
 void Entity::SetStatic(bool isStatic)
 {
-	m_isStatic = isStatic;
+	m_IsStatic = isStatic;
 }
 
 bool Entity::HasCollider()
@@ -137,17 +142,17 @@ bool Entity::HasCollider()
 
 bool Entity::IsStatic() const
 {
-	return !m_isStatic;
+	return !m_IsStatic;
 }
 
-bool Entity::IsColliding(Entity* other)
+bool Entity::IsColliding(Entity* pOther)
 {
 	for (Collider* pCollider : mp_Colliders)
 	{
 		if (!pCollider->IsActive())
 			continue;
 
-		for (Collider* pOtherCollider : other->mp_Colliders)
+		for (Collider* pOtherCollider : pOther->mp_Colliders)
 		{
 			if (!pOtherCollider->IsActive())
 				continue;
@@ -159,4 +164,3 @@ bool Entity::IsColliding(Entity* other)
 
 	return false;
 }
-

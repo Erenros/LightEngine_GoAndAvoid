@@ -12,7 +12,7 @@
 
 struct EntityInfo
 {
-	Entity* pEntity = nullptr;
+	Entity* entity = nullptr;
 	bool toRemove = false;
 };
 
@@ -59,32 +59,32 @@ private:
 	bool CheckOBBCircleCollision(gcle::Rectangle* pRect, gcle::Circle* pCircle);
 
 private:
-	bool ThrowCheckRectRect(gcle::Shape* a, gcle::Shape* b);
-	bool ThrowCheckCircleCircle(gcle::Shape* a, gcle::Shape* b);
-	bool ThrowCheckRectCircle(gcle::Shape* a, gcle::Shape* b);
-	bool ThrowCheckCircleRect(gcle::Shape* a, gcle::Shape* b);
+	bool ThrowCheckRectRect(gcle::Shape* pA, gcle::Shape* pB);
+	bool ThrowCheckCircleCircle(gcle::Shape* pA, gcle::Shape* pB);
+	bool ThrowCheckRectCircle(gcle::Shape* pA, gcle::Shape* pB);
+	bool ThrowCheckCircleRect(gcle::Shape* pA, gcle::Shape* pB);
 
 private:
-	void RepulseRectRect(Collider* a, Collider* b);
-	void RepulseCircleCircle(Collider* a, Collider* b);
-	void RepulseRectCircle(Collider* a, Collider* b);
-	void RepulseCircleRect(Collider* a, Collider* b);
+	void RepulseRectRect(Collider* pA, Collider* pB);
+	void RepulseCircleCircle(Collider* pA, Collider* pB);
+	void RepulseRectCircle(Collider* pA, Collider* pB);
+	void RepulseCircleRect(Collider* pA, Collider* pB);
 
-	float32 GetRepulseCorrectionMultiplyer(Collider* a, Collider* b);
+	float32 GetRepulseCorrectionMultiplyer(Collider* pA, Collider* pB);
 	void AccumulateCorrection(Entity* pEntity, Vector2f delta);
-	void RepulseOBB(Collider* colA, Collider* colB);
+	void RepulseOBB(Collider* pColA, Collider* pColB);
 
 private:
-	bool ShouldUseContinuousCollision(Collider* collider) const;
-	bool TryResolveContinuousCollision(Collider* colliderA, Collider* colliderB, float64 deltaTime);
-	ContinuousCollisionHit SweepColliderAgainstAABB(Collider* movingCollider, Collider* obstacleCollider, float64 deltaTime);
+	bool ShouldUseContinuousCollision(Collider* pCollider) const;
+	bool TryResolveContinuousCollision(Collider* pColliderA, Collider* pColliderB, float64 deltaTime);
+	ContinuousCollisionHit SweepColliderAgainstAABB(Collider* pMovingCollider, Collider* pObstacleCollider, float64 deltaTime);
 	ContinuousCollisionHit SegmentAABBIntersection(Vector2f start, Vector2f end, const AABB& target);
-	void ApplyContinuousCollisionResponse(Collider* movingCollider, const ContinuousCollisionHit& hit, float64 deltaTime);
-	AABB ComputeCurrentAABB(Collider* collider);
+	void ApplyContinuousCollisionResponse(Collider* pMovingCollider, const ContinuousCollisionHit& hit, float64 deltaTime);
+	AABB ComputeCurrentAABB(Collider* pCollider);
 	AABB ExpandAABB(const AABB& aabb, Vector2f amount);
 	AABB TranslateAABB(const AABB& aabb, Vector2f delta);
 	AABB UnionAABB(const AABB& a, const AABB& b);
-	AABB ComputePredictedAABB(Collider* collider, const AABB& currentAABB, float32 dt);
+	AABB ComputePredictedAABB(Collider* pCollider, const AABB& currentAABB, float32 dt);
 	bool TestAxis(float32 startAxis, float32 deltaAxis, float32 minAxis, float32 maxAxis, Vector2f negativeNormal, Vector2f positiveNormal);
 
 public:
@@ -99,12 +99,12 @@ private:
 	void EntityToAdd(std::vector<EntityInfo>& m_EntitiesToAdd, std::vector<EntityInfo>& m_EntitiesToUpdate);
 
 private:
-	void EntityToUpdate(std::vector<Collider*>* activeColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
-	void GenerateQuadTree(std::vector<Collider*>* activeColliders, float32 dt);
+	void EntityToUpdate(std::vector<Collider*>* pActiveColliders, std::vector<EntityInfo>& m_EntitiesToUpdate);
+	void GenerateQuadTree(std::vector<Collider*>* pActiveColliders, float32 dt);
 	void PendingCorrections();
 	void HandleCollision(std::pair<Collider*, Collider*> collider, float32 dt);
-	void MakeTreePairs(std::vector<Collider*>* activeColliders);
-	void MakePairs(std::vector<Collider*>* activeColliders);
+	void MakeTreePairs(std::vector<Collider*>* pActiveColliders);
+	void MakePairs(std::vector<Collider*>* pActiveColliders);
 
 	void UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt);
 	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders, float32 dt);
@@ -119,38 +119,38 @@ private:
 
 private:
 	using CollisionFn = bool(PhysicsManager::*)(gcle::Shape*, gcle::Shape*);
-	static CollisionFn collisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
+	static CollisionFn m_CollisionTable[static_cast<int32>(gcle::Shapes::Count) - 1][static_cast<int32>(gcle::Shapes::Count) - 1];
 
 	using RepulseFn = void(PhysicsManager::*)(Collider* a, Collider* b);
-	static RepulseFn repulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
+	static RepulseFn m_RepulseTable[static_cast<int32>(RepulseTypes::Count)][static_cast<int32>(RepulseTypes::Count)];
 
 private:
-	CollisionInfo m_colDatas;
+	CollisionInfo m_ColDatas;
 
 
 private:
-	bool m_activateQuadTree = true;
-	bool m_dynamicQuadTreeSize = false;
+	bool m_ActivateQuadTree = true;
+	bool m_DynamicQuadTreeSize = false;
 
-	Vector2f m_quadTreePos1{ -50000, -50000 };
-	Vector2f m_quadTreePos2{ 50000, 50000 };
+	Vector2f m_QuadTreePos1{ -50000, -50000 };
+	Vector2f m_QuadTreePos2{ 50000, 50000 };
 
-	QuadTree* m_quadTree = new QuadTree(m_quadTreePos1.x, m_quadTreePos1.y, m_quadTreePos2.x, m_quadTreePos2.y);
+	QuadTree* mp_QuadTree = new QuadTree(m_QuadTreePos1.x, m_QuadTreePos1.y, m_QuadTreePos2.x, m_QuadTreePos2.y);
 
-	int8 m_frameBetweenQuadTreeRegenerations = 1;
-	int8 m_timeBetweenRegeneration = 0;
+	int8 m_FrameBetweenQuadTreeRegenerations = 1;
+	int8 m_TimeBetweenRegeneration = 0;
 
-	std::vector<std::pair<Collider*, Collider*>> m_pairs;
-	std::vector<Collider*> m_queryResult;
+	std::vector<std::pair<Collider*, Collider*>> m_Pairs;
+	std::vector<Collider*> m_QueryResult;
 
 private: 
-	float32 m_entryTime = 0.0f;
-	float32 m_exitTime = 1.0f;
-	Vector2f m_entryNormal{ 0.0f, 0.0f };
+	float32 m_EntryTime = 0.0f;
+	float32 m_ExitTime = 1.0f;
+	Vector2f m_EntryNormal{ 0.0f, 0.0f };
 
 public : 
 	~PhysicsManager();
 
-	Collider* m_pCurrentColliderA = nullptr;
-	Collider* m_pCurrentColliderB = nullptr;
+	Collider* mp_CurrentColliderA = nullptr;
+	Collider* mp_CurrentColliderB = nullptr;
 };

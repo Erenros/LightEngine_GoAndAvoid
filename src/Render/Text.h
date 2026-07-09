@@ -14,22 +14,22 @@ class Text
 {
 private:
 
-	Font* mp_font = nullptr;
-	SDL_Texture* mp_texture = nullptr;
+	Font* mp_Font = nullptr;
+	SDL_Texture* mp_Texture = nullptr;
 
-	std::string m_text;
+	std::string m_Text;
 
-	SDL_Color* mp_color = nullptr;
-	SDL_FRect* mp_rect = nullptr;
+	SDL_Color* mp_Color = nullptr;
+	SDL_FRect* mp_Rect = nullptr;
 
-	bool m_needToChange = false;
-	int32 m_fontSize = 24;
+	bool m_NeedToChange = false;
+	int32 m_FontSize = 24;
 public:
 
-	SDL_Texture* CreateTexture(Window* window);
-	SDL_FRect* GetSDLRect() { return mp_rect; };
+	SDL_Texture* GetTexture(Window* pWindow);
+	SDL_FRect* GetSDLRect();
 
-	Text(Font* font, const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	Text(Font* pFont, const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 
 	~Text();
 
@@ -37,7 +37,7 @@ public:
 	void SetFont(const std::string& id);
 	void SetText(const std::string& text);
 
-	void SetPosition(int x, int y);
+	void SetPosition(int32 x, int32 y);
 
 
 	Font* GetFont();

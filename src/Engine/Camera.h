@@ -14,7 +14,7 @@ class Camera
 		~Camera();
 		void Init(Window* pWindow);
 
-		void SetFollowing(Entity* newEntity);
+		void SetFollowing(Entity* pNewEntity);
 		Entity* GetFollowing();
 
 		void SetPosition(Vector2f v);
@@ -36,14 +36,14 @@ private:
 
 private:
 	Window*			mp_Window = nullptr;
-	Vector2f		screenMiddle;
-	float32			m_zoom = 1;
-	Transform2D		transform;
-	Entity*			m_followingEntity = nullptr;
+	Vector2f		m_ScreenMiddle;
+	float32			m_Zoom = 1;
+	Transform2D		m_Transform;
+	Entity*			mp_FollowingEntity = nullptr;
 
 	uint64			m_Id = 0;
 
-	bool m_isActive = false;
+	bool m_IsActive = false;
 
 private: 
 	friend class GameManager;

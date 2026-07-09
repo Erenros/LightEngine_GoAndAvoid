@@ -4,8 +4,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
 
-MIX_Mixer* Audio::s_mixer = nullptr;
-MIX_Track* Audio::s_musicTrack = nullptr;
+MIX_Mixer* Audio::Mixer = nullptr;
+MIX_Track* Audio::MusicTrack = nullptr;
 
 bool Audio::Init()
 {
@@ -15,8 +15,8 @@ bool Audio::Init()
 		return false;
 	}
 
-	s_mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
-	if (s_mixer == nullptr)
+	Mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+	if (Mixer == nullptr)
 	{
 		GCLE_WARN << "MIX_CreateMixerDevice failed : " << SDL_GetError() << ENDL;
 		return false;
@@ -28,46 +28,57 @@ bool Audio::Init()
 void Audio::Shutdown()
 {
 	MIX_Quit(); 
-	s_mixer = nullptr;
-	s_musicTrack = nullptr;
+	Mixer = nullptr;
+	MusicTrack = nullptr;
 }
+
+MIX_Mixer* Audio::GetMixer()
+{
+	return Mixer;
+}
+
+void Audio::SetCurrentMusicTrack(MIX_Track* track){
+	MusicTrack = track; 
+}
+
+
 
 void Audio::SetMusicVolume(int volume)
 {
-	if (s_musicTrack != nullptr)
-		MIX_SetTrackGain(s_musicTrack, static_cast<float>(volume) / 128.0f);
+	if (MusicTrack != nullptr)
+		MIX_SetTrackGain(MusicTrack, static_cast<float>(volume) / 128.0f);
 }
 
 void Audio::StopMusic()
 {
-	if (s_musicTrack != nullptr)
-		MIX_StopTrack(s_musicTrack, 0);
+	if (MusicTrack != nullptr)
+		MIX_StopTrack(MusicTrack, 0);
 }
 
 void Audio::PauseMusic()
 {
-	if (s_musicTrack != nullptr)
-		MIX_PauseTrack(s_musicTrack);
+	if (MusicTrack != nullptr)
+		MIX_PauseTrack(MusicTrack);
 }
 
 void Audio::ResumeMusic()
 {
-	if (s_musicTrack != nullptr)
-		MIX_ResumeTrack(s_musicTrack);
+	if (MusicTrack != nullptr)
+		MIX_ResumeTrack(MusicTrack);
 }
 
 void Audio::StopAllSound()
 {
-	if (s_mixer != nullptr)
-		MIX_StopTag(s_mixer, "sfx", 0);
+	if (Mixer != nullptr)
+		MIX_StopTag(Mixer, "sfx", 0);
 }
 
 bool Audio::IsAMusicPlaying()
 {
-	return s_musicTrack != nullptr && MIX_TrackPlaying(s_musicTrack);
+	return MusicTrack != nullptr && MIX_TrackPlaying(MusicTrack);
 }
 
 bool Audio::IsAMusicPaused()
 {
-	return s_musicTrack != nullptr && MIX_TrackPaused(s_musicTrack);
+	return MusicTrack != nullptr && MIX_TrackPaused(MusicTrack);
 }

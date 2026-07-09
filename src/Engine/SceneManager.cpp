@@ -2,6 +2,17 @@
 #include "Scene.h"
 
 
+SceneManager& SceneManager::GetInstance(){
+     static SceneManager instance;
+     return instance;
+}
+
+
+SceneManager::SceneManager()
+{
+   
+}
+
 SceneManager::~SceneManager()
 {
     DeleteAllScenes();
@@ -24,13 +35,6 @@ Scene* SceneManager::GetPreviousScene()
 std::string& SceneManager::GetPreviousSceneTag() {
     return m_PreviousSceneTag;
 
-}
-
-uint32 SceneManager::GetCurrentSceneFlag(){
-    if (m_CurrentSceneTag == "") {
-        return 0b0;
-    }
-    return m_Scenes[m_CurrentSceneTag]->GetFlag();
 }
 
 Scene* SceneManager::GetSceneWithTag(const std::string& tag) {
@@ -68,8 +72,6 @@ void SceneManager::DeleteScene(const std::string& tag) {
     if (m_Scenes[tag] != nullptr) {
         Scene* scene = m_Scenes[tag];
 
-        m_validFlag.push_back(scene->m_flag);
-
         m_Scenes.erase(tag);
 
         if (m_CurrentSceneTag == tag) {
@@ -85,13 +87,6 @@ void SceneManager::DeleteScene(const std::string& tag) {
     std::cerr << "Scene " << tag << "doesn't exist" << std::endl;
 }
 
-bool SceneManager::isLoaded(uint32 flag){
-    uint32 test = m_Scenes[m_CurrentSceneTag]->m_flag & flag;
-    if (test != 0b0) {
-        return true;
-    }
-    return false;
-}
 
 void SceneManager::UpdateCurrentScene(Clock& time) {
     if (m_CurrentSceneTag != "") {
@@ -133,20 +128,20 @@ void SceneManager::LoadUnloadActiveTextures(const std::string& newSceneId){
     Scene* newScene = m_Scenes[newSceneId];
     std::vector<std::string> m_activatedTextures;
 
-    for (auto& texture : currentScene->m_activeTextures) {
-        if (std::find(newScene->m_activeTextures.begin(), newScene->m_activeTextures.end(), texture) != newScene->m_activeTextures.end()) {
+    for (auto& texture : currentScene->m_ActiveTextures) {
+        if (std::find(newScene->m_ActiveTextures.begin(), newScene->m_ActiveTextures.end(), texture) != newScene->m_ActiveTextures.end()) {
             m_activatedTextures.push_back(texture); 
             continue;
         }
         else {
-            RessourceManager::GetInstance().m_textureMap[texture].UnloadTexture();
+            RessourceManager::GetInstance().m_surfaceMap[texture].UnloadTexture();
             GCLE_INFO << "unload " << texture << ENDL;
         }
     }
-    for (auto& texture : newScene->m_activeTextures) {
+    for (auto& texture : newScene->m_ActiveTextures) {
         if (std::find(m_activatedTextures.begin(),m_activatedTextures.end(), texture) == m_activatedTextures.end()) {
             std::string path = "../../assets/textures/" + texture + ".png";
-            RessourceManager::GetInstance().LoadTexture(GameManager::GetInstance().GetWindow(), path, texture);
+            RessourceManager::GetInstance().LoadSurface(GameManager::GetInstance().GetWindow(), path, texture);
             m_activatedTextures.push_back(texture);
             GCLE_INFO << "load " << texture << ENDL;
         }
