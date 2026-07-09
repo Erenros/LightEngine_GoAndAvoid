@@ -41,7 +41,7 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
 		SDL_Rect SrcRect = { info.x, info.y, info.advanceX, info.height };
 		SDL_Rect DistRect = {static_cast<int32>(x * factor), 0, static_cast<int32>(info.advanceX * factor), static_cast<int32>(info.height * factor)};
 
-		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->a);
+		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->b);
 		SDL_SetSurfaceAlphaMod(mp_Font->GetFontSurface(), mp_Color->a);
 
 		SDL_BlitSurfaceScaled(mp_Font->GetFontSurface(), &SrcRect, textSurface, &DistRect, SDL_SCALEMODE_LINEAR);

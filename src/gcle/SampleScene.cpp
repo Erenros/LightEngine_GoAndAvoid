@@ -6,12 +6,15 @@
 #include "include.h"
 #include "PhysicsManager.h"
 
+
 void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
 	 	 
-	//std::string text = "Test";
-	//CreateText(text, { 40, 40 }, 50);
+	std::string text = "Test";
+	Text* textObj = CreateText(text, { 40, 40 }, 50);
+	//textObj->SetFont("street-fighter");
+
 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(-400, 0);
