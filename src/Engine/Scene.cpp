@@ -83,26 +83,26 @@ void Scene::Draw(Window* pWindow)
 
 	for (auto& layer : GameManager::GetInstance().m_UIs) {
 		for (UI* ui : layer) {
-			if (window->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_frustrumCulling)
+			if (pWindow->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_FrustrumCulling)
 			{
-				if (ui->IsActiveIn(m_tag))
+				if (ui->IsActiveIn(m_Tag))
 				{
 					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
-					m_numberOfDraw++;
+					m_NumberOfDraw++;
 				}
 			}
 			else if (ui->GetRenderShape() != nullptr)
 			{
-				if (ui->IsActiveIn(m_tag))
+				if (ui->IsActiveIn(m_Tag))
 				{
 					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
-					m_numberOfDraw++;
+					m_NumberOfDraw++;
 				}
 			}
 		}
 	}
 
-	for (Text* t : m_texts)
+	for (Text* t : m_Texts)
 	{
 		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
 		m_NumberOfDraw++;
@@ -166,7 +166,6 @@ Camera* Scene::CreateCamera()
 
 	GameManager::GetInstance().m_Camera.push_back(pCamera);
 
-	pCamera->SetActive(true);
 	mp_ActiveCamera = pCamera;
 
 	return pCamera;
@@ -200,7 +199,7 @@ void Scene::Update(Clock& time) const
 	for (auto& layer : GameManager::GetInstance().m_UIs) {
 		for(UI* ui : layer)
 		{
-			if (ui->IsActiveIn(m_tag))
+			if (ui->IsActiveIn(m_Tag))
 				ui->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
 	} 
@@ -208,7 +207,7 @@ void Scene::Update(Clock& time) const
 	if (InputManager::GetInstance().IsDown(LeftButton))
 	{
 		for (auto it : buttons) {
-			if (it.IsInside(mp_activeCamera->GetScreenMousePosition())){}
+			if (it.IsInside(mp_ActiveCamera->GetScreenMousePosition())){}
 				it.Click();
 		}
 	}

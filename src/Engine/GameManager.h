@@ -36,7 +36,7 @@ public:
 
 	void SetWindowClearColor(Color color) { m_ClearColor = color; }
 
-	void AddEntity(Entity* entity) { m_entitiesToCreate.push_back(entity); };
+	void AddEntity(Entity* entity) { m_EntitiesToCreate.push_back(entity); };
 	void AddUI(UI* ui) { m_UIsToCreate.push_back(ui); };
 
 	void UpdateRigidBodies(float32 dt);
@@ -71,7 +71,7 @@ private:
 	std::vector <UI*> m_UIsToCreate;
 	std::vector <UI*> m_UIsToDestroy;
 
-	std::vector <Camera*> m_camera; 
+	std::vector <Camera*> m_Camera; 
 	
 	int m_LoopTour = 0; 
 

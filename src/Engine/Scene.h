@@ -14,8 +14,6 @@ class GameManager;
 class Window;
 class WorldText;
 
-
-
 class Scene
 {
 private :
