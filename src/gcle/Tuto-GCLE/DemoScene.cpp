@@ -5,6 +5,7 @@
 
 #include "Tuto-GCLE/DemoPlayer.h"
 #include "Tuto-GCLE/GCEnemy.h"
+#include "Tuto-GCLE/Table.h"
 #include "Tuto-GCLE/Tag.h"
 
 void DemoScene::OnInitialize()
@@ -19,6 +20,7 @@ void DemoScene::OnInitialize()
 
 	m_Smooth.Initialize(pSceneCamera, mp_Player);
 
+	CreateEntity<Demo::Table>(gcle::Shapes::Rectangle);
 
 	/*mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
 	mp_Enemy->SetTarget(mp_Player);

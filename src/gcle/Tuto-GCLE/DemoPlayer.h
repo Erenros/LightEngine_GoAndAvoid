@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tuto-GCLE/Character.h"
+#include "Tuto-GCLE/Object.h"
 
 namespace Demo
 {
@@ -14,6 +15,10 @@ namespace Demo
 		void OnCollision(Entity* collidedWith)		override;
 		void OnCollisionExit(Entity* collidedWith)	override;
 		void OnCollisionEnter(Entity* collidedWith) override;
+
+		void OnTrigger(Entity* collidedWith)		override;
+		void OnTriggerExit(Entity* collidedWith)	override;
+		void OnTriggerEnter(Entity* collidedWith)   override;
 
 		void Death()								override;
 		void Heal(int amount)						override;
@@ -36,5 +41,8 @@ namespace Demo
 		float32 m_DodgeForce = 15000.0f;
 
 		Vector2f m_LastMoveDirection = { 0.0f, -1.0f };
+
+		Collider* mp_InteractableRange = nullptr;
+		std::vector<Object*> mp_InteractableObject;
 	}; 
 }

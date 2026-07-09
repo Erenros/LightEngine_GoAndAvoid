@@ -139,7 +139,7 @@ namespace Demo
 
 		pProj->SetPosition(GetPosition().x, GetPosition().y);
 		pProj->ScaleBy({ 0.1f, 0.1f });
-		pProj->GetTransform2D().UpdateChildPosition();
+		//pProj->GetTransform2D().UpdateChildPosition();
 
 		pProj->SetColor(Color::Red);
 		pProj->SetSpeed(700.0f);

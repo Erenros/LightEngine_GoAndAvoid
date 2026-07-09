@@ -74,6 +74,12 @@ namespace Demo
 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
+
+		if (im.IsDown('F') && mp_InteractableObject.size() != 0)
+		{
+			mp_InteractableObject[0]->Interact();
+		}
+
 	}
 
 	void GCPlayer::UpdateDodgeRoll(float32 dt)
@@ -101,6 +107,8 @@ namespace Demo
 
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
 
+		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 0.6f, 0.6f }, true);
+
 		SetRigidBody(true);
 		GetRigidBody().SetGravity(false);
 		GetRigidBody().ActivateDamping(true);
@@ -113,7 +121,7 @@ namespace Demo
 		AddAnimation("Walk", 0, 5, 3, 64, 64, 0.2f);
 		AddAnimation("Hit", 0, 3, 5, 64, 64, 0.2f);
 		AddAnimation("Death", 0, 10, 6, 64, 64, 0.25f);
-		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.25f);
+		AddAnimation("Appear", 0, 11, 9, 64, 64, 0.095f);
 		AddAnimation("Teleport", 0, 11, 21, 64, 64, 0.25f);
 
 		AddFunctionInFrame("Appear", 11, [this]()
@@ -144,6 +152,51 @@ namespace Demo
 	void GCPlayer::OnCollision(Entity* collidedWith) {}
 	void GCPlayer::OnCollisionExit(Entity* collidedWith) {}
 	void GCPlayer::OnCollisionEnter(Entity* collidedWith) {}
+
+	void GCPlayer::OnTrigger(Entity* collidedWith)
+	{
+	}
+
+	void GCPlayer::OnTriggerExit(Entity* collidedWith)
+	{
+		bool toClear = false;
+		for (auto it = mp_InteractableObject.begin(); it != mp_InteractableObject.end(); )
+		{
+			Object* obj = *it;
+
+			if (obj == nullptr || obj->GetId() == collidedWith->GetId())
+			{ 
+				obj->SetColor(Color{ 255, 255, 255, 255 });
+				it = mp_InteractableObject.erase(it);
+			} 
+			else
+			{
+				++it;
+			}
+
+		}
+	}
+
+	void GCPlayer::OnTriggerEnter(Entity* collidedWith)
+	{
+		if (collidedWith->IsTag(GameTag::Decor))
+		{
+			Object* pObj = static_cast<Object*>(collidedWith);
+
+			bool alreadyIn = false;
+			for (auto& obj : mp_InteractableObject)
+			{
+				if (collidedWith->GetId() == obj->GetId())
+					alreadyIn = true;
+			}
+
+			if (!alreadyIn && pObj->CanBeInteractWith())
+			{
+				mp_InteractableObject.push_back(pObj);
+				pObj->SetColor(Color{ 0, 255, 0, 150 });
+			}
+		}
+	}
 
 	void GCPlayer::Death()
 	{

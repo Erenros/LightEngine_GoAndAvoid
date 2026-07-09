@@ -9,5 +9,6 @@ namespace Demo
 		Player,
 		Enemy,
 		Wall,
+		Decor,
 	};
 }

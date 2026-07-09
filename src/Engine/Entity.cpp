@@ -87,7 +87,6 @@ void Entity::Update(float32 dt)
 	if (m_RigidBody.IsActive())
 		m_RigidBody.Update(dt);
 
-	m_Transform.UpdateChildPosition();
 
 	if (m_IsStatic == false)
 	{
@@ -123,6 +122,7 @@ void Entity::Update(float32 dt)
 	}
 
 	OnUpdate();
+	m_Transform.UpdateChildPosition();
 }
 
 void Entity::AddCollider(Collider* pCollider)
