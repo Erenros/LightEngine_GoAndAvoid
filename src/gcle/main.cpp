@@ -11,18 +11,21 @@
 #include "SceneManager.h"
 #include "Profiler.h"
 
+#include "Tuto-GCLE/DemoScene.h"
+
 #undef main
 
 
 int main(int argc, char** argv)
 { 
-    //_CrtSetBreakAlloc(29164);
+    //_CrtSetBreakAlloc(135);
 
     GameManager& gm = GameManager::GetInstance();
 
     gm.Init(640, 480, 120);
 
-    SceneManager::GetInstance().CreateScene<SampleScene>("DebugScene");
+    SceneManager::GetInstance().CreateScene<DemoScene>("DebugScene");
+    SceneManager::GetInstance().CreateScene<SampleScene>("Sample");
 
     SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 

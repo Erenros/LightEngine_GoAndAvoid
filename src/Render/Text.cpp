@@ -50,6 +50,7 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
 	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_BLEND);
 
 	mp_Texture = SDL_CreateTextureFromSurface(pWindow->GetRenderer(), textSurface);
+	SDL_SetTextureScaleMode(mp_Texture, SDL_SCALEMODE_NEAREST);
 
 	SDL_DestroySurface(textSurface);
 

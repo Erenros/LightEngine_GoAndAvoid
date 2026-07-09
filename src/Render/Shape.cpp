@@ -2,6 +2,16 @@
 #include <SDL3/SDL.h>
 #include "Engine/Entity.h"
 
+const Color Color::White = { 255,255,255,255 };
+const Color Color::Black = { 0,0,0,255 };
+const Color Color::Red = { 255,0,0,255 };
+const Color Color::Green = { 0,255,0,255 };
+const Color Color::Blue = { 0,0,255,255 };
+const Color Color::Yellow = { 255,255,0,255 };
+const Color Color::Cyan = { 0,255,255,255 };
+const Color Color::Magenta = { 255,0,255,255 };
+const Color Color::Transparent = { 0,0,0,0 };
+
 namespace gcle
 {
 	SDL_FColor ToSDLColor(Color c)
@@ -81,6 +91,22 @@ namespace gcle
 		return pivot;
 	}
 
+	Color Shape::GetColor() const
+	{
+		if (m_Verticies.empty() || m_Verticies[0] == nullptr)
+			return { 255, 255, 255, 255 };
+
+		const SDL_FColor& c = m_Verticies[0]->color;
+
+		return
+		{
+			static_cast<uint8>(c.r * 255.f),
+			static_cast<uint8>(c.g * 255.f),
+			static_cast<uint8>(c.b * 255.f),
+			static_cast<uint8>(c.a * 255.f)
+		};
+	}
+
 	void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	{
 		Vector2f newPivot = { x, y };
@@ -130,6 +156,19 @@ namespace gcle
 	void Shape::Rotate(Degrees delta)
 	{
 		SetRotation(m_Transform.GetDegAngle() + delta);
+	}
+
+	void Shape::SetColor(Color color)
+	{
+		SDL_FColor sdlColor = ToSDLColor(color);
+
+		for (SDL_Vertex* vertex : m_Verticies)
+		{
+			if (vertex != nullptr)
+			{
+				vertex->color = sdlColor;
+			}
+		}
 	}
 
 	void Shape::UpdateRenderVertices()
@@ -441,6 +480,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[3]->tex_coord = { u1, v1 };
@@ -454,6 +499,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[2]->tex_coord = { u1, v1 };
@@ -464,6 +515,13 @@ namespace gcle
 			float32 v0 = y / static_cast<float32>(textH);
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { (u0 + u1) * 0.5f, (v0 + v1) * 0.5f };
 			for (int i = 1; i < m_Smoothness + 1; i++)
 			{
@@ -497,6 +555,17 @@ namespace gcle
 	void Shape::SetScale(float32 scale) { SetScale({ scale, scale }); }
 
 	Shape* Rectangle::Clone() const { return GCLE_NEW Rectangle(*this); }
+
+	void Shape::SetFlip(TextureFlipMode mode)
+	{
+		m_FlipMode = mode;
+	}
+
+	TextureFlipMode Shape::GetFlip() const
+	{
+		return m_FlipMode;
+	}
+
 	Shape* Circle::Clone() const { return GCLE_NEW Circle(*this); }
 	Shape* Triangle::Clone() const { return GCLE_NEW Triangle(*this); }
 

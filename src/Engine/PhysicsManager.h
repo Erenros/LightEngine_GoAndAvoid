@@ -91,6 +91,7 @@ public:
 	void SetDynamicQuadTreeSize(bool activate);
 	void SetQuadTreePos1(Vector2f pos1);
 	void SetQuadTreePos2(Vector2f pos2);
+	void RebuildQuadTree();
 	void SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame);
 
 private:
@@ -105,7 +106,7 @@ private:
 	void MakeTreePairs(std::vector<Collider*>* pActiveColliders);
 	void MakePairs(std::vector<Collider*>* pActiveColliders);
 
-	void UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt);
+	void UpdateQuadTree(std::vector<Collider*>& activeColliders, float32 dt);
 	void UpdateWithoutQuadTree(std::vector<Collider*> activeColliders, float32 dt);
 
 private:
@@ -129,6 +130,7 @@ private:
 private:
 	bool m_ActivateQuadTree = true;
 	bool m_DynamicQuadTreeSize = false;
+	bool m_ForceQuadTreeRegen = false;
 
 	Vector2f m_QuadTreePos1{ -50000, -50000 };
 	Vector2f m_QuadTreePos2{ 50000, 50000 };

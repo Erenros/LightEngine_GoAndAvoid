@@ -17,7 +17,7 @@ protected:
 	bool m_isSprite = false;
 	bool m_textureChanged = false;
 
-	bool m_toDestroy = false;
+	bool m_toDestroy = false; 
 
 public:
 
@@ -39,9 +39,7 @@ public:
 
 	virtual ~Texture() ;
 
-	void InitTextureWithSurface(Window* pWindow, Surface* pSurface);
-
-
+	void InitTextureWithSurface(Window* pWindow, Surface* pSurface); 
 
 	//Maybe not really usefull now
 	Texture(Window* pWindow, const std::string& path);

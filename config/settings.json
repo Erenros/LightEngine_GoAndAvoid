@@ -49,9 +49,19 @@
         "preprocessorDefinitions": []
       },
       "config-release": {
-        "additionalDependencies": [],
-        "additionalIncludeDirectories": [],
-        "additionalLibraryDirectories": [],
+        "additionalDependencies": [
+          "SDL3.lib;SDL3_mixer.lib;SDL3_image.lib;%(AdditionalDependencies)"
+        ],
+        "additionalIncludeDirectories": [
+          "$(SolutionDir)../lib/SDL3/include",
+          "$(SolutionDir)../lib/SDL3_mixer/include",
+          "$(SolutionDir)../lib/SDL3_image/include"
+        ],
+        "additionalLibraryDirectories": [
+          "$(SolutionDir)../lib/SDL3/lib/x64",
+          "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
+          "$(SolutionDir)../lib/SDL3_image/lib/x64"
+        ],
         "preprocessorDefinitions": []
       },
       "dependencies": [
@@ -115,9 +125,19 @@
         ]
       },
       "config-release": {
-        "additionalDependencies": [],
-        "additionalIncludeDirectories": [],
-        "additionalLibraryDirectories": [],
+        "additionalDependencies": [
+          "SDL3.lib",
+          "SDL3_mixer.lib",
+          "SDL3_image.lib",
+          "%(AdditionalDependencies)"
+        ],
+        "additionalIncludeDirectories": [
+        ],
+        "additionalLibraryDirectories": [
+          "$(SolutionDir)../lib/SDL3/lib/x64",
+          "$(SolutionDir)../lib/SDL3_mixer/lib/x64",
+          "$(SolutionDir)../lib/SDL3_image/lib/x64"
+        ],
         "preprocessorDefinitions": []
       },
       "dependencies": [

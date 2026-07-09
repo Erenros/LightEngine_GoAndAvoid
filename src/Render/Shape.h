@@ -13,12 +13,46 @@ class Surface;
 struct SDL_Vertex;
 struct SDL_FPoint;
 
-struct Color {
-	uint8 r;
-	uint8 g;
-	uint8 b;
-	uint8 a;
+struct Color
+{
+	uint8 r = 0;
+	uint8 g = 0;
+	uint8 b = 0;
+	uint8 a = 0;
+
+	constexpr Color() = default;
+	constexpr Color(uint8 _r, uint8 _g, uint8 _b, uint8 _a) : r(_r), g(_g), b(_b), a(_a)
+	{
+	}
+
+	static const Color White;
+	static const Color Black;
+	static const Color Red;
+	static const Color Green;
+	static const Color Blue;
+	static const Color Yellow;
+	static const Color Cyan;
+	static const Color Magenta;
+	static const Color Transparent;
 };
+
+enum class TextureFlipMode : int32
+{
+	FLIP_NONE,                                                                  /*	Do not flip			*/
+	FLIP_HORIZONTAL,                                                            /*	Flip horizontally	*/
+	FLIP_VERTICAL,                                                              /*	Flip vertically		*/
+	FLIP_HORIZONTAL_AND_VERTICAL = (FLIP_HORIZONTAL | FLIP_VERTICAL)
+};
+
+inline TextureFlipMode operator|(TextureFlipMode a, TextureFlipMode b)
+{
+	return static_cast<TextureFlipMode>(static_cast<int32>(a) | static_cast<int32>(b));
+}
+
+inline bool HasFlipFlag(TextureFlipMode value, TextureFlipMode flag)
+{
+	return (static_cast<int32>(value) & static_cast<int32>(flag)) != 0;
+}
 
 namespace gcle
 {
@@ -85,6 +119,21 @@ namespace gcle
 		Degrees GetRotation();
 
 		Transform2D* GetTransform();
+		Color GetColor() const;
+ 
+		public:
+
+		void SetTexture(Window* window, SurfaceStruct* pSurface);
+		void SetOrigin(Vector2f origin);
+		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+		 
+		void SetScale(Vector2f scale);
+		void SetScale(float32 scale);
+		void ScaleBy(Vector2f factor);
+		 
+		void SetRotation(Degrees angle); 
+		void Rotate(Degrees delta);
+		void SetColor(Color color);
 
 
 	public:
@@ -109,24 +158,18 @@ namespace gcle
 		virtual void SetTrianglePoints(std::vector<Vector2f> newTrianglePoints) {};
 
 	public:
-
-		void SetTexture(Window* window, SurfaceStruct* pSurface);
-		void SetOrigin(Vector2f origin);
-		void SetPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-		 
-		void SetScale(Vector2f scale);
-		void SetScale(float32 scale);
-		void ScaleBy(Vector2f factor);
-		 
-		void SetRotation(Degrees angle); 
-		void Rotate(Degrees delta);
-
-	public:
 		void Move(Vector2f translation);
 
 		virtual void SetTextureRect(int16 x, int16 y, int16 w, int16 h, int16 textW, int16 textH);
 
 		virtual Shape* Clone() const = 0;
+
+		protected:
+			TextureFlipMode m_FlipMode = TextureFlipMode::FLIP_NONE;
+
+	public:
+		void SetFlip(TextureFlipMode mode);
+		TextureFlipMode GetFlip() const;
 	};
 
 

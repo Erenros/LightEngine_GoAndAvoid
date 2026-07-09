@@ -40,12 +40,16 @@ public:
 	Entity* GetOwner() const	;
 	void SetOwner(Entity* pOwner);
 
+	bool IsTrigger() const;
+	void SetTrigger(bool isTrigger);
+
 private:
 	Shape* mp_Shape = nullptr;
 
 	Entity* mp_Owner = nullptr;
 
 	bool m_IsActive = false;
+	bool m_IsTrigger = false;
 
 	CollisionDirection m_CollisionDirection;
 

@@ -49,7 +49,7 @@ void Sprite::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 }
 
 
-void Sprite::PlayAnimation(const std::string& id, int8 mode)
+void Sprite::PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interrupt)
 {
 	if (!m_animationMap.contains(id))
 	{
@@ -57,10 +57,31 @@ void Sprite::PlayAnimation(const std::string& id, int8 mode)
 		return;
 	}
 
+	if (!CanInterruptCurrentAnimation(interrupt))
+		return;
+
+	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) &&
+		m_currentAnimationId == id)
+	{
+		return;
+	}
+
+	m_currentAnimationId = id;
 	mp_CurrentAnimation = m_animationMap[id];
-	m_CurrentFrameX = mp_CurrentAnimation->firstFrame;
+
+	if (HasFlag(mode, AnimationMode::Reverse))
+	{
+		m_CurrentFrameX = mp_CurrentAnimation->lastFrame;
+		mp_CurrentAnimation->m_frameId = mp_CurrentAnimation->lastFrame - mp_CurrentAnimation->firstFrame;
+	}
+	else
+	{
+		m_CurrentFrameX = mp_CurrentAnimation->firstFrame;
+		mp_CurrentAnimation->m_frameId = 0;
+	}
+
 	m_CurrentFrameY = mp_CurrentAnimation->line;
-	m_Timer = mp_CurrentAnimation->duration;
+	m_Timer = 0.f;
 	m_Mode = mode;
 }
 
@@ -70,7 +91,7 @@ void Sprite::StopAnimation()
 	m_CurrentFrameX = 0;
 	m_CurrentFrameY = 0;
 	m_Timer = 0.f;
-	m_Mode = 0;
+	m_Mode = AnimationMode::None;
 }
 
 void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
@@ -85,27 +106,47 @@ void Sprite::UpdateAnimation(float32 deltatime, gcle::Shape* pShape)
 		return;
 
 	m_Timer = 0.f;
-	anim->frameId++;
 
-	m_CurrentFrameX++;
-	if (m_CurrentFrameX > anim->lastFrame) 
+	int32 direction = HasFlag(m_Mode, AnimationMode::Reverse) ? -1 : 1;
+
+	m_CurrentFrameX += direction;
+	anim->m_frameId += direction;
+	 
+	if (!HasFlag(m_Mode, AnimationMode::Reverse))
 	{
-		if (m_Mode == 1)
+		if (m_CurrentFrameX > anim->lastFrame)
 		{
-			StopAnimation();
-			return;
-		}
+			if (!HasFlag(m_Mode, AnimationMode::Loop))
+			{
+				StopAnimation();
+				return;
+			}
 
-		m_CurrentFrameX = anim->firstFrame;
-		anim->frameId = 0;
+			m_CurrentFrameX = anim->firstFrame;
+			anim->m_frameId = 0;
+		}
+	}
+	else
+	{
+		if (m_CurrentFrameX < anim->firstFrame)
+		{
+			if (!HasFlag(m_Mode, AnimationMode::Loop))
+			{
+				StopAnimation();
+				return;
+			}
+
+			m_CurrentFrameX = anim->lastFrame;
+			anim->m_frameId = anim->lastFrame - anim->firstFrame;
+		}
 	}
 
 
 	int32 x = m_CurrentFrameX * anim->tileW;
 	int32 y = m_CurrentFrameY * anim->tileH;
 
-	if (anim->m_animationFunction.find(anim->frameId) != anim->m_animationFunction.end()) {
-		anim->m_animationFunction[anim->frameId]();
+	if (anim->m_animationFunction.find(anim->m_frameId) != anim->m_animationFunction.end()) {
+		anim->m_animationFunction[anim->m_frameId]();
 	}
 
 	pShape->SetTextureRect(x, y, anim->tileW, anim->tileH, m_Width, m_Height);
@@ -117,7 +158,7 @@ bool Sprite::IsAnimationPlaying()
 }
 
 
-void Sprite::AddFunctionInFrameSprite(const std::string& animation, int32 frame, std::function<void*()> function) {
+void Sprite::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function) {
 	auto it = m_animationMap.find(animation);
 	if (it == m_animationMap.end())
 		return;
@@ -139,4 +180,36 @@ void Sprite::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	if (itFunction != anim->m_animationFunction.end()) {
 		anim->m_animationFunction.erase(itFunction);
 	}
+}
+
+const std::string& Sprite::GetCurrentAnimation() const
+{
+	return m_currentAnimationId;
+}
+
+bool Sprite::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return true;
+
+	if (interrupt == AnimationInterrupt::Force)
+		return true;
+
+	return !HasFlag(m_Mode, AnimationMode::Lock);
+}
+
+bool Sprite::IsAnimationAtStart() const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return false;
+
+	return HasFlag(m_Mode, AnimationMode::Reverse) ? m_CurrentFrameX == mp_CurrentAnimation->lastFrame : m_CurrentFrameX == mp_CurrentAnimation->firstFrame;
+}
+
+bool Sprite::IsAnimationAtEnd() const
+{
+	if (mp_CurrentAnimation == nullptr)
+		return false;
+
+	return HasFlag(m_Mode, AnimationMode::Reverse) ? m_CurrentFrameX == mp_CurrentAnimation->firstFrame : m_CurrentFrameX == mp_CurrentAnimation->lastFrame;
 }

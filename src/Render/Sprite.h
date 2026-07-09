@@ -31,10 +31,48 @@ struct Animation
 		tileH(tileHeight),
 		duration(duration)
 	{}
-	std::unordered_map<int, std::function<void*()>> m_animationFunction;
-	int32 frameId = 0;
+	std::unordered_map<int, std::function<void()>> m_animationFunction;
+	int m_frameId = 0;
 
 };
+
+// Mode : 
+// Loop = infinite loop
+// IgnoreIfAlreadyPlaying = If the same animation is already playing don't override it and let it end 
+// Reverse = Play the animation in the reverse order
+// Lock = Animation can't be cancel unless Animation Interrupt is set to Force
+enum class AnimationMode : uint8
+{
+	None = 0,
+	Loop = 1 << 0,
+	IgnoreIfAlreadyPlaying = 1 << 1,
+	Reverse = 1 << 2,
+	Lock = 1 << 3
+};
+
+// Mode : 
+// Normal = Animation can be interrupt unless the AnimationMode is Lock 
+// Override the AnimationMode lock
+enum class AnimationInterrupt : uint8
+{
+	Normal,
+	Force
+};
+
+inline AnimationMode operator|(AnimationMode a, AnimationMode b)
+{
+	return static_cast<AnimationMode>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+}
+
+inline AnimationMode operator&(AnimationMode a, AnimationMode b)
+{
+	return static_cast<AnimationMode>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+}
+
+inline bool HasFlag(AnimationMode value, AnimationMode flag)
+{
+	return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
+}
 
 
 class Sprite : public Texture
@@ -50,9 +88,10 @@ private:
 	int32 m_CurrentFrameX = 0;
 	int32 m_CurrentFrameY = 0;
 
+	std::string m_currentAnimationId;
 	float32 m_Timer = 0.f;
 
-	int8 m_Mode = 0;
+	AnimationMode m_Mode = AnimationMode::None;
 
 public:
 	
@@ -72,10 +111,17 @@ public:
 		int32 tileWidth, 
 		int32 tileHeight, 
 		float32 duration = 0.5f);
+ 
+	void PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interrupt = AnimationInterrupt::Normal);
 
-	void PlayAnimation(const std::string& id, int8 mode);
-	void StopAnimation();
-
-	void AddFunctionInFrameSprite(const std::string& animation, int32 frame, std::function<void*()> function);
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function); 
+	void StopAnimation();  
 	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
+
+
+	const std::string& GetCurrentAnimation() const;
+	bool CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const;
+
+	bool IsAnimationAtStart() const;
+	bool IsAnimationAtEnd() const;
 };

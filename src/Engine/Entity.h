@@ -49,16 +49,10 @@ public:
 	void SetRotation(Degrees angle);
 
 	void SetTexture(const std::string& id);
+	void SetTextureFlip(TextureFlipMode mode);
 
-	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
-
-	// Mode : 0 = infinite loop | 1 = play animation only 1 time
-	void PlayAnimation(const std::string& id, int8 mode = 0);
-	void StopAnimation();
-	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function);
-	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
-
-	void SetLayer(int32 layer);
+	void SetLayer(int32 layer); 
+	void SetColor(Color color);
 
 public:
 	//void SetRenderShape(gcle::Shapes);
@@ -71,6 +65,7 @@ public:
 	RigidBody2D& GetRigidBody()	 ;
 	Transform2D& GetTransform2D();
 	gcle::Shape* GetRenderShape();
+	Color GetColor() const;
 
 public:
 	bool IsStatic() const;
@@ -81,15 +76,28 @@ public:
 	bool IsRigidBody() const;
 
 public:
+	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
+	void PlayAnimation(const std::string& id, AnimationMode mode = AnimationMode::IgnoreIfAlreadyPlaying, AnimationInterrupt interupt = AnimationInterrupt::Normal);
+	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function); 
+	void StopAnimation(); 
+	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
+	const std::string& GetCurrentAnimation() const;
+	bool CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const; 
+	bool IsAnimationAtStart() const;
+	bool IsAnimationAtEnd() const;
+
+
+public:
 	void AddCollider(Collider* pCollider);
 	void RemoveCollider(Collider* pCollider); 
 	const std::unordered_set<Collider*>& GetColliders() const;
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale);
+	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale, bool isTrigger = false);
 
 public:
 	void AddActiveScene(const std::string& sceneTag);
 	void RemoveActiveScene(const std::string& sceneTag); 
 	bool IsActiveIn(const std::string& sceneTag);
+	bool HasActiveScenes() const;
 
 public:
 	bool IsWorldText() const;
@@ -101,9 +109,14 @@ protected:
 	virtual void OnUpdate() {};
 	virtual void OnDestroy() {};
 	virtual void OnInitialize() {};
+
 	virtual void OnCollision(Entity* pCollidedWith) {};
 	virtual void OnCollisionExit(Entity* pCollidedWith) {};
 	virtual void OnCollisionEnter(Entity* pCollidedWith) {};
+
+	virtual void OnTrigger(Entity* pOther) {};
+	virtual void OnTriggerExit(Entity* pOther) {};
+	virtual void OnTriggerEnter(Entity* pOther) {};
 
 private:
 	void Initialize();
@@ -140,6 +153,7 @@ private:
 	std::vector<std::string> m_ActiveScenes;
 	std::unordered_set<Collider*> mp_Colliders;
 	std::unordered_map<int64, Entity*> m_CollidingEntity;
+	std::unordered_map<int64, Entity*> m_TriggeringEntity;
 
 private: 
 	friend class Scene;

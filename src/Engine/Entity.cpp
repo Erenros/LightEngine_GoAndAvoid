@@ -147,9 +147,10 @@ const std::unordered_set<Collider*>& Entity::GetColliders() const
 	return mp_Colliders;
 }
 
-Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale)
+Collider* Entity::CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale, bool isTrigger)
 {
 	Collider* collider = GCLE_NEW Collider();
+	collider->SetTrigger(isTrigger);
 
 	gcle::Shape* colliderShape = GetBaseShape(shape);
 
@@ -308,6 +309,14 @@ void Entity::SetTexture(const std::string& id)
 	RM.AddTexture(id, mp_RenderShape->GetTexture());
 }
 
+void Entity::SetTextureFlip(TextureFlipMode mode)
+{
+	if (mp_RenderShape == nullptr)
+		return;
+
+	mp_RenderShape->SetFlip(mode);
+}
+
 void Entity::SetRenderPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 {
 	if(mp_RenderShape != nullptr)
@@ -451,6 +460,11 @@ bool Entity::IsActiveIn(const std::string& sceneTag) {
 	return (std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), sceneTag) != m_ActiveScenes.end());
 }
 
+bool Entity::HasActiveScenes() const
+{
+	return !m_ActiveScenes.empty();
+}
+
 bool Entity::IsWorldText() const
 {
 	return m_IsWorldText;
@@ -468,7 +482,7 @@ void Entity::AddAnimation(const std::string& id, int32 firstFrame, int32 lastFra
 	sprite->AddAnimation(id, firstFrame, lastFrame, line, tileWidth, tileHeight, duration);
 }
 
-void Entity::PlayAnimation(const std::string& id, int8 mode)
+void Entity::PlayAnimation(const std::string& id, AnimationMode mode, AnimationInterrupt interupt)
 {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
@@ -477,7 +491,7 @@ void Entity::PlayAnimation(const std::string& id, int8 mode)
 		return;
 	}
 
-	sprite->PlayAnimation(id, mode);
+	sprite->PlayAnimation(id, mode, interupt);
 }
 
 void Entity::StopAnimation()
@@ -492,14 +506,14 @@ void Entity::StopAnimation()
 	sprite->StopAnimation();
 }
 
-void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void*()> function) {
+void Entity::AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function) {
 	Sprite* sprite = mp_RenderShape->GetTexture();
 	if (!sprite)
 	{
 		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
 		return;
 	}
-	sprite->AddFunctionInFrameSprite(animation, frame, function);
+	sprite->AddFunctionInFrame(animation, frame, function);
 }
 
 void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
@@ -512,6 +526,59 @@ void Entity::RemoveFunctionInFrame(const std::string& animation, int32 frame) {
 	sprite->RemoveFunctionInFrame(animation, frame);
 }
 
+const std::string& Entity::GetCurrentAnimation() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return std::string();
+	}
+	return sprite->GetCurrentAnimation();
+}
+
+bool Entity::CanInterruptCurrentAnimation(AnimationInterrupt interrupt) const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return false;
+	}
+	return sprite->CanInterruptCurrentAnimation(interrupt);
+}
+
+bool Entity::IsAnimationAtStart() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return false;
+	}
+	return sprite->IsAnimationAtStart();
+}
+
+bool Entity::IsAnimationAtEnd() const
+{
+	Sprite* sprite = mp_RenderShape->GetTexture();
+	if (!sprite)
+	{
+		GCLE_WARN << "Entity don't have texture, add one before use this function" << ENDL;
+		return false;
+	}
+	return sprite->IsAnimationAtEnd();
+}
+
+void Entity::SetColor(Color color)
+{
+	mp_RenderShape->SetColor(color);
+}
+
+Color Entity::GetColor() const
+{
+	return mp_RenderShape->GetColor();
+}
 void Entity::SetLayer(int32 layer)
 {
 	m_Layer = std::clamp(layer, 0, 15);

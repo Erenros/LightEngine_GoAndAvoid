@@ -70,7 +70,7 @@ void SampleScene::OnUpdate(Clock& time)
 	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		pEntity->PlayAnimation("anim2", 1);
+		pEntity->PlayAnimation("anim2", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		/*if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
 		{
 			SwitchCamera(mp_MainCamera);
@@ -85,4 +85,7 @@ void SampleScene::OnUpdate(Clock& time)
 	{
 		pEntity->StopAnimation();
 	}
+
+	if (InputManager::GetInstance().IsDown('O'))
+		SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene", false);
 } 
