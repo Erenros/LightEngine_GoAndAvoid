@@ -8,13 +8,14 @@ namespace Demo
 	{
 	public:
 
-		void Interact();
+		void Interact(Entity* pEntity);
 		bool CanBeInteractWith() const;
+		void SetInteract(bool interact);
 
 	protected:
-		virtual void OnInteract() {};
+		virtual void OnInteract(Entity* pEntity) {};
 
 	protected:
-		bool m_CanInteract = true;
+		bool m_CanInteract = false;
 	};
 }

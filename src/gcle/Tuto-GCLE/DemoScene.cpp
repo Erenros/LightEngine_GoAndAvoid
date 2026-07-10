@@ -20,21 +20,21 @@ void DemoScene::OnInitialize()
 
 	m_Smooth.Initialize(pSceneCamera, mp_Player);
 
-	CreateEntity<Demo::Table>(gcle::Shapes::Rectangle);
+	//CreateEntity<Demo::Table>(gcle::Shapes::Rectangle);
 
-	/*mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
 	mp_Enemy->SetTarget(mp_Player);
 	mp_Enemy->SetDetectionRange(600.0f);
 	mp_Enemy->SetAttackRange(400.0f);
 	mp_Enemy->SetPosition(100.0f, 100.0f);
 
-	Demo::GCEnemy* pEnemy2 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
-	pEnemy2->SetTarget(mp_Player);
-	pEnemy2->SetPosition(-200.0f, 150.0f);
+	//Demo::GCEnemy* pEnemy2 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	//pEnemy2->SetTarget(mp_Player);
+	//pEnemy2->SetPosition(-200.0f, 150.0f);
 
-	Demo::GCEnemy* pEnemy3 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
-	pEnemy3->SetTarget(mp_Player);
-	pEnemy3->SetPosition(200.0f, -150.0f);*/
+	//Demo::GCEnemy* pEnemy3 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	//pEnemy3->SetTarget(mp_Player);
+	//pEnemy3->SetPosition(200.0f, -150.0f);
 
 
 

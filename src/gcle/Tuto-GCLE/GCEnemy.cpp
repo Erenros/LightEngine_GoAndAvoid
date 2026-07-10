@@ -9,6 +9,7 @@
 
 #include "Tuto-GCLE/Projectile.h"
 #include "Tuto-GCLE/Tag.h"
+#include "Tuto-GCLE/InteractableHeart.h"
 
 namespace Demo
 {
@@ -192,9 +193,23 @@ namespace Demo
 				Destroy();
 			});
 
-		PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
+		//PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
 
 		SetPosition(100.0f, 100.0f);
+
+		Entity* pSpawnZone = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<Entity>(gcle::Shapes::Rectangle);
+		pSpawnZone->SetParent(this);
+		pSpawnZone->SetPosition(0.0f, 0.0f);
+		pSpawnZone->SetRigidBody(false);
+		pSpawnZone->SetTexture("Spawn");
+		pSpawnZone->AddAnimation("Spawn", 0, 3, 0, 32, 32, 0.1f);
+		pSpawnZone->AddFunctionInFrame("Spawn", 3, [this]()
+			{
+				PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
+			});
+
+		pSpawnZone->PlayAnimation("Spawn", AnimationMode::Lock | AnimationMode::Loop);
+
 	}
 
 	void GCEnemy::OnCollision(Entity* collidedWith) {}
@@ -205,6 +220,10 @@ namespace Demo
 	{
 		Character::Death();
 		m_State = EnemyState::Dead;
+
+		InteractableHeart* pDrop = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<InteractableHeart>(gcle::Shapes::Rectangle);
+		pDrop->SetParent(this);
+		pDrop->SetPosition(0.0f, 0.0f);
 
 		GetRigidBody().Stop();
 		GetRigidBody().SetActive(false);

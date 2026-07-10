@@ -17,10 +17,12 @@ void Demo::Table::OnInitialize()
     SetTexture("Table_Vertical");
 }
 
-void Demo::Table::OnInteract()
+void Demo::Table::OnInteract(Entity* pEntity)
 {
     if (m_IsDown == false)
     {
+        SetTag(GameTag::Wall);
+
         SetStatic(false);
         GetRigidBody().ActivateDamping(true);
         GetRigidBody().SetDampingStrenght(0.99f);

@@ -77,7 +77,7 @@ namespace Demo
 
 		if (im.IsDown('F') && mp_InteractableObject.size() != 0)
 		{
-			mp_InteractableObject[0]->Interact();
+			mp_InteractableObject[0]->Interact(this);
 		}
 
 	}
@@ -166,6 +166,7 @@ namespace Demo
 
 			if (obj == nullptr || obj->GetId() == collidedWith->GetId())
 			{ 
+				obj->SetInteract(false);
 				obj->SetColor(Color{ 255, 255, 255, 255 });
 				it = mp_InteractableObject.erase(it);
 			} 
@@ -194,6 +195,7 @@ namespace Demo
 			{
 				mp_InteractableObject.push_back(pObj);
 				pObj->SetColor(Color{ 0, 255, 0, 150 });
+				pObj->SetInteract(true);
 			}
 		}
 	}

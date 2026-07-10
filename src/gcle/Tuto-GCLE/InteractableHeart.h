@@ -1,19 +1,16 @@
 #pragma once
-
 #include "Tuto-GCLE/Object.h"
-
 
 namespace Demo
 {
-	class Table : public Object
+	class InteractableHeart : public Object
 	{
-	public:
+	public: 
 		void OnInitialize() override;
 		void OnInteract(Entity* pEntity) override;
+		void OnUpdate() override;
 
-		bool IsDown() const;
 	private:
-
-		bool m_IsDown = false;
-	};
+		int m_HealAmount = 10;
+	}; 
 }

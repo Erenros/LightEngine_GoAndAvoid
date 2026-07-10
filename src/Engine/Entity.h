@@ -54,6 +54,8 @@ public:
 	void SetLayer(int32 layer); 
 	void SetColor(Color color);
 
+	void SetParent(Entity* pEntity);
+
 public:
 	//void SetRenderShape(gcle::Shapes);
 	Vector2f GetScale();

@@ -294,6 +294,14 @@ void Entity::SetTexture(const std::string& id)
 	if (mp_RenderShape == nullptr)
 		return;
 
+	if (mp_RenderShape->GetTexture() != nullptr)
+	{
+		if (mp_RenderShape->GetTexture()->GetId() == id)
+		{
+			return;
+		}
+	}
+
 	RessourceManager& RM  = RessourceManager::GetInstance();
 
 	if (SceneManager::GetInstance().GetCurrentSceneTag() != "") {
@@ -573,6 +581,14 @@ bool Entity::IsAnimationAtEnd() const
 void Entity::SetColor(Color color)
 {
 	mp_RenderShape->SetColor(color);
+}
+
+void Entity::SetParent(Entity* pEntity)
+{
+	mp_RenderShape->GetTransform()->SetParent(pEntity->GetRenderShape()->GetTransform());
+	mp_RenderShape->GetTransform()->UpdateChildPosition();
+	m_Transform.SetParent(&pEntity->GetTransform2D());
+	GetTransform2D().UpdateChildPosition();
 }
 
 Color Entity::GetColor() const
