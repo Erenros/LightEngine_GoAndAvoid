@@ -10,7 +10,7 @@ void DebugScene::OnInitialize()
 {
 	Scene::OnInitialize();
 
-	std::string text = "Test";
+	std::string text = "Test Salut, je suis thomas le goat et ethan va te faire";
 	CreateText(text, { 40, 40 }, 50);
 
 	Collider* setUpCollider = nullptr;

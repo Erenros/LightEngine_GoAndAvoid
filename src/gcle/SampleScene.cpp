@@ -38,7 +38,6 @@ void SampleScene::OnInitialize()
 	//pEntity->GetRigidBody().SetCollisionOnContinuous();
 
 	pEntity = entity1;
-
 	mp_MainCamera->SetFollowing(entity1);
 
 	pSceneCamera = CreateCamera();

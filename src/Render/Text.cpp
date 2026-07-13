@@ -8,53 +8,141 @@
 
 SDL_Texture* Text::GetTexture(Window* pWindow)
 {
-	if (mp_Texture != nullptr && !m_NeedToChange)
-		return mp_Texture;
-
-	m_NeedToChange = false;
-	SDL_DestroyTexture(mp_Texture);
-
-	if (mp_Font == nullptr || !mp_Font->IsFontInit())
-	{
-		GCLE_WARN << "Font is nullptr can't create texture for text" << ENDL;
-		return nullptr;
-	}
+    if (mp_Texture != nullptr && !m_NeedToChange)
+        return mp_Texture;
 
 
-	//SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_text.c_str(), *mp_color);
-	int32 width = 0;
-	int32 height = 0;
+    m_NeedToChange = false;
 
-	mp_Font->GetTextSize(m_Text, width, height);
 
-	float32 factor = static_cast<float32>(m_FontSize) / static_cast<float32>(mp_Font->GetFontSize());
+    if (mp_Texture != nullptr)
+    {
+        SDL_DestroyTexture(mp_Texture);
+        mp_Texture = nullptr;
+    }
 
-	mp_Rect->w = width * factor;
-	mp_Rect->h = height * factor;
 
-	SDL_Surface* textSurface = SDL_CreateSurface(static_cast<int32>(width * factor), static_cast<int32>(height * factor), SDL_PIXELFORMAT_RGBA32);
-	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_ADD);
-	
-	int32 x = 0;
-	for (auto& charactere : m_Text) {
-		GlyphInfo& info = mp_Font->GetGlypInfo(charactere);
-		SDL_Rect SrcRect = { info.x, info.y, info.advanceX, info.height };
-		SDL_Rect DistRect = {static_cast<int32>(x * factor), 0, static_cast<int32>(info.advanceX * factor), static_cast<int32>(info.height * factor)};
+    if (mp_Font == nullptr || !mp_Font->IsFontInit())
+    {
+        GCLE_WARN << "Font is nullptr can't create texture for text" << ENDL;
+        return nullptr;
+    }
 
-		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->a);
-		SDL_SetSurfaceAlphaMod(mp_Font->GetFontSurface(), mp_Color->a);
 
-		SDL_BlitSurfaceScaled(mp_Font->GetFontSurface(), &SrcRect, textSurface, &DistRect, SDL_SCALEMODE_LINEAR);
-		x += info.advanceX;
-	}
-	SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_BLEND);
+    int32 width = 0;
+    int32 height = 0;
 
-	mp_Texture = SDL_CreateTextureFromSurface(pWindow->GetRenderer(), textSurface);
-	SDL_SetTextureScaleMode(mp_Texture, SDL_SCALEMODE_NEAREST);
+    mp_Font->GetTextSize(m_Text, width, height);
 
-	SDL_DestroySurface(textSurface);
 
-	return mp_Texture;
+    float32 factor =
+        static_cast<float32>(m_FontSize) /
+        static_cast<float32>(mp_Font->GetFontSize());
+
+
+    mp_Rect->w = width * factor;
+    mp_Rect->h = height * factor;
+
+
+    SDL_Surface* textSurface =
+        SDL_CreateSurface(
+            static_cast<int32>(width * factor),
+            static_cast<int32>(height * factor),
+            SDL_PIXELFORMAT_RGBA32
+        );
+
+
+    if (!textSurface)
+        return nullptr;
+
+
+    SDL_SetSurfaceBlendMode(
+        textSurface,
+        SDL_BLENDMODE_BLEND
+    );
+
+
+    int32 x = 0;
+
+
+    for (char charactere : m_Text)
+    {
+        GlyphInfo* info = mp_Font->GetGlypInfo(charactere);
+
+
+        if (info == nullptr)
+        {
+            continue;
+        }
+         
+        if (charactere != ' ')
+        {
+            SDL_Rect src =
+            {
+                info->x,
+                info->y,
+                info->width,
+                info->height
+            };
+
+
+            SDL_Rect dst =
+            {
+                static_cast<int32>(x * factor),
+                0,
+                static_cast<int32>(info->width * factor),
+                static_cast<int32>(info->height * factor)
+            };
+
+
+            SDL_SetSurfaceColorMod(
+                mp_Font->GetFontSurface(),
+                mp_Color->r,
+                mp_Color->g,
+                mp_Color->b
+            );
+
+
+            SDL_SetSurfaceAlphaMod(
+                mp_Font->GetFontSurface(),
+                mp_Color->a
+            );
+
+
+            SDL_BlitSurfaceScaled(
+                mp_Font->GetFontSurface(),
+                &src,
+                textSurface,
+                &dst,
+                SDL_SCALEMODE_LINEAR
+            );
+        }
+
+         
+        x += info->advanceX;
+    }
+
+
+    mp_Texture =
+        SDL_CreateTextureFromSurface(
+            pWindow->GetRenderer(),
+            textSurface
+        );
+
+
+    if (mp_Texture)
+    {
+        SDL_SetTextureScaleMode(
+            mp_Texture,
+            SDL_SCALEMODE_NEAREST
+        );
+    }
+
+
+    SDL_DestroySurface(textSurface);
+
+
+    return mp_Texture;
 }
 
 SDL_FRect* Text::GetSDLRect()

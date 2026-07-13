@@ -38,6 +38,7 @@ void Font::InitFont(const std::string& path)
 
     mp_Font = font;
 	ReadFromAtlasChunk(path.c_str());
+
     return;
 }
 
@@ -89,15 +90,29 @@ bool Font::ReadFromAtlasChunk(const std::string& path) {
 	return false;
 }
 
-GlyphInfo& Font::GetGlypInfo(char& charactere){
-	return m_Glyphs[charactere];
+GlyphInfo* Font::GetGlypInfo(char c)
+{
+	auto it = m_Glyphs.find(c);
+	if (it == m_Glyphs.end())
+		return nullptr;
+
+	return &it->second;
 }
 
-void Font::GetTextSize(const std::string& text, int32& width, int32& height){
-	for (auto& charactere : text) {
-		GlyphInfo& info = m_Glyphs[charactere];
-		height = std::max(height, info.height);
-		width += info.advanceX;
+void Font::GetTextSize(const std::string& text, int32& width, int32& height)
+{
+	width = 0;
+	height = 0;
+
+	for (char c : text)
+	{
+		GlyphInfo* info = GetGlypInfo(c);
+
+		if (!info)
+			continue;
+
+		width += info->advanceX;
+		height = std::max(height, info->height);
 	}
 }
 

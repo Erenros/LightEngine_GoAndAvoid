@@ -44,7 +44,7 @@ private:
 	bool ReadFromAtlasChunk(const std::string& path);
 
 public:
-	GlyphInfo& GetGlypInfo(char& charactere);
+	GlyphInfo* GetGlypInfo(char charactere);
 
 	void GetTextSize(const std::string& text, int32& width, int32& height);
 

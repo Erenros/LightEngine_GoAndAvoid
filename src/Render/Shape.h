@@ -34,6 +34,9 @@ struct Color
 	static const Color Cyan;
 	static const Color Magenta;
 	static const Color Transparent;
+
+	
+
 };
 
 enum class TextureFlipMode : int32

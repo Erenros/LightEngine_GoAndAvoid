@@ -12,6 +12,9 @@ void DemoScene::OnInitialize()
 {
 	Scene::OnInitialize();
 
+	std::string text = "Test            Salut, je suis thomas !";
+	CreateText(text, { 40, 40 }, 50);
+
 	pSceneCamera = CreateCamera();
 	SwitchCamera(pSceneCamera);
 
