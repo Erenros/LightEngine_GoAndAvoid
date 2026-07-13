@@ -63,7 +63,7 @@ T* Scene::CreateUI()
 
 	ui->Initialize();
 
-	GameManager::GetInstance().AddEntity(new_UI);
+	GameManager::GetInstance().AddUI(new_UI);
 
 	return new_UI;
 }

@@ -100,6 +100,7 @@ void GameManager::Loop()
 
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
+		UpdateUISystem();
 		PROFILER_END("Entity");
 
 		PROFILER_START("Input", "Input Update");

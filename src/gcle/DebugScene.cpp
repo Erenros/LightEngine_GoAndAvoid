@@ -51,16 +51,16 @@ void DebugScene::OnInitialize()
 	}
 
 	//creation d'un trigger
-	Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	{
-		entity2->SetPosition(200, -100);
-		entity2->SetScale({ 1, 5 });
-		entity2->SetRotation(0);
-		entity2->SetTag(Demo::Tag::Trigger);
-		entity2->SetRigidBody(false);
-		entity2->SetStatic(true);
-		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
-	}
+	//Entity* entity2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	//{
+	//	entity2->SetPosition(200, -100);
+	//	entity2->SetScale({ 1, 5 });
+	//	entity2->SetRotation(0);
+	//	entity2->SetTag(Demo::Tag::Trigger);
+	//	entity2->SetRigidBody(false);
+	//	entity2->SetStatic(true);
+	//	setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+	//}
 
 	//creation d'un sol
 	/*Entity* entity3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
@@ -74,11 +74,11 @@ void DebugScene::OnInitialize()
 		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
 	}*/
 
-	//Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");
-	//ui->SetScale({ 10, 1 });
-	//ui->GetText()->SetFontSize(300);
-	//ui->GetText()->SetColor(0, 0, 0, 0);
-	//ui->SetPosition(1000, 500);
+	Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");
+	ui->SetScale({ 10, 10 });
+	ui->GetText()->SetFontSize(300);
+	ui->GetText()->SetColor(0, 0, 0, 255);
+	ui->SetPosition(500, 500);
 	//ui->SetFunctions({});
 	//ou 
 	//ui->AddFunction();

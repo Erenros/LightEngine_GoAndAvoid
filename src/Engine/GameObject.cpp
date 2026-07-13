@@ -9,7 +9,8 @@
 
 GameObject::~GameObject()
 {
-    delete mp_RenderShape;
+    if (mp_RenderShape == nullptr)
+        delete mp_RenderShape;
     mp_RenderShape = nullptr;
 }
 
