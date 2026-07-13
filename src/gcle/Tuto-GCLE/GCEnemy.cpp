@@ -142,8 +142,8 @@ namespace Demo
 		pProj->GetTransform2D().UpdateChildPosition();
 
 		pProj->SetColor(Color::Red);
-		pProj->SetSpeed(700.0f);
-		pProj->GoToDirection(worldTarget.x, worldTarget.y);
+		//pProj->SetSpeed(700.0f);
+		//pProj->GoToDirection(worldTarget.x, worldTarget.y);
 	}
 
 	void GCEnemy::OnDestroy()
@@ -159,8 +159,8 @@ namespace Demo
 
 		SetRigidBody(true);
 		GetRigidBody().SetGravity(false);
-		GetRigidBody().ActivateDamping(true);
-		GetRigidBody().SetDampingStrenght(0.99f);
+		GetRigidBody().ActivateFriction(true);
+		GetRigidBody().SetFriction({ 0.99f , 0.99f});
 		GetRigidBody().SetCollisionOnContinuous();
 
 		SetTexture("enemy");
