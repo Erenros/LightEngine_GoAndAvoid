@@ -5,6 +5,7 @@
 #include "Vector2.hpp"
 
 using Radians = float32;
+using Vector2f = Vector2<float32>;
 
 
 #ifdef _DEBUG
@@ -14,6 +15,10 @@ using Radians = float32;
 #endif
 
 #define assert( condition ) if ( condition == false ) throw;
+
+Vector2f ComputeRatioPositionFromPivot(Vector2f pivot, Vector2f size, float32 ratioX, float32 ratioY);
+ 
+Vector2f ComputePivotFromRatioPosition(Vector2f ratioPosition, Vector2f size, float32 ratioX, float32 ratioY);
 
 int8 GenerateRandomNumber(int8 min, int8 max);
 

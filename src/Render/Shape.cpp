@@ -77,15 +77,11 @@ namespace gcle
 		if (m_Shape == Shapes::Circle)
 		{
 			float32 size = GetRadius() * 2.f;
-			Vector2f topLeft = { pivot.x - size * 0.5f, pivot.y - size * 0.5f };
-			return { topLeft.x + size * ratioX, topLeft.y + size * ratioY };
+			return ComputeRatioPositionFromPivot(pivot, { size, size }, ratioX, ratioY);
 		}
 		else if (m_Shape == Shapes::Rectangle)
 		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			Vector2f topLeft = { pivot.x - sizeX * 0.5f, pivot.y - sizeY * 0.5f };
-			return { topLeft.x + sizeX * ratioX, topLeft.y + sizeY * ratioY };
+			return ComputeRatioPositionFromPivot(pivot, { GetWidth(), GetHeight() }, ratioX, ratioY);
 		}
 
 		return pivot;
@@ -114,15 +110,11 @@ namespace gcle
 		if (m_Shape == Shapes::Circle)
 		{
 			float32 size = GetRadius() * 2.f;
-			newPivot.x = x - size * ratioX + size * 0.5f;
-			newPivot.y = y - size * ratioY + size * 0.5f;
+			newPivot = ComputePivotFromRatioPosition({ x, y }, { size, size }, ratioX, ratioY);
 		}
 		else if (m_Shape == Shapes::Rectangle)
 		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			newPivot.x = x - sizeX * ratioX + sizeX * 0.5f;
-			newPivot.y = y - sizeY * ratioY + sizeY * 0.5f;
+			newPivot = ComputePivotFromRatioPosition({ x, y }, { GetWidth(), GetHeight() }, ratioX, ratioY);
 		}
 
 		m_Transform.SetPosition(newPivot);

@@ -35,6 +35,7 @@ public:
 	void SetRigidBody(bool isRigidBody);
 
 	void SetPosition(float32 x, float32 y);
+	void SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY);
 	void SetRenderPosition(Vector2f v, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 	void SetRenderPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
@@ -61,6 +62,7 @@ public:
 	Vector2f GetScale();
 	Degrees GetRotation();
 	Vector2f GetPosition();
+	Vector2f GetPosition(float32 ratioX, float32 ratioY);
 	Vector2f GetRenderPosition();
 	int64 GetId() const			 ;
 	int32 GetLayer() const		 ;
@@ -123,6 +125,7 @@ protected:
 private:
 	void Initialize();
 	void Update(float32 dt);
+	Vector2f GetRenderSize() const;
 	void Initialize(gcle::Shapes shape);
 	gcle::Shape* GetBaseShape(gcle::Shapes shape);
 

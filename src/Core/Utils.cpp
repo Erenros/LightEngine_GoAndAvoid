@@ -3,6 +3,21 @@
 
 
 
+Vector2f ComputeRatioPositionFromPivot(Vector2f pivot, Vector2f size, float32 ratioX, float32 ratioY)
+{
+	Vector2f topLeft = { pivot.x - size.x * 0.5f, pivot.y - size.y * 0.5f };
+	return { topLeft.x + size.x * ratioX, topLeft.y + size.y * ratioY };
+}
+
+Vector2f ComputePivotFromRatioPosition(Vector2f ratioPosition, Vector2f size, float32 ratioX, float32 ratioY)
+{
+	return
+	{
+		ratioPosition.x - size.x * ratioX + size.x * 0.5f,
+		ratioPosition.y - size.y * ratioY + size.y * 0.5f
+	};
+}
+
 int8 GenerateRandomNumber(int8 min, int8 max){
 	if (max == 0) {
 		max += 1;

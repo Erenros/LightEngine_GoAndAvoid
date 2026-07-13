@@ -125,6 +125,27 @@ void Entity::Update(float32 dt)
 	m_Transform.UpdateChildPosition();
 }
 
+Vector2f Entity::GetRenderSize() const
+{
+	if (mp_RenderShape == nullptr)
+		return { 0.f, 0.f };
+
+	switch (mp_RenderShape->GetShape())
+	{
+	case gcle::Shapes::Rectangle:
+		return { mp_RenderShape->GetWidth(), mp_RenderShape->GetHeight() };
+
+	case gcle::Shapes::Circle:
+	{
+		float32 diameter = mp_RenderShape->GetRadius() * 2.f;
+		return { diameter, diameter };
+	}
+
+	default: 
+		return { 0.f, 0.f };
+	}
+}
+
 void Entity::AddCollider(Collider* pCollider)
 {
 	if (pCollider == nullptr)
@@ -214,6 +235,12 @@ void Entity::SetTag(int32 tag)
 Vector2f Entity::GetPosition()
 {
 	return m_Transform.GetPosition();
+} 
+
+Vector2f Entity::GetPosition(float32 ratioX, float32 ratioY)
+{
+	Vector2f pivot = m_Transform.GetPosition();
+	return ComputeRatioPositionFromPivot(pivot, GetRenderSize(), ratioX, ratioY);
 }
 
 void Entity::SetSpeed(float32 speed)
@@ -251,6 +278,12 @@ void Entity::SetRigidBody(bool isRigidBody)
 void Entity::SetPosition(float32 x, float32 y)
 {
 	m_Transform.SetPosition({ x, y });
+}
+
+void Entity::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
+{
+	Vector2f newPivot = ComputePivotFromRatioPosition({ x, y }, GetRenderSize(), ratioX, ratioY);
+	m_Transform.SetPosition(newPivot);
 }
 
 Vector2f Entity::GetScale()
