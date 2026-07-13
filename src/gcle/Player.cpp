@@ -25,6 +25,7 @@ void Player::OnUpdate() {
 }
 
 void Player::OnInitialize() {
-    RigidBody2D rb = GetRigidBody();
-    rb.SetDampingStrenght(1000);
+    RigidBody2D rb = GetRigidBody();    
+    rb.SetFriction({ 0.15, 0.15 });
+
 }

@@ -2,9 +2,9 @@
 #include <vector>
 #include <iostream>
 #include "Entity.h"
+#include "UI.h"
 #include "Core/InputManager.h"
-
-
+#include "Button.h"
 
 //class Entity;
 class Font;
@@ -13,8 +13,6 @@ class Camera;
 class GameManager;
 class Window;
 class WorldText;
-
-
 
 class Scene
 { 
@@ -28,6 +26,14 @@ public:
 
 	template<typename T>
 	T* CreateEntity();
+	
+	template<typename T>
+	T* CreateUI(gcle::Shapes shape);
+
+	template<typename T>
+	T* CreateUI();
+
+	Button* CreateButton(gcle::Shapes shape, std::string text);
 
 	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	 
@@ -61,9 +67,11 @@ private:
 
 
 #ifdef _DEBUG
+
 public:
 	void SetDebug();
 	void SetSelectedEntity(Entity* pEntity);
+
 private:
 	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
 	void	DestroyDebugText(Text* pText);
@@ -91,6 +99,8 @@ private:
 	std::vector<Camera*> m_ActiveCamera;
 
 	float32 m_Test = 0;
+
+	std::vector<Button> buttons;
 
 	bool	m_FrustrumCulling = true;
 	uint64	m_NumberOfDraw = 0;

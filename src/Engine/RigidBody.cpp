@@ -19,16 +19,16 @@ void RigidBody2D::Initialize(Transform2D* pTransform)
 
 void RigidBody2D::Update(float32 dt)
 {
-	if (m_UseFriction) {
-		ApplyFriction(dt);
+	if (m_TempVelHasChanged)
+	{
+		m_Velocity = m_TempVelocity;
+		m_TempVelHasChanged = false;
 	}
 
 	ApplyGravity(dt);
 
-	if (m_TempVelHasChanged) {
-		m_Velocity = m_TempVelocity;
-		m_TempVelHasChanged = false;
-	}
+	if (m_UseFriction)
+		ApplyFriction(dt);
 
 	ClampVelocity();
 	ApplyVelocity(dt);
@@ -36,9 +36,6 @@ void RigidBody2D::Update(float32 dt)
 	m_TempVelocity = m_Velocity;
 
 	mp_Transform->UpdateChildPosition();
-
-	if (!m_UseFriction)
-		m_Velocity = {0, 0};
 }
 
 bool RigidBody2D::UseContinuousCollision() const
@@ -155,11 +152,6 @@ void RigidBody2D::RemoveVelocityAlongNormal(const Vector2f& normal)
 	}
 }
 
-void RigidBody2D::SetDampingStrenght(float32 strenght)
-{
-	m_Friction = { strenght, strenght };
-}
-
 Vector2f RigidBody2D::CalculateNextPosition(float32 dt)
 {
 	Vector2f pos = mp_Transform->GetPosition();
@@ -192,6 +184,28 @@ void RigidBody2D::ApplyGravity(float32 dt)
 	m_Velocity.y += m_Gravity * dt;
 }
 
+void RigidBody2D::Brake(float32 dt)
+{
+	float32 speed = GetSpeed();
+
+	if (speed <= 0.01f)
+	{
+		m_Velocity = { 0.f, 0.f };
+		return;
+	}
+
+	float32 newSpeed = std::max(0.f, speed - m_BrakeDeceleration * dt);
+	float32 ratio = newSpeed / speed;
+
+	m_Velocity.x *= ratio;
+	m_Velocity.y *= ratio;
+}
+
+void RigidBody2D::SetBrakeDeceleration(float32 deceleration)
+{
+	m_BrakeDeceleration = deceleration; 
+}
+
 void RigidBody2D::SetCollisionDetectionMode(CollisionDetectionMode mode)
 {
 	m_CollisionDetectionMode = mode;
@@ -210,7 +224,6 @@ void RigidBody2D::SetActive(bool Active) {
 	IsRigidBody = Active; 
 }
 
-
 void RigidBody2D::ZeroVelocityX() { 
 	m_Velocity.x = 0; 
 }
@@ -219,15 +232,22 @@ void RigidBody2D::ZeroVelocityY() {
 	m_Velocity.y = 0; 
 }
 
-void RigidBody2D::SetDampingOnXAxis(float32 strenght) { 
-m_Friction = { strenght, 0 }; 
+void RigidBody2D::SetFriction(Vector2f velocityFrictionFactor)
+{
+	m_Friction = velocityFrictionFactor;
 }
 
-void RigidBody2D::SetDampingOnYAxis(float32 strenght) { 
-	m_Friction = { 0, strenght }; 
+void RigidBody2D::SetFrictionOnXAxis(float32 strenght) 
+{
+	m_Friction.x = strenght; 
 }
 
-void RigidBody2D::ActivateDamping(bool isActive)
+void RigidBody2D::SetFrictionOnYAxis(float32 strenght) 
+{ 
+	m_Friction.y = strenght; 
+}
+
+void RigidBody2D::ActivateFriction(bool isActive)
 {
 	m_UseFriction = isActive;
 }

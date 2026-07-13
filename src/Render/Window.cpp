@@ -180,7 +180,6 @@ void Window::DrawOnRenderer(SDL_Texture* pTexture, SDL_FRect* pSrcrect, SDL_FRec
 
 void Window::Draw(gcle::Shape* pShape)
 {
-
 	const std::vector<SDL_Vertex*>& verticesPtr = pShape->GetVerticies();
 
 	std::vector<SDL_Vertex> vertices;
@@ -198,19 +197,19 @@ void Window::Draw(gcle::Shape* pShape)
 	}
 }
 
-bool Window::IsInsideWindow(Entity* pEntity) {
-	if (pEntity->GetRenderShape() == nullptr)
+bool Window::IsInsideWindow(GameObject* gm) {
+	if (gm->GetRenderShape() == nullptr)
 		return false;
 	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 
 	AABB entityAABB;
-	if (static_cast<int32>(pEntity->GetRenderShape()->GetRotation()) % 180 != 0) {
-		entityAABB = GetRotatedAABB(pEntity->GetRenderPosition(), { pEntity->GetRenderShape()->GetWidth(), pEntity->GetRenderShape()->GetHeight() }, pEntity->GetRenderShape()->GetRotation() * DEG_TO_RAD);
+	if (static_cast<int32>(gm->GetRenderShape()->GetRotation()) % 180 != 0) {
+		entityAABB = GetRotatedAABB(gm->GetRenderPosition(), { gm->GetRenderShape()->GetWidth(), gm->GetRenderShape()->GetHeight() }, gm->GetRenderShape()->GetRotation() * DEG_TO_RAD);
 		entityAABB = { entityAABB.minX - margin, entityAABB.minY - margin, entityAABB.maxX + margin, entityAABB.maxY + margin };
 	}
 	else
-		entityAABB = { pEntity->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , pEntity->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , pEntity->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, pEntity->GetRenderShape()->GetPosition(1.f, 1.f).y + margin };
+		entityAABB = { gm->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , gm->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , gm->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, gm->GetRenderShape()->GetPosition(1.f, 1.f).y + margin };
 
 	AABB windowAABB = { -margin, -margin, margin + RENDER_TARGET_WIDTH , margin + RENDER_TARGET_HEIGHT };
 

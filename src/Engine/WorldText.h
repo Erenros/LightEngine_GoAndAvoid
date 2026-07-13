@@ -18,6 +18,5 @@ public:
 	WorldText(): Entity() {};
 	
 	void SetRenderPosition(Vector2f pos);
-
 };
 

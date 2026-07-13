@@ -1,164 +1,82 @@
 #pragma once
-#include <vector>
+
+#include <unordered_map>
 #include <unordered_set>
-#include "include.h"
-#include "Transform.h"
-#include "Render/Shape.h"
-#include "Render/Texture.h"
-#include "Render/Sprite.h"
+
+#include "GameObject.h"
 #include "RigidBody.h"
-#include <cmath>
 
 class Collider;
 
-struct Target
-{
-	Vector2f position;
-	float distance = 0.f;
-	bool isSet = false;
-};
-
-class Entity
+class Entity : public GameObject
 {
 public:
-	void Destroy();
-	void Move(Vector2f translation);
-	bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
-	bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
+    void Destroy();
 
-public:
-	void SetTag(int32 tag);
-	
-	void SetSpeed(float32 speed);
-	void SetDirection(float32 x, float32 y, float32 speed = -1.f);
+    void SetTag(int32 tag);
+    void SetRigidBody(bool isRigidBody);
+    void SetStatic(bool isStatic);
 
-	void SetRigidBody(bool isRigidBody);
+    int64 GetId() const;
+    int32* GetCollisionLayer();
+    RigidBody2D& GetRigidBody();
+    const RigidBody2D& GetRigidBody() const;
 
-	void SetPosition(float32 x, float32 y);
-	void SetRenderPosition(Vector2f v, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-	void SetRenderPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
+    bool IsStatic() const;
+    bool IsColliding(Entity* other) const;
+    bool IsTag(int32 tag) const;
+    bool IsRigidBody() const;
+    bool HasCollider() const;
 
-	void SetStatic(bool isStatic);
-	void SetRenderSize(int32 shapeType, std::vector<float32> points); 
+    void AddCollider(Collider* collider);
+    void RemoveCollider(Collider* collider);
+    const std::unordered_set<Collider*>& GetColliders() const;
 
-	void SetScale(Vector2f scale);
-	void ScaleBy(Vector2f factor);
-	void SetScale(float32 scale);
+    Collider* CreateCollider(
+        gcle::Shapes shape,
+        bool isActive,
+        Vector2f relativePosition,
+        float32 relativeRotation,
+        Vector2f relativeScale,
+        bool isTrigger = false);
 
-	void Rotate(Degrees delta);
-	void SetRotation(Degrees angle);
+    bool IsWorldText() const;
 
-	void SetTexture(const std::string& id);
-	void SetTextureFlip(TextureFlipMode mode);
+    virtual void OnCollision(Entity* other) {}
+    virtual void OnCollisionEnter(Entity* other) {}
+    virtual void OnCollisionExit(Entity* other) {}
 
-	void SetLayer(int32 layer); 
-	void SetColor(Color color);
-
-public:
-	//void SetRenderShape(gcle::Shapes);
-	Vector2f GetScale();
-	Degrees GetRotation();
-	Vector2f GetPosition();
-	Vector2f GetRenderPosition();
-	int64 GetId() const			 ;
-	int32 GetLayer() const		 ;
-	RigidBody2D& GetRigidBody()	 ;
-	Transform2D& GetTransform2D();
-	gcle::Shape* GetRenderShape();
-	Color GetColor() const;
-
-public:
-	bool IsStatic() const;
-	bool IsColliding(Entity* pOther);
-	bool IsInside(Vector2f position);
-	bool ToDestroy() const;
-	bool IsTag(int32 tag) const;
-	bool IsRigidBody() const;
-
-public:
-	void AddAnimation(const std::string& id, int32 firstFrame, int32 lastFrame, int32 line, int32 tileWidth, int32 tileHeight, float32 duration = 0.5f);
-	void PlayAnimation(const std::string& id, AnimationMode mode = AnimationMode::IgnoreIfAlreadyPlaying, AnimationInterrupt interupt = AnimationInterrupt::Normal);
-	void AddFunctionInFrame(const std::string& animation, int32 frame, std::function<void()> function); 
-	void StopAnimation(); 
-	void RemoveFunctionInFrame(const std::string& animation, int32 frame);
-	const std::string& GetCurrentAnimation() const;
-	bool CanInterruptCurrentAnimation(AnimationInterrupt interrupt = AnimationInterrupt::Normal) const; 
-	bool IsAnimationAtStart() const;
-	bool IsAnimationAtEnd() const;
-
-
-public:
-	void AddCollider(Collider* pCollider);
-	void RemoveCollider(Collider* pCollider); 
-	const std::unordered_set<Collider*>& GetColliders() const;
-	Collider* CreateCollider(gcle::Shapes shape, bool isActive, Vector2f relativePosition, float32 rotation, Vector2f scale, bool isTrigger = false);
-
-public:
-	void AddActiveScene(const std::string& sceneTag);
-	void RemoveActiveScene(const std::string& sceneTag); 
-	bool IsActiveIn(const std::string& sceneTag);
-	bool HasActiveScenes() const;
-
-public:
-	bool IsWorldText() const;
+    virtual void OnTrigger(Entity* other) {}
+    virtual void OnTriggerEnter(Entity* other) {}
+    virtual void OnTriggerExit(Entity* other) {}
 
 protected:
-	Entity() = default;
-	~Entity();
-	 
-	virtual void OnUpdate() {};
-	virtual void OnDestroy() {};
-	virtual void OnInitialize() {};
+    Entity() = default;
+    ~Entity() override;
 
-	virtual void OnCollision(Entity* pCollidedWith) {};
-	virtual void OnCollisionExit(Entity* pCollidedWith) {};
-	virtual void OnCollisionEnter(Entity* pCollidedWith) {};
+    void OnUpdate() override {}
+    void OnDestroy() override {}
+    void OnInitialize() override {}
 
-	virtual void OnTrigger(Entity* pOther) {};
-	virtual void OnTriggerExit(Entity* pOther) {};
-	virtual void OnTriggerEnter(Entity* pOther) {};
+    bool m_IsWorldText = false;
 
 private:
-	void Initialize();
-	void Update(float32 dt);
-	void Initialize(gcle::Shapes shape);
-	gcle::Shape* GetBaseShape(gcle::Shapes shape);
+    void Initialize(gcle::Shapes shape) override;
+    void Initialize();
+    void Update(float32 dt) override;
 
 private:
-	void SetDebugLayer(int32 layer);
+    int32 m_Tag = -1;
+    bool m_IsStatic = false;
+    bool m_IsHighlighted = false;
 
-protected:
+    RigidBody2D m_RigidBody;
+    std::unordered_set<Collider*> mp_Colliders;
+    std::unordered_map<int64, Entity*> m_CollidingEntity;
+    std::unordered_map<int64, Entity*> m_TriggeringEntity;
 
-	Target			m_Target;
-	int64			m_Id			= 0;
-	int32			m_Tag			= -1;
-	float32			m_Speed			= 0.f;
-	bool			m_ToDestroy		= false; 
-	Vector2f		m_Direction		= { 0.0f, 0.0f };
-
-private:
-	bool m_IsStatic			= false;
-	bool m_IsHighlighted	= false;
-
-protected:
-	bool m_IsWorldText = false;
-
-private:
-	Transform2D  m_Transform;
-	gcle::Shape* mp_RenderShape = nullptr;
-	RigidBody2D	 m_RigidBody;
-
-private:
-	int32 m_Layer = 0;
-	std::vector<std::string> m_ActiveScenes;
-	std::unordered_set<Collider*> mp_Colliders;
-	std::unordered_map<int64, Entity*> m_CollidingEntity;
-	std::unordered_map<int64, Entity*> m_TriggeringEntity;
-
-private: 
-	friend class Scene;
-	friend class Camera;
-	friend class GameManager;
-	friend class PhysicsManager; 
-
+    friend class Scene;
+    friend class Camera;
+    friend class GameManager;
+    friend class PhysicsManager;
 };

@@ -52,11 +52,14 @@ public:
 
 	void RemoveVelocityAlongNormal(const Vector2f& normal);
 
-	void SetDampingStrenght(float32 strenght);
-	void SetDampingOnXAxis(float32 strenght);
-	void SetDampingOnYAxis(float32 strenght);
+	void Brake(float32 dt);
+	void SetBrakeDeceleration(float32 deceleration);
 
-	void ActivateDamping(bool isActive);
+	void SetFriction(Vector2f velocityFrictionFactor);
+	void SetFrictionOnXAxis(float32 strenght);
+	void SetFrictionOnYAxis(float32 strenght);
+
+	void ActivateFriction(bool isActive);
 
 	Vector2f CalculateNextPosition(float32 dt);
 	bool UseContinuousCollision() const;
@@ -84,6 +87,7 @@ private:
 	bool m_UseFriction = false;
 
 	float32 m_MaxSpeed = 500.0f;
+	float32 m_BrakeDeceleration = 800.f;
 
 	float32 m_Gravity = GRAVITY;
 	bool m_UseGravity = false;
