@@ -136,17 +136,24 @@ PhysicsManager& PhysicsManager::GetInstance()
 
 void PhysicsManager::AddEntity(Entity* pEntity)
 {
-	EntityInfo info = { pEntity, false };
-	m_EntitiesToUpdate.push_back(info);
+	for (auto& info : m_EntitiesToUpdate)
+	{
+		if (info.entity->GetId() == pEntity->GetId())
+			return; 
+	}
+	m_EntitiesToUpdate.push_back({ pEntity, false });
 }
 
 void PhysicsManager::RemoveEntity(Entity* pEntity)
 {
 	for (auto& info : m_EntitiesToUpdate)
 	{
+		if (info.toRemove) continue; 
 		if (info.entity->GetId() == pEntity->GetId())
 		{
 			info.toRemove = true;
+			m_ForceQuadTreeRegen = true;
+			return;
 		}
 	}
 }
@@ -196,6 +203,12 @@ void PhysicsManager::EntityToUpdate(std::vector<Collider*>* pActiveColliders, st
 
 void PhysicsManager::Update(float32 dt)
 {
+	for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
+	{
+		if (m_EntitiesToUpdate[i].toRemove)
+			m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
+	}
+
 	EntityToRemove(m_EntitiesToRemove, m_EntitiesToUpdate);
 	EntityToAdd(m_EntitiesToAdd, m_EntitiesToUpdate);
 
@@ -214,30 +227,20 @@ void PhysicsManager::Update(float32 dt)
 	}
 }
 
-void PhysicsManager::UpdateQuadTree(std::vector<Collider*> activeColliders, float32 dt)
+void PhysicsManager::UpdateQuadTree(std::vector<Collider*>& activeColliders, float32 dt)
 {
 	int32 nbrTest = 0;
-
 	m_Pairs.clear();
 	m_TimeBetweenRegeneration += 1;
 
 	GenerateQuadTree(&activeColliders, dt);
-
 	MakeTreePairs(&activeColliders);
-	for (auto& pair : m_Pairs) {
 
+	for (auto& pair : m_Pairs) 
+	{
 		nbrTest += 1;
-
 		HandleCollision(pair, dt);
-
 		PendingCorrections();
-
-		for (int32 i = static_cast<int32>(m_EntitiesToUpdate.size()) - 1; i >= 0; i--)
-		{
-			if (m_EntitiesToUpdate[i].toRemove)
-				m_EntitiesToUpdate.erase(m_EntitiesToUpdate.begin() + i);
-		}
-
 	}
 	m_Pairs.clear();
 }
@@ -269,7 +272,7 @@ void PhysicsManager::UpdateWithoutQuadTree(std::vector<Collider*> activeCollider
 
 void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* pActiveColliders, float32 dt)
 {
-	if (m_TimeBetweenRegeneration >= m_FrameBetweenQuadTreeRegenerations)
+	if (m_TimeBetweenRegeneration >= m_FrameBetweenQuadTreeRegenerations || m_ForceQuadTreeRegen)
 	{
 		mp_QuadTree->Clear();
 
@@ -289,6 +292,7 @@ void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* pActiveColliders, 
 		}
 
 		m_TimeBetweenRegeneration = 0;
+		m_ForceQuadTreeRegen = false; 
 	}
 }
 
@@ -347,10 +351,30 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 	Entity* entityA = colliderA->GetOwner();
 	Entity* entityB = colliderB->GetOwner();
 
-	bool coliding = IsColliding(colliderA, colliderB); 
+	bool coliding = IsColliding(colliderA, colliderB);
+	bool isTriggerPair = colliderA->IsTrigger() || colliderB->IsTrigger(); 
 
 	if (coliding)
 	{
+		if (isTriggerPair) 
+		{
+			if (!entityA->m_TriggeringEntity.contains(entityB->GetId()))
+			{
+				entityA->OnTriggerEnter(entityB);
+				entityA->m_TriggeringEntity.insert({ entityB->GetId(), entityB });
+
+				entityB->OnTriggerEnter(entityA);
+				entityB->m_TriggeringEntity.insert({ entityA->GetId(), entityA });
+			}
+			else
+			{
+				entityA->OnTrigger(entityB);
+				entityB->OnTrigger(entityA);
+			}
+
+			return;
+		}
+
 		if (entityA->IsRigidBody() && entityB->IsRigidBody())
 		{
 			ThrowRepulse(colliderA, colliderB);
@@ -372,9 +396,9 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 
 		return;
 	}
-
-	bool needAntiTunneling =
-		ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB);
+	 
+	bool needAntiTunneling = !isTriggerPair &&
+		(ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB));
 
 	if (needAntiTunneling)
 	{
@@ -382,6 +406,15 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 		{
 			return;
 		}
+	}
+	 
+	if (entityA->m_TriggeringEntity.contains(entityB->GetId()))
+	{
+		entityA->OnTriggerExit(entityB);
+		entityA->m_TriggeringEntity.erase(entityB->GetId());
+
+		entityB->OnTriggerExit(entityA);
+		entityB->m_TriggeringEntity.erase(entityA->GetId());
 	}
 
 	if (entityA->m_CollidingEntity.contains(entityB->GetId()))
@@ -1367,10 +1400,19 @@ void PhysicsManager::SetDynamicQuadTreeSize(bool activate) {
 
 void PhysicsManager::SetQuadTreePos1(Vector2f pos1) {
 	m_QuadTreePos1 = pos1;
+	RebuildQuadTree();
 }
 
 void PhysicsManager::SetQuadTreePos2(Vector2f pos2) {
 	m_QuadTreePos2 = pos2;
+	RebuildQuadTree();
+}
+
+void PhysicsManager::RebuildQuadTree()
+{
+	delete mp_QuadTree;
+	mp_QuadTree = new QuadTree(m_QuadTreePos1.x, m_QuadTreePos1.y, m_QuadTreePos2.x, m_QuadTreePos2.y);
+	m_ForceQuadTreeRegen = true;
 }
 
 void PhysicsManager::SetFrameBetweenQuadTreeRegenerations(int8 nbrFrame) {

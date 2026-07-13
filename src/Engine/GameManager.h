@@ -46,6 +46,9 @@ public:
 	std::vector<Entity*> GetActiveEntities(const std::string& scene);
 	std::vector<UI*> GetActiveUIs(const std::string& scene);
 
+	std::vector<Camera*> GetCamerasInScene(const std::string& scene);
+	void RemoveCamera(Camera* pCamera);
+
 private:
 	void UpdateEntitySystem();
 	void UpdateUISystem();

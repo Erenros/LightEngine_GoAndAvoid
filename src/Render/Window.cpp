@@ -84,11 +84,18 @@ void Window::Create(const char* pName, int32 width, int32 height, uint32 windowF
 	SDL_SetRenderTarget(mp_Renderer, NULL);
 
 	mp_Dst = new SDL_FRect();
+	mp_Dst->x = 0.f;
+	mp_Dst->y = 0.f;
+	mp_Dst->w = static_cast<float32>(width);
+	mp_Dst->h = static_cast<float32>(height);
 }
 
 Vector2f Window::GetMousePositionOnRenderTarget()
 {
 	Vector2u mousePos = GetMousePosition();
+
+	if (mp_Dst->w <= 0.f || mp_Dst->h <= 0.f)
+		return Vector2f{ RENDER_TARGET_WIDTH * 0.5f, RENDER_TARGET_HEIGHT * 0.5f };
 
 	float32 scaleX = RENDER_TARGET_WIDTH / mp_Dst->w;
 	float32 scaleY = RENDER_TARGET_HEIGHT / mp_Dst->h;

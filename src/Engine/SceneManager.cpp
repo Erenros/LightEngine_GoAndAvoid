@@ -41,50 +41,145 @@ Scene* SceneManager::GetSceneWithTag(const std::string& tag) {
     return m_Scenes[tag];
 }
 
-void SceneManager::SetCurrentSceneWithTag(const std::string& tag) {
-    if (m_Scenes[tag] != nullptr) {
-        if (m_CurrentSceneTag != "") {
-            m_PreviousSceneTag = m_CurrentSceneTag;
-            LoadUnloadActiveTextures(tag);
-        }
-        m_CurrentSceneTag = tag;
+void SceneManager::SetCurrentSceneWithTag(const std::string& tag, bool pause) 
+{
+    if (tag == m_CurrentSceneTag)
+        return; 
+
+    if (!m_SceneFactories.contains(tag)) {
+        std::cerr << "tag : " << tag << " doesn't exist " << std::endl;
         return;
     }
-    std::cerr << "tag : " << tag << " doesn't exist " << std::endl;
+
+    bool hadCurrentScene = (m_CurrentSceneTag != "");
+     
+    auto it = m_Scenes.find(tag);
+    if (it == m_Scenes.end() || it->second == nullptr)
+    {
+        InstantiateSceneFromFactory(tag);
+    }
+    else if (it->second->IsPaused())
+    {
+        it->second->OnResume();
+        it->second->m_IsPaused = false;
+    }
+     
+    if (hadCurrentScene)
+        LoadUnloadActiveTextures(tag);
+     
+    if (hadCurrentScene)
+    {
+        Scene* outgoingScene = m_Scenes[m_CurrentSceneTag];
+        m_PreviousSceneTag = m_CurrentSceneTag;
+
+        if (pause)
+        {
+            outgoingScene->OnPause();
+            outgoingScene->m_IsPaused = true;
+        }
+        else
+        {
+            DestroyScene(m_PreviousSceneTag);
+        }
+    }
+
+    m_CurrentSceneTag = tag;
+
+    SetCurrentCamera();
 }
 
-void SceneManager::SetCurrentSceneToPreviousScene() {
-    if (m_PreviousSceneTag != "") {
-        if (m_CurrentSceneTag != "") {
-            m_Scenes[m_CurrentSceneTag]->OnExit();
-        }     
-        LoadUnloadActiveTextures(m_PreviousSceneTag);
-        std::string currentTag = m_PreviousSceneTag;
-        m_PreviousSceneTag = m_CurrentSceneTag;
-        m_CurrentSceneTag = currentTag;
+void SceneManager::SetCurrentSceneToPreviousScene(bool pause) {
+    if (m_PreviousSceneTag == "") {
+        std::cerr << "there is no previous scene " << std::endl;
         return;
     }
-    std::cerr << "there is no previous scene " << std::endl;
+    SetCurrentSceneWithTag(m_PreviousSceneTag, pause);
+}
+
+Scene* SceneManager::InstantiateSceneFromFactory(const std::string& tag)
+{
+    Scene* scene = m_SceneFactories[tag]();
+    scene->m_Tag = tag;
+    m_Scenes[tag] = scene;
+
+    std::string previousSceneTag = m_CurrentSceneTag;
+    m_CurrentSceneTag = tag; 
+    scene->OnInitialize();
+    m_CurrentSceneTag = previousSceneTag;
+
+    return scene;
+}
+
+void SceneManager::DestroyScene(const std::string& tag)
+{
+    auto it = m_Scenes.find(tag);
+    if (it == m_Scenes.end() || it->second == nullptr)
+        return;
+
+    Scene* scene = it->second;
+
+    scene->OnExit();
+
+    DestroySceneEntities(tag);
+    DestroySceneCameras(tag);
+
+    delete scene;
+    m_Scenes.erase(it);
+}
+
+void SceneManager::DestroySceneEntities(const std::string& tag)
+{
+    std::vector<Entity*> entities = GameManager::GetInstance().GetActiveEntities(tag);
+    for (Entity* e : entities)
+    {
+        e->RemoveActiveScene(tag);
+        if (!e->HasActiveScenes()) 
+            e->Destroy(); 
+    }
+}
+
+void SceneManager::DestroySceneCameras(const std::string& tag)
+{
+    std::vector<Camera*> cameras = GameManager::GetInstance().GetCamerasInScene(tag);
+    for (Camera* cam : cameras)
+    {
+        cam->RemoveActiveScene(tag);
+        if (!cam->HasActiveScenes())
+            GameManager::GetInstance().RemoveCamera(cam);
+    }
 }
 
 void SceneManager::DeleteScene(const std::string& tag) {
-    
     if (m_Scenes[tag] != nullptr) {
         Scene* scene = m_Scenes[tag];
 
+        scene->OnExit();
+        DestroySceneEntities(tag);
+        DestroySceneCameras(tag);
+
         m_Scenes.erase(tag);
 
-        if (m_CurrentSceneTag == tag) {
-            m_CurrentSceneTag = "";
-        }
-        if (m_PreviousSceneTag == tag) {
-            m_PreviousSceneTag = "";
-        }
+        if (m_CurrentSceneTag == tag) m_CurrentSceneTag = "";
+        if (m_PreviousSceneTag == tag) m_PreviousSceneTag = "";
 
         delete scene;
         return;
     }
     std::cerr << "Scene " << tag << "doesn't exist" << std::endl;
+}
+
+void SceneManager::SetCurrentCamera()
+{
+    Scene* scene = m_Scenes[m_CurrentSceneTag];
+     
+    if (scene->mp_ActiveCamera != nullptr)
+    {
+        scene->SwitchCamera(scene->mp_ActiveCamera);
+    }
+    else if (scene->m_ActiveCamera.size() > 0)
+    {
+        scene->SwitchCamera(scene->m_ActiveCamera[0]);
+    }
 }
 
 
@@ -106,9 +201,11 @@ void SceneManager::DrawCurrentScene(Window* pWindow) {
 
 void SceneManager::DrawCurrentSceneDebug(Window* pWindow)
 {
+#ifdef _DEBUG
     if (m_CurrentSceneTag != "") {
         m_Scenes[m_CurrentSceneTag]->DrawDebug(pWindow);
     }
+#endif // _DEBUG
 }
 
 void SceneManager::DeleteAllScenes()

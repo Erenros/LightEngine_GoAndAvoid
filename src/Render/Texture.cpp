@@ -28,7 +28,9 @@ SDL_Texture* Texture::CreateTexture(Window* window)
 	}
 
 	m_textureChanged = false;
+	SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 	mp_texture = texture;
+
 	return mp_texture;
 }
 
@@ -87,10 +89,11 @@ void Texture::InitTextureWithSurface(Window* window, Surface* surface)
 	if (texture == NULL)
 		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
-	mp_texture = texture;
+	SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+	mp_texture = texture; 
 
 	m_Id = mp_surface->GetID();
-}
+} 
 
 void Texture::InitTextureWithBuffer(Window* pWindow, Asset* pAsset)
 {
@@ -116,6 +119,7 @@ void Texture::InitTextureWithBuffer(Window* pWindow, Asset* pAsset)
 		GCLE_WARN << "Error during creation of the texture" << ENDL;
 
 	//SDL_FreeSurface(surface);
+	SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 	mp_texture = texture;
 
 	m_Id = pAsset->name;
@@ -133,8 +137,9 @@ void Texture::InitTexture(Window* pWindow, const std::string& path)
 
 
 	//SDL_FreeSurface(surface);
-
+	SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 	mp_texture = texture;
+
 
 	std::filesystem::path path2(path);
 	m_Id = path2.stem().string();

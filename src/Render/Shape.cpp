@@ -2,6 +2,16 @@
 #include <SDL3/SDL.h>
 #include "Engine/Entity.h"
 
+const Color Color::White = { 255,255,255,255 };
+const Color Color::Black = { 0,0,0,255 };
+const Color Color::Red = { 255,0,0,255 };
+const Color Color::Green = { 0,255,0,255 };
+const Color Color::Blue = { 0,0,255,255 };
+const Color Color::Yellow = { 255,255,0,255 };
+const Color Color::Cyan = { 0,255,255,255 };
+const Color Color::Magenta = { 255,0,255,255 };
+const Color Color::Transparent = { 0,0,0,0 };
+
 namespace gcle
 {
 #pragma region Shape
@@ -61,6 +71,43 @@ namespace gcle
 		m_Transform.SetDirty();
 	}
 
+	Vector2f Shape::GetPosition(float32 ratioX, float32 ratioY)
+	{
+		Vector2f pivot = m_Transform.GetPosition();
+
+		if (m_Shape == Shapes::Circle)
+		{
+			float32 size = GetRadius() * 2.f;
+			Vector2f topLeft = { pivot.x - size * 0.5f, pivot.y - size * 0.5f };
+			return { topLeft.x + size * ratioX, topLeft.y + size * ratioY };
+		}
+		else if (m_Shape == Shapes::Rectangle)
+		{
+			float32 sizeX = GetWidth();
+			float32 sizeY = GetHeight();
+			Vector2f topLeft = { pivot.x - sizeX * 0.5f, pivot.y - sizeY * 0.5f };
+			return { topLeft.x + sizeX * ratioX, topLeft.y + sizeY * ratioY };
+		}
+
+		return pivot;
+	}
+
+	Color Shape::GetColor() const
+	{
+		if (m_Verticies.empty() || m_Verticies[0] == nullptr)
+			return { 255, 255, 255, 255 };
+
+		const SDL_FColor& c = m_Verticies[0]->color;
+
+		return
+		{
+			static_cast<uint8>(c.r * 255.f),
+			static_cast<uint8>(c.g * 255.f),
+			static_cast<uint8>(c.b * 255.f),
+			static_cast<uint8>(c.a * 255.f)
+		};
+	}
+
 	void Shape::Move(Vector2f translation)
 	{
 		Vector2f pivot = m_Transform.GetPosition();
@@ -78,6 +125,19 @@ namespace gcle
 	void Shape::Rotate(Degrees delta)
 	{
 		SetRotation(m_Transform.GetDegAngle() + delta);
+	}
+
+	void Shape::SetColor(Color color)
+	{
+		SDL_FColor sdlColor = ToSDLColor(color);
+
+		for (SDL_Vertex* vertex : m_Verticies)
+		{
+			if (vertex != nullptr)
+			{
+				vertex->color = sdlColor;
+			}
+		}
 	}
 
 	void Shape::UpdateRenderVertices()
@@ -299,6 +359,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[3]->tex_coord = { u1, v1 };
@@ -312,6 +378,12 @@ namespace gcle
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
 
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { u0, v0 };
 			m_Verticies[1]->tex_coord = { u1, v0 };
 			m_Verticies[2]->tex_coord = { u1, v1 };
@@ -322,6 +394,13 @@ namespace gcle
 			float32 v0 = y / static_cast<float32>(textH);
 			float32 u1 = (x + w) / static_cast<float32>(textW);
 			float32 v1 = (y + h) / static_cast<float32>(textH);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_HORIZONTAL))
+				std::swap(u0, u1);
+
+			if (HasFlipFlag(m_FlipMode, TextureFlipMode::FLIP_VERTICAL))
+				std::swap(v0, v1);
+
 			m_Verticies[0]->tex_coord = { (u0 + u1) * 0.5f, (v0 + v1) * 0.5f };
 			for (int i = 1; i < m_Smoothness + 1; i++)
 			{
@@ -359,215 +438,17 @@ namespace gcle
 	void Shape::SetPosition(float32 x, float32 y, float32 ratioX, float32 ratioY)
 	{
 		Vector2f newPivot = { x, y };
-
-		if (m_Shape == Shapes::Circle)
-		{
-			float32 size = GetRadius() * 2.f;
-			newPivot.x = x - size * ratioX + size * 0.5f;
-			newPivot.y = y - size * ratioY + size * 0.5f;
-		}
-		else if (m_Shape == Shapes::Rectangle)
-		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			newPivot.x = x - sizeX * ratioX + sizeX * 0.5f;
-			newPivot.y = y - sizeY * ratioY + sizeY * 0.5f;
-		}
-
-		m_Transform.SetPosition(newPivot);
-		m_Center = newPivot;
 	}
 
-#pragma endregion
-
-#pragma region Rectangle
-
-	void Rectangle::SetHeight(float32 height)
+	void Shape::SetFlip(TextureFlipMode mode)
 	{
-		m_Height = height;
-		m_LocalPositions = {
-			{ -m_Width * 0.5f, -m_Height * 0.5f },
-			{  m_Width * 0.5f, -m_Height * 0.5f },
-			{ -m_Width * 0.5f,  m_Height * 0.5f },
-			{  m_Width * 0.5f,  m_Height * 0.5f }
-		};
-		m_Transform.SetDirty();
+		m_FlipMode = mode;
 	}
 
-	void Rectangle::SetWidth(float32 width)
+	TextureFlipMode Shape::GetFlip() const
 	{
-		m_Width = width;
-		m_LocalPositions = {
-			{ -m_Width * 0.5f, -m_Height * 0.5f },
-			{  m_Width * 0.5f, -m_Height * 0.5f },
-			{ -m_Width * 0.5f,  m_Height * 0.5f },
-			{  m_Width * 0.5f,  m_Height * 0.5f }
-		};
-		m_Transform.SetDirty();
+		return m_FlipMode;
 	}
-
-#pragma endregion
-
-#pragma region Circle
-
-	void Circle::SetRadius(float32 radius)
-	{
-		m_Radius = radius;
-
-		Degrees degreesBetweenPoints = 360.0f / m_Smoothness;
-
-		for (int32 i = 0; i < m_Smoothness; i++)
-		{
-			Radians rad = MathGC::DegToRad(degreesBetweenPoints * i);
-			m_LocalPositions[i + 1] = { sin(rad) * radius, cos(rad) * radius };
-		}
-
-		m_Transform.SetDirty();
-	}
-
-#pragma endregion
-
-#pragma region Triangle
-
-	void Triangle::SetTrianglePoints(std::vector<Vector2f> newTrianglePoints)
-	{
-		if (newTrianglePoints.size() < 3)
-			return;
-
-		m_TrianglePoints = newTrianglePoints;
-
-		float32 minX = std::min({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
-		float32 maxX = std::max({ newTrianglePoints[0].x, newTrianglePoints[1].x, newTrianglePoints[2].x });
-		float32 minY = std::min({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
-		float32 maxY = std::max({ newTrianglePoints[0].y, newTrianglePoints[1].y, newTrianglePoints[2].y });
-		Vector2f pivot = { (minX + maxX) * 0.5f, (minY + maxY) * 0.5f };
-
-		m_Transform.SetPosition(pivot);
-		m_Center = pivot;
-
-		m_LocalPositions.clear();
-		for (int i = 0; i < 3; i++)
-		{
-			m_LocalPositions.push_back({ newTrianglePoints[i].x - pivot.x, newTrianglePoints[i].y - pivot.y });
-		}
-
-		m_Transform.SetDirty();
-	}
-
-#pragma endregion
-
-#pragma endregion
-
-#pragma region Gets
-
-#pragma region Shape
-
-	Shapes Shape::GetShape()
-	{
-		return m_Shape;
-	};
-
-	Vector2f  Shape::GetOrigin()
-	{
-		return m_Origin;
-	}
-
-	Vector2f Shape::GetPosition(float32 ratioX, float32 ratioY)
-	{
-		Vector2f pivot = m_Transform.GetPosition();
-
-		if (m_Shape == Shapes::Circle)
-		{
-			float32 size = GetRadius() * 2.f;
-			Vector2f topLeft = { pivot.x - size * 0.5f, pivot.y - size * 0.5f };
-			return { topLeft.x + size * ratioX, topLeft.y + size * ratioY };
-		}
-		else if (m_Shape == Shapes::Rectangle)
-		{
-			float32 sizeX = GetWidth();
-			float32 sizeY = GetHeight();
-			Vector2f topLeft = { pivot.x - sizeX * 0.5f, pivot.y - sizeY * 0.5f };
-			return { topLeft.x + sizeX * ratioX, topLeft.y + sizeY * ratioY };
-		}
-
-		return pivot;
-	}
-
-	Vector2f Shape::GetScale()
-	{
-		return m_Transform.GetScale();
-	}
-
-	Sprite* Shape::GetTexture()
-	{
-		return (mp_Texture == nullptr ? nullptr : mp_Texture);
-	};
-
-	Degrees Shape::GetRotation()
-	{
-		return m_Transform.GetDegAngle();
-	}
-
-	Transform2D* Shape::GetTransform()
-	{
-		return &m_Transform;
-	}
-
-	GameObject* Shape::GetOwner()
-	{
-		return mp_Owner;
-	};
-
-	float32 Shape::GetWidth() 
-	{ 
-		return 0.f; 
-	};
-
-	float32 Shape::GetHeight() 
-	{ 
-		return 0.f;
-	};
-
-	float32 Shape::GetRadius()
-	{
-		return 0.f; 
-	};
-
-	int32 Shape::GetSmoothness() 
-	{
-		return 0;
-	};
-
-	Vector2f Shape::GetCenter()
-	{ 
-		return { 0, 0 };
-	};
-
-	std::vector<int32>& Shape::GetIndicies()
-	{
-		return m_Indicies;
-	};
-
-	std::vector<Vector2f> Shape::GetTrianglePoints()
-	{
-		return m_TrianglePoints;
-	};
-	
-	std::vector<SDL_FPoint*>& Shape::GetHollow()
-	{
-		UpdateRenderVertices();
-		return m_HollowPoints;
-	}
-
-	std::vector<SDL_Vertex*>& Shape::GetVerticies()
-	{
-		UpdateRenderVertices();
-		return m_Verticies;
-	}
-
-#pragma endregion
-
-#pragma region Rectangle
 
 	float32 Rectangle::GetHeight() {
 		return m_Height * m_Transform.GetScale().y;

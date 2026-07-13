@@ -15,17 +15,7 @@ class Window;
 class WorldText;
 
 class Scene
-{
-private :
-	struct DebugInformation
-	{
-		float32 Colliders	= 0;
-		float32 Entity		= 0;
-		float32 Input		= 0;
-		float32 SceneUpdate	= 0;
-		float32 Draw		= 0;
-	};
-
+{ 
 public:
 
 	Text* CreateText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
@@ -46,15 +36,17 @@ public:
 	Button* CreateButton(gcle::Shapes shape, std::string text);
 
 	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
-
+	 
 	Camera* CreateCamera();
-
+	 
 	void AddDrawnTexture(const std::string&);
+	void AddActiveCamera(Camera* pCam);
 	bool isDrawn(const std::string& tag);
-
-	void SetDebug();
-
+	 
 	Camera* GetCurrentCamera();
+
+	bool IsPaused() const;
+
 protected: 
 	Scene() = default;
 		
@@ -63,6 +55,8 @@ protected:
 	virtual void OnInitialize();
 	virtual void OnUpdate(Clock& time);
 	virtual void OnExit();
+	virtual void OnPause();
+	virtual void OnResume();
 
 	Camera* GetMainCamera();
 	void SwitchCamera(Camera* pCamera);
@@ -70,6 +64,13 @@ protected:
 private: 
 	void Update(Clock& time) const;
 	void Draw(Window* pWindow);
+
+
+#ifdef _DEBUG
+
+public:
+	void SetDebug();
+	void SetSelectedEntity(Entity* pEntity);
 
 private:
 	Text*	CreateDebugText(const std::string& text, Vector2f pos, int32 fontSize, byte r = 255, byte g = 255, byte b = 255);
@@ -84,6 +85,7 @@ private:
 
 	void	SetDebugInfo() const;
 
+#endif // _DEBUG
 
 protected:
 	std::string m_Tag;
@@ -94,19 +96,23 @@ private:
 
 	std::vector<Text*> m_Texts;
 	std::vector<std::string> m_ActiveTextures;
+	std::vector<Camera*> m_ActiveCamera;
 
 	float32 m_Test = 0;
 
 	std::vector<Button> buttons;
 
+	bool	m_FrustrumCulling = true;
+	uint64	m_NumberOfDraw = 0;
 
+	bool m_IsPaused = false;
+
+#ifdef _DEBUG
 private:
 	// DEBUG
 	bool	m_Debug = false;
 	int32	m_UpdateDebug = 0;
-	uint64	m_NumberOfDraw = 0;
 	bool	m_DebugPerf = false;
-	bool	m_FrustrumCulling = true;
 	bool	m_IsVisualDebugActive = false;
 
 	std::vector<Text*>	m_DebugTexts;
@@ -147,6 +153,7 @@ private:
 
 	Text*  mp_NumberDraw		= nullptr;
 	Text*  mp_NumberDrawP	= nullptr;
+#endif // !_DEBUG
 
 private: 
 	friend class GameManager;

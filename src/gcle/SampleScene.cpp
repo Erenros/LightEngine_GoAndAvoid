@@ -6,12 +6,15 @@
 #include "include.h"
 #include "PhysicsManager.h"
 
+
 void SampleScene::OnInitialize()
 {
 	Scene::OnInitialize();
 	 	 
-	//std::string text = "Test";
-	//CreateText(text, { 40, 40 }, 50);
+	std::string text = "Test";
+	Text* textObj = CreateText(text, { 40, 40 }, 50);
+	//textObj->SetFont("street-fighter");
+
 
 	Entity* entity1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
 	entity1->SetPosition(-400, 0);
@@ -70,6 +73,22 @@ void SampleScene::OnUpdate(Clock& time)
 	 
 	if (InputManager::GetInstance().IsDown('A'))
 	{
-		pEntity->PlayAnimation("anim2", 1);
+		pEntity->PlayAnimation("anim2", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+		/*if (GetCurrentCamera()->GetId() != mp_MainCamera->GetId())
+		{
+			SwitchCamera(mp_MainCamera);
+		}
+		else
+		{
+			SwitchCamera(pSceneCamera);
+		} */
 	}
+
+	if (InputManager::GetInstance().IsDown('E'))
+	{
+		pEntity->StopAnimation();
+	}
+
+	if (InputManager::GetInstance().IsDown('O'))
+		SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene", false);
 } 
