@@ -6,6 +6,7 @@ namespace Demo
 {
 	enum class EnemyState
 	{
+		Spawning,
 		Idle,
 		Chase,
 		Attack,
@@ -26,6 +27,7 @@ namespace Demo
 		void Death()								override;
 		void Heal(int amount)						override;
 		void Shoot()								override;
+		void Damage(int amount)                     override;
 
 		void SetTarget(Entity* pTarget);
 		void SetDetectionRange(float32 range);
@@ -47,7 +49,7 @@ namespace Demo
 	private:
 		Entity* mp_Target = nullptr;
 
-		EnemyState m_State = EnemyState::Idle;
+		EnemyState m_State = EnemyState::Spawning;
 
 		float32 m_DetectionRange = 500.0f;
 		float32 m_AttackRange = 350.0f;

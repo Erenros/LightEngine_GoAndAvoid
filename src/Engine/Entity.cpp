@@ -585,10 +585,8 @@ void Entity::SetColor(Color color)
 
 void Entity::SetParent(Entity* pEntity)
 {
-	mp_RenderShape->GetTransform()->SetParent(pEntity->GetRenderShape()->GetTransform());
-	mp_RenderShape->GetTransform()->UpdateChildPosition();
-	m_Transform.SetParent(&pEntity->GetTransform2D());
-	GetTransform2D().UpdateChildPosition();
+	mp_RenderShape->GetTransform()->SetParent(pEntity->GetRenderShape()->GetTransform()); 
+	m_Transform.SetParent(&pEntity->GetTransform2D()); 
 }
 
 Color Entity::GetColor() const

@@ -1,5 +1,7 @@
 #include "Object.h"
 
+#include "Tuto-GCLE/Tag.h"
+
 void Demo::Object::Interact(Entity* pEntity)
 {
 	if (m_CanInteract)
@@ -13,5 +15,22 @@ bool Demo::Object::CanBeInteractWith() const
 
 void Demo::Object::SetInteract(bool interact)
 {
-	m_CanInteract = true;
+	m_CanInteract = interact;
+}
+
+bool Demo::Object::IsPlayerInRange() const
+{
+	return m_PlayerInRange;
+}
+
+void Demo::Object::OnTriggerEnter(Entity* pOther)
+{
+	if (pOther != nullptr && pOther->IsTag(GameTag::Player))
+		m_PlayerInRange = true;
+}
+
+void Demo::Object::OnTriggerExit(Entity* pOther)
+{
+	if (pOther != nullptr && pOther->IsTag(GameTag::Player))
+		m_PlayerInRange = false;
 }

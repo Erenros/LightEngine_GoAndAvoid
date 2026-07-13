@@ -165,9 +165,7 @@ namespace Demo
 			Object* obj = *it;
 
 			if (obj == nullptr || obj->GetId() == collidedWith->GetId())
-			{ 
-				obj->SetInteract(false);
-				obj->SetColor(Color{ 255, 255, 255, 255 });
+			{   
 				it = mp_InteractableObject.erase(it);
 			} 
 			else
@@ -193,9 +191,7 @@ namespace Demo
 
 			if (!alreadyIn && pObj->CanBeInteractWith())
 			{
-				mp_InteractableObject.push_back(pObj);
-				pObj->SetColor(Color{ 0, 255, 0, 150 });
-				pObj->SetInteract(true);
+				mp_InteractableObject.push_back(pObj); 
 			}
 		}
 	}

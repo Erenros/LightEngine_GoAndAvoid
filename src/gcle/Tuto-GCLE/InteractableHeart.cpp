@@ -27,7 +27,7 @@ void Demo::InteractableHeart::OnInteract(Entity* pEntity)
 
 void Demo::InteractableHeart::OnUpdate()
 {
-    if (CanBeInteractWith())
+    if (IsPlayerInRange() && CanBeInteractWith())
     {
         SetTexture("InteractDropHeart");
     }

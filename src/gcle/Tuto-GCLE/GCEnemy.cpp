@@ -20,6 +20,9 @@ namespace Demo
 		if (m_State == EnemyState::Dead)
 			return;
 
+		if (m_State == EnemyState::Spawning)
+			return;
+
 		float32 dt = static_cast<float32>(GameManager::GetInstance().GetTime()->GetDeltaTime());
 
 		UpdateState(dt);
@@ -177,6 +180,7 @@ namespace Demo
 			{
 				PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 				m_CanShoot = true;
+				m_State = EnemyState::Idle;
 			});
 
 		AddFunctionInFrame("Hit", 2, [this]()
@@ -190,25 +194,36 @@ namespace Demo
 
 		AddFunctionInFrame("Death", 10, [this]()
 			{
+				InteractableHeart* pDrop = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<InteractableHeart>(gcle::Shapes::Rectangle);
+				pDrop->SetPosition(GetPosition().x, GetPosition().y);
+
+				pDrop->SetParent(this);
+
 				Destroy();
 			});
 
 		//PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
 
 		SetPosition(100.0f, 100.0f);
-
+		 
 		Entity* pSpawnZone = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<Entity>(gcle::Shapes::Rectangle);
+		pSpawnZone->SetPosition(GetPosition().x, GetPosition().y); 
 		pSpawnZone->SetParent(this);
-		pSpawnZone->SetPosition(0.0f, 0.0f);
 		pSpawnZone->SetRigidBody(false);
 		pSpawnZone->SetTexture("Spawn");
 		pSpawnZone->AddAnimation("Spawn", 0, 3, 0, 32, 32, 0.1f);
-		pSpawnZone->AddFunctionInFrame("Spawn", 3, [this]()
+		
+		pSpawnZone->AddFunctionInFrame("Spawn", 1, [this]()
 			{
 				PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
 			});
+		
+		pSpawnZone->AddFunctionInFrame("Spawn", 3, [pSpawnZone]()
+			{
+				pSpawnZone->Destroy();
+			});
 
-		pSpawnZone->PlayAnimation("Spawn", AnimationMode::Lock | AnimationMode::Loop);
+		pSpawnZone->PlayAnimation("Spawn", AnimationMode::Lock);
 
 	}
 
@@ -220,10 +235,6 @@ namespace Demo
 	{
 		Character::Death();
 		m_State = EnemyState::Dead;
-
-		InteractableHeart* pDrop = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<InteractableHeart>(gcle::Shapes::Rectangle);
-		pDrop->SetParent(this);
-		pDrop->SetPosition(0.0f, 0.0f);
 
 		GetRigidBody().Stop();
 		GetRigidBody().SetActive(false);
@@ -238,6 +249,14 @@ namespace Demo
 	{
 		if (mp_Target != nullptr)
 			ShootAt(mp_Target->GetPosition());
+	}
+
+	void GCEnemy::Damage(int amount)
+	{
+		if (m_State == EnemyState::Spawning)
+			return;
+
+		Character::Damage(amount);
 	}
 
 	void GCEnemy::SetTarget(Entity* pTarget) { mp_Target = pTarget; }
