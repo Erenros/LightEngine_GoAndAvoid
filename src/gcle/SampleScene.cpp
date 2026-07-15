@@ -35,10 +35,10 @@ void SampleScene::OnInitialize()
 	//pEntity->SetPosition(0, 0); 
 	//pEntity->Rotate(0);
 	//pEntity->SetRigidBody(true);  
-	//pEntity->GetRigidBody().SetDampingStrenght(0.9f);
+	//pEntity->GetRigidBody()->SetDampingStrenght(0.9f);
 	//pEntity->SetTexture("images");
 	//Collider* pCol = pEntity->CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }); 
-	//pEntity->GetRigidBody().SetCollisionOnContinuous();
+	//pEntity->GetRigidBody()->SetCollisionOnContinuous();
 
 	pEntity = entity1;
 
@@ -55,7 +55,7 @@ void SampleScene::OnInitialize()
 			entity->SetScale(0.2f);
 			entity->SetPosition(0.0f + i * 100, 0.0f + y * 100);
 			entity->SetRigidBody(true);
-			entity->GetRigidBody().SetGravity(false); 
+			entity->GetRigidBody()->SetGravity(false); 
 			entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1.0f, 1.0f });
 			entity->SetStatic(true);
 		}

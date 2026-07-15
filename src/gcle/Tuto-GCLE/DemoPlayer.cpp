@@ -24,32 +24,32 @@ namespace Demo
 
 		if (im.IsHeld('Q') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ -1, 0 }, 1200, dt);
+			GetRigidBody()->AddForce({ -1, 0 }, 1200, dt);
 			SetTextureFlip(TextureFlipMode::FLIP_HORIZONTAL);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('D') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 1, 0 }, 1200, dt); 
+			GetRigidBody()->AddForce({ 1, 0 }, 1200, dt); 
 			SetTextureFlip(TextureFlipMode::FLIP_NONE);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('S') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 0, 1 }, 1200, dt); 
+			GetRigidBody()->AddForce({ 0, 1 }, 1200, dt); 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('Z') && m_CanMove)
 		{
-			GetRigidBody().AddForce({ 0, -1 }, 1200, dt); 
+			GetRigidBody()->AddForce({ 0, -1 }, 1200, dt); 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
-		m_LastMoveDirection = GetRigidBody().GetVelocity();
+		m_LastMoveDirection = GetRigidBody()->GetVelocity();
 
 		if (
-			GetRigidBody().GetVelocity().x <= 0.05f && GetRigidBody().GetVelocity().y <= 0.05f &&
-			GetRigidBody().GetVelocity().x >= -0.05f && GetRigidBody().GetVelocity().y >= -0.05f && 
+			GetRigidBody()->GetVelocity().x <= 0.05f && GetRigidBody()->GetVelocity().y <= 0.05f &&
+			GetRigidBody()->GetVelocity().x >= -0.05f && GetRigidBody()->GetVelocity().y >= -0.05f && 
 			m_CanMove
 		){
 			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
@@ -69,8 +69,8 @@ namespace Demo
 			SetInvincible(true, m_DodgeDuration);
 			SetColor({ 255, 255, 255, 50 }); 
 
-			GetRigidBody().Stop();
-			GetRigidBody().AddImpulse(m_LastMoveDirection, m_DodgeForce);
+			GetRigidBody()->Stop();
+			GetRigidBody()->AddImpulse(m_LastMoveDirection, m_DodgeForce);
 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
@@ -102,10 +102,10 @@ namespace Demo
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
 
 		SetRigidBody(true);
-		GetRigidBody().SetGravity(false);
-		GetRigidBody().ActivateFriction(true);
-		GetRigidBody().SetFriction({ 0.99f , 0});
-		GetRigidBody().SetCollisionOnContinuous();
+		GetRigidBody()->SetGravity(false);
+		GetRigidBody()->ActivateFriction(true);
+		GetRigidBody()->SetFriction({ 0.99f , 0});
+		GetRigidBody()->SetCollisionOnContinuous();
 
 		SetTexture("player");
 

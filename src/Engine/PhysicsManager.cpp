@@ -90,7 +90,7 @@ namespace
 		// La correction indique la direction qui sort l'objet de la collision.
 		// On retire seulement la vitesse qui continue a pousser dans l'obstacle,
 		// et on pose les flags uniquement contre les objets immobiles.
-		pEntity->GetRigidBody().RemoveVelocityAlongNormal(correction);
+		pEntity->GetRigidBody()->RemoveVelocityAlongNormal(correction);
 		pCollider->CollidingOn(correction);
 	}
 }
@@ -512,7 +512,7 @@ ContinuousCollisionHit PhysicsManager::SweepColliderAgainstAABB(Collider* pMovin
 	AABB expandedObstacleAABB = ExpandAABB(obstacleAABB, movingHalfSize);
 
 	Vector2f start = pMovingCollider->GetShape()->GetPosition(0.5f, 0.5f);
-	Vector2f velocity = movingEntity->GetRigidBody().GetVelocity();
+	Vector2f velocity = movingEntity->GetRigidBody()->GetVelocity();
 	Vector2f end = start + velocity * static_cast<float32>(dt);
 
 	return SegmentAABBIntersection(start, end, expandedObstacleAABB);
@@ -598,7 +598,7 @@ AABB PhysicsManager::ComputePredictedAABB(Collider* pCollider, const AABB& curre
 	if (entity == nullptr || !entity->IsRigidBody())
 		return currentAABB;
 
-	Vector2f motion = entity->GetRigidBody().GetVelocity() * dt;
+	Vector2f motion = entity->GetRigidBody()->GetVelocity() * dt;
 	return TranslateAABB(currentAABB, motion);
 }
 
@@ -663,7 +663,7 @@ bool PhysicsManager::ShouldUseContinuousCollision(Collider* pCollider) const
 	if (!entity->IsRigidBody())
 		return false;
 
-	return entity->GetRigidBody().UseContinuousCollision();
+	return entity->GetRigidBody()->UseContinuousCollision();
 }
 
 AABB PhysicsManager::TranslateAABB(const AABB& aabb, Vector2f delta)
@@ -713,7 +713,7 @@ void PhysicsManager::ApplyContinuousCollisionResponse(Collider* pMovingCollider,
 		return;
 
 	Vector2f start = pMovingCollider->GetShape()->GetPosition(0.5f, 0.5f);
-	Vector2f velocity = movingEntity->GetRigidBody().GetVelocity();
+	Vector2f velocity = movingEntity->GetRigidBody()->GetVelocity();
 	Vector2f motion = velocity * static_cast<float32>(dt);
 
 	float32 safeTime = std::max(0.0f, hit.time - 0.001f);
@@ -725,7 +725,7 @@ void PhysicsManager::ApplyContinuousCollisionResponse(Collider* pMovingCollider,
 	Vector2f safeOwnerCenter = safeCenter - ownerToCollider;
 
 	movingEntity->SetPosition(safeOwnerCenter.x, safeOwnerCenter.y);
-	movingEntity->GetRigidBody().RemoveVelocityAlongNormal(hit.normal);
+	movingEntity->GetRigidBody()->RemoveVelocityAlongNormal(hit.normal);
 	pMovingCollider->CollidingOn(hit.normal);
 }
 
@@ -1209,8 +1209,8 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 		if (!pColA->GetOwner()->IsStatic() || !pColB->GetOwner()->IsStatic())
 		{
-			a->GetRigidBody().ZeroVelocityX();
-			b->GetRigidBody().ZeroVelocityX();
+			a->GetRigidBody()->ZeroVelocityX();
+			b->GetRigidBody()->ZeroVelocityX();
 		}
 	}
 	else
@@ -1232,8 +1232,8 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 		if (!a->IsStatic() || !b->IsStatic())
 		{
-			a->GetRigidBody().ZeroVelocityY();
-			b->GetRigidBody().ZeroVelocityY();
+			a->GetRigidBody()->ZeroVelocityY();
+			b->GetRigidBody()->ZeroVelocityY();
 		}
 	}
 

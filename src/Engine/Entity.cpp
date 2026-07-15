@@ -166,14 +166,14 @@ int32* Entity::GetCollisionLayer()
     return &m_Mask;
 }
 
-RigidBody2D& Entity::GetRigidBody()
+RigidBody2D* Entity::GetRigidBody()
 {
-    return m_RigidBody;
+    return &m_RigidBody;
 }
 
-const RigidBody2D& Entity::GetRigidBody() const
+const RigidBody2D* Entity::GetRigidBody() const
 {
-    return m_RigidBody;
+    return &m_RigidBody;
 }
 
 bool Entity::IsStatic() const

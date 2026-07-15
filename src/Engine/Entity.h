@@ -31,8 +31,8 @@ public:
 
     int64 GetId() const;
     int32* GetCollisionLayer();
-    RigidBody2D& GetRigidBody();
-    const RigidBody2D& GetRigidBody() const;
+    RigidBody2D* GetRigidBody();
+    const RigidBody2D* GetRigidBody() const;
 
     bool IsStatic() const;
     bool IsColliding(Entity* other) const;

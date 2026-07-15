@@ -179,7 +179,7 @@ void GameManager::UpdateRigidBodies(float32 dt)
 	for (auto& entity : GetActiveEntities(SceneManager::GetInstance().m_CurrentSceneTag))
 	{
 		if (entity->IsRigidBody())
-			entity->GetRigidBody().Update(dt);
+			entity->GetRigidBody()->Update(dt);
 	}
 }
 
