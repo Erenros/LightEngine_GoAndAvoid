@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "WorldText.h"
 #include "RessourceManager.h"
+#include "InputManager.h"
 
 void Scene::Draw(Window* pWindow) 
 {
@@ -34,6 +35,27 @@ void Scene::Draw(Window* pWindow)
 				{
 					WorldText* text = static_cast<WorldText*>(e);
 					GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(text->GetText());
+					m_NumberOfDraw++;
+				}
+			}
+		}
+	}
+
+	for (auto& layer : GameManager::GetInstance().m_UIs) {
+		for (UI* ui : layer) {
+			if (pWindow->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_FrustrumCulling)
+			{
+				if (ui->IsActiveIn(m_Tag))
+				{
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
+					m_NumberOfDraw++;
+				}
+			}
+			else if (ui->GetRenderShape() != nullptr)
+			{
+				if (ui->IsActiveIn(m_Tag))
+				{
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
 					m_NumberOfDraw++;
 				}
 			}
@@ -133,6 +155,21 @@ void Scene::Update(Clock& time) const
 				e->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
 	} 
+	for (auto& layer : GameManager::GetInstance().m_UIs) {
+		for(UI* ui : layer)
+		{
+			if (ui->IsActiveIn(m_Tag))
+				ui->Update(static_cast<float32>(time.GetDeltaTime()));
+		}
+	} 
+
+	if (InputManager::GetInstance().IsDown(LeftButton))
+	{
+		for (auto it : buttons) {
+			if (it.IsInside(mp_ActiveCamera->GetScreenMousePosition())){}
+				it.Click();
+		}
+	}
 }
 
 #ifdef _DEBUG
@@ -501,7 +538,17 @@ void Scene::SwitchCamera(Camera* pCamera)
 	}
 }
 
-Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a) 
+Button* Scene::CreateButton(gcle::Shapes shape, std::string text)
+{
+	Button* button = CreateUI<Button>(shape);
+	buttons.push_back(*button);
+	button->Initialize();
+
+	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
+	return button;
+}
+
+Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a)
 {
 	WorldText* worldText = CreateEntity<WorldText>();
 	Font* font = RessourceManager::GetInstance().GetFont(fontId);

@@ -7,6 +7,8 @@
 #include "Engine/RessourceManager.h"
 #include "Sprite.h"
 
+class GameObject;
+class UI;
 class Entity;
 class Window;
 class Surface;
@@ -72,7 +74,7 @@ namespace gcle
 
 	protected:
 		Transform2D m_Transform;
-		Entity* mp_Owner;
+		GameObject* mp_Owner;
 
 		//circle
 		float32 m_Radius = 0.0f;
@@ -101,8 +103,8 @@ namespace gcle
 
 		//Constructors 
 
-		Shape(Entity* pOwner);
-		Shape(const Shape& shape);
+		Shape(GameObject* owner);
+		Shape(const Shape& pShape);
 		Shape& operator=(const Shape&) = delete;
 
 	public:
@@ -140,20 +142,17 @@ namespace gcle
 
 
 	public:
-
 		virtual float32 GetWidth();
 		virtual float32 GetHeight();
 		virtual float32 GetRadius();
 		virtual int32 GetSmoothness();
-		virtual Entity* GetOwner();
+		virtual GameObject* GetOwner();
 		virtual Vector2f GetCenter();
 		virtual std::vector<SDL_FPoint*>& GetHollow();
 		virtual std::vector<Vector2f> GetTrianglePoints();
 
 
 	public:
-		//Setters 
-
 		virtual void SetRadius(float32 radius) {};
 		virtual void SetHeight(float32 height) {};
 		virtual void SetWidth(float32 width) {};
@@ -179,7 +178,7 @@ namespace gcle
 	class Rectangle : public Shape {
 
 	public:
-		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, Entity* pOwner);
+		Rectangle(float32 x, float32 y, float32 height, float32 width, Color color, GameObject* owner);
 	
 		Shape* Clone() const override;
 
@@ -203,7 +202,7 @@ namespace gcle
 
 		//Contructors
 
-		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, Entity* pOwner);
+		Triangle(float32 x1, float32 y1, float32 x2, float32 y2, float32 x3, float32 y3, Color color, GameObject* owner);
 
 		Shape* Clone() const override;
 
@@ -217,7 +216,7 @@ namespace gcle
 
 		//Contructors
 
-		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, Entity* pOwner);
+		Circle(float32 x, float32 y, float32 radius, int _smoothness, Color color, GameObject* owner);
 
 		Shape* Clone() const override;
 

@@ -1,7 +1,7 @@
 #include "DemoScene.h"
 
 #include "Engine/PhysicsManager.h"
-
+#include "Render/Text.h"
 
 #include "Tuto-GCLE/DemoPlayer.h"
 #include "Tuto-GCLE/GCEnemy.h"
@@ -10,6 +10,7 @@
 
 void DemoScene::OnInitialize()
 {
+
 	Scene::OnInitialize();
 
 	std::string text = "Test            Salut, je suis thomas !";

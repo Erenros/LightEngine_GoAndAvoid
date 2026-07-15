@@ -84,7 +84,7 @@ namespace Demo
 		else
 			SetTextureFlip(TextureFlipMode::FLIP_NONE);
 
-		GetRigidBody().AddForce(direction, m_MoveForce, dt);
+		GetRigidBody()->AddForce(direction, m_MoveForce, dt);
 
 		PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 	}
@@ -146,8 +146,8 @@ namespace Demo
 		//pProj->GetTransform2D().UpdateChildPosition();
 
 		pProj->SetColor(Color::Red);
-		pProj->SetSpeed(700.0f);
-		pProj->GoToDirection(worldTarget.x, worldTarget.y);
+		//pProj->SetSpeed(700.0f);
+		//pProj->GoToDirection(worldTarget.x, worldTarget.y);
 	}
 
 	void GCEnemy::OnDestroy()
@@ -162,10 +162,10 @@ namespace Demo
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
 
 		SetRigidBody(true);
-		GetRigidBody().SetGravity(false);
-		GetRigidBody().ActivateDamping(true);
-		GetRigidBody().SetDampingStrenght(0.99f);
-		GetRigidBody().SetCollisionOnContinuous();
+		GetRigidBody()->SetGravity(false);
+		GetRigidBody()->ActivateFriction(true);
+		GetRigidBody()->SetFriction({ 0.99f , 0.99f});
+		GetRigidBody()->SetCollisionOnContinuous();
 
 		SetTexture("enemy");
 
@@ -236,8 +236,8 @@ namespace Demo
 		Character::Death();
 		m_State = EnemyState::Dead;
 
-		GetRigidBody().Stop();
-		GetRigidBody().SetActive(false);
+		GetRigidBody()->Stop();
+		GetRigidBody()->SetActive(false);
 	}
 
 	void GCEnemy::Heal(int amount)

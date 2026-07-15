@@ -12,7 +12,9 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
         return mp_Texture;
 
 
-    m_NeedToChange = false;
+	//SDL_Surface* surface = TTF_RenderText_Blended(mp_font->GetSDLFont(), m_Text.c_str(), *mp_color);
+	int32 width = 0;
+	int32 height = 0;
 
 
     if (mp_Texture != nullptr)
@@ -28,6 +30,8 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
         return nullptr;
     }
 
+		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->b);
+		SDL_SetSurfaceAlphaMod(mp_Font->GetFontSurface(), mp_Color->a);
 
     int32 width = 0;
     int32 height = 0;
@@ -211,6 +215,10 @@ void Text::SetPosition(int32 x, int32 y)
 
 void Text::SetFontSize(int32 size) {
 	m_FontSize = size;
+	
+	mp_Rect->h = size;
+	mp_Rect->w = static_cast<float32>(m_Text.size()) * static_cast<float32>(size) * 0.6f;
+
 	m_NeedToChange = true;
 }
 

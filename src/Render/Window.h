@@ -72,7 +72,9 @@ public:
 	Vector2f GetMousePositionOnRenderTarget();
 
 public:
-	bool IsInsideWindow(Entity* pEntity);
+	bool IsInsideWindow(GameObject* gm);
+
+private:
 
 private:
 	SDL_Window* mp_Window = nullptr;
