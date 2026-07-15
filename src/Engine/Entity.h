@@ -8,10 +8,22 @@
 
 class Collider;
 
+struct Target
+{
+    Vector2f position;
+    float distance = 0.f;
+    bool isSet = false;
+};
+
 class Entity : public GameObject
 {
 public:
     void Destroy();
+
+    void Move(Vector2f translation);
+    bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
+    bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
+    void SetDirection(float32 x, float32 y, float32 speed);
 
     void SetTag(int32 tag);
     void SetRigidBody(bool isRigidBody);
@@ -69,12 +81,16 @@ private:
     int32 m_Tag = -1;
     bool m_IsStatic = false;
     bool m_IsHighlighted = false;
+    Target m_Target;
+    float m_Speed = 0;
+    Vector2f m_Direction;
 
     RigidBody2D m_RigidBody;
     std::unordered_set<Collider*> mp_Colliders;
     std::unordered_map<int64, Entity*> m_CollidingEntity;
     std::unordered_map<int64, Entity*> m_TriggeringEntity;
 
+private:
     friend class Scene;
     friend class Camera;
     friend class GameManager;

@@ -20,6 +20,8 @@ Entity::~Entity()
 
 void Entity::Initialize(gcle::Shapes shape)
 {
+
+    m_Target.isSet = false;
     GameObject::Initialize(shape);
     Initialize();
 }
@@ -31,6 +33,8 @@ void Entity::Initialize()
     m_Mask = 1;
     m_Id = s_NextEntityId++;
 
+    m_Target.isSet = false;
+
     m_RigidBody.Initialize(&m_Transform);
     m_RigidBody.SetActive(true);
 
@@ -41,6 +45,40 @@ void Entity::Update(float32 dt)
 {
     if (m_RigidBody.IsActive())
         m_RigidBody.Update(dt);
+
+    if (m_IsStatic == false)
+    {
+        float32 distance = dt * m_Speed;
+        Vector2f translation = m_Direction * distance;
+
+        Move(translation);
+        if (mp_RenderShape != nullptr) {
+            Texture* tex = mp_RenderShape->GetTexture();
+            if (tex != nullptr)
+            {
+                if (tex->IsSprite())
+                    static_cast<Sprite*>(tex)->UpdateAnimation(dt, mp_RenderShape);
+            }
+        }
+        if (m_Target.isSet)
+        {
+            float32 x1 = GetPosition().x;
+            float32 y1 = GetPosition().y;
+
+            float32 x2 = x1 + m_Direction.x * m_Target.distance;
+            float32 y2 = y1 + m_Direction.y * m_Target.distance;
+
+            m_Target.distance -= distance;
+
+            if (m_Target.distance <= 0)
+            {
+                SetPosition(m_Target.position.x, m_Target.position.y);
+                m_Direction = Vector2f({ 0.f, 0.f });
+                m_Target.isSet = false;
+            }
+        }
+    }
+
 
     GameObject::Update(dt);
     OnUpdate();
@@ -54,6 +92,47 @@ void Entity::Destroy()
     m_ToDestroy = true;
     PhysicsManager::GetInstance().RemoveEntity(this);
     OnDestroy();
+}
+
+void Entity::Move(Vector2f translation) {
+    Vector2f pivot = m_Transform.GetPosition();
+    m_Transform.SetPosition({ pivot.x + translation.x, pivot.y + translation.y });
+}
+
+bool Entity::GoToPosition(float32 x, float32 y, float32 speed)
+{
+    if (GoToDirection(x, y, speed) == false)
+        return false;
+
+    Vector2f position = m_Transform.GetPosition();
+
+    m_Target.position = { x, y };
+    m_Target.distance = position.GetDistance({ x, y });
+    m_Target.isSet = true;
+
+    return true;
+}
+
+bool Entity::GoToDirection(float32 x, float32 y, float32 speed)
+{
+    Vector2f position = m_Transform.GetPosition();
+    Vector2f direction = Vector2f({ x - position.x, y - position.y });
+
+    direction = direction.Normalized();
+
+    SetDirection(direction.x, direction.y, speed);
+
+    return true;
+}
+
+void Entity::SetDirection(float32 x, float32 y, float32 speed)
+{
+    if (speed > 0)
+    {
+        m_Speed = speed;
+    }
+
+    m_Direction = { x, y };
 }
 
 void Entity::SetTag(int32 tag)
