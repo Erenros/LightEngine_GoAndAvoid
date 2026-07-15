@@ -219,6 +219,11 @@ bool Entity::HasCollider() const
     return !mp_Colliders.empty();
 }
 
+void Entity::SetParent(Transform2D* pParent)
+{
+    m_Transform.SetParent(pParent);
+}
+
 void Entity::AddCollider(Collider* collider)
 {
     if (collider == nullptr)

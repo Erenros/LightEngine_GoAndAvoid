@@ -33,9 +33,6 @@ SDL_Texture* Text::GetTexture(Window* pWindow)
 		SDL_SetSurfaceColorMod(mp_Font->GetFontSurface(), mp_Color->r, mp_Color->g, mp_Color->b);
 		SDL_SetSurfaceAlphaMod(mp_Font->GetFontSurface(), mp_Color->a);
 
-    int32 width = 0;
-    int32 height = 0;
-
     mp_Font->GetTextSize(m_Text, width, height);
 
 

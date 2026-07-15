@@ -10,9 +10,9 @@ void Demo::Table::OnInitialize()
     CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
 
     SetRigidBody(true);
-    GetRigidBody().SetGravity(false);
+    GetRigidBody()->SetGravity(false);
     SetStatic(true);
-    GetRigidBody().SetCollisionOnContinuous();
+    GetRigidBody()->SetCollisionOnContinuous();
 
     SetTexture("Table_Vertical");
 }
@@ -24,8 +24,8 @@ void Demo::Table::OnInteract(Entity* pEntity)
         SetTag(GameTag::Wall);
 
         SetStatic(false);
-        GetRigidBody().ActivateDamping(true);
-        GetRigidBody().SetDampingStrenght(0.99f);
+        GetRigidBody()->ActivateFriction(true);
+        GetRigidBody()->SetFriction({ 0.99f, 0.99f });
 
         m_CanInteract = false;
         m_IsDown = true;

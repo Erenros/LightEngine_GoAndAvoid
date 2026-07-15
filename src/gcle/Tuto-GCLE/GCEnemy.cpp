@@ -197,7 +197,7 @@ namespace Demo
 				InteractableHeart* pDrop = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<InteractableHeart>(gcle::Shapes::Rectangle);
 				pDrop->SetPosition(GetPosition().x, GetPosition().y);
 
-				pDrop->SetParent(this);
+				pDrop->SetParent(&GetTransform2D());
 
 				Destroy();
 			});
@@ -208,7 +208,7 @@ namespace Demo
 		 
 		Entity* pSpawnZone = SceneManager::GetInstance().GetCurrentScene()->CreateEntity<Entity>(gcle::Shapes::Rectangle);
 		pSpawnZone->SetPosition(GetPosition().x, GetPosition().y); 
-		pSpawnZone->SetParent(this);
+		pSpawnZone->SetParent(&GetTransform2D());
 		pSpawnZone->SetRigidBody(false);
 		pSpawnZone->SetTexture("Spawn");
 		pSpawnZone->AddAnimation("Spawn", 0, 3, 0, 32, 32, 0.1f);

@@ -44,6 +44,8 @@ public:
     void RemoveCollider(Collider* collider);
     const std::unordered_set<Collider*>& GetColliders() const;
 
+    void SetParent(Transform2D* pParent);
+
     Collider* CreateCollider(
         gcle::Shapes shape,
         bool isActive,

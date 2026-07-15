@@ -10,7 +10,7 @@ void Demo::InteractableHeart::OnInitialize()
     CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f }, true);
 
     SetRigidBody(true);
-    GetRigidBody().SetGravity(false);
+    GetRigidBody()->SetGravity(false);
     SetStatic(true); 
 
     SetTexture("DropHeart");
