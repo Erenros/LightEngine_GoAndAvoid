@@ -59,9 +59,9 @@ namespace
 		return true;
 	}
 
-	float32 KinematicFactor(Entity* pEntity)
+	float32 StaticFactor(Entity* pEntity)
 	{
-		return pEntity->IsStatic() ? 1.0f : 0.0f;
+		return pEntity->IsStatic() ? 0.0f : 1.0f;
 	}
 
 	bool ShouldBlockMovement(Entity* pEntity, Entity* pOtherEntity)
@@ -72,8 +72,8 @@ namespace
 		// On bloque uniquement quand l'objet touche un obstacle non Kinematic.
 		return pEntity != nullptr &&
 			pOtherEntity != nullptr &&
-			pEntity->IsStatic() &&
-			!pOtherEntity->IsStatic();
+			!pEntity->IsStatic() &&
+			pOtherEntity->IsStatic();
 	}
 
 	void ApplyBlockingResponse(Collider* pCollider, Collider* pOtherCollider, const Vector2f& correction)
@@ -1196,18 +1196,18 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 		if (x1 < x2)
 		{
-			delta1.x -= correction * a->IsStatic();
-			delta2.x += correction * b->IsStatic();
+			delta1.x -= correction * !a->IsStatic();
+			delta2.x += correction * !b->IsStatic();
 
 		}
 		else
 		{
-			delta1.x += correction * a->IsStatic();
-			delta2.x -= correction * b->IsStatic();
+			delta1.x += correction * !a->IsStatic();
+			delta2.x -= correction * !b->IsStatic();
 
 		}
 
-		if (!pColA->GetOwner()->IsStatic() || !pColB->GetOwner()->IsStatic())
+		if (pColA->GetOwner()->IsStatic() || pColB->GetOwner()->IsStatic())
 		{
 			a->GetRigidBody()->ZeroVelocityX();
 			b->GetRigidBody()->ZeroVelocityX();
@@ -1219,18 +1219,18 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 		if (y1 < y2)
 		{
-			delta1.y -= correction * a->IsStatic();
-			delta2.y += correction * b->IsStatic();
+			delta1.y -= correction * !a->IsStatic();
+			delta2.y += correction * !b->IsStatic();
 
 		}
 		else
 		{
-			delta1.y += correction * a->IsStatic();
-			delta2.y -= correction * b->IsStatic();
+			delta1.y += correction * !a->IsStatic();
+			delta2.y -= correction * !b->IsStatic();
 
 		}
 
-		if (!a->IsStatic() || !b->IsStatic())
+		if (a->IsStatic() || b->IsStatic())
 		{
 			a->GetRigidBody()->ZeroVelocityY();
 			b->GetRigidBody()->ZeroVelocityY();
@@ -1264,8 +1264,8 @@ void PhysicsManager::RepulseCircleCircle(Collider* pColA, Collider* pColB)
 	Vector2f normal = SafeNormal(distance, { 1.0f, 0.0f }); // direction B -> A
 	Vector2f translation = normal * penetration * GetRepulseCorrectionMultiplyer(pColA, pColB);
 
-	Vector2f delta1 = translation * KinematicFactor(pColA->GetOwner());
-	Vector2f delta2 = -translation * KinematicFactor(pColB->GetOwner());
+	Vector2f delta1 = translation * StaticFactor(pColA->GetOwner());
+	Vector2f delta2 = -translation * StaticFactor(pColB->GetOwner());
 
 	AccumulateCorrection(pColA->GetOwner(), delta1);
 	AccumulateCorrection(pColB->GetOwner(), delta2);
@@ -1316,8 +1316,8 @@ void PhysicsManager::RepulseRectCircle(Collider* pColA, Collider* pColB)
 		else { newPos.y = ry + rh + pCircle->GetRadius(); normal = { 0.0f,  1.0f }; }
 
 		Vector2f translation = (newPos - circlePos) * correctionMultiplyer;
-		Vector2f deltaRect = -translation * KinematicFactor(pColA->GetOwner());
-		Vector2f deltaCircle = translation * KinematicFactor(pColB->GetOwner());
+		Vector2f deltaRect = -translation * StaticFactor(pColA->GetOwner());
+		Vector2f deltaCircle = translation * StaticFactor(pColB->GetOwner());
 
 		ApplyBlockingResponse(pColA, pColB, deltaRect);
 		ApplyBlockingResponse(pColB, pColA, deltaCircle);
@@ -1333,8 +1333,8 @@ void PhysicsManager::RepulseRectCircle(Collider* pColA, Collider* pColB)
 	float32  overlap = (pCircle->GetRadius() - length) * correctionMultiplyer;
 
 	Vector2f translation = normal * overlap;
-	Vector2f deltaRect = -translation * KinematicFactor(pColA->GetOwner());
-	Vector2f deltaCircle = translation * KinematicFactor(pColB->GetOwner());
+	Vector2f deltaRect = -translation * StaticFactor(pColA->GetOwner());
+	Vector2f deltaCircle = translation * StaticFactor(pColB->GetOwner());
 
 	ApplyBlockingResponse(pColA, pColB, deltaRect);
 	ApplyBlockingResponse(pColB, pColA, deltaCircle);
@@ -1363,8 +1363,8 @@ void PhysicsManager::RepulseOBB(Collider* pColA, Collider* pColB)
 
 	Vector2f correction = normal * penetration * GetRepulseCorrectionMultiplyer(pColA, pColB);
 
-	Vector2f deltaA = -correction * KinematicFactor(pColA->GetOwner());
-	Vector2f deltaB = correction * KinematicFactor(pColB->GetOwner());
+	Vector2f deltaA = -correction * StaticFactor(pColA->GetOwner());
+	Vector2f deltaB = correction * StaticFactor(pColB->GetOwner());
 
 	ApplyBlockingResponse(pColA, pColB, deltaA);
 	ApplyBlockingResponse(pColB, pColA, deltaB);
@@ -1382,7 +1382,7 @@ float32 PhysicsManager::GetRepulseCorrectionMultiplyer(Collider* pColA, Collider
 	gcle::Shape* a = pColA->GetShape();
 	gcle::Shape* b = pColB->GetShape();
 
-	if (pColA->GetOwner()->IsStatic() && pColB->GetOwner()->IsStatic())
+	if (!pColA->GetOwner()->IsStatic() && !pColB->GetOwner()->IsStatic())
 		return 0.5;
 	else
 		return 1.0;

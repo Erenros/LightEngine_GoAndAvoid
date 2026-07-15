@@ -24,6 +24,7 @@ public:
     bool GoToPosition(float32 x, float32 y, float32 speed = -1.f);
     bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
     void SetDirection(float32 x, float32 y, float32 speed);
+    void SetSpeed(float32 speed);
 
     void SetTag(int32 tag);
     void SetRigidBody(bool isRigidBody);

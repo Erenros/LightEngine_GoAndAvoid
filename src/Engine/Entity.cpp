@@ -135,6 +135,11 @@ void Entity::SetDirection(float32 x, float32 y, float32 speed)
     m_Direction = { x, y };
 }
 
+void Entity::SetSpeed(float32 speed)
+{
+    m_Speed = speed;
+}
+
 void Entity::SetTag(int32 tag)
 {
     m_Tag = tag;

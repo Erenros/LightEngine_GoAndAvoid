@@ -146,8 +146,8 @@ namespace Demo
 		//pProj->GetTransform2D().UpdateChildPosition();
 
 		pProj->SetColor(Color::Red);
-		//pProj->SetSpeed(700.0f);
-		//pProj->GoToDirection(worldTarget.x, worldTarget.y);
+		pProj->SetSpeed(700.0f);
+		pProj->GoToDirection(worldTarget.x, worldTarget.y);
 	}
 
 	void GCEnemy::OnDestroy()

@@ -112,7 +112,7 @@ namespace Demo
 		SetRigidBody(true);
 		GetRigidBody()->SetGravity(false);
 		GetRigidBody()->ActivateFriction(true);
-		GetRigidBody()->SetFriction({ 0.99f , 0});
+		GetRigidBody()->SetFriction({ 0.99f , 0.99f});
 		GetRigidBody()->SetCollisionOnContinuous();
 
 		SetTexture("player");
@@ -223,8 +223,8 @@ namespace Demo
 		pProj->GetTransform2D().UpdateChildPosition();
 
 		pProj->SetColor(Color::Yellow);
-		//pProj->SetSpeed(400.0f);
-		//pProj->GoToDirection(posToGo.x, posToGo.y);
+		pProj->SetSpeed(400.0f);
+		pProj->GoToDirection(posToGo.x, posToGo.y);
 	}
 
 	void GCPlayer::Damage(int amount)

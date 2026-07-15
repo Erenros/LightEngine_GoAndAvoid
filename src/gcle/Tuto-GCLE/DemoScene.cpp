@@ -32,6 +32,7 @@ void DemoScene::OnInitialize()
 	mp_Enemy->SetAttackRange(400.0f);
 	mp_Enemy->SetPosition(100.0f, 100.0f);
 
+
 	//Demo::GCEnemy* pEnemy2 = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
 	//pEnemy2->SetTarget(mp_Player);
 	//pEnemy2->SetPosition(-200.0f, 150.0f);
