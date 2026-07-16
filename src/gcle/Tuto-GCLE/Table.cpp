@@ -21,7 +21,7 @@ void Demo::Table::OnInteract(Entity* pEntity)
 {
     if (m_IsDown == false)
     {
-        SetTag(GameTag::Wall);
+        SetTag(GameTag::Obstacle);
 
         SetStatic(false);
         GetRigidBody()->ActivateFriction(true);

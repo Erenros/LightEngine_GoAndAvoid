@@ -6,15 +6,14 @@
 #include "Tuto-GCLE/DemoPlayer.h"
 #include "Tuto-GCLE/GCEnemy.h"
 #include "Tuto-GCLE/Table.h"
+#include "Tuto-GCLE/Wall.h"
 #include "Tuto-GCLE/Tag.h"
 
 void DemoScene::OnInitialize()
 {
 
 	Scene::OnInitialize();
-
-	std::string text = "Test            Salut, je suis thomas !";
-	CreateText(text, { 40, 40 }, 50);
+	 
 
 	pSceneCamera = CreateCamera();
 	SwitchCamera(pSceneCamera);
@@ -43,37 +42,23 @@ void DemoScene::OnInitialize()
 
 
 
-	Entity* pWall1 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
-	pWall1->SetPosition(0, -400);
-	pWall1->SetScale({8.0f, 1.0f});
-	pWall1->SetTag(Demo::GameTag::Wall);
-	pWall1->SetRigidBody(true);
-	pWall1->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
-	pWall1->SetStatic(true);
+	 
+	
+	Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	pWall->SetPosition(0, -400);
+	pWall->SetScale({ 8.0f, 1.0f });
 
-	Entity* pWall2 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Demo::Wall* pWall2 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
 	pWall2->SetPosition(0, 400);
 	pWall2->SetScale({ 8.0f, 1.0f });
-	pWall2->SetTag(Demo::GameTag::Wall);
-	pWall2->SetRigidBody(true);
-	pWall2->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
-	pWall2->SetStatic(true);
 
-	Entity* pWall3 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Demo::Wall* pWall3 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
 	pWall3->SetPosition(-400, 0);
 	pWall3->SetScale({ 1.0f, 8.0f });
-	pWall3->SetTag(Demo::GameTag::Wall);
-	pWall3->SetRigidBody(true);
-	pWall3->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
-	pWall3->SetStatic(true);
 
-	Entity* pWall4 = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+	Demo::Wall* pWall4 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
 	pWall4->SetPosition(400, 0);
-	pWall4->SetScale({ 1.0f, 8.0f });
-	pWall4->SetTag(Demo::GameTag::Wall);
-	pWall4->SetRigidBody(true);
-	pWall4->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
-	pWall4->SetStatic(true);
+	pWall4->SetScale({ 1.0f, 8.0f }); 
 
 	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
 	PhysicsManager::GetInstance().SetActivateQuadTree(true);

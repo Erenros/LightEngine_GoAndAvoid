@@ -30,7 +30,7 @@ namespace Demo
 
 	void Projectile::OnTriggerEnter(Entity* pEntity)
 	{
-		if (pEntity->IsTag(GameTag::Wall))
+		if (pEntity->IsTag(GameTag::Obstacle))
 		{
 			Destroy();
 			return;

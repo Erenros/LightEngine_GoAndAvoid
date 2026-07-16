@@ -8,7 +8,7 @@ namespace Demo
 	{
 		Player,
 		Enemy,
-		Wall,
+		Obstacle,
 		Decor,
 	};
 }
