@@ -13,11 +13,11 @@ protected:
     virtual void OnActivate() {}
     virtual void OnUpdate() override {}
     virtual void OnInitialize() override {}
+    virtual void Update(float32 dt) override;
 
 private:
     void Initialize(gcle::Shapes shape) override;
     void Initialize();
-    void Update(float32 dt) override;
     void OnSetPosition(float32 x, float32 y) override;
 public: 
     void SetText(const std::string& text);

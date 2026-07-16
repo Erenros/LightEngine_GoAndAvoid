@@ -8,26 +8,18 @@ InputManager& InputManager::GetInstance()
 
 void InputManager::Update()
 {
-	std::unordered_map<int16, bool>::iterator it;
+	m_Previous = m_Current;
 
-	for (it = m_KeysDownReset.begin(); it != m_KeysDownReset.end(); it++)
+	for (int i = 0; i < 256; ++i)
 	{
-		if (it->second == false)
-		{
-			if ((GetAsyncKeyState(it->first) & 0x8000) == 0)
-			{
-				it->second = true;
-			}
-		}
+		m_Current[i] = (GetAsyncKeyState(i) & 0x8000) != 0;
 	}
 
 	for (int8 i = 0; i < m_Controllers.size(); i++)
 	{
 		m_Controllers[i]->state = GetGamepadState(i);
 	}
-}
-
-
+} 
 
 
 Vector2<int32> InputManager::GetMouseRelativePosition()
@@ -49,40 +41,24 @@ Vector2<int32> InputManager::GetMouseWorldPosition()
 
 
 
-bool InputManager::IsDown(const int16 key)
+bool InputManager::IsDown(int16 key)
 {
-	if ((GetAsyncKeyState(key) & 0x8000) != 0)
-	{
-		if (m_KeysDownReset.find(key) == m_KeysDownReset.end())
-		{
-			m_KeysDownReset[key] = false;
-			return true;
-		}
-
-		else
-		{
-			if (m_KeysDownReset[key] == true)
-			{
-				m_KeysDownReset[key] = false;
-				return true;
-			}
-
-			else
-			{
-				return false;
-			}
-		}
-	}
-
-	return false;
+	return m_Current[key] && !m_Previous[key];
 }
 
-bool InputManager::IsHeld(const char key){
-	return ((GetAsyncKeyState(key) & 0x8000) != 0);
+bool InputManager::IsReleased(int16 key)
+{
+	return !m_Current[key] && m_Previous[key];
 }
 
-bool InputManager::IsUp(const char key){
-	return ((GetAsyncKeyState(key) & 0x8000) == 0);
+bool InputManager::IsHeld(int16 key)
+{
+	return m_Current[key];
+}
+
+bool InputManager::IsUp(int16 key)
+{
+	return !m_Current[key];
 }
 
 void InputManager::AddController(Controller* pController)

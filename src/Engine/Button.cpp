@@ -1,14 +1,12 @@
 #include "Button.h"
 
-
-Button::Button()
+ 
+void Button::OnReleased(bool insideOnRelease)
 {
-}
+	if (!insideOnRelease) return;
 
-void Button::Click()
-{
-	for (int32 i = 0; i < m_FunctionToCallOnActivate.size(); i++) {
-		m_FunctionToCallOnActivate[i]();
-	}
+	for (auto& fn : m_FunctionToCallOnActivate) 
+		fn();
+	
 	OnClick();
 }

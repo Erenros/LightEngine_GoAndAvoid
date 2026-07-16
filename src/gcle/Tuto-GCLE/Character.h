@@ -13,7 +13,7 @@ namespace Demo
 		void SetMaxLife(int maxLife);
 		void SetCurrentLife(int currentLife);
 
-		int GetMaxLife(int maxLife) const;
+		int GetMaxLife() const;
 		int GetCurrentLife() const;
 
 		virtual void Damage(int amount);

@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <unordered_map>
+#include <array>
 #include "include.h"
 #include <Windows.h>
 #include <Xinput.h>
@@ -82,7 +82,8 @@ class InputManager
 {
 private:
 	
-	std::unordered_map<int16, bool> m_KeysDownReset;
+	std::array<bool, 256> m_Current{};
+	std::array<bool, 256> m_Previous{};
 
 	std::vector<Controller*> m_Controllers;
 
@@ -107,8 +108,9 @@ public:
 	Vector2<int32> GetMouseWorldPosition();
 
 	bool IsDown(const int16 key);
-	bool IsHeld(const char key);
-	bool IsUp(const char key);
+	bool IsReleased(int16 key);
+	bool IsHeld(int16 key);
+	bool IsUp(int16 key);
 
 	void AddController(Controller* pConntroller);
 

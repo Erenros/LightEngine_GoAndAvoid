@@ -161,15 +161,7 @@ void Scene::Update(Clock& time) const
 			if (ui->IsActiveIn(m_Tag))
 				ui->Update(static_cast<float32>(time.GetDeltaTime()));
 		}
-	} 
-
-	if (InputManager::GetInstance().IsDown(LeftButton))
-	{
-		for (auto it : buttons) {
-			if (it.IsInside(mp_ActiveCamera->GetScreenMousePosition())){}
-				it.Click();
-		}
-	}
+	}  
 }
 
 #ifdef _DEBUG
@@ -540,12 +532,47 @@ void Scene::SwitchCamera(Camera* pCamera)
 
 Button* Scene::CreateButton(gcle::Shapes shape, std::string text)
 {
-	Button* button = CreateUI<Button>(shape);
-	buttons.push_back(*button);
-	button->Initialize();
+	Button* button = CreateUI<Button>(shape);  
 
 	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
 	return button;
+}
+
+Toggle* Scene::CreateToggle(gcle::Shapes shape, const std::string& checkImage, const std::string& unCheckImage)
+{
+	Toggle* pToggle = CreateUI<Toggle>(shape);
+	pToggle->SetOnCheckedTexture(checkImage);
+	pToggle->SetOnUncheckedTexture(unCheckImage);
+	return pToggle;
+}
+
+Slider* Scene::CreateSlider(gcle::Shapes shape, SliderOrientation orientation)
+{
+	Slider* pSlider = CreateUI<Slider>(shape);
+	pSlider->SetOrientation(orientation);
+	return pSlider;
+}
+
+Scrollbar* Scene::CreateScrollbar(gcle::Shapes shape, float32 handleSizeRatio)
+{
+	Scrollbar* pScrollbar = CreateUI<Scrollbar>(shape);
+	pScrollbar->SetHandleSizeRatio(handleSizeRatio);
+	return pScrollbar;
+}
+
+Panel* Scene::CreatePanel(gcle::Shapes shape, Color color)
+{
+	Panel* pPanel = CreateUI<Panel>(shape);
+	pPanel->SetBackgroundColor(color);
+	return pPanel;
+}
+
+Image* Scene::CreateImage(gcle::Shapes shape, const std::string& textureId)
+{
+	Image* pImage = CreateUI<Image>(shape);
+	if (!textureId.empty())
+		pImage->SetSprite(textureId);
+	return pImage;
 }
 
 Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a)

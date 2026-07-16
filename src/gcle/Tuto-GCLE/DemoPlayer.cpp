@@ -79,6 +79,11 @@ namespace Demo
 		{
 			mp_InteractableObject[0]->Interact(this);
 		}
+		
+		if (im.IsDown('P'))
+		{
+			Damage(10);
+		}
 
 	}
 
@@ -108,6 +113,8 @@ namespace Demo
 		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
 
 		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 0.6f, 0.6f }, true);
+
+		
 
 		SetRigidBody(true);
 		GetRigidBody()->SetGravity(false);
@@ -147,6 +154,17 @@ namespace Demo
 			});
 
 		PlayAnimation("Appear", AnimationMode::IgnoreIfAlreadyPlaying | AnimationMode::Lock, AnimationInterrupt::Force);
+
+
+		SetMaxLife(50);
+		SetCurrentLife(50);
+
+
+
+
+
+
+
 	}
 
 	void GCPlayer::OnCollision(Entity* collidedWith) {}

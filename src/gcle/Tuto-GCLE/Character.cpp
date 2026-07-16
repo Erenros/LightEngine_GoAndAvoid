@@ -40,7 +40,7 @@ namespace Demo
 		m_CurrentLife = currentLife;
 	}
 
-	int Character::GetMaxLife(int maxLife) const
+	int Character::GetMaxLife() const
 	{
 		return m_MaxLife;
 	}

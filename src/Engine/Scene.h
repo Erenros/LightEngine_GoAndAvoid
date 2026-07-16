@@ -5,6 +5,11 @@
 #include "UI.h"
 #include "Core/InputManager.h"
 #include "Button.h"
+#include "Toggle.h"
+#include "Slider.h"
+#include "Scrollbar.h"
+#include "Panel.h"
+#include "Image.h"
 
 //class Entity;
 class Font;
@@ -34,6 +39,11 @@ public:
 	T* CreateUI();
 
 	Button* CreateButton(gcle::Shapes shape, std::string text);
+	Toggle* CreateToggle(gcle::Shapes shape, const std::string& checkImage, const std::string& unCheckImage);
+	Slider* CreateSlider(gcle::Shapes shape, SliderOrientation orientation = SliderOrientation::Horizontal);
+	Scrollbar* CreateScrollbar(gcle::Shapes shape, float32 handleSizeRatio = 0.2f);
+	Panel* CreatePanel(gcle::Shapes shape, Color color = Color::White);
+	Image* CreateImage(gcle::Shapes shape, const std::string& textureId);
 
 	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	 
@@ -98,9 +108,7 @@ private:
 	std::vector<std::string> m_ActiveTextures;
 	std::vector<Camera*> m_ActiveCamera;
 
-	float32 m_Test = 0;
-
-	std::vector<Button> buttons;
+	float32 m_Test = 0; 
 
 	bool	m_FrustrumCulling = true;
 	uint64	m_NumberOfDraw = 0;

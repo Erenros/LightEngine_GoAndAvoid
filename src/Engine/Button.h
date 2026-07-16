@@ -1,19 +1,20 @@
 #pragma once
-#include "include.h"
-#include "UI.h"
+#include "Interactable.h"
 
-class Button : public UI
+class Button : public Interactable
 {
 public:
-	Button() ;
-	~Button() = default;
+    Button() = default;
+    ~Button() = default;
 
-	void Click() ;
-	virtual void OnClick() {};
+    void SetFunctions(std::vector<std::function<void()>> functions) { m_FunctionToCallOnActivate = functions; }
+    void AddFunction(std::function<void()> function) { m_FunctionToCallOnActivate.push_back(function); }
 
-	void SetFunctions(std::vector < std::function<void()>> functions) { m_FunctionToCallOnActivate = functions; }
-	void AddFunction(std::function<void()> function) { m_FunctionToCallOnActivate.push_back(function); }
+    virtual void OnClick() {}
+
+protected:
+    void OnReleased(bool insideOnRelease) override;
 
 private:
-	std::vector<std::function<void()>> m_FunctionToCallOnActivate;
+    std::vector<std::function<void()>> m_FunctionToCallOnActivate;
 };
