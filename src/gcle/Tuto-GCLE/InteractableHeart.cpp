@@ -27,12 +27,10 @@ void Demo::InteractableHeart::OnInteract(Entity* pEntity)
 
 void Demo::InteractableHeart::OnUpdate()
 {
-    if (IsPlayerInRange() && CanBeInteractWith())
+    bool shouldShowInteract = IsPlayerInRange() && CanBeInteractWith();
+    if (shouldShowInteract != m_WasShowingInteract)
     {
-        SetTexture("InteractDropHeart");
-    }
-    else
-    {
-        SetTexture("DropHeart");
+        SetTexture(shouldShowInteract ? "InteractDropHeart" : "DropHeart");
+        m_WasShowingInteract = shouldShowInteract;
     }
 }

@@ -80,10 +80,11 @@ namespace Demo
 
 	void Character::Heal(int amount)
 	{
-		m_CurrentLife += amount;
-
-		if (m_CurrentLife > m_MaxLife)
+		if (m_CurrentLife + amount > m_MaxLife)
 			m_CurrentLife = m_MaxLife;
+		else
+			m_CurrentLife += amount;
+
 	}
 
 	void Character::SetInvincible(bool isInvincible, float duration)

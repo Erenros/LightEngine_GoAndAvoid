@@ -29,7 +29,7 @@ public:
 		m_Flag |= flag;
 	}
 
-	uint32 GetFlag() {
+	uint32 GetFlag() const {
 		return m_Flag;
 	}
 

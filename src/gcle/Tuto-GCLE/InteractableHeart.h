@@ -12,5 +12,6 @@ namespace Demo
 
 	private:
 		int m_HealAmount = 10;
+		bool m_WasShowingInteract = false;
 	}; 
 }

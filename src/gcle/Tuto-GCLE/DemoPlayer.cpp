@@ -45,7 +45,7 @@ namespace Demo
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
-		m_LastMoveDirection = GetRigidBody()->GetVelocity();
+		
 
 		if (
 			GetRigidBody()->GetVelocity().x <= 0.05f && GetRigidBody()->GetVelocity().y <= 0.05f &&
@@ -53,6 +53,10 @@ namespace Demo
 			m_CanMove
 		){
 			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
+		}
+		else
+		{
+			m_LastMoveDirection = GetRigidBody()->GetVelocity();
 		}
 
 		if (im.IsDown(LeftButton))
@@ -70,6 +74,10 @@ namespace Demo
 			SetColor({ 255, 255, 255, 50 }); 
 
 			GetRigidBody()->Stop();
+
+			if (m_LastMoveDirection.x == 0 && m_LastMoveDirection.y == 0)
+				m_LastMoveDirection = { 1.0f, 0.0f };
+
 			GetRigidBody()->AddImpulse(m_LastMoveDirection, m_DodgeForce);
 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);

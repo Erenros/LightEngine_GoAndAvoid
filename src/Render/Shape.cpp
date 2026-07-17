@@ -371,7 +371,7 @@ namespace gcle
 	}
 
 	void Shape::SetTexture(Window* window, SurfaceStruct* pSurface)
-	{
+	{ 
 		mp_Texture = new Sprite(window, pSurface->mp_surface);
 	}
 
