@@ -15,19 +15,12 @@ enum class SliderVisualMode
     Handle,
     Fill
 };
-
-enum class SliderHorizontalStart
+ 
+enum class SliderFillAnchor
 {
-    Left,
-    Middle,
-    Right,
-};
-
-enum class SliderVerticalStart
-{
-    Top,
-    Middle,
-    Bottom,
+    Start,
+    Center,
+    End
 };
 
 class Slider : public Interactable
@@ -42,6 +35,9 @@ public:
     void SetVisualMode(SliderVisualMode mode);
     SliderVisualMode GetVisualMode() const;
 
+    void SetFillAnchor(SliderFillAnchor anchor);
+    SliderFillAnchor GetFillAnchor() const;
+
     void SetHandle(UI* handle);
     void SetHandleSizeRatio(float32 ratio);
      
@@ -53,6 +49,7 @@ public:
     void SetRenderSize(int32 shapeType, const std::vector<float32>& points);
 
 protected:
+    void OnInitialize() override;
     void Update(float32 dt) override;
     void OnPressed() override;
 
@@ -63,6 +60,8 @@ private:
     void UpdateVisualHandle();
     void UpdateVisualFill();
 
+    static float32 RatioForAnchor(SliderFillAnchor anchor);
+
 protected:
     float32 m_MinValue = 0.f;
     float32 m_MaxValue = 1.f;
@@ -70,6 +69,7 @@ protected:
 
     SliderOrientation m_Orientation = SliderOrientation::Horizontal;
     SliderVisualMode  m_VisualMode = SliderVisualMode::Handle;
+    SliderFillAnchor  m_FillAnchor = SliderFillAnchor::Start;
 
     float32 m_HandleSizeRatio = 1.f;
 

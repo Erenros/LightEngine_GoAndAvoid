@@ -51,6 +51,17 @@ SliderVisualMode Slider::GetVisualMode() const
     return m_VisualMode;
 }
 
+void Slider::SetFillAnchor(SliderFillAnchor anchor)
+{
+    m_FillAnchor = anchor;
+    UpdateVisual();
+}
+
+SliderFillAnchor Slider::GetFillAnchor() const
+{
+    return m_FillAnchor;
+}
+
 void Slider::SetOnValueChanged(std::function<void(float32)> callback)
 {
     m_OnValueChanged = std::move(callback);
@@ -98,12 +109,22 @@ void Slider::SetRenderSize(int32 shapeType, const std::vector<float32>& points)
     UpdateVisual();
 }
 
+void Slider::OnInitialize()
+{
+    Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
+
+    mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
+}
+
 void Slider::Update(float32 dt)
 {
     Interactable::Update(dt);
 
     if (IsPressed())
         UpdateValueFromMouse();
+     
+    if (m_VisualMode == SliderVisualMode::Fill)
+        UpdateVisualFill();
 }
 
 void Slider::OnPressed()
@@ -118,19 +139,23 @@ void Slider::UpdateValueFromMouse()
 
     Vector2f mouse = GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget();
 
-    Vector2f pos = GetRenderPosition();
+    float32 width = GetRenderShape()->GetWidth();
+    float32 height = GetRenderShape()->GetHeight();
+     
+    Vector2f center = GetRenderPosition();
+    Vector2f topLeft = { center.x - width * 0.5f, center.y - height * 0.5f };
 
-    float length =
+    float32 length =
         (m_Orientation == SliderOrientation::Horizontal)
-        ? GetRenderShape()->GetWidth()
-        : GetRenderShape()->GetHeight();
+        ? width
+        : height;
 
-    float axis =
+    float32 axis =
         (m_Orientation == SliderOrientation::Horizontal)
-        ? mouse.x - pos.x
-        : mouse.y - pos.y;
+        ? mouse.x - topLeft.x
+        : mouse.y - topLeft.y;
 
-    float t = std::clamp(axis / length, 0.f, 1.f);
+    float32 t = std::clamp(axis / length, 0.f, 1.f);
 
     SetValue(m_MinValue + t * (m_MaxValue - m_MinValue));
 }
@@ -141,7 +166,7 @@ void Slider::UpdateVisual()
     {
         UpdateVisualFill();
         return;
-    } 
+    }
 
     UpdateVisualHandle();
 }
@@ -151,28 +176,38 @@ void Slider::UpdateVisualHandle()
     if (!mp_Handle || !GetRenderShape())
         return;
 
-    float t = (m_MaxValue > m_MinValue) ? (m_Value - m_MinValue) / (m_MaxValue - m_MinValue) : 0.f;
+    float32 t = (m_MaxValue > m_MinValue) ? (m_Value - m_MinValue) / (m_MaxValue - m_MinValue) : 0.f;
 
-    float width = GetRenderShape()->GetWidth();
-    float height = GetRenderShape()->GetHeight();
+    float32 width = GetRenderShape()->GetWidth();
+    float32 height = GetRenderShape()->GetHeight();
+
+    Vector2f center = GetPosition(); 
+    Vector2f topLeft = { center.x - width * 0.5f, center.y - height * 0.5f };
 
     if (m_Orientation == SliderOrientation::Horizontal)
     {
-        float handleWidth = width * m_HandleSizeRatio;
-        float x = t * (width - handleWidth);
-
-        mp_Handle->SetPosition(
-            GetPosition().x + x,
-            GetPosition().y);
+        float32 handleWidth = width * m_HandleSizeRatio;
+        float32 x = t * (width - handleWidth);
+         
+        mp_Handle->SetPosition(topLeft.x + x + handleWidth * 0.5f, center.y);
     }
     else
     {
-        float handleHeight = height * m_HandleSizeRatio;
-        float y = t * (height - handleHeight);
+        float32 handleHeight = height * m_HandleSizeRatio;
+        float32 y = t * (height - handleHeight);
 
-        mp_Handle->SetPosition(
-            GetPosition().x,
-            GetPosition().y + y);
+        mp_Handle->SetPosition(center.x, topLeft.y + y + handleHeight * 0.5f);
+    }
+}
+
+float32 Slider::RatioForAnchor(SliderFillAnchor anchor)
+{
+    switch (anchor)
+    {
+    case SliderFillAnchor::Start:  return 0.0f;
+    case SliderFillAnchor::End:    return 1.0f;
+    case SliderFillAnchor::Center:
+    default:                       return 0.5f;
     }
 }
 
@@ -184,22 +219,24 @@ void Slider::UpdateVisualFill()
     float32 t = (m_MaxValue > m_MinValue) ? (m_Value - m_MinValue) / (m_MaxValue - m_MinValue) : 0.f;
     t = std::clamp(t, 0.f, 1.f);
 
+    float32 fixedRatio = RatioForAnchor(m_FillAnchor);
+     
     if (m_Orientation == SliderOrientation::Horizontal)
     {
         float32 newWidth = m_FullSize.x * t;
-         
-        float32 leftEdge = m_AnchorPosition.x - m_FullSize.x * 0.5f;
+
+        float32 fixedWorldX = (m_AnchorPosition.x - m_FullSize.x * 0.5f) + m_FullSize.x * fixedRatio;
 
         GameObject::SetRenderSize(0, { newWidth, m_FullSize.y });
-        SetRenderPosition({ leftEdge, m_AnchorPosition.y }, 0.0f, 0.5f);
+        SetRenderPosition({ fixedWorldX, m_AnchorPosition.y }, fixedRatio, 0.5f);
     }
     else
     {
         float32 newHeight = m_FullSize.y * t;
-         
-        float32 topEdge = m_AnchorPosition.y - m_FullSize.y * 0.5f;
+
+        float32 fixedWorldY = (m_AnchorPosition.y - m_FullSize.y * 0.5f) + m_FullSize.y * fixedRatio;
 
         GameObject::SetRenderSize(0, { m_FullSize.x, newHeight });
-        SetRenderPosition({ m_AnchorPosition.x, topEdge }, 0.5f, 0.0f);
+        SetRenderPosition({ m_AnchorPosition.x, fixedWorldY }, 0.5f, fixedRatio);
     }
 }

@@ -69,7 +69,10 @@ void DemoScene::InitializeHUD()
 	mp_HealthBarBackground->SetLayer(10);
 
 	mp_HealthBar = CreateSlider(gcle::Shapes::Rectangle);
-	mp_HealthBar->SetVisualMode(SliderVisualMode::Fill); 
+	mp_HealthBar->SetVisualMode(SliderVisualMode::Handle);
+	//mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
+	mp_HealthBar->SetHandleTexture("knob");
+	mp_HealthBar->SetHandleSizeRatio(1.0f);
 	mp_HealthBar->SetRenderSize(0, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBar->SetPosition(148.0f, 40.0f);
 	mp_HealthBar->SetColor(Color::Red);
