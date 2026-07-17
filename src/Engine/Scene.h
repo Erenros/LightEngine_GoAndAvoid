@@ -38,7 +38,7 @@ public:
 	template<typename T>
 	T* CreateUI();
 
-	Button* CreateButton(gcle::Shapes shape, std::string text);
+	Button* CreateButton(gcle::Shapes shape, std::string text, const std::string& background = "background-button");
 	Toggle* CreateToggle(gcle::Shapes shape, const std::string& checkImage, const std::string& unCheckImage);
 	Slider* CreateSlider(gcle::Shapes shape, SliderOrientation orientation = SliderOrientation::Horizontal);
 	Scrollbar* CreateScrollbar(gcle::Shapes shape, float32 handleSizeRatio = 0.2f);

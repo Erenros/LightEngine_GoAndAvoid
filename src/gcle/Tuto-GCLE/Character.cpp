@@ -19,6 +19,11 @@ namespace Demo
 			m_wasHit = false;
 		}
 
+		if (m_CurrentLife <= 0)
+		{
+			Damage(1000000000);
+		}
+
 		if (m_IsInvincible)
 		{
 			m_InvincibilityTimer -= dt;

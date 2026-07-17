@@ -43,6 +43,15 @@ void Slider::SetOrientation(SliderOrientation orientation)
 void Slider::SetVisualMode(SliderVisualMode mode)
 {
     m_VisualMode = mode;
+
+    if (mode == SliderVisualMode::Handle && mp_Handle == nullptr)
+    {
+        Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
+
+        mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
+        mp_Handle->SetRenderSize(1, { 50.0f });
+    }
+
     UpdateVisual();
 }
 
@@ -111,14 +120,18 @@ void Slider::SetRenderSize(int32 shapeType, const std::vector<float32>& points)
 
 void Slider::OnInitialize()
 {
-    Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
-
-    mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
+    
 }
 
 void Slider::Update(float32 dt)
 {
     Interactable::Update(dt);
+
+    if (mp_Handle != nullptr)
+    {
+        if (GetLayer() + 1 != mp_Handle->GetLayer())
+            mp_Handle->SetLayer(GetLayer() + 1);
+    }
 
     if (IsPressed())
         UpdateValueFromMouse();
@@ -137,7 +150,7 @@ void Slider::UpdateValueFromMouse()
     if (m_VisualMode == SliderVisualMode::Fill)
         return;
 
-    Vector2f mouse = GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget();
+    Vector2f mouse = GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget(); 
 
     float32 width = GetRenderShape()->GetWidth();
     float32 height = GetRenderShape()->GetHeight();
@@ -157,7 +170,7 @@ void Slider::UpdateValueFromMouse()
 
     float32 t = std::clamp(axis / length, 0.f, 1.f);
 
-    SetValue(m_MinValue + t * (m_MaxValue - m_MinValue));
+    SetValue(m_MinValue + t * (m_MaxValue - m_MinValue)); 
 }
 
 void Slider::UpdateVisual()
@@ -188,15 +201,20 @@ void Slider::UpdateVisualHandle()
     {
         float32 handleWidth = width * m_HandleSizeRatio;
         float32 x = t * (width - handleWidth);
-         
-        mp_Handle->SetPosition(topLeft.x + x + handleWidth * 0.5f, center.y);
+        float32 newX = topLeft.x + x + handleWidth * 0.5f;
+
+        mp_Handle->SetPosition(newX, center.y);
+        mp_Handle->SetRenderPosition(newX, center.y);
     }
     else
     {
         float32 handleHeight = height * m_HandleSizeRatio;
         float32 y = t * (height - handleHeight);
+         
+        float32 newY = topLeft.y + y + handleHeight * 0.5f;
 
-        mp_Handle->SetPosition(center.x, topLeft.y + y + handleHeight * 0.5f);
+        mp_Handle->SetPosition(center.x, newY);
+        mp_Handle->SetRenderPosition(center.x, newY);
     }
 }
 

@@ -83,7 +83,7 @@ namespace Demo
 		if (im.IsDown('P'))
 		{
 			Damage(10);
-		}
+		} 
 
 	}
 

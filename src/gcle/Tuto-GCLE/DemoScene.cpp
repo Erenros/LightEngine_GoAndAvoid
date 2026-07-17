@@ -69,16 +69,23 @@ void DemoScene::InitializeHUD()
 	mp_HealthBarBackground->SetLayer(10);
 
 	mp_HealthBar = CreateSlider(gcle::Shapes::Rectangle);
-	mp_HealthBar->SetVisualMode(SliderVisualMode::Handle);
-	//mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
-	mp_HealthBar->SetHandleTexture("knob");
-	mp_HealthBar->SetHandleSizeRatio(1.0f);
+	//mp_HealthBar->SetVisualMode(SliderVisualMode::Handle);
+	//mp_HealthBar->SetHandleTexture("knob");
+	//mp_HealthBar->SetHandleSizeRatio(0.10f);
+	mp_HealthBar->SetVisualMode(SliderVisualMode::Fill);
+	mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
 	mp_HealthBar->SetRenderSize(0, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBar->SetPosition(148.0f, 40.0f);
 	mp_HealthBar->SetColor(Color::Red);
 	mp_HealthBar->SetRange(0.0f, static_cast<float32>(mp_Player->GetMaxLife()));
 	mp_HealthBar->SetValue(static_cast<float32>(mp_Player->GetCurrentLife()), false);
-	mp_HealthBar->SetInteractable(false);
+	mp_HealthBar->SetOnValueChanged(
+		[this](float32 value)
+		{
+			mp_Player->SetCurrentLife(std::floor(value));
+		}
+	);
+	mp_HealthBar->SetInteractable(true);
 	mp_HealthBar->SetLayer(11);
 	 
 	mp_PlayerPortrait = CreateImage(gcle::Shapes::Rectangle, "player_portrait");
@@ -108,7 +115,7 @@ void DemoScene::UpdateHUD()
 	if (mp_Player == nullptr || mp_HealthBar == nullptr)
 		return;
 
-	mp_HealthBar->SetValue(static_cast<float32>(mp_Player->GetCurrentLife()), false);
+	mp_HealthBar->SetValue(static_cast<float32>(mp_Player->GetCurrentLife()), true);
 }
 
 void DemoScene::OnUpdate(Clock& time)
@@ -120,7 +127,5 @@ void DemoScene::OnUpdate(Clock& time)
 	UpdateHUD();
 
 	if (InputManager::GetInstance().IsDown('O'))
-		SceneManager::GetInstance().SetCurrentSceneWithTag("Sample", true);
-
-	mp_HealthBar->SetValue(static_cast<float32>(mp_Player->GetCurrentLife()), true);
+		SceneManager::GetInstance().SetCurrentSceneWithTag("Sample", true); 
 }

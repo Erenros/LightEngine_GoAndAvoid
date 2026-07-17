@@ -530,9 +530,10 @@ void Scene::SwitchCamera(Camera* pCamera)
 	}
 }
 
-Button* Scene::CreateButton(gcle::Shapes shape, std::string text)
+Button* Scene::CreateButton(gcle::Shapes shape, std::string text, const std::string& background)
 {
 	Button* button = CreateUI<Button>(shape);  
+	button->SetTexture(background);
 
 	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
 	return button;

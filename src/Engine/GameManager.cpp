@@ -280,6 +280,11 @@ void GameManager::UpdateUISystem()
 				m_UIsToDestroy.push_back(ui);
 				it = m_UIs[i].erase(it);
 			}
+			else if (ui->GetLayer() != i)        
+			{
+				m_UIsToCreate.push_back(ui);     
+				it = m_UIs[i].erase(it);         
+			}
 			else
 			{
 				++it;
@@ -302,6 +307,7 @@ void GameManager::UpdateUISystem()
 
 	m_UIsToCreate.clear();
 }
+
 void GameManager::DestroyEverything()
 {
 	for (auto& layer : m_Entities)
