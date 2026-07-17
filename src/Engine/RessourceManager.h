@@ -11,8 +11,7 @@
 #include "Render/Surface.h"
 #include "include.h"
 
-class Window;
-//Faudra biennnn optimiser ca plus tard
+class Window; 
 
 struct SurfaceStruct {
 public:
@@ -41,7 +40,7 @@ public:
 	}
 
 	bool IsLoaded() {
-		return mp_surface == nullptr;
+		return mp_surface != nullptr;
 	}
 
 	~SurfaceStruct() {
