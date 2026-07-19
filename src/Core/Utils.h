@@ -1,0 +1,114 @@
+#pragma once 
+#include "PrimitiveTypes.h"
+#include <string>
+#include "Debugger.h"
+#include "Vector2.hpp"
+
+using Radians = float32;
+
+
+#ifdef _DEBUG
+#define GCLE_NEW new( _NORMAL_BLOCK, __FILE__ , __LINE__ )
+#else
+#define GCLE_NEW new
+#endif
+
+#define assert( condition ) if ( condition == false ) throw;
+
+int8 GenerateRandomNumber(int8 min, int8 max);
+
+#define hundred 0x1
+#define thousand 0x2
+#define million 0x3	
+#define billion 0x4
+#define trillion 0x5
+
+std::string NumberToString(float64 value);
+std::string RemoveZeroes(std::string string);
+std::string ChangeUnit(std::string string, int32 precision);
+std::string ChangeUnit(float64 value, int32 precision);
+
+template<typename T>
+class SmartPtr 
+{
+public: 
+    SmartPtr(T* pP = nullptr) : mp_Ptr(pP)
+    {
+        if (pP)
+            (*mp_RefCount)++;
+        else
+            mp_RefCount = nullptr;
+    }
+     
+    SmartPtr(const SmartPtr& other) : mp_Ptr(other.mp_Ptr), mp_RefCount(other.mp_RefCount)
+    {
+        if (mp_RefCount)
+            ++(*mp_RefCount);
+    }
+     
+    SmartPtr& operator=(const SmartPtr& other)
+    {
+        if (this != &other)
+        {
+            Release();
+
+            mp_Ptr = other.mp_Ptr;
+            mp_RefCount = other.mp_RefCount;
+
+            if (mp_RefCount)
+                ++(*mp_RefCount);
+        }
+
+        return *this;
+    }
+     
+    ~SmartPtr()
+    {
+        Release();
+    }
+
+    T& operator*() const
+    {
+        return *mp_Ptr;
+    }
+
+    T* operator->() const
+    {
+        return mp_Ptr;
+    }
+
+    uint64 UseCount() const
+    {
+        return mp_RefCount ? *mp_RefCount : 0;
+    }
+
+private:
+    void Release()
+    {
+        if (mp_RefCount)
+        {
+            --(*mp_RefCount);
+
+            if (*mp_RefCount == 0)
+            {
+                delete mp_Ptr;
+                delete mp_RefCount;
+            }
+        }
+    }
+
+private:
+    T* mp_Ptr;
+    uint64* mp_RefCount;
+};
+
+struct AABB {
+    float32 minX, minY, maxX, maxY;
+
+    bool overlaps(const AABB& other);
+
+    bool include(const AABB& other);
+};
+
+AABB GetRotatedAABB(Vector2<float32> center, Vector2<float32> halfSize, Radians rotation);
+
