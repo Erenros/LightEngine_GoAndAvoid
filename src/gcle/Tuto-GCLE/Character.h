@@ -23,7 +23,7 @@ namespace Demo
 		virtual void Shoot() {};
 
 	protected: 
-		bool IsFlinching() const { return m_wasHit; }
+		bool IsFlinching() const;
 
 		void SetInvincible(bool isInvincible, float duration = 0.0f);
 		bool IsInvincible() const;
@@ -32,8 +32,8 @@ namespace Demo
 		bool m_CanShoot = false;
 
 	private:
-		int m_MaxLife = 20.0f;
-		int m_CurrentLife = 20.0f;
+		int m_MaxLife = 20;
+		int m_CurrentLife = 20;
 
 		float m_baseDamageDuration = 1.0f;
 		float m_damageDuration = 0.0f;
@@ -44,6 +44,5 @@ namespace Demo
 
 	protected:
 		friend class DemoScene;
-	};
-
+	}; 
 }

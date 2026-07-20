@@ -126,10 +126,19 @@ PhysicsManager::RepulseFn PhysicsManager::m_RepulseTable[static_cast<int32>(Repu
 	}
 };
 
+PhysicsManager* PhysicsManager::s_Instance = nullptr;
+
 PhysicsManager& PhysicsManager::GetInstance()
 {
-	static PhysicsManager instance;
-	return instance;
+	if (s_Instance == nullptr)
+		s_Instance = GCLE_NEW PhysicsManager();
+	return *s_Instance;
+}
+
+void PhysicsManager::DestroyInstance()
+{
+	delete s_Instance;
+	s_Instance = nullptr;
 }
 
 #pragma region EntityHandling

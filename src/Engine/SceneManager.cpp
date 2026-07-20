@@ -2,15 +2,22 @@
 #include "Scene.h"
 
 
-SceneManager& SceneManager::GetInstance(){
-     static SceneManager instance;
-     return instance;
+SceneManager* SceneManager::s_Instance = nullptr;
+
+SceneManager& SceneManager::GetInstance() {
+    if (s_Instance == nullptr)
+        s_Instance = GCLE_NEW SceneManager();
+    return *s_Instance;
 }
 
+void SceneManager::DestroyInstance()
+{
+    delete s_Instance;
+    s_Instance = nullptr;
+}
 
 SceneManager::SceneManager()
-{
-   
+{ 
 }
 
 SceneManager::~SceneManager()

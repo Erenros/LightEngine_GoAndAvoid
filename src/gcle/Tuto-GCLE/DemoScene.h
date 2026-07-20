@@ -36,6 +36,9 @@ private:
 	Toggle* mp_MuteToggle = nullptr;
 	Image* mp_PlayerPortrait = nullptr;
 
+	// --- Pause ---
+	Panel* mp_PauseMenu = nullptr;
+
 	void InitializeHUD();
 	void UpdateHUD();
 };

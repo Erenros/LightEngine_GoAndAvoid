@@ -45,7 +45,7 @@ void UI::Update(float32 dt)
 void UI::OnSetPosition(float32 x, float32 y)
 {
     if (mp_Text != nullptr) {
-        mp_Text->SetPosition(x - (mp_Text->GetSizes().x / 2), y - (mp_Text->GetSizes().y / 2));
+        mp_Text->SetPosition(static_cast<int32>(x - (mp_Text->GetSizes().x / 2)), static_cast<int32>(y - (mp_Text->GetSizes().y / 2)));
     }
 }
 

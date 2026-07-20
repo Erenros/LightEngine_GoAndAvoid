@@ -217,6 +217,27 @@ bool Window::IsInsideWindow(GameObject* gm) {
 	return windowAABB.overlaps(entityAABB);
 }
 
+void Window::SetFullscreen(bool fullscreen)
+{
+	if (!SDL_SetWindowFullscreen(mp_Window, fullscreen))
+	{
+		GCLE_ERROR << "SetWindowFullscreen failed : " << SDL_GetError() << ENDL;
+		return;
+	}
+
+	m_IsFullscreen = fullscreen;
+}
+
+void Window::ToggleFullscreen()
+{
+	SetFullscreen(!m_IsFullscreen);
+}
+
+bool Window::IsFullscreen() const
+{
+	return m_IsFullscreen;
+}
+
 void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
 {
 	std::vector<SDL_FPoint*> pointsPtr;

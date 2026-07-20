@@ -13,6 +13,10 @@ void Scene::Draw(Window* pWindow)
 	m_NumberOfDraw = 0;
 	for (auto& layer : GameManager::GetInstance().m_Entities) {
 		for(Entity* e : layer){
+
+			if (e->IsActive() == false)
+				continue;
+
 			if (pWindow->IsInsideWindow(e) && e->GetRenderShape() != nullptr && m_FrustrumCulling) 
 			{
 				if (e->IsActiveIn(m_Tag)) 
@@ -43,6 +47,10 @@ void Scene::Draw(Window* pWindow)
 
 	for (auto& layer : GameManager::GetInstance().m_UIs) {
 		for (UI* ui : layer) {
+
+			if (ui->IsActive() == false)
+				continue;
+
 			if (pWindow->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_FrustrumCulling)
 			{
 				if (ui->IsActiveIn(m_Tag))

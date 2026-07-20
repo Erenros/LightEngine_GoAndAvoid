@@ -7,12 +7,19 @@
 
 #undef PlaySound
 
+RessourceManager* RessourceManager::s_Instance = nullptr;
 
 RessourceManager& RessourceManager::GetInstance() {
-	static RessourceManager instance;
-	return instance;
+	if (s_Instance == nullptr)
+		s_Instance = GCLE_NEW RessourceManager();
+	return *s_Instance;
 }
 
+void RessourceManager::DestroyInstance()
+{
+	delete s_Instance;
+	s_Instance = nullptr;
+}
 
 void RessourceManager::PlayMusic(const std::string& id, int32 mode)
 {
@@ -123,6 +130,9 @@ void RessourceManager::Init(Window* pWindow)
 void RessourceManager::InitTextureFolder(Window* pWindow)
 {
 	std::filesystem::path filename = "../../assets/textures";
+
+	GCLE_INFO << "CWD: " << std::filesystem::current_path().string() << ENDL;
+	GCLE_INFO << "Texture dir exists: " << std::filesystem::exists(filename) << ENDL;
 
 	if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
 	{

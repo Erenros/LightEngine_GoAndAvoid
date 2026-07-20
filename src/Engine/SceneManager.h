@@ -12,26 +12,15 @@ class Window;
 class Clock;
 
 
-class SceneManager {
-	std::unordered_map<std::string, Scene*> m_Scenes;
-	std::unordered_map<std::string, std::function<Scene* ()>> m_SceneFactories; 
-	std::string m_CurrentSceneTag = "";
-	std::string m_PreviousSceneTag = "";
-
-	void UpdateCurrentScene(Clock& time);
-	void DrawCurrentScene(Window* pWindow);
-	void DrawCurrentSceneDebug(Window* pWindow);
-
-	friend class GameManager;
-
-	void LoadUnloadActiveTextures(const std::string& newScene);
-
+class SceneManager { 
 public:
 
 	SceneManager();
 	~SceneManager();
 
 	static SceneManager& GetInstance();
+	static void DestroyInstance();
+
 	Scene* GetCurrentScene();
 	Scene* GetPreviousScene();
 	Scene* GetSceneWithTag(const std::string& tag);
@@ -54,6 +43,24 @@ private:
 	void DestroyScene(const std::string& tag);
 	void DestroySceneEntities(const std::string& tag);
 	void DestroySceneCameras(const std::string& tag);
+
+private:
+	void UpdateCurrentScene(Clock& time);
+	void DrawCurrentScene(Window* pWindow);
+	void DrawCurrentSceneDebug(Window* pWindow);
+	void LoadUnloadActiveTextures(const std::string& newScene);
+
+private: 
+	std::unordered_map<std::string, Scene*> m_Scenes;
+	std::unordered_map<std::string, std::function<Scene* ()>> m_SceneFactories;
+	std::string m_CurrentSceneTag = "";
+	std::string m_PreviousSceneTag = "";
+
+private:
+	static SceneManager* s_Instance;
+
+private:
+	friend class GameManager;
 };
 
 #include "SceneManager.inl"

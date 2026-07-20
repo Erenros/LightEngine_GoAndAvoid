@@ -1,9 +1,18 @@
 #include "InputManager.h"
 
+InputManager* InputManager::s_Instance = nullptr;
+
 InputManager& InputManager::GetInstance()
 {
-	static InputManager instance;
-	return instance;
+	if (s_Instance == nullptr)
+		s_Instance = GCLE_NEW InputManager();
+	return *s_Instance;
+}
+
+void InputManager::DestroyInstance()
+{
+	delete s_Instance;
+	s_Instance = nullptr;
 }
 
 void InputManager::Update()

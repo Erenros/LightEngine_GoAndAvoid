@@ -149,7 +149,7 @@
       "property-lib": false,
       "property-pch": false,
       "property-vcpkg": false,
-      "property-window": false
+      "property-window": true
     }
   },
   "projects_name_to_guid": {

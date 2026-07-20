@@ -52,27 +52,10 @@ public:
 
 class RessourceManager
 {
-private:
-
-	std::unordered_map<std::string, Sound*> m_SoundMap;
-	std::unordered_map<std::string, Music*> m_MusicMap;
-
-	std::unordered_map<std::string, SurfaceStruct> m_surfaceMap;
-
-	std::unordered_map<std::string, Font*> m_FontMap;
-
-	std::unordered_map<std::string, std::vector<Texture*>> m_textures;
-
-	friend class SceneManager;
-
-private:
-
-	void ForcePutSurface(Surface* pText, std::string id);
-	friend class AssetEngine;
-
 public:
 
 	static RessourceManager& GetInstance();
+	static void DestroyInstance();
 
 	Font* GetFont(const std::string& id);
 	SurfaceStruct* GetSurface(const std::string& id);
@@ -129,4 +112,24 @@ public:
 	void DeleteAllSurface();
 
 	~RessourceManager();
+
+private:
+	void ForcePutSurface(Surface* pText, std::string id);
+
+private:
+
+	std::unordered_map<std::string, Font*> m_FontMap; 
+	std::unordered_map<std::string, Sound*> m_SoundMap;
+	std::unordered_map<std::string, Music*> m_MusicMap; 
+	std::unordered_map<std::string, SurfaceStruct> m_surfaceMap; 
+	std::unordered_map<std::string, std::vector<Texture*>> m_textures;
+
+private:
+	static RessourceManager* s_Instance;
+
+
+private:
+
+	friend class AssetEngine;
+	friend class SceneManager;
 };

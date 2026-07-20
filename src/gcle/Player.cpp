@@ -26,6 +26,6 @@ void Player::OnUpdate() {
 
 void Player::OnInitialize() {
     RigidBody2D* rb = GetRigidBody();    
-    rb->SetFriction({ 0.15, 0.15 });
+    rb->SetFriction({ 0.15f, 0.15f });
 
 }

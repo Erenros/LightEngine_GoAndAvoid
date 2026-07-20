@@ -19,6 +19,7 @@ public:
 	int16 m_fps = 120;
 
 	static GameManager& GetInstance();
+	static void DestroyInstance();
 
 	float64 fixedUpdateDT = 1.f / FixedUpdateExecution; 
 	float32 accDt = 0.f;
@@ -77,7 +78,9 @@ private:
 
 	std::vector <Camera*> m_Camera; 
 	
-	int m_LoopTour = 0; 
+	int32 m_LoopTour = 0; 
+
+	static GameManager* s_GameManagerInstance;
 
 
 private:

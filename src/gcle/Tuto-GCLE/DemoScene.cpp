@@ -24,7 +24,7 @@ void DemoScene::OnInitialize()
 	SwitchCamera(pSceneCamera);
 
 	mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
-	SetSelectedEntity(mp_Player);
+	//SetSelectedEntity(mp_Player);
 
 	m_Smooth.Initialize(pSceneCamera, mp_Player);
 
@@ -82,7 +82,7 @@ void DemoScene::InitializeHUD()
 	mp_HealthBar->SetOnValueChanged(
 		[this](float32 value)
 		{
-			mp_Player->SetCurrentLife(std::floor(value));
+			mp_Player->SetCurrentLife(static_cast<int>(std::floor(value)));
 		}
 	);
 	mp_HealthBar->SetInteractable(true);

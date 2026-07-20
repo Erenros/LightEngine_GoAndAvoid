@@ -87,6 +87,11 @@ namespace Demo
 
 	}
 
+	bool Character::IsFlinching() const
+	{
+		return m_wasHit;
+	}
+
 	void Character::SetInvincible(bool isInvincible, float duration)
 	{
 		m_IsInvincible = isInvincible;
