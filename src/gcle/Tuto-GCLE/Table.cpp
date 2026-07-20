@@ -6,7 +6,7 @@ void Demo::Table::OnInitialize()
 {
     SetTag(GameTag::Decor);
 
-    ScaleBy({ 0.8, 0.64 });
+    ScaleBy({ 0.8f, 0.64f });
     CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
 
     SetRigidBody(true);

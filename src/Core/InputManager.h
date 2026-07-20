@@ -80,30 +80,21 @@ struct Controller
  
 class InputManager
 {
-private:
-	
-	std::array<bool, 256> m_Current{};
-	std::array<bool, 256> m_Previous{};
-
-	std::vector<Controller*> m_Controllers;
-
 public:
 
 	static InputManager& GetInstance();
+	static void DestroyInstance();
 
 	void Update();
 
-	//Constructor
-
+	//Constructor 
 	InputManager() = default;
 
-	//Destructor
-
+	//Destructor 
 	~InputManager() = default;
 
 
-	//Input tests
-
+	//Input tests 
 	Vector2<int32> GetMouseRelativePosition();
 	Vector2<int32> GetMouseWorldPosition();
 
@@ -119,8 +110,7 @@ public:
 	void SetVibration(int8 controller, float32 powerLeft, float32 powerRight);
 
 
-	XINPUT_STATE GetGamepadState(int8 controller);
-
+	XINPUT_STATE GetGamepadState(int8 controller); 
 
 	void SetLeftStickDeadZone(int8 controller, float32 Xpos, float32 Xneg, float32 Ypos, float32 Yneg);
 	void SetRightStickDeadZone(int8 controller, float32 Xpos, float32 Xneg, float32 Ypos, float32 Yneg);
@@ -143,5 +133,16 @@ public:
 
 	float32 LeftTriggerPressed(int8 controller);
 	float32 RightTriggerPressed(int8 controller);
+
+private:
+
+	std::array<bool, 256> m_Current{};
+	std::array<bool, 256> m_Previous{};
+
+	std::vector<Controller*> m_Controllers;
+
+private:
+	static InputManager* s_Instance;
+
 };
 

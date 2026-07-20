@@ -25,8 +25,7 @@ public:
     bool GoToDirection(float32 x, float32 y, float32 speed = -1.f);
     void SetDirection(float32 x, float32 y, float32 speed);
     void SetSpeed(float32 speed);
-
-    void SetTag(int32 tag);
+     
     void SetRigidBody(bool isRigidBody);
     void SetStatic(bool isStatic);
 
@@ -36,8 +35,7 @@ public:
     const RigidBody2D* GetRigidBody() const;
 
     bool IsStatic() const;
-    bool IsColliding(Entity* other) const;
-    bool IsTag(int32 tag) const;
+    bool IsColliding(Entity* other) const; 
     bool IsRigidBody() const;
     bool HasCollider() const;
 
@@ -81,7 +79,7 @@ private:
     void Update(float32 dt) override;
 
 private:
-    int32 m_Tag = -1;
+    
     bool m_IsStatic = false;
     bool m_IsHighlighted = false;
     Target m_Target;

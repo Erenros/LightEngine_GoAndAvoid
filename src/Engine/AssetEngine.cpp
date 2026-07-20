@@ -3,10 +3,19 @@
 #include "Sprite.h"
 #include <fstream>
 
+AssetEngine* AssetEngine::s_Instance = nullptr;
+
 AssetEngine& AssetEngine::GetInstance()
 {
-	 static AssetEngine instance;
-	 return instance;
+	if (s_Instance == nullptr)
+		s_Instance = GCLE_NEW AssetEngine();
+	return *s_Instance;
+}
+
+void AssetEngine::DestroyInstance()
+{
+	delete s_Instance;
+	s_Instance = nullptr;
 }
 
 void AssetEngine::Init(Window* pWindow,const std::string& path)

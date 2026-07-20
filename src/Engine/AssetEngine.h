@@ -40,25 +40,9 @@ struct Asset
 
 class AssetEngine
 {
-private:
-
-	std::unordered_map<std::string, Asset*> m_AssetMap;
-
-private:
-
-	void ReadFile(const std::string& path, std::vector<byte>& data);
-	std::vector<byte> EncryptData(std::vector<byte>& data, int8 key);
-
-	void ReadName(std::ifstream& file, Entry& entry, std::string& name);
-	bool ReadHeader(std::ifstream& file);
-	bool ReadEntry(std::ifstream& file, Entry& entry);
-	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
-
-	uint64 HashName(const std::string& name);
-
-public:
-
+public: 
 	static AssetEngine& GetInstance();
+	static void DestroyInstance();
 
 	void Init(Window* pWindow,const std::string& path);
 
@@ -72,4 +56,22 @@ public:
 
 	void DeleteAsset(const std::string& id);
 	void ClearAsset();
+
+private: 
+	void ReadFile(const std::string& path, std::vector<byte>& data);
+	std::vector<byte> EncryptData(std::vector<byte>& data, int8 key);
+
+	void ReadName(std::ifstream& file, Entry& entry, std::string& name);
+	bool ReadHeader(std::ifstream& file);
+	bool ReadEntry(std::ifstream& file, Entry& entry);
+	bool ReadData(std::ifstream& file, Entry& entry, std::vector<byte>& outData);
+
+	uint64 HashName(const std::string& name);
+
+private: 
+	std::unordered_map<std::string, Asset*> m_AssetMap;
+
+private:
+	static AssetEngine* s_Instance;
+
 };

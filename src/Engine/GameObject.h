@@ -33,6 +33,12 @@ public:
     void SetTextureFlip(TextureFlipMode mode);
     void SetColor(Color color);
 
+    void SetActive(bool active);
+    bool IsActive() const;
+
+    void SetTag(int32 tag);
+    bool IsTag(int32 tag) const;
+
     void SetLayer(int32 layer);
 
     void AddAnimation(
@@ -100,6 +106,10 @@ protected:
     bool m_ToDestroy = false;
     int32 m_Mask = 0;
     int32 m_Layer = 0;
+
+    bool m_IsActive = true;
+
+    int32 m_Tag = -1;
 
 private:
     Sprite* GetSprite();

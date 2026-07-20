@@ -74,6 +74,11 @@ public:
 public:
 	bool IsInsideWindow(GameObject* gm);
 
+public:
+	void SetFullscreen(bool fullscreen);
+	void ToggleFullscreen();
+	bool IsFullscreen() const;
+
 private:
 
 private:
@@ -82,6 +87,8 @@ private:
 	SDL_Texture* mp_RenderTarget = nullptr;
 	SDL_FRect* mp_Dst;
 	uint32 m_Width, m_Height = 0;
+
+	bool m_IsFullscreen = false;
 
 private:
 	friend class Event;

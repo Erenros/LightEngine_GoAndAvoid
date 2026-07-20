@@ -41,6 +41,7 @@ class PhysicsManager
 {
 public:
 	static PhysicsManager& GetInstance();
+	static void DestroyInstance();
 
 	void AddEntity(Entity* pEntity);
 	void RemoveEntity(Entity* pEntity);
@@ -149,6 +150,9 @@ private:
 	float32 m_EntryTime = 0.0f;
 	float32 m_ExitTime = 1.0f;
 	Vector2f m_EntryNormal{ 0.0f, 0.0f };
+
+private:
+	static PhysicsManager* s_Instance;
 
 public : 
 	~PhysicsManager();

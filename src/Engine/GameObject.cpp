@@ -154,6 +154,26 @@ void GameObject::SetColor(Color color)
         mp_RenderShape->SetColor(color);
 }
 
+void GameObject::SetActive(bool active)
+{
+    m_IsActive = active;
+}
+
+bool GameObject::IsActive() const
+{
+    return m_IsActive;
+}
+
+void GameObject::SetTag(int32 tag)
+{
+    m_Tag = tag;
+}
+
+bool GameObject::IsTag(int32 tag) const
+{
+    return m_Tag == tag;
+}
+
 void GameObject::SetLayer(int32 layer)
 {
     m_Layer = std::clamp(layer, 0, 15);

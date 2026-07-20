@@ -140,11 +140,6 @@ void Entity::SetSpeed(float32 speed)
     m_Speed = speed;
 }
 
-void Entity::SetTag(int32 tag)
-{
-    m_Tag = tag;
-}
-
 void Entity::SetRigidBody(bool isRigidBody)
 {
     m_RigidBody.SetActive(isRigidBody);
@@ -207,11 +202,6 @@ bool Entity::IsColliding(Entity* other) const
     }
 
     return false;
-}
-
-bool Entity::IsTag(int32 tag) const
-{
-    return m_Tag == tag;
 }
 
 bool Entity::IsRigidBody() const

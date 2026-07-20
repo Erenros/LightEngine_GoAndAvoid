@@ -7,19 +7,27 @@
 #include "SceneManager.h"
 #include "PhysicsManager.h"
 #include "Core/InputManager.h" 
+#include "Engine/AssetEngine.h"
 
 #include <algorithm>
 
 #include <timeapi.h>
 #pragma comment(lib, "winmm.lib")
 
+GameManager* GameManager::s_GameManagerInstance = nullptr;
+
 GameManager& GameManager::GetInstance()
 {
-	static GameManager instance;
-	return instance;
+	if (s_GameManagerInstance == nullptr)
+		s_GameManagerInstance = GCLE_NEW GameManager();
+	return *s_GameManagerInstance;
 }
 
-
+void GameManager::DestroyInstance()
+{
+	delete s_GameManagerInstance;
+	s_GameManagerInstance = nullptr;
+}
 
 GameManager::~GameManager()
 {
@@ -73,6 +81,11 @@ void GameManager::Loop()
 	timeBeginPeriod(1);
 	while (m_IsRunning == true)
 	{
+		// Set window in fullscreen
+		if (InputManager::GetInstance().IsDown(F11))
+		{
+			mp_Window->ToggleFullscreen();
+		}
 
 
 		PROFILER_START("Colliders", "Colliders Update");
@@ -152,13 +165,22 @@ void GameManager::Loop()
 
 void GameManager::Close()
 {
+	// Just to be safe
+
+	SceneManager::GetInstance();
+	AssetEngine::GetInstance();
+	PhysicsManager::GetInstance();
+	InputManager::GetInstance();
+	RessourceManager::GetInstance();
+
+
+	SceneManager::GetInstance().DeleteAllScenes();
 	RessourceManager::GetInstance().DeleteAll();
 	DestroyEverything();
 
 	PROFILER_CLEAR();
 
-	delete mp_Window;
-
+	delete mp_Window; 
 }
 
 Clock* GameManager::GetTime()
