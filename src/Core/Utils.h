@@ -14,24 +14,13 @@ using Vector2f = Vector2<float32>;
 #define GCLE_NEW new
 #endif
 
-#define assert( condition ) if ( condition == false ) throw;
+#define GCLE_ASSERT( condition ) if (!(condition)) { GCLE_ERROR << "Assertion failed: " #condition << ENDL; std::abort(); }
 
 Vector2f ComputeRatioPositionFromPivot(Vector2f pivot, Vector2f size, float32 ratioX, float32 ratioY);
  
 Vector2f ComputePivotFromRatioPosition(Vector2f ratioPosition, Vector2f size, float32 ratioX, float32 ratioY);
 
 int8 GenerateRandomNumber(int8 min, int8 max);
-
-#define hundred 0x1
-#define thousand 0x2
-#define million 0x3	
-#define billion 0x4
-#define trillion 0x5
-
-std::string NumberToString(float64 value);
-std::string RemoveZeroes(std::string string);
-std::string ChangeUnit(std::string string, int32 precision);
-std::string ChangeUnit(float64 value, int32 precision);
 
 template<typename T>
 class SmartPtr 

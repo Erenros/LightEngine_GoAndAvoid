@@ -16,37 +16,29 @@ void DebugScene::OnInitialize()
 
 	Collider* setUpCollider = nullptr;
 
-	//creation d'un player classique
+	//basic creation of an entity
 	Entity* entity1 = CreateEntity<DebugPlayer>(gcle::Shapes::Rectangle);
 	{
 		entity1->SetPosition(50, -200);
 		entity1->SetRotation(0);
 
-		//tag du player
+		//player tag
 		entity1->SetTag(Tag::Player);
 
 		entity1->SetRigidBody(true);
 		entity1->GetRigidBody()->SetGravity(10, true);
 		entity1->GetRigidBody()->SetMaxSpeed(100);
 
-		// appeler Brake() quand vous le souhaitez pour qu'il fasse effet (au contacte du sol en generale)
+		// call Brake() when you want it to work
 		entity1->GetRigidBody()->SetBrakeDeceleration(100);
 
-		//si l'entity est un static elle ne peut pas bouger et coupe la velocité quand un objet 
-		//entre en contacte avec (dans la direction de la normal entre eux)
+		//if an entity is static she can't move and get her velocity set to 0
 		entity1->SetStatic(false);
 
-		//permet a l'objet de ne pas clip a travers les autres entité 
-		//(mais est assez couteux donc a ne mettre que sur un player)
+		//an entity can't clip through another one
+		//but take a high cost 
 		entity1->GetRigidBody()->SetCollisionOnContinuous();
 
-		//creation d'un collider parametres : (
-		// forme, 
-		// si il est actif, 
-		// position relatif a l'entité, 
-		// rotation relative a l'entité, 
-		// scale relatif a l'entité
-		// )
 		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, {{ 0, 0 }, 0, { 1, 1 }});
 	}
 

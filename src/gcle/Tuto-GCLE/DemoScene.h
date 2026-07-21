@@ -17,6 +17,7 @@ namespace Demo
 
 class DemoScene : public Scene
 {
+public:
 	void OnInitialize() override;
 	void OnUpdate(Clock& time) override;
 

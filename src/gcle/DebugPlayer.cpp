@@ -16,24 +16,24 @@ void DebugPlayer::OnUpdate() {
 
 
     if (im.IsHeld('Q')) {
-        GetRigidBody()->AddForce({ -1, 0 }, 100, dt);
+        rb->AddForce({ -1, 0 }, 100, dt);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody()->AddForce({ 1, 0 }, 100, dt);
+        rb->AddForce({ 1, 0 }, 100, dt);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody()->AddForce({ 0, 1 }, 100, dt);
+        rb->AddForce({ 0, 1 }, 100, dt);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody()->AddForce({ 0, -1 }, 100, dt);
+        rb->AddForce({ 0, -1 }, 100, dt);
     }
 
-    if (IsGrounded) {
-        //ralentis au sol
+    if (IsGrounded) 
+    { 
         rb->Brake(dt);
 
         if (im.IsHeld(' ')) {
-            GetRigidBody()->AddImpulse({ 0, -1 }, 100000);
+            rb->AddImpulse({ 0, -1 }, 100000);
         }
     }
 }

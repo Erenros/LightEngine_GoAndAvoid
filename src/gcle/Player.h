@@ -3,7 +3,9 @@
 #include "Core/InputManager.h"
 
 
-class Player: public Entity{
+class Player: public Entity
+{
+public:
 	void OnUpdate() override;
 	void OnInitialize() override;
 };

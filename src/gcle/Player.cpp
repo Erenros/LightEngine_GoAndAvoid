@@ -6,26 +6,27 @@ void Player::OnUpdate() {
     RigidBody2D* rb = GetRigidBody();
     float32 dt = static_cast<float32>(GameManager::GetInstance().GetTime()->GetDeltaTime());
     
+    constexpr float MOVE_FORCE = 600.0f;
 
     if (im.IsHeld('Q')) {
-        GetRigidBody()->AddForce({ -1, 0 }, 600, dt);
+        rb->AddForce({ -1, 0 }, MOVE_FORCE, dt);
     }
     if (im.IsHeld('D')) {
-        GetRigidBody()->AddForce({ 1, 0 }, 600, dt);
+        rb->AddForce({ 1, 0 }, MOVE_FORCE, dt);
     }
     if (im.IsHeld('S')) {
-        GetRigidBody()->AddForce({ 0, 1 }, 600, dt);
+        rb->AddForce({ 0, 1 }, MOVE_FORCE, dt);
     }
     if (im.IsHeld('Z')) {
-        GetRigidBody()->AddForce({ 0, -1 }, 600, dt);
+        rb->AddForce({ 0, -1 }, MOVE_FORCE, dt);
     }
     if (im.IsHeld('B')) {
-        GetRigidBody()->AddImpulse({ 0, -1 }, 600);
+        rb->AddImpulse({ 0, -1 }, MOVE_FORCE);
     }
 }
 
-void Player::OnInitialize() {
+void Player::OnInitialize() 
+{
     RigidBody2D* rb = GetRigidBody();    
     rb->SetFriction({ 0.15f, 0.15f });
-
 }

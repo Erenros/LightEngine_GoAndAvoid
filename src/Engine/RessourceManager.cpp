@@ -42,7 +42,13 @@ void RessourceManager::ForcePutSurface(Surface* pText, std::string id)
 
 Font* RessourceManager::GetFont(const std::string& id)
 {
-	return m_FontMap[id];
+	auto it = m_FontMap.find(id);
+	if (it == m_FontMap.end())
+	{
+		GCLE_WARN << "Font '" << id << "' doesn't exist" << ENDL;
+		return nullptr;
+	}
+	return it->second;
 }
 
 SurfaceStruct* RessourceManager::GetSurface(const std::string& id)
