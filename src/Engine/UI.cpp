@@ -53,3 +53,13 @@ void UI::SetText(const std::string& text)
 {
     mp_Text->SetText(text);
 }
+
+void UI::SetActive(bool active)
+{
+    GameObject::SetActive(active);
+
+    if (mp_Text != nullptr)
+    {
+        mp_Text->SetActive(active);
+    }
+}

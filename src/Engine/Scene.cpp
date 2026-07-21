@@ -72,8 +72,11 @@ void Scene::Draw(Window* pWindow)
 
 	for (Text* t : m_Texts)
 	{
-		GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
-		m_NumberOfDraw++;
+		if(t->IsActive())
+		{
+			GameManager::GetInstance().GetWindow()->DrawTextOnRenderer(t);
+			m_NumberOfDraw++;
+		}
 	}
 }
 

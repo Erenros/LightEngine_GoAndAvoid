@@ -41,6 +41,8 @@ public:
 	void AddUI(UI* ui);
 
 	void UpdateRigidBodies(float32 dt);
+
+	void Quit();
 	
 	Window* GetWindow() ; 
 
