@@ -21,6 +21,17 @@ class DemoScene : public Scene
 	void OnUpdate(Clock& time) override;
 
 private:
+	void InitializeHUD();
+	void InitializePauseHUD();
+	void UpdateHUD();
+
+
+	void SetMenuActive(std::vector<UI*>& ui, bool active);
+	void OpenMenu(std::vector<UI*>& menu);
+	void CloseCurrentMenu();
+	void HandleEscape();
+
+private:
 
 	Camera* pSceneCamera = nullptr;
 
@@ -32,13 +43,18 @@ private:
 	// --- HUD ---
 	Panel* mp_HealthBarBackground = nullptr;
 	Slider* mp_HealthBar = nullptr;
-	Button* mp_PauseButton = nullptr;
 	Toggle* mp_MuteToggle = nullptr;
 	Image* mp_PlayerPortrait = nullptr;
 
 	// --- Pause ---
 	Panel* mp_PauseMenu = nullptr;
+	Button* mp_ResumeButton = nullptr;
+	Button* mp_OptionButton = nullptr;
+	Button* mp_QuitButton = nullptr;
 
-	void InitializeHUD();
-	void UpdateHUD();
+	std::vector<UI*> m_UIMainHUD;
+	std::vector<UI*> m_UIPauseMenu;
+	std::vector<UI*> m_UIOptionMenu;
+
+	std::vector<std::vector<UI*>*> m_MenuStack;
 };

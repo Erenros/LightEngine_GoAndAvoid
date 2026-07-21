@@ -23,6 +23,8 @@ public:
     void SetText(const std::string& text);
     void SetTextObject(Text* pText) { mp_Text = pText; }
 
+    void SetActive(bool active) override;
+
     Text* GetText() { return mp_Text; }
 
 protected: 

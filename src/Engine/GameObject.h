@@ -33,7 +33,7 @@ public:
     void SetTextureFlip(TextureFlipMode mode);
     void SetColor(Color color);
 
-    void SetActive(bool active);
+    
     bool IsActive() const;
 
     void SetTag(int32 tag);
@@ -88,6 +88,7 @@ public:
 protected:
     virtual void Initialize(gcle::Shapes shape);
     virtual void Update(float32 dt);
+    virtual void SetActive(bool active);
 
     virtual void OnInitialize() {}
     virtual void OnUpdate() {}

@@ -203,6 +203,11 @@ void GameManager::UpdateRigidBodies(float32 dt)
 	}
 }
 
+void GameManager::Quit()
+{
+	m_IsRunning = false;
+}
+
 std::vector<Entity*> GameManager::GetActiveEntities(const std::string& scene)
 {
 	std::vector<Entity*> results;

@@ -12,18 +12,6 @@ struct SDL_FRect;
 
 class Text
 {
-private:
-
-	Font* mp_Font = nullptr;
-	SDL_Texture* mp_Texture = nullptr;
-
-	std::string m_Text;
-
-	SDL_Color* mp_Color = nullptr;
-	SDL_FRect* mp_Rect = nullptr;
-
-	bool m_NeedToChange = false;
-	int32 m_FontSize = 24;
 public:
 
 	SDL_Texture* GetTexture(Window* pWindow);
@@ -45,4 +33,23 @@ public:
 	int32 GetFontSize();
 
 	Vector2f GetSizes();
+
+	bool IsActive() const;
+	void SetActive(bool active);
+
+private:
+
+	Font* mp_Font = nullptr;
+	SDL_Texture* mp_Texture = nullptr;
+
+	std::string m_Text;
+
+	SDL_Color* mp_Color = nullptr;
+	SDL_FRect* mp_Rect = nullptr;
+
+	bool m_NeedToChange = false;
+	int32 m_FontSize = 24;
+
+	bool m_IsActive = true;
+
 };

@@ -93,14 +93,6 @@ void DemoScene::InitializeHUD()
 	mp_PlayerPortrait->SetPosition(40.0f, 40.0f);
 	mp_PlayerPortrait->SetLayer(10);
 	 
-	mp_PauseButton = CreateButton(gcle::Shapes::Rectangle, "Pause");
-	mp_PauseButton->SetPosition(500.0f, 200.0f);
-	mp_PauseButton->AddFunction([]()
-		{
-			Clock* pClock = GameManager::GetInstance().GetTime();
-			pClock->SetTimeScale(pClock->GetTimeScale() > 0.0 ? 0.0 : 1.0);
-		});
-	 
 	mp_MuteToggle = CreateToggle(gcle::Shapes::Rectangle, "icon_mute", "icon_sound");
 	mp_MuteToggle->SetRenderSize(0, { 48.0f, 48.0f });
 	mp_MuteToggle->SetPosition(1600.0f, 240.0f); 
@@ -108,6 +100,104 @@ void DemoScene::InitializeHUD()
 		{
 			RessourceManager::GetInstance().SetMusicVolume(isMuted ? 0 : 128);
 		});
+
+	m_UIMainHUD = { mp_HealthBarBackground, mp_HealthBar, mp_PlayerPortrait, mp_MuteToggle};
+
+	InitializePauseHUD();
+}
+
+void DemoScene::InitializePauseHUD()
+{
+	constexpr float WIDTH_MULTIPLYER = 2.0f;
+	constexpr float CENTER_X = 960.0f;
+	constexpr float CENTER_Y = 540.0f;
+
+	mp_PauseMenu = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
+	mp_PauseMenu->SetRenderSize(0, { (WIDTH_MULTIPLYER + 0.5f) * 100, 864.0f });
+	mp_PauseMenu->SetPosition(CENTER_X, CENTER_Y);
+	mp_PauseMenu->SetLayer(14);
+
+	mp_ResumeButton = CreateButton(gcle::Shapes::Rectangle, "Resume");
+	mp_ResumeButton->SetPosition(CENTER_X, 288.0f);
+	mp_ResumeButton->ScaleBy({ WIDTH_MULTIPLYER , 1.0f});
+	mp_ResumeButton->SetLayer(15);
+	mp_ResumeButton->AddFunction([this]()
+		{
+			HandleEscape();
+		});
+
+	mp_OptionButton = CreateButton(gcle::Shapes::Rectangle, "Options");
+	mp_OptionButton->SetPosition(CENTER_X, 576.0f);
+	mp_OptionButton->ScaleBy({ WIDTH_MULTIPLYER , 1.0f});
+	mp_OptionButton->SetLayer(15);
+	mp_OptionButton->AddFunction([this]()
+		{
+			OpenMenu(m_UIOptionMenu);
+		});
+
+	mp_QuitButton = CreateButton(gcle::Shapes::Rectangle, "Quit");
+	mp_QuitButton->SetPosition(CENTER_X, 864.0f);
+	mp_QuitButton->ScaleBy({ WIDTH_MULTIPLYER , 1.0f });
+	mp_QuitButton->SetLayer(15);
+	mp_QuitButton->AddFunction([]()
+		{
+			GameManager::GetInstance().Quit();
+		});
+
+
+	m_UIPauseMenu = { mp_PauseMenu, mp_ResumeButton, mp_OptionButton, mp_QuitButton };
+
+	SetMenuActive(m_UIPauseMenu, false);
+}
+
+void DemoScene::SetMenuActive(std::vector<UI*>& ui, bool active)
+{
+	for (auto& element : ui)
+	{
+		if (element != nullptr)
+			element->SetActive(active);
+	}
+}
+
+void DemoScene::OpenMenu(std::vector<UI*>& menu)
+{
+	if (!m_MenuStack.empty())
+		SetMenuActive(*m_MenuStack.back(), false);
+
+	SetMenuActive(menu, true);
+	m_MenuStack.push_back(&menu);
+}
+
+void DemoScene::CloseCurrentMenu()
+{
+	if (m_MenuStack.empty())
+		return;
+
+	SetMenuActive(*m_MenuStack.back(), false);
+	m_MenuStack.pop_back();
+
+	if (!m_MenuStack.empty())
+		SetMenuActive(*m_MenuStack.back(), true);
+}
+
+void DemoScene::HandleEscape()
+{
+	Clock* pClock = GameManager::GetInstance().GetTime();
+
+	if (m_MenuStack.empty())
+	{ 
+		OpenMenu(m_UIPauseMenu);
+		pClock->SetTimeScale(0.0);
+	}
+	else if (m_MenuStack.back() == &m_UIPauseMenu)
+	{ 
+		CloseCurrentMenu();
+		pClock->SetTimeScale(1.0);
+	}
+	else
+	{ 
+		CloseCurrentMenu();
+	}
 }
 
 void DemoScene::UpdateHUD()
@@ -128,4 +218,9 @@ void DemoScene::OnUpdate(Clock& time)
 
 	if (InputManager::GetInstance().IsDown('O'))
 		SceneManager::GetInstance().SetCurrentSceneWithTag("Sample", true); 
+	
+	if (InputManager::GetInstance().IsDown(Escape))
+	{
+		HandleEscape();
+	}
 }

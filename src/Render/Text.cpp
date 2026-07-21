@@ -225,3 +225,13 @@ Vector2f Text::GetSizes() {
 Font* Text::GetFont() {
 	return mp_Font;
 }
+
+bool Text::IsActive() const
+{
+    return m_IsActive;
+}
+
+void Text::SetActive(bool active)
+{
+    m_IsActive = active;
+}
