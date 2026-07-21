@@ -23,7 +23,7 @@ void DebugScene::OnInitialize()
 		entity1->SetRotation(0);
 
 		//tag du player
-		entity1->SetTag(Demo::Tag::Player);
+		entity1->SetTag(Tag::Player);
 
 		entity1->SetRigidBody(true);
 		entity1->GetRigidBody()->SetGravity(10, true);
@@ -47,7 +47,7 @@ void DebugScene::OnInitialize()
 		// rotation relative a l'entité, 
 		// scale relatif a l'entité
 		// )
-		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, {{ 0, 0 }, 0, { 1, 1 }});
 	}
 
 	//creation d'un trigger
@@ -56,10 +56,10 @@ void DebugScene::OnInitialize()
 		entity2->SetPosition(200, -100);
 		entity2->SetScale({ 1, 5 });
 		entity2->SetRotation(0);
-		entity2->SetTag(Demo::Tag::Trigger);
+		entity2->SetTag(Tag::Trigger);
 		entity2->SetRigidBody(false);
 		entity2->SetStatic(true);
-		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { { 0, 0 }, 0, { 1, 1 } });
 	}
 
 	//creation d'un sol
@@ -67,11 +67,11 @@ void DebugScene::OnInitialize()
 	{
 		entity3->SetPosition(0, 300);
 		entity3->SetScale({ 10, 1 });
-		entity3->SetTag(Demo::Tag::Ground);
+		entity3->SetTag(Tag::Ground);
 		entity3->SetRotation(0);
 		entity3->SetRigidBody(true);
 		entity3->SetStatic(true);
-		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, {{ 0, 0 }, 0, { 1, 1 }});
 	}
 
 	Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");

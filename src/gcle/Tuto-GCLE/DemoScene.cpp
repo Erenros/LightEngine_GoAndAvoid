@@ -14,7 +14,7 @@
 #include "Tuto-GCLE/GCEnemy.h"
 #include "Tuto-GCLE/Table.h"
 #include "Tuto-GCLE/Wall.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 void DemoScene::OnInitialize()
 {
@@ -64,7 +64,7 @@ void DemoScene::InitializeHUD()
 	constexpr float32 HEALTHBAR_HEIGHT = 32.0f;
 	 
 	mp_HealthBarBackground = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
-	mp_HealthBarBackground->SetRenderSize(0, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT }); 
+	mp_HealthBarBackground->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBarBackground->SetPosition(148.0f, 40.0f);         
 	mp_HealthBarBackground->SetLayer(10);
 
@@ -74,7 +74,7 @@ void DemoScene::InitializeHUD()
 	//mp_HealthBar->SetHandleSizeRatio(0.10f);
 	mp_HealthBar->SetVisualMode(SliderVisualMode::Fill);
 	mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
-	mp_HealthBar->SetRenderSize(0, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
+	mp_HealthBar->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBar->SetPosition(148.0f, 40.0f);
 	mp_HealthBar->SetColor(Color::Red);
 	mp_HealthBar->SetRange(0.0f, static_cast<float32>(mp_Player->GetMaxLife()));
@@ -89,12 +89,12 @@ void DemoScene::InitializeHUD()
 	mp_HealthBar->SetLayer(11);
 	 
 	mp_PlayerPortrait = CreateImage(gcle::Shapes::Rectangle, "player_portrait");
-	mp_PlayerPortrait->SetRenderSize(0, { 64.0f, 64.0f });
+	mp_PlayerPortrait->SetRenderSize(gcle::Shapes::Rectangle, { 64.0f, 64.0f });
 	mp_PlayerPortrait->SetPosition(40.0f, 40.0f);
 	mp_PlayerPortrait->SetLayer(10);
 	 
 	mp_MuteToggle = CreateToggle(gcle::Shapes::Rectangle, "icon_mute", "icon_sound");
-	mp_MuteToggle->SetRenderSize(0, { 48.0f, 48.0f });
+	mp_MuteToggle->SetRenderSize(gcle::Shapes::Rectangle, { 48.0f, 48.0f });
 	mp_MuteToggle->SetPosition(1600.0f, 240.0f); 
 	mp_MuteToggle->SetOnValueChanged([](bool isMuted)
 		{
@@ -113,7 +113,7 @@ void DemoScene::InitializePauseHUD()
 	constexpr float CENTER_Y = 540.0f;
 
 	mp_PauseMenu = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
-	mp_PauseMenu->SetRenderSize(0, { (WIDTH_MULTIPLYER + 0.5f) * 100, 864.0f });
+	mp_PauseMenu->SetRenderSize(gcle::Shapes::Rectangle, { (WIDTH_MULTIPLYER + 0.5f) * 100, 864.0f });
 	mp_PauseMenu->SetPosition(CENTER_X, CENTER_Y);
 	mp_PauseMenu->SetLayer(14);
 

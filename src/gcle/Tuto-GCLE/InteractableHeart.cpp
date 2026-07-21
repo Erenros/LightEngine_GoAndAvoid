@@ -1,13 +1,13 @@
 #include "InteractableHeart.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 #include "Tuto-GCLE/DemoPlayer.h"
 
 void Demo::InteractableHeart::OnInitialize()
 {
-    SetTag(GameTag::Decor);
+    SetTag(Tag::Decor);
 
     //ScaleBy({ 0.8, 0.64 });
-    CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f }, true);
+    CreateCollider(gcle::Shapes::Rectangle, true, { { 0.0f, 0.0f }, 0, { 1.0f, 1.0f } }, true);
 
     SetRigidBody(true);
     GetRigidBody()->SetGravity(false);

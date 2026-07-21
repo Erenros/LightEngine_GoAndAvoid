@@ -6,7 +6,7 @@
 #include "Core/Timer.h"
 
 #include "Tuto-GCLE/Projectile.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 namespace Demo
 {
@@ -116,11 +116,11 @@ namespace Demo
 
 	void GCPlayer::OnInitialize()
 	{
-		SetTag(GameTag::Player);
+		SetTag(Tag::Player);
 
-		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
+		CreateCollider(gcle::Shapes::Rectangle, true, { { -3.0f, 0.0f }, 0, { 0.3f, 0.45f } });
 
-		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 0.6f, 0.6f }, true);
+		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { { 0.0f, 0.0f }, 0, { 0.6f, 0.6f } }, true);
 
 		
 
@@ -204,7 +204,7 @@ namespace Demo
 
 	void GCPlayer::OnTriggerEnter(Entity* collidedWith)
 	{
-		if (collidedWith->IsTag(GameTag::Decor))
+		if (collidedWith->IsTag(Tag::Decor))
 		{
 			Object* pObj = static_cast<Object*>(collidedWith);
 

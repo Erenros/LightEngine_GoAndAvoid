@@ -49,7 +49,7 @@ void Slider::SetVisualMode(SliderVisualMode mode)
         Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
 
         mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
-        mp_Handle->SetRenderSize(1, { 50.0f });
+        mp_Handle->SetRenderSize(gcle::Shapes::Circle, { 50.0f });
     }
 
     UpdateVisual();
@@ -105,9 +105,9 @@ void Slider::SetPosition(float32 x, float32 y)
     UpdateVisual();
 }
 
-void Slider::SetRenderSize(int32 shapeType, const std::vector<float32>& points)
+void Slider::SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& points)
 {
-    if (shapeType == 0 && points.size() >= 2)
+    if (shapeType == gcle::Shapes::Rectangle && points.size() >= 2)
     {
         m_FullSize = { points[0], points[1] };
         m_HasFullSize = true;
@@ -245,7 +245,7 @@ void Slider::UpdateVisualFill()
 
         float32 fixedWorldX = (m_AnchorPosition.x - m_FullSize.x * 0.5f) + m_FullSize.x * fixedRatio;
 
-        GameObject::SetRenderSize(0, { newWidth, m_FullSize.y });
+        GameObject::SetRenderSize(gcle::Shapes::Rectangle, { newWidth, m_FullSize.y });
         SetRenderPosition({ fixedWorldX, m_AnchorPosition.y }, fixedRatio, 0.5f);
     }
     else
@@ -254,7 +254,7 @@ void Slider::UpdateVisualFill()
 
         float32 fixedWorldY = (m_AnchorPosition.y - m_FullSize.y * 0.5f) + m_FullSize.y * fixedRatio;
 
-        GameObject::SetRenderSize(0, { m_FullSize.x, newHeight });
+        GameObject::SetRenderSize(gcle::Shapes::Rectangle, { m_FullSize.x, newHeight });
         SetRenderPosition({ m_AnchorPosition.x, fixedWorldY }, 0.5f, fixedRatio);
     }
 }

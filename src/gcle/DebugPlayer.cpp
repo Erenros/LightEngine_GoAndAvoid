@@ -40,7 +40,7 @@ void DebugPlayer::OnUpdate() {
 
 void DebugPlayer::OnCollisionEnter(Entity* collidedWith)
 {
-    if (collidedWith->IsTag(Demo::Tag::Ground)) {
+    if (collidedWith->IsTag(Tag::Ground)) {
         IsGrounded = true;
     }
 }
@@ -52,7 +52,7 @@ void DebugPlayer::OnCollision(Entity* collidedWith)
 
 void DebugPlayer::OnCollisionExit(Entity* collidedWith)
 {
-    if (collidedWith->IsTag(Demo::Tag::Ground)) {
+    if (collidedWith->IsTag(Tag::Ground)) {
         IsGrounded = false;
     }
 }

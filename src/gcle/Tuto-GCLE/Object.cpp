@@ -1,6 +1,6 @@
 #include "Object.h"
 
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 void Demo::Object::Interact(Entity* pEntity)
 {
@@ -25,12 +25,12 @@ bool Demo::Object::IsPlayerInRange() const
 
 void Demo::Object::OnTriggerEnter(Entity* pOther)
 {
-	if (pOther != nullptr && pOther->IsTag(GameTag::Player))
+	if (pOther != nullptr && pOther->IsTag(Tag::Player))
 		m_PlayerInRange = true;
 }
 
 void Demo::Object::OnTriggerExit(Entity* pOther)
 {
-	if (pOther != nullptr && pOther->IsTag(GameTag::Player))
+	if (pOther != nullptr && pOther->IsTag(Tag::Player))
 		m_PlayerInRange = false;
 }

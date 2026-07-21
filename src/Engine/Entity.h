@@ -15,6 +15,24 @@ struct Target
     bool isSet = false;
 };
 
+namespace gcle
+{
+    struct ColliderDesc
+    {
+        Vector2f    RelativePosition    = { 0.0f, 0.0f };
+        float32     RelativeRotation    =   0.0f;
+        Vector2f    RelativeScale       = { 1.0f, 1.0f };
+
+        ColliderDesc() = default;
+        ColliderDesc(Vector2f _RelativePosition, float32 _RelativeRotation, Vector2f _RelativeScale) : 
+            RelativePosition(_RelativePosition),
+            RelativeRotation(_RelativeRotation),
+            RelativeScale(_RelativeScale)
+        { }
+            
+    };               
+}
+
 class Entity : public GameObject
 {
 public:
@@ -48,9 +66,7 @@ public:
     Collider* CreateCollider(
         gcle::Shapes shape,
         bool isActive,
-        Vector2f relativePosition,
-        float32 relativeRotation,
-        Vector2f relativeScale,
+        gcle::ColliderDesc desc,
         bool isTrigger = false);
 
     bool IsWorldText() const;

@@ -1,10 +1,10 @@
 #include "Wall.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 void Demo::Wall::OnInitialize()
 {
-	SetTag(Demo::GameTag::Obstacle);
+	SetTag(Tag::Obstacle);
 	SetRigidBody(true);
 	SetStatic(true);
-	CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
+	CreateCollider(gcle::Shapes::Rectangle, true, { { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f } });
 }

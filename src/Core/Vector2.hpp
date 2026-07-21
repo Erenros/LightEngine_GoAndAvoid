@@ -68,6 +68,12 @@ public:
 	Vector2 Normalized()
 	{
 		T norm = Norm(); 
+
+		if (norm == 0)
+		{
+			return *this;
+		}
+
 		return *this / norm;
 	}
 

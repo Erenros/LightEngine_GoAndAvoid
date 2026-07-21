@@ -1,6 +1,6 @@
 #include "Projectile.h"
 
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 #include "Tuto-GCLE/DemoPlayer.h"
 #include "Tuto-GCLE/GCEnemy.h"
 
@@ -17,7 +17,7 @@ namespace Demo
 	void Projectile::OnInitialize()
 	{
 		SetRigidBody(true);
-		CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f }, true);
+		CreateCollider(gcle::Shapes::Circle, true, { { 0.0f, 0.0f }, 0, { 1.0f, 1.0f } }, true);
 	}
 
 	void Projectile::OnTrigger(Entity* collidedWith)
@@ -30,19 +30,19 @@ namespace Demo
 
 	void Projectile::OnTriggerEnter(Entity* pEntity)
 	{
-		if (pEntity->IsTag(GameTag::Obstacle))
+		if (pEntity->IsTag(Tag::Obstacle))
 		{
 			Destroy();
 			return;
 		}
 
-		if (pEntity->IsTag(GameTag::Player) && m_OwnerTag == GameTag::Enemy)
+		if (pEntity->IsTag(Tag::Player) && m_OwnerTag == Tag::Enemy)
 		{
 			static_cast<GCPlayer*>(pEntity)->Damage(m_Damage);
 			Destroy();
 		}
 
-		if (pEntity->IsTag(GameTag::Enemy) && m_OwnerId != pEntity->GetId())
+		if (pEntity->IsTag(Tag::Enemy) && m_OwnerId != pEntity->GetId())
 		{
 			static_cast<GCEnemy*>(pEntity)->Damage(m_Damage);
 			Destroy();
@@ -54,7 +54,7 @@ namespace Demo
 		mp_Owner = pEntity;
 		if (pEntity != nullptr)
 		{
-			m_OwnerTag = pEntity->IsTag(GameTag::Enemy) ? GameTag::Enemy : pEntity->IsTag(GameTag::Player) ? GameTag::Player : -1;
+			m_OwnerTag = pEntity->IsTag(Tag::Enemy) ? Tag::Enemy : pEntity->IsTag(Tag::Player) ? Tag::Player : -1;
 			m_OwnerId = pEntity->GetId();
 		}
 	}
