@@ -316,13 +316,14 @@ GCLE_INFO << "	Debug System was only defined for windows" << ENDL;
 		return *this;
 	}
 
-	Debugger& Debugger::operator<<(bool b) {
-		static const std::string CHARACTERS[2] = { "TRUE", "FALSE" };
-		Output(CHARACTERS[b ? 0 : 1]);
+	Debugger& Debugger::operator<<(bool b) 
+	{ 
+		Output(BOOL_CHARACTERS[b ? 0 : 1]);
 		return *this;
 	}
 
-	void Debugger::operator<<(const DBG_END_OF_LINE& end) {
+	void Debugger::operator<<(const DBG_END_OF_LINE& end) 
+	{
 		operator<<(end.c);
 		if (m_Output & DebuggerOutput::CONSOLE)
 			std::cout.flush();

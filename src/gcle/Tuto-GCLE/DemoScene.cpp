@@ -16,46 +16,47 @@
 #include "Tuto-GCLE/Wall.h"
 #include "Tag.h"
 
+#include "Tuto-GCLE/TileMapLoader.h"
+
 void DemoScene::OnInitialize()
 {
-	Scene::OnInitialize();
+	//Scene::OnInitialize();
 
 	pSceneCamera = CreateCamera();
 	SwitchCamera(pSceneCamera);
 
-	mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
-	//SetSelectedEntity(mp_Player);
 
-	m_Smooth.Initialize(pSceneCamera, mp_Player);
+	Demo::TileMapLoader loader{};
+	loader.CreateMap(this, "../../assets/map/test.gcmap");
 
-	mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
-	mp_Enemy->SetTarget(mp_Player);
-	mp_Enemy->SetDetectionRange(600.0f);
-	mp_Enemy->SetAttackRange(400.0f);
-	mp_Enemy->SetPosition(100.0f, 100.0f);
+	//mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
+	////SetSelectedEntity(mp_Player);
 
-	Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	pWall->SetPosition(0, -400);
-	pWall->SetScale({ 8.0f, 1.0f });
+	//m_Smooth.Initialize(pSceneCamera, mp_Player);
 
-	Demo::Wall* pWall2 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	pWall2->SetPosition(0, 400);
-	pWall2->SetScale({ 8.0f, 1.0f });
+	//mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	//mp_Enemy->SetTarget(mp_Player);
+	//mp_Enemy->SetDetectionRange(600.0f);
+	//mp_Enemy->SetAttackRange(400.0f);
+	//mp_Enemy->SetPosition(100.0f, 100.0f);
 
-	Demo::Wall* pWall3 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	pWall3->SetPosition(-400, 0);
-	pWall3->SetScale({ 1.0f, 8.0f });
+	//Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	//pWall->SetPosition(0, -400);
+	//pWall->SetScale({ 8.0f, 1.0f });
 
-	Demo::Wall* pWall4 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	pWall4->SetPosition(400, 0);
-	pWall4->SetScale({ 1.0f, 8.0f });
+	//Demo::Wall* pWall2 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	//pWall2->SetPosition(0, 400);
+	//pWall2->SetScale({ 8.0f, 1.0f });
 
-	PhysicsManager::GetInstance().SetFrameBetweenQuadTreeRegenerations(1);
-	PhysicsManager::GetInstance().SetActivateQuadTree(true);
-	PhysicsManager::GetInstance().SetQuadTreePos1({ -5000, -5000 });
-	PhysicsManager::GetInstance().SetQuadTreePos2({ 5000, 5000 });
+	//Demo::Wall* pWall3 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	//pWall3->SetPosition(-400, 0);
+	//pWall3->SetScale({ 1.0f, 8.0f });
 
-	InitializeHUD();
+	//Demo::Wall* pWall4 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	//pWall4->SetPosition(400, 0);
+	//pWall4->SetScale({ 1.0f, 8.0f }); 
+
+	//InitializeHUD();
 }
 
 void DemoScene::InitializeHUD()
@@ -65,14 +66,14 @@ void DemoScene::InitializeHUD()
 	 
 	mp_HealthBarBackground = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
 	mp_HealthBarBackground->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
-	mp_HealthBarBackground->SetPosition(148.0f, 40.0f);         
+	mp_HealthBarBackground->SetPosition(215.0f, 40.0f);         
 	mp_HealthBarBackground->SetLayer(10);
 
 	mp_HealthBar = CreateSlider(gcle::Shapes::Rectangle); 
 	mp_HealthBar->SetVisualMode(SliderVisualMode::Fill);
 	mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
 	mp_HealthBar->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
-	mp_HealthBar->SetPosition(148.0f, 40.0f);
+	mp_HealthBar->SetPosition(215.0f, 40.0f);
 	mp_HealthBar->SetColor(Color::Red);
 	mp_HealthBar->SetRange(0.0f, static_cast<float32>(mp_Player->GetMaxLife()));
 	mp_HealthBar->SetValue(static_cast<float32>(mp_Player->GetCurrentLife()), false);
@@ -284,7 +285,7 @@ void DemoScene::UpdateHUD()
 
 void DemoScene::OnUpdate(Clock& time)
 {
-	Scene::OnUpdate(time);
+	//Scene::OnUpdate(time);
 
 	m_Smooth.Update(static_cast<float>(time.GetDeltaTime()));
 

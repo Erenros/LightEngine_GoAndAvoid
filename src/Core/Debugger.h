@@ -51,6 +51,7 @@ namespace GCLE
 		inline static DebuggerInputMode m_CurrentInputMode;
 		inline static std::ofstream m_LogFile;
 		inline static bool m_IsInit = false;
+		const std::string BOOL_CHARACTERS[2] = { "TRUE", "FALSE" };
 
 		struct ErrorReport
 		{
