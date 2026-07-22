@@ -66,6 +66,9 @@ public:
 
 	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f });
 
+	void SetWindowSize(int32 width, int32 height);
+	Vector2u GetSize();
+
 public:
 	Vector2u GetMousePosition();
 	Vector2f GetWindowSize();

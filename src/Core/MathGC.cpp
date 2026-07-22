@@ -155,7 +155,7 @@ Matrix Matrix::operator*(Matrix& matrix2)
 	InitSize();
 	matrix2.InitSize();
 
-	assert(width == matrix2.height);
+	GCLE_ASSERT(width == matrix2.height);
 
 	Matrix result;
 	result.matrix.resize(height);

@@ -15,7 +15,9 @@ void Slider::SetHandle(UI* handle)
     mp_Handle = handle;
 
     if (mp_Handle != nullptr && !m_HandleTextureId.empty())
-        mp_Handle->SetTexture(m_HandleTextureId);
+    {
+        mp_Handle->SetTexture(m_HandleTextureId); 
+    }
 
     UpdateVisual();
 }
@@ -49,7 +51,7 @@ void Slider::SetVisualMode(SliderVisualMode mode)
         Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
 
         mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
-        mp_Handle->SetRenderSize(gcle::Shapes::Circle, { 50.0f });
+        mp_Handle->SetRenderSize(gcle::Shapes::Circle, { 25.0f });
     }
 
     UpdateVisual();
@@ -116,6 +118,14 @@ void Slider::SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& p
     GameObject::SetRenderSize(shapeType, points);
 
     UpdateVisual();
+}
+
+void Slider::SetActive(bool active)
+{
+    if (mp_Handle != nullptr)
+        mp_Handle->SetActive(active);
+
+    UI::SetActive(active);
 }
 
 void Slider::OnInitialize()

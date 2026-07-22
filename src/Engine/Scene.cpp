@@ -555,6 +555,7 @@ Toggle* Scene::CreateToggle(gcle::Shapes shape, const std::string& checkImage, c
 	Toggle* pToggle = CreateUI<Toggle>(shape);
 	pToggle->SetOnCheckedTexture(checkImage);
 	pToggle->SetOnUncheckedTexture(unCheckImage);
+	pToggle->SetOn(false, true);
 	return pToggle;
 }
 

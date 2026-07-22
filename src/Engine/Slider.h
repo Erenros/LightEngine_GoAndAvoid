@@ -56,6 +56,8 @@ public:
     void SetPosition(float32 x, float32 y);
     void SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& points);
 
+    void SetActive(bool active) override;
+
 protected:
     void OnInitialize() override;
     void Update(float32 dt) override;
