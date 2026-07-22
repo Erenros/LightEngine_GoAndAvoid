@@ -17,6 +17,22 @@ struct Target
 
 namespace gcle
 {
+    // Every collider informations are relative to the entity it was created from
+    // 
+    // Relative Position : 
+    //      if x = 1.0f and y = 0.0f it means that the collider is 1 unite on the right of the entity
+    //      if entity position is at { 10.0f, 5.0f }, collider position is at { 11.0f, 5.0f }
+    //      because 10.0f + 1.0f = 11.0f
+    // 
+    // Relative Rotation :
+    //      if rotation = 10.0f it means that the collider is rotate from 10.0f more degree than the entity
+    //      if entity rotation is 10.0f degree, collider rotation is 20.0f degree
+    //      because 10.0f + 10.0f = 20.0f
+    // 
+    // Relative Scale : 
+    //      if x = 2.0f and y = 1.0f it means that the collider is 2 times bigger on x than the entity
+    //      if entity scale is at { 10.0f, 5.0f }, collider scale is at { 20.0f, 5.0f }
+    //      because 10.0f * 2.0f = 20.0f
     struct ColliderDesc
     {
         Vector2f    RelativePosition    = { 0.0f, 0.0f };
