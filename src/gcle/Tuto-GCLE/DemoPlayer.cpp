@@ -89,6 +89,7 @@ namespace Demo
 		if (im.IsDown('F') && mp_InteractableObject.size() != 0)
 		{
 			mp_InteractableObject[0]->Interact(this);
+			mp_InteractableObject.erase(mp_InteractableObject.begin());
 		}
 		
 		if (im.IsDown('P'))
