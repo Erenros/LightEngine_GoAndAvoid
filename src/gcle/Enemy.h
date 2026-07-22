@@ -1,9 +1,8 @@
 #pragma once
-#include "Entity.h"
+#include "KillableEntity.h"
 
-class Enemy : public Entity
+class Enemy : public KillableEntity
 {
 protected:
-    void OnInitialize() override;
     void OnCollisionEnter(Entity* other) override;
 };

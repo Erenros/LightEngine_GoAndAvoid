@@ -1,8 +1,6 @@
 #pragma once
-
 #include "KillableEntity.h"
 #include "CharacterInput.h"
-#include <unordered_set>
 #include <string>
 
 class Hitbox;
@@ -29,13 +27,7 @@ private:
 
     float32 m_actionTimer = 0.0f;
     float32 m_animDt = 0.1f;
-    bool m_grounded = false;
-
-    float32 m_velY = 0.0f;
     float32 m_jumpSpeed = 850.0f;
-    float32 m_gravity = 2600.0f;
-
-    std::unordered_set<Entity*> m_groundContacts;
 
     void UpdateAnimation();
     void Play(const std::string& anim, AnimationMode animMode = AnimationMode::None);
@@ -45,8 +37,6 @@ private:
 public:
     void OnInitialize() override;
     void OnUpdate() override;
-    void OnCollision(Entity* other) override;
-    void OnCollisionExit(Entity* other) override;
     void OnDeath() override;
 
     void SetupPlayer(InputMapping mapping, int8 padIndex);

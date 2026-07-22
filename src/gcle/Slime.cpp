@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 
-Slime::Slime() : m_StateFrames(0), m_Speed(30.0f)
+Slime::Slime() : m_StateFrames(0), m_Speed(100.0f)
 {
 }
 
@@ -14,20 +14,9 @@ void Slime::OnInitialize()
 {
     Enemy::OnInitialize();
 
-    SetTag(1);
-    SetRigidBody(true);
-    SetStatic(false);
-
-    GetRigidBody()->SetMass(1.0f);
-    GetRigidBody()->SetMaxSpeed(50.0f);
-    GetRigidBody()->SetGravity(false);
-    GetRigidBody()->SetFriction({ 0.1f, 0.1f });
-    GetRigidBody()->ActivateFriction(true);
-
     SetTexture("Slime");
 
     AddAnimation("Idle", 0, 3, 0, 47, 47, 0.15f);
-
     PlayAnimation("Idle", AnimationMode::Loop, AnimationInterrupt::Force);
 
     CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, false);
@@ -47,12 +36,12 @@ void Slime::OnUpdate()
 
         if (std::abs(dirX) < 0.2f)
         {
-            SetDirection(0.0f, 0.0f, 0.0f);
+            m_velX = 0.0f;
             PlayAnimation("Idle", AnimationMode::Loop, AnimationInterrupt::Force);
         }
         else
         {
-            SetDirection(dirX, 0.0f, m_Speed);
+            m_velX = (dirX > 0.0f ? 1.0f : -1.0f) * m_Speed;
             PlayAnimation("Move", AnimationMode::Loop, AnimationInterrupt::Force);
         }
     }

@@ -1,21 +1,15 @@
 #include "Player.h"
 #include "GameManager.h"
-#include "Platform.h"
 #include "Hitbox.h"
-#include <cmath>
-#include <iostream>
 
 void Player::OnInitialize()
 {
-    SetStatic(true);
+    KillableEntity::OnInitialize();
 
     RigidBody2D* rb = GetRigidBody();
     if (rb != nullptr)
     {
         rb->SetFriction({ 0.0f, 0.0f });
-        rb->SetActive(true);
-        rb->SetGravity(false);
-        rb->SetCollisionOnContinuous();
     }
 
     m_input.SetMapping(InputMapping::Keyboard, 0);
@@ -109,91 +103,53 @@ void Player::OnUpdate()
     float32 dt = static_cast<float32>(GameManager::GetInstance().GetTime()->GetDeltaTime());
 
     m_currentInputs = m_input.Read();
-    RigidBody2D* rb = GetRigidBody();
-
-    if (rb == nullptr)
-    {
-        return;
-    }
 
     bool locked = (m_actionTimer > 0.0f);
-    m_grounded = (!m_groundContacts.empty());
-
-    if (m_grounded && m_velY >= 0.0f)
-    {
-        m_velY = 0.0f;
-    }
-    else
-    {
-        m_velY += m_gravity * dt;
-    }
 
     if (locked)
     {
         m_actionTimer -= dt;
+        m_velX = 0.0f;
     }
-
-    if (!locked)
+    else
     {
-        float targetSpeedX = 400.0f;
+        m_velX = 400.0f;
 
-        if (m_grounded && m_currentInputs.jump)
+        if (!m_groundContacts.empty() && m_currentInputs.jump)
         {
             m_velY = -m_jumpSpeed;
-            m_grounded = false;
             m_groundContacts.clear();
             m_state = State::Jump;
         }
         else if (m_currentInputs.skill0)
         {
             StartAction("Attack", 4, State::Attack, AnimationMode::Lock);
+            m_velX = 0.0f;
             if (m_attackHitbox != nullptr)
             {
                 m_attackHitbox->Activate({ 50.0f, 0.0f }, { 1.0f, 1.0f }, m_dmg, 0.2f);
             }
         }
-        else if (!m_grounded && m_velY < 0.0f)
+        else if (m_groundContacts.empty() && m_velY < 0.0f)
         {
             m_state = State::Jump;
         }
-        else if (!m_grounded && m_velY > 0.0f)
+        else if (m_groundContacts.empty() && m_velY > 0.0f)
         {
             m_state = State::Fall;
         }
-        else if (m_grounded)
+        else if (!m_groundContacts.empty())
         {
             m_state = State::Run;
         }
-
-        rb->SetVelocity({ targetSpeedX, m_velY });
     }
 
+    KillableEntity::OnUpdate();
     UpdateAnimation();
 
     if (m_sprite != nullptr && GetRenderShape() != nullptr)
     {
         m_sprite->UpdateAnimation(dt, GetRenderShape());
-    }
-}
-
-void Player::OnCollision(Entity* other)
-{
-    if (other != nullptr && other->IsTag(1))
-    {
-        m_groundContacts.insert(other);
-
-        if (m_velY > 0.0f)
-        {
-            m_velY = 0.0f;
-        }
-    }
-}
-
-void Player::OnCollisionExit(Entity* other)
-{
-    if (other != nullptr && other->IsTag(1))
-    {
-        m_groundContacts.erase(other);
     }
 }
 
