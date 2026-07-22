@@ -28,4 +28,7 @@ private:
     int32 m_damage = 0;
     float32 m_life = 0.0f;
     bool m_hasHit = false;
+    #ifdef _DEBUG
+    Entity* m_debugVisual = nullptr;
+#endif
 };

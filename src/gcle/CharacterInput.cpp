@@ -1,4 +1,5 @@
 #include "CharacterInput.h"
+#include <iostream>
 
 void CharacterInput::SetMapping(InputMapping mapping, int8 padIndex)
 {
@@ -37,9 +38,15 @@ FrameInputs CharacterInput::ReadKeyboard()
     in.left = im.IsHeld(static_cast<char>(m_keyLeft));
     in.right = im.IsHeld(static_cast<char>(m_keyRight));
     in.crouch = im.IsHeld(static_cast<char>(m_keyCrouch));
-    in.jump = im.IsDown(m_keyJump);
+    in.jump = im.IsDown(m_keyJump) || im.IsDown(VK_UP);
     in.skill0 = im.IsDown(m_keySkill0);
     in.skill1 = im.IsDown(m_keySkill1);
+
+    if (in.jump)
+    {
+        std::cout << "[DEBUG INPUT] Touche saut detectee (Espace ou Fleche Haut) !" << std::endl;
+    }
+
     return in;
 }
 
@@ -66,6 +73,12 @@ FrameInputs CharacterInput::ReadController()
     in.jump = (pressed & 1) != 0;
     in.skill0 = (pressed & 2) != 0;
     in.skill1 = (pressed & 4) != 0;
+
+    if (in.jump)
+    {
+        std::cout << "[DEBUG INPUT] Bouton A Manette detecte !" << std::endl;
+    }
+
     return in;
 }
 
@@ -92,5 +105,11 @@ FrameInputs CharacterInput::ReadJoystick()
     in.jump = (pressed & 1) != 0;
     in.skill0 = (pressed & 2) != 0;
     in.skill1 = (pressed & 4) != 0;
+
+    if (in.jump)
+    {
+        std::cout << "[DEBUG INPUT] Bouton A Joystick detecte !" << std::endl;
+    }
+
     return in;
 }

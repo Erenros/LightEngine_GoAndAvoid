@@ -2,12 +2,18 @@
 
 void Platform::OnInitialize()
 {
+    SetTag(1);
     SetRigidBody(true);
+    GetRigidBody()->SetGravity(false);
     SetStatic(true);
-    CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
 }
 
 void Platform::SetType(PlatformType type)
 {
     m_type = type;
+}
+
+void Platform::SetStatic(bool isStatic)
+{
+    Entity::SetStatic(isStatic);
 }

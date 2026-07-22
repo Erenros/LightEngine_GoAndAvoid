@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
     GameManager& gm = GameManager::GetInstance();
 
-    gm.Init(1080, 720, 120);
+    gm.Init(1920, 1180, 120);
 
     SceneManager::GetInstance().CreateScene<TestScene>("TestScene");
     //SceneManager::GetInstance().CreateScene<DebugScene>("Sample");

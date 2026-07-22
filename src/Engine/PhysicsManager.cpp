@@ -305,6 +305,7 @@ void PhysicsManager::PendingCorrections()
 
 		Vector2f current = pEntity->GetPosition();
 		pEntity->SetPosition(current.x + delta.x, current.y + delta.y);
+		pEntity->GetTransform2D().UpdateChildPosition(); // <-- rafraîchit le collider avant la paire suivante
 	}
 	m_PendingCorrections.clear();
 }

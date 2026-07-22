@@ -1,17 +1,40 @@
 #include "Player.h"
 #include "GameManager.h"
+#include "Platform.h"
+#include "Hitbox.h"
+#include <cmath>
+#include <iostream>
 
 void Player::OnInitialize()
 {
+    SetStatic(true);
+
     RigidBody2D* rb = GetRigidBody();
     if (rb != nullptr)
     {
-        rb->SetFriction({ 0.0f, 0.15f });
+        rb->SetFriction({ 0.0f, 0.0f });
+        rb->SetActive(true);
+        rb->SetGravity(false);
+        rb->SetCollisionOnContinuous();
     }
-    m_input.SetMapping(InputMapping::Keyboard, 0);
 
+    m_input.SetMapping(InputMapping::Keyboard, 0);
     m_hp = 1;
     m_maxHp = 1;
+
+    SetTexture("male_hero");
+    Window* window = GameManager::GetInstance().GetWindow();
+    m_sprite = new Sprite(window, "../../assets/textures/male_hero.png");
+
+    m_sprite->AddAnimation("Run", 0, 7, 3, 128, 128, m_animDt);
+    m_sprite->AddAnimation("Jump", 0, 5, 4, 128, 128, m_animDt);
+    m_sprite->AddAnimation("Fall", 0, 2, 5, 128, 128, m_animDt);
+    m_sprite->AddAnimation("Attack", 0, 2, 6, 128, 128, m_animDt);
+
+    m_sprite->AddFunctionInFrame("Attack", 2, [this]() { ReleasePendingAttack(); });
+
+    m_state = State::Run;
+    Play("Run", AnimationMode::Loop);
 }
 
 void Player::SetupPlayer(InputMapping mapping, int8 padIndex)
@@ -29,8 +52,62 @@ void Player::SetCustomKeys(int16 left, int16 right, int16 crouch, int16 jump, in
     m_input.m_keySkill1 = skill1;
 }
 
+void Player::SetHitbox(Hitbox* hitbox)
+{
+    m_attackHitbox = hitbox;
+}
+
+void Player::Play(const std::string& anim, AnimationMode animMode)
+{
+    if (anim == m_currentAnim)
+    {
+        return;
+    }
+    m_sprite->PlayAnimation(anim, animMode, AnimationInterrupt::Force);
+    m_currentAnim = anim;
+}
+
+void Player::StartAction(const std::string& anim, int32 nbFrames, State state, AnimationMode animMode)
+{
+    Play(anim, animMode);
+    m_currentAnim = anim;
+    m_actionTimer = nbFrames * m_animDt;
+    m_state = state;
+}
+
+void Player::ReleasePendingAttack()
+{
+    m_actionTimer = 0.0f;
+    m_state = State::Run;
+}
+
+void Player::UpdateAnimation()
+{
+    if (m_state == State::Dead || m_actionTimer > 0.0f)
+    {
+        return;
+    }
+
+    switch (m_state)
+    {
+    case State::Run:
+        Play("Run", AnimationMode::Loop);
+        break;
+    case State::Jump:
+        Play("Jump", AnimationMode::None);
+        break;
+    case State::Fall:
+        Play("Fall", AnimationMode::Loop);
+        break;
+    case State::Attack:
+        break;
+    }
+}
+
 void Player::OnUpdate()
 {
+    float32 dt = static_cast<float32>(GameManager::GetInstance().GetTime()->GetDeltaTime());
+
     m_currentInputs = m_input.Read();
     RigidBody2D* rb = GetRigidBody();
 
@@ -39,17 +116,106 @@ void Player::OnUpdate()
         return;
     }
 
-    Vector2f currentVel = rb->GetVelocity();
-    rb->SetVelocity({ 400.0f, currentVel.y });
+    bool locked = (m_actionTimer > 0.0f);
+    m_grounded = (!m_groundContacts.empty());
 
-    if (m_currentInputs.jump)
+    if (m_grounded && m_velY >= 0.0f)
     {
-        rb->SetVelocity({ 400.0f, 0.0f });
-        rb->AddImpulse({ 0.0f, -1.0f }, 600.0f);
+        m_velY = 0.0f;
+    }
+    else
+    {
+        m_velY += m_gravity * dt;
+    }
+
+    if (locked)
+    {
+        m_actionTimer -= dt;
+    }
+
+    if (!locked)
+    {
+        float targetSpeedX = 400.0f;
+
+        if (m_grounded && m_currentInputs.jump)
+        {
+            m_velY = -m_jumpSpeed;
+            m_grounded = false;
+            m_groundContacts.clear();
+            m_state = State::Jump;
+        }
+        else if (m_currentInputs.skill0)
+        {
+            StartAction("Attack", 4, State::Attack, AnimationMode::Lock);
+            if (m_attackHitbox != nullptr)
+            {
+                m_attackHitbox->Activate({ 50.0f, 0.0f }, { 1.0f, 1.0f }, m_dmg, 0.2f);
+            }
+        }
+        else if (!m_grounded && m_velY < 0.0f)
+        {
+            m_state = State::Jump;
+        }
+        else if (!m_grounded && m_velY > 0.0f)
+        {
+            m_state = State::Fall;
+        }
+        else if (m_grounded)
+        {
+            m_state = State::Run;
+        }
+
+        rb->SetVelocity({ targetSpeedX, m_velY });
+    }
+
+    UpdateAnimation();
+
+    if (m_sprite != nullptr && GetRenderShape() != nullptr)
+    {
+        m_sprite->UpdateAnimation(dt, GetRenderShape());
+    }
+}
+
+void Player::OnCollision(Entity* other)
+{
+    if (other != nullptr && other->IsTag(1))
+    {
+        m_groundContacts.insert(other);
+
+        if (m_velY > 0.0f)
+        {
+            m_velY = 0.0f;
+        }
+    }
+}
+
+void Player::OnCollisionExit(Entity* other)
+{
+    if (other != nullptr && other->IsTag(1))
+    {
+        m_groundContacts.erase(other);
     }
 }
 
 void Player::OnDeath()
 {
-    Destroy();
+    if (m_sprite != nullptr)
+    {
+        delete m_sprite;
+        m_sprite = nullptr;
+    }
+    KillableEntity::OnDeath();
+}
+
+std::string Player::GetStateAsString() const
+{
+    switch (m_state)
+    {
+    case State::Run: return "Run";
+    case State::Jump: return "Jump";
+    case State::Fall: return "Fall";
+    case State::Attack: return "Attack";
+    case State::Dead: return "Dead";
+    default: return "Unknown";
+    }
 }

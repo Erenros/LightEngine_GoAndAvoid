@@ -3,8 +3,10 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Platform.h"
+#include "Decor.h"
 #include "WorldText.h"
 #include "Render/Text.h"
+#include "Slime.h"
 #include <string>
 
 class TestScene : public Scene

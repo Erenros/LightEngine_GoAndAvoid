@@ -3,5 +3,5 @@
 void KillableEntity::TakeDamage(int dmg)
 {
     m_hp -= dmg;
-    if (m_hp <= 0) Destroy();
+    if (m_hp <= 0) OnDeath();
 }

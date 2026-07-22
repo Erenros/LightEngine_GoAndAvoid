@@ -3,7 +3,7 @@
 
 #ifdef _DEBUG
 
-class DebugPlayer : public Entity
+class DebugPlatform : public Entity
 {
 private:
     Entity* m_target = nullptr;
@@ -17,7 +17,7 @@ public:
     void OnInitialize() override
     {
         SetRigidBody(false);
-        SetColor(Color{ 255, 255, 0, 120 });
+        SetColor(Color{ 0, 255, 0, 120 });
     }
 
     void OnUpdate() override

@@ -1,11 +1,27 @@
 #include "TestScene.h"
 #include "Engine/SceneManager.h"
+#include "Hitbox.h"
 #include <fstream>
 #include <iostream>
 
-// OBLIGATOIRE : Tu dois ajouter cette bibliothèque à ton projet pour que ça compile
+#ifdef _DEBUG
+#include "DebugPlayer.h"
+#include "DebugHitbox.h"
+#include "DebugPlatform.h"
+#include "DebugKillableEntity.h"
+#endif
+
 #include "../lib/nlohmann/json.hpp"
 using json = nlohmann::json;
+
+namespace
+{
+    constexpr float GLOBAL_SCALE = 4.0f;
+    constexpr float PLAYER_SCALE = 0.6f;
+    constexpr float ENEMY_SCALE = 0.6f;
+    constexpr int16 TEXTURE_WIDTH = 400;
+    constexpr int16 TEXTURE_HEIGHT = 400;
+}
 
 void TestScene::OnInitialize()
 {
@@ -14,23 +30,39 @@ void TestScene::OnInitialize()
     m_pCamera = CreateCamera();
     SwitchCamera(m_pCamera);
 
-    // Chargement du vrai niveau
-    LoadLevel("C:\\Users\\X1605\\Downloads\\gcle_Gameplay-main\\gcle_Gameplay-main\\assets\\LDTK\\Lv1.ldtk");
+    LoadLevel("../../assets/LDTK/Lv1.ldtk");
     AddDrawnTexture("Assets");
+    AddDrawnTexture("slime");
+
     m_pPlayer = CreateEntity<Player>(gcle::Shapes::Rectangle);
-    m_pPlayer->SetPosition(0.0f, 200.0f);
-    m_pPlayer->SetScale({ 1.0f, 1.0f });
+    m_pPlayer->SetPosition(0.0f, 800.0f);
+    m_pPlayer->SetScale({ PLAYER_SCALE, PLAYER_SCALE });
+
     m_pPlayer->SetRigidBody(true);
+
+    RigidBody2D* prb = m_pPlayer->GetRigidBody();
+    if (prb != nullptr)
+    {
+        prb->SetFriction({ 0.0f, 0.0f });
+        prb->SetActive(true);
+        prb->SetGravity(false);
+        prb->SetCollisionOnContinuous();
+    }
+
     m_pPlayer->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
 
-    m_pEnemy = CreateEntity<Enemy>(gcle::Shapes::Rectangle);
-    m_pEnemy->SetPosition(800.0f, 350.0f);
-    m_pEnemy->SetScale({ 1.0f, 1.0f });
-    m_pEnemy->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
-    if (m_pEnemy->GetRigidBody() != nullptr)
-    {
-        m_pEnemy->GetRigidBody()->SetActive(true);
-    }
+#ifdef _DEBUG
+    DebugHitbox* playerHitbox = CreateEntity<DebugHitbox>(gcle::Shapes::Rectangle);
+#else
+    Hitbox* playerHitbox = CreateEntity<Hitbox>(gcle::Shapes::Rectangle);
+#endif
+    playerHitbox->SetOwner(m_pPlayer);
+    m_pPlayer->SetHitbox(playerHitbox);
+
+#ifdef _DEBUG
+    DebugPlayer* debugPlayer = CreateEntity<DebugPlayer>(gcle::Shapes::Rectangle);
+    debugPlayer->SetTarget(m_pPlayer);
+#endif
 
     Entity* textEntity = CreateWorldText("Init...", 20, "Hack-Regular", 255, 255, 0, 255);
     m_pPlayerDebugText = static_cast<WorldText*>(textEntity);
@@ -41,7 +73,6 @@ void TestScene::LoadLevel(const std::string& filepath)
     std::ifstream file(filepath);
     if (!file.is_open())
     {
-        std::cerr << "Erreur critique : Impossible de trouver le niveau " << filepath << std::endl;
         return;
     }
 
@@ -51,60 +82,87 @@ void TestScene::LoadLevel(const std::string& filepath)
     auto levels = data["levels"];
     if (levels.empty()) return;
 
-    // RAPPEL : Remplace 512 par la vraie taille en pixels de ton fichier "Assets.png"
-    int16 textureLargeurTotale = 512;
-    int16 textureHauteurTotale = 512;
-
     for (const auto& layer : levels[0]["layerInstances"])
     {
         std::string layerName = layer["__identifier"];
         float gridSize = layer["__gridSize"];
 
-        // 1. Calque des Plateformes
+        float targetSize = gridSize * GLOBAL_SCALE;
+        float engineScale = targetSize / 100.0f;
+
         if (layerName == "Platformes")
         {
             for (const auto& tile : layer["gridTiles"])
             {
-                float posX = tile["px"][0];
-                float posY = tile["px"][1];
+                float posX = tile["px"][0] * GLOBAL_SCALE;
+                float posY = tile["px"][1] * GLOBAL_SCALE;
 
                 int16 srcX = tile["src"][0];
                 int16 srcY = tile["src"][1];
 
                 Platform* p = CreateEntity<Platform>(gcle::Shapes::Rectangle);
                 p->SetPosition(posX, posY);
-                p->SetScale({ gridSize, gridSize });
-
+                p->SetScale({ engineScale, engineScale });
                 p->SetTexture("Assets");
 
-                // CORRECTION : Utilisation de GetRenderShape()
+                p->SetTag(1);
+                p->SetRigidBody(true);
+                p->GetRigidBody()->SetGravity(false);
+                p->SetStatic(false);
+
+                p->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
+
                 if (p->GetRenderShape() != nullptr)
                 {
-                    p->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), textureLargeurTotale, textureHauteurTotale);
+                    p->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
                 }
+
+#ifdef _DEBUG
+                DebugPlatform* debugPlat = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                debugPlat->SetTarget(p);
+#endif
             }
         }
-        // 2. Calque du Décor
         else if (layerName == "Decor")
         {
             for (const auto& tile : layer["gridTiles"])
             {
-                float posX = tile["px"][0];
-                float posY = tile["px"][1];
+                float posX = tile["px"][0] * GLOBAL_SCALE;
+                float posY = tile["px"][1] * GLOBAL_SCALE;
 
                 int16 srcX = tile["src"][0];
                 int16 srcY = tile["src"][1];
 
-                Entity* decor = CreateEntity<Entity>(gcle::Shapes::Rectangle);
+                Decor* decor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
                 decor->SetPosition(posX, posY);
-                decor->SetScale({ gridSize, gridSize });
-
+                decor->SetScale({ engineScale, engineScale });
                 decor->SetTexture("Assets");
 
-                // CORRECTION : Utilisation de GetRenderShape()
                 if (decor->GetRenderShape() != nullptr)
                 {
-                    decor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), textureLargeurTotale, textureHauteurTotale);
+                    decor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                }
+            }
+        }
+        else if (layerName == "Entities")
+        {
+            for (const auto& entityInstance : layer["entityInstances"])
+            {
+                std::string entityIdentifier = entityInstance["__identifier"];
+
+                float posX = entityInstance["px"][0] * GLOBAL_SCALE;
+                float posY = entityInstance["px"][1] * GLOBAL_SCALE;
+
+                if (entityIdentifier == "Slime")
+                {
+                    Slime* slime = CreateEntity<Slime>(gcle::Shapes::Rectangle);
+                    slime->SetPosition(posX, posY);
+                    slime->SetScale({ GLOBAL_SCALE / 5, GLOBAL_SCALE / 5 });
+
+#ifdef _DEBUG
+                    DebugKillableEntity* debugEnemy = CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
+                    debugEnemy->SetTarget(slime);
+#endif
                 }
             }
         }
@@ -117,17 +175,25 @@ void TestScene::OnUpdate(Clock& time)
 
     if (m_pPlayer != nullptr)
     {
+        if (m_pPlayer->ToDestroy())
+        {
+            m_pPlayer = nullptr;
+            return;
+        }
+
         Vector2f playerPos = m_pPlayer->GetPosition();
 
         if (m_pCamera != nullptr)
         {
-            m_pCamera->SetPosition({ playerPos.x + 250.0f, 240.0f });
+            m_pCamera->SetPosition({ playerPos.x + 250.0f, playerPos.y - 150.0f });
         }
 
         if (m_pPlayerDebugText != nullptr && m_pPlayerDebugText->GetText() != nullptr)
         {
             m_pPlayerDebugText->SetRenderPosition({ playerPos.x, playerPos.y - 60.0f });
-            std::string debugStr = "HP: " + std::to_string(m_pPlayer->GetHp()) + " | X: " + std::to_string(static_cast<int32>(playerPos.x));
+            std::string debugStr = "HP: " + std::to_string(m_pPlayer->GetHp()) +
+                " | X: " + std::to_string(static_cast<int32>(playerPos.x)) +
+                " | Y: " + std::to_string(static_cast<int32>(playerPos.y));
             m_pPlayerDebugText->GetText()->SetText(debugStr);
         }
     }
