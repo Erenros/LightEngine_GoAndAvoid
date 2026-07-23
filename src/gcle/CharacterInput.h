@@ -30,7 +30,7 @@ public:
     int16 m_keyRight = 'D';
     int16 m_keyCrouch = 'S';
     int16 m_keyJump = VK_SPACE;
-    int16 m_keySkill0 = VK_NUMPAD0;
+    int16 m_keySkill0 = 'E';
     int16 m_keySkill1 = VK_NUMPAD1;
 
 private:

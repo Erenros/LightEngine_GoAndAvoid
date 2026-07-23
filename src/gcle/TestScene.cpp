@@ -185,7 +185,14 @@ void TestScene::OnUpdate(Clock& time)
 
         if (m_pCamera != nullptr)
         {
-            m_pCamera->SetPosition({ playerPos.x + 250.0f, playerPos.y - 150.0f });
+            Vector2f currentPos = m_pCamera->GetPosition();
+            Vector2f targetPos = { playerPos.x + 250.0f, playerPos.y - 150.0f };
+            float dt = static_cast<float>(time.GetDeltaTime());
+            
+            float newX = currentPos.x + (targetPos.x - currentPos.x) * 10.0f * dt;
+            float newY = currentPos.y + (targetPos.y - currentPos.y) * 10.0f * dt;
+
+            m_pCamera->SetPosition({ newX, newY });
         }
 
         if (m_pPlayerDebugText != nullptr && m_pPlayerDebugText->GetText() != nullptr)

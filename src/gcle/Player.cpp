@@ -16,14 +16,17 @@ void Player::OnInitialize()
     m_hp = 1;
     m_maxHp = 1;
 
-    SetTexture("male_hero");
+    SetTexture("male_hero2");
     Window* window = GameManager::GetInstance().GetWindow();
-    m_sprite = new Sprite(window, "../../assets/textures/male_hero.png");
+    m_sprite = new Sprite(window, "../../assets/textures/male_hero2.png");
 
-    m_sprite->AddAnimation("Run", 0, 7, 3, 128, 128, m_animDt);
-    m_sprite->AddAnimation("Jump", 0, 5, 4, 128, 128, m_animDt);
-    m_sprite->AddAnimation("Fall", 0, 2, 5, 128, 128, m_animDt);
-    m_sprite->AddAnimation("Attack", 0, 2, 6, 128, 128, m_animDt);
+    m_sprite->AddAnimation("Idle", 0, 9, 0, 32, 50, m_animDt);
+    m_sprite->AddAnimation("Walk", 0, 9, 1, 35, 50, m_animDt);
+    m_sprite->AddAnimation("Run", 0, 9, 2, 40, 50, m_animDt);
+    m_sprite->AddAnimation("Jump", 0, 5, 3, 31, 50, m_animDt);
+    m_sprite->AddAnimation("Fall", 0, 2, 4, 29, 50, m_animDt);
+    m_sprite->AddAnimation("Attack", 0, 2, 5, 61, 50, m_animDt);
+    m_sprite->AddAnimation("AttackEnd", 0, 3, 6, 46, 50, m_animDt);
 
     m_sprite->AddFunctionInFrame("Attack", 2, [this]() { ReleasePendingAttack(); });
 
@@ -72,6 +75,7 @@ void Player::StartAction(const std::string& anim, int32 nbFrames, State state, A
 void Player::ReleasePendingAttack()
 {
     m_actionTimer = 0.0f;
+    m_attackCooldownTimer = 0.2f;
     m_state = State::Run;
 }
 
@@ -104,6 +108,11 @@ void Player::OnUpdate()
 
     m_currentInputs = m_input.Read();
 
+    if (m_attackCooldownTimer > 0.0f)
+    {
+        m_attackCooldownTimer -= dt;
+    }
+
     bool locked = (m_actionTimer > 0.0f);
 
     if (locked)
@@ -121,9 +130,9 @@ void Player::OnUpdate()
             m_groundContacts.clear();
             m_state = State::Jump;
         }
-        else if (m_currentInputs.skill0)
+        else if (m_currentInputs.skill0 && m_attackCooldownTimer <= 0.0f)
         {
-            StartAction("Attack", 4, State::Attack, AnimationMode::Lock);
+            StartAction("Attack", 3, State::Attack, AnimationMode::Lock);
             m_velX = 0.0f;
             if (m_attackHitbox != nullptr)
             {

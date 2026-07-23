@@ -28,6 +28,7 @@ private:
     float32 m_actionTimer = 0.0f;
     float32 m_animDt = 0.1f;
     float32 m_jumpSpeed = 850.0f;
+    float32 m_attackCooldownTimer = 0.0f;
 
     void UpdateAnimation();
     void Play(const std::string& anim, AnimationMode animMode = AnimationMode::None);
