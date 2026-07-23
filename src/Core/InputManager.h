@@ -97,18 +97,24 @@ public:
 	//Input tests 
 	Vector2<int32> GetMouseRelativePosition();
 	Vector2<int32> GetMouseWorldPosition();
+	void ResetScroll();
+	void OnMouseWheel(int32 deltaX, int32 deltaY);
+	int32 GetScrollDeltaX() const { return m_ScrollDeltaX; }
+	int32 GetScrollDeltaY() const { return m_ScrollDeltaY; }
+	bool IsScrollingUp() const { return m_ScrollDeltaY > 0; }
+	bool IsScrollingDown() const { return m_ScrollDeltaY < 0; }
+
+
 
 	bool IsDown(const int16 key);
 	bool IsReleased(int16 key);
 	bool IsHeld(int16 key);
 	bool IsUp(int16 key);
 
+
 	void AddController(Controller* pConntroller);
-
 	bool IsControllerDown(int8 controller, int16 key);
-
 	void SetVibration(int8 controller, float32 powerLeft, float32 powerRight);
-
 
 	XINPUT_STATE GetGamepadState(int8 controller); 
 
@@ -135,6 +141,9 @@ public:
 	float32 RightTriggerPressed(int8 controller);
 
 private:
+
+	int32 m_ScrollDeltaX = 0;
+	int32 m_ScrollDeltaY = 0;
 
 	std::array<bool, 256> m_Current{};
 	std::array<bool, 256> m_Previous{};

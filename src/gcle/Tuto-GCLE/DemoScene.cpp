@@ -20,7 +20,7 @@
 
 void DemoScene::OnInitialize()
 {
-	//Scene::OnInitialize();
+	Scene::OnInitialize();
 
 	pSceneCamera = CreateCamera();
 	SwitchCamera(pSceneCamera);
@@ -285,7 +285,7 @@ void DemoScene::UpdateHUD()
 
 void DemoScene::OnUpdate(Clock& time)
 {
-	//Scene::OnUpdate(time);
+	Scene::OnUpdate(time);
 
 	m_Smooth.Update(static_cast<float>(time.GetDeltaTime()));
 
