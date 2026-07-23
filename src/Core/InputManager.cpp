@@ -30,12 +30,7 @@ void InputManager::Update()
 	}
 
 	ResetScroll();
-}
-
-void InputManager::UpdateMouse()
-{
-	ResetScroll();
-}
+} 
 
 Vector2<int32> InputManager::GetMouseRelativePosition()
 {

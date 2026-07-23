@@ -35,6 +35,8 @@ private:
 
 private:
 
+	float m_Zoom = 1.0f;
+
 	Camera* pSceneCamera = nullptr;
 
 	Demo::GCPlayer* mp_Player = nullptr;

@@ -21,7 +21,7 @@ class Camera
 		Vector2f GetPosition();
 		 
 		void SetZoom(float32 zoom);
-		float32 GetZoom();
+		float32 GetZoom() const;
 
 		Vector2f GetScreenMousePosition();
 		Vector2f GetMouseScreenToWorldPosition();
