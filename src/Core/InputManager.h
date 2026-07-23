@@ -85,7 +85,7 @@ public:
 	static InputManager& GetInstance();
 	static void DestroyInstance();
 
-	void Update();
+	void Update(); 
 
 	//Constructor 
 	InputManager() = default;

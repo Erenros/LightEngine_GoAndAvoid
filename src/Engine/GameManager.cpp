@@ -92,14 +92,14 @@ void GameManager::Loop()
 		int32 exec = 0;
 		accDt += static_cast<float32>(m_Time.GetDeltaTime());
 
-		PROFILER_START("Input", "Input Update");
-		InputManager::GetInstance().Update();
-		PROFILER_END("Input");
 
 		PROFILER_START("SceneU", "Scene Update");
 		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
 		PROFILER_END("SceneU");
 		
+		PROFILER_START("Input", "Input Update");
+		InputManager::GetInstance().Update();
+		PROFILER_END("Input");
 
 		while (accDt >= fixedUpdateDT)
 		{

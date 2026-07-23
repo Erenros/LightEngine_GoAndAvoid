@@ -291,6 +291,11 @@ void DemoScene::OnUpdate(Clock& time)
 
 	UpdateHUD();
 
+	if (InputManager::GetInstance().IsScrollingUp())
+	{
+		GCLE_INFO << "SCROLL !!!!!!!!!!!!!!!!" << ENDL;
+	}
+
 	if (InputManager::GetInstance().IsDown('O'))
 		SceneManager::GetInstance().SetCurrentSceneWithTag("Sample", true); 
 	
