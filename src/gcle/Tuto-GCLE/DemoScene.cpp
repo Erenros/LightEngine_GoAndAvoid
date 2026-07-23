@@ -211,7 +211,7 @@ void DemoScene::InitializeOptionsMenu()
 		});
 
 	// --- Back ---
-	mp_BackButton = CreateButton(gcle::Shapes::Rectangle, "Retour");
+	mp_BackButton = CreateButton(gcle::Shapes::Rectangle, "Back");
 	mp_BackButton->SetPosition(CENTER_X, 640.0f);
 	mp_BackButton->ScaleBy({ 2.5f, 1.0f });
 	mp_BackButton->SetLayer(15);
