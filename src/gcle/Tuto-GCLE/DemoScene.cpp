@@ -26,37 +26,37 @@ void DemoScene::OnInitialize()
 	SwitchCamera(pSceneCamera);
 
 
-	Demo::TileMapLoader loader{};
-	loader.CreateMap(this, "../../assets/map/test.gcmap");
+	/*Demo::TileMapLoader loader{};
+	loader.CreateMap(this, "../../assets/map/test.gcmap");*/
 
-	//mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
-	////SetSelectedEntity(mp_Player);
+	mp_Player = CreateEntity<Demo::GCPlayer>(gcle::Shapes::Rectangle);
+	//SetSelectedEntity(mp_Player);
 
-	//m_Smooth.Initialize(pSceneCamera, mp_Player);
+	m_Smooth.Initialize(pSceneCamera, mp_Player);
 
-	//mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
-	//mp_Enemy->SetTarget(mp_Player);
-	//mp_Enemy->SetDetectionRange(600.0f);
-	//mp_Enemy->SetAttackRange(400.0f);
-	//mp_Enemy->SetPosition(100.0f, 100.0f);
+	mp_Enemy = CreateEntity<Demo::GCEnemy>(gcle::Shapes::Rectangle);
+	mp_Enemy->SetTarget(mp_Player);
+	mp_Enemy->SetDetectionRange(600.0f);
+	mp_Enemy->SetAttackRange(400.0f);
+	mp_Enemy->SetPosition(100.0f, 100.0f);
 
-	//Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	//pWall->SetPosition(0, -400);
-	//pWall->SetScale({ 8.0f, 1.0f });
+	Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	pWall->SetPosition(0, -400);
+	pWall->SetScale({ 8.0f, 1.0f });
 
-	//Demo::Wall* pWall2 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	//pWall2->SetPosition(0, 400);
-	//pWall2->SetScale({ 8.0f, 1.0f });
+	Demo::Wall* pWall2 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	pWall2->SetPosition(0, 400);
+	pWall2->SetScale({ 8.0f, 1.0f });
 
-	//Demo::Wall* pWall3 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	//pWall3->SetPosition(-400, 0);
-	//pWall3->SetScale({ 1.0f, 8.0f });
+	Demo::Wall* pWall3 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	pWall3->SetPosition(-400, 0);
+	pWall3->SetScale({ 1.0f, 8.0f });
 
-	//Demo::Wall* pWall4 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
-	//pWall4->SetPosition(400, 0);
-	//pWall4->SetScale({ 1.0f, 8.0f }); 
+	Demo::Wall* pWall4 = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
+	pWall4->SetPosition(400, 0);
+	pWall4->SetScale({ 1.0f, 8.0f }); 
 
-	//InitializeHUD();
+	InitializeHUD();
 }
 
 void DemoScene::InitializeHUD()
@@ -287,13 +287,22 @@ void DemoScene::OnUpdate(Clock& time)
 {
 	Scene::OnUpdate(time);
 
+	constexpr float ZOOM_ADDITION = 0.1f;
+
 	m_Smooth.Update(static_cast<float>(time.GetDeltaTime()));
 
 	UpdateHUD();
 
 	if (InputManager::GetInstance().IsScrollingUp())
 	{
-		GCLE_INFO << "SCROLL !!!!!!!!!!!!!!!!" << ENDL;
+		GetCurrentCamera()->SetZoom(m_Zoom + ZOOM_ADDITION);
+		m_Zoom = GetCurrentCamera()->GetZoom();
+	}
+
+	if (InputManager::GetInstance().IsScrollingDown())
+	{
+		GetCurrentCamera()->SetZoom(m_Zoom - ZOOM_ADDITION);
+		m_Zoom = GetCurrentCamera()->GetZoom();
 	}
 
 	if (InputManager::GetInstance().IsDown('O'))

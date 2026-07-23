@@ -48,15 +48,16 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 	if (mp_FollowingEntity != nullptr)
 		m_Transform.SetPosition(mp_FollowingEntity->GetPosition());
 
-	m_ScreenMiddle = Vector2f{ RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT } * 0.5f;
-	
+	m_ScreenMiddle = Vector2f{ RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT } *0.5f;
+
 	for (auto& layer : entities)
 	{
 		for (Entity* entity : layer)
 		{
 			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
 				if (entity->GetRenderShape() != nullptr) {
-					entity->SetRenderPosition((entity->GetPosition() - GetPosition()) + m_ScreenMiddle);
+					Vector2f offset = (entity->GetPosition() - GetPosition()) * GetZoom();
+					entity->SetRenderPosition(offset + m_ScreenMiddle);
 
 					Vector2f realScale = entity->GetScale();
 					entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
@@ -64,10 +65,11 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 				}
 				else if (entity->IsWorldText()) {
 					WorldText* text = static_cast<WorldText*>(entity);
-					text->SetRenderPosition((text->GetPosition() - GetPosition()) + m_ScreenMiddle);
+					Vector2f offset = (text->GetPosition() - GetPosition()) * GetZoom();
+					text->SetRenderPosition(offset + m_ScreenMiddle);
 				}
 			}
-			
+
 		}
 	}
 }
@@ -77,7 +79,7 @@ void Camera::SetZoom(float32 zoom)
 	m_Zoom = zoom;
 }
 
-float32 Camera::GetZoom()
+float32 Camera::GetZoom() const
 {
 	return m_Zoom;
 }
