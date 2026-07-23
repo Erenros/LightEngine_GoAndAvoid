@@ -148,7 +148,7 @@ void PhysicsManager::AddEntity(Entity* pEntity)
 	for (auto& info : m_EntitiesToUpdate)
 	{
 		if (info.entity->GetId() == pEntity->GetId())
-			return; 
+			return;
 	}
 	m_EntitiesToUpdate.push_back({ pEntity, false });
 }
@@ -157,7 +157,7 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 {
 	for (auto& info : m_EntitiesToUpdate)
 	{
-		if (info.toRemove) continue; 
+		if (info.toRemove) continue;
 		if (info.entity->GetId() == pEntity->GetId())
 		{
 			info.toRemove = true;
@@ -245,7 +245,7 @@ void PhysicsManager::UpdateQuadTree(std::vector<Collider*>& activeColliders, flo
 	GenerateQuadTree(&activeColliders, dt);
 	MakeTreePairs(&activeColliders);
 
-	for (auto& pair : m_Pairs) 
+	for (auto& pair : m_Pairs)
 	{
 		nbrTest += 1;
 		HandleCollision(pair, dt);
@@ -301,7 +301,7 @@ void PhysicsManager::GenerateQuadTree(std::vector<Collider*>* pActiveColliders, 
 		}
 
 		m_TimeBetweenRegeneration = 0;
-		m_ForceQuadTreeRegen = false; 
+		m_ForceQuadTreeRegen = false;
 	}
 }
 
@@ -314,6 +314,8 @@ void PhysicsManager::PendingCorrections()
 
 		Vector2f current = pEntity->GetPosition();
 		pEntity->SetPosition(current.x + delta.x, current.y + delta.y);
+
+		pEntity->GetTransform2D().UpdateChildPosition();
 	}
 	m_PendingCorrections.clear();
 }
@@ -361,11 +363,11 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 	Entity* entityB = colliderB->GetOwner();
 
 	bool coliding = IsColliding(colliderA, colliderB);
-	bool isTriggerPair = colliderA->IsTrigger() || colliderB->IsTrigger(); 
+	bool isTriggerPair = colliderA->IsTrigger() || colliderB->IsTrigger();
 
 	if (coliding)
 	{
-		if (isTriggerPair) 
+		if (isTriggerPair)
 		{
 			if (!entityA->m_TriggeringEntity.contains(entityB->GetId()))
 			{
@@ -405,7 +407,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 
 		return;
 	}
-	 
+
 	bool needAntiTunneling = !isTriggerPair &&
 		(ShouldUseContinuousCollision(colliderA) || ShouldUseContinuousCollision(colliderB));
 
@@ -416,7 +418,7 @@ void PhysicsManager::HandleCollision(std::pair<Collider*, Collider*> collider, f
 			return;
 		}
 	}
-	 
+
 	if (entityA->m_TriggeringEntity.contains(entityB->GetId()))
 	{
 		entityA->OnTriggerExit(entityB);
@@ -637,6 +639,26 @@ bool PhysicsManager::TestAxis(float32 startAxis, float32 deltaAxis, float32 minA
 
 	m_ExitTime = std::min(m_ExitTime, axisExit);
 	return m_EntryTime <= m_ExitTime;
+}
+
+void PhysicsManager::ApplyDynamicVelocityResponse(Collider* pColA, Collider* pColB, const Vector2f& normal)
+{
+	Entity* a = pColA->GetOwner();
+	Entity* b = pColB->GetOwner();
+
+	if (a == nullptr || b == nullptr) return;
+	if (a->IsStatic() || b->IsStatic()) return;
+
+	Vector2f relativeVel = a->GetRigidBody()->GetVelocity() - b->GetRigidBody()->GetVelocity();
+	float32 velAlongNormal = relativeVel.Dot(normal);
+
+	if (velAlongNormal >= 0.0f)
+		return;
+
+	Vector2f correction = normal * (velAlongNormal * 0.5f);
+
+	a->GetRigidBody()->SetVelocity(a->GetRigidBody()->GetVelocity() - correction);
+	b->GetRigidBody()->SetVelocity(b->GetRigidBody()->GetVelocity() + correction);
 }
 
 AABB PhysicsManager::UnionAABB(const AABB& a, const AABB& b)
@@ -1199,6 +1221,8 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 	float32 correctionMultiplyer = GetRepulseCorrectionMultiplyer(pColA, pColB);
 
+	Vector2f normal;
+
 	if (overlapX < overlapY)
 	{
 		float32 correction = overlapX * correctionMultiplyer;
@@ -1207,13 +1231,13 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 		{
 			delta1.x -= correction * !a->IsStatic();
 			delta2.x += correction * !b->IsStatic();
-
+			normal = { -1.0f, 0.0f };
 		}
 		else
 		{
 			delta1.x += correction * !a->IsStatic();
 			delta2.x -= correction * !b->IsStatic();
-
+			normal = { 1.0f, 0.0f };
 		}
 
 		if (pColA->GetOwner()->IsStatic() || pColB->GetOwner()->IsStatic())
@@ -1230,13 +1254,13 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 		{
 			delta1.y -= correction * !a->IsStatic();
 			delta2.y += correction * !b->IsStatic();
-
+			normal = { 0.0f, -1.0f };
 		}
 		else
 		{
 			delta1.y += correction * !a->IsStatic();
 			delta2.y -= correction * !b->IsStatic();
-
+			normal = { 0.0f, 1.0f };
 		}
 
 		if (a->IsStatic() || b->IsStatic())
@@ -1248,6 +1272,8 @@ void PhysicsManager::RepulseRectRect(Collider* pColA, Collider* pColB)
 
 	ApplyBlockingResponse(pColA, pColB, delta1);
 	ApplyBlockingResponse(pColB, pColA, delta2);
+
+	ApplyDynamicVelocityResponse(pColA, pColB, normal);
 
 	AccumulateCorrection(a, delta1);
 	AccumulateCorrection(b, delta2);
@@ -1270,7 +1296,7 @@ void PhysicsManager::RepulseCircleCircle(Collider* pColA, Collider* pColB)
 	if (penetration <= 0.0f)
 		return;
 
-	Vector2f normal = SafeNormal(distance, { 1.0f, 0.0f }); // direction B -> A
+	Vector2f normal = SafeNormal(distance, { 1.0f, 0.0f });
 	Vector2f translation = normal * penetration * GetRepulseCorrectionMultiplyer(pColA, pColB);
 
 	Vector2f delta1 = translation * StaticFactor(pColA->GetOwner());
@@ -1281,6 +1307,8 @@ void PhysicsManager::RepulseCircleCircle(Collider* pColA, Collider* pColB)
 
 	ApplyBlockingResponse(pColA, pColB, delta1);
 	ApplyBlockingResponse(pColB, pColA, delta2);
+
+	ApplyDynamicVelocityResponse(pColA, pColB, normal);
 }
 
 void PhysicsManager::RepulseRectCircle(Collider* pColA, Collider* pColB)
@@ -1331,6 +1359,8 @@ void PhysicsManager::RepulseRectCircle(Collider* pColA, Collider* pColB)
 		ApplyBlockingResponse(pColA, pColB, deltaRect);
 		ApplyBlockingResponse(pColB, pColA, deltaCircle);
 
+		ApplyDynamicVelocityResponse(pColA, pColB, normal);
+
 		AccumulateCorrection(pColA->GetOwner(), deltaRect);
 		AccumulateCorrection(pColB->GetOwner(), deltaCircle);
 
@@ -1347,6 +1377,8 @@ void PhysicsManager::RepulseRectCircle(Collider* pColA, Collider* pColB)
 
 	ApplyBlockingResponse(pColA, pColB, deltaRect);
 	ApplyBlockingResponse(pColB, pColA, deltaCircle);
+
+	ApplyDynamicVelocityResponse(pColA, pColB, normal);
 
 	AccumulateCorrection(pColA->GetOwner(), deltaRect);
 	AccumulateCorrection(pColB->GetOwner(), deltaCircle);
@@ -1377,6 +1409,8 @@ void PhysicsManager::RepulseOBB(Collider* pColA, Collider* pColB)
 
 	ApplyBlockingResponse(pColA, pColB, deltaA);
 	ApplyBlockingResponse(pColB, pColA, deltaB);
+
+	ApplyDynamicVelocityResponse(pColA, pColB, normal);
 
 	AccumulateCorrection(pColA->GetOwner(), deltaA);
 	AccumulateCorrection(pColB->GetOwner(), deltaB);

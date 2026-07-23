@@ -43,7 +43,7 @@ bool GameManager::Init(int32 windowWidth, int32 windowHeight, int16 FPS)
 	GCLE::Debugger::Init(&desc);
 #endif
 
-	srand(static_cast<int32>(m_Time.GetTime()));
+	srand(time(NULL));
 
 	m_fps = FPS;
 	fpsDT = 1.f / m_fps;
@@ -81,26 +81,22 @@ void GameManager::Loop()
 	timeBeginPeriod(1);
 	while (m_IsRunning == true)
 	{
+		m_Time.Update();
+
+		if (Event::WindowEvent())
+		{
+			m_IsRunning = false;
+		}
+
 		// Set window in fullscreen
 		if (InputManager::GetInstance().IsDown(F11))
 		{
 			mp_Window->ToggleFullscreen();
 		}
 
-
 		PROFILER_START("Colliders", "Colliders Update");
 		int32 exec = 0;
 		accDt += static_cast<float32>(m_Time.GetDeltaTime());
-
-
-		PROFILER_START("SceneU", "Scene Update");
-		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
-		PROFILER_END("SceneU");
-		
-		PROFILER_START("Input", "Input Update");
-		InputManager::GetInstance().Update();
-		PROFILER_END("Input");
-
 		while (accDt >= fixedUpdateDT)
 		{
 			accDt -= static_cast<float32>(fixedUpdateDT);
@@ -115,11 +111,20 @@ void GameManager::Loop()
 		}
 		PROFILER_END("Colliders");
 
+
+		PROFILER_START("SceneU", "Scene Update");
+		SceneManager::GetInstance().UpdateCurrentScene(m_Time);
+		PROFILER_END("SceneU");
+
+		PROFILER_START("Input", "Input Update");
+		InputManager::GetInstance().Update();
+		PROFILER_END("Input");
+
 		PROFILER_START("Entity", "Entity Creation / Deletion");
 		UpdateEntitySystem();
 		UpdateUISystem();
 		PROFILER_END("Entity");
-		 
+
 		PROFILER_START("SceneD", "Scene Draw");
 		for (auto& cam : m_Camera)
 		{
@@ -137,26 +142,12 @@ void GameManager::Loop()
 		mp_Window->Present();
 		PROFILER_END("SceneD");
 
-		if (Event::WindowEvent())
-		{
-			m_IsRunning = false;
-		}
-
 
 		float64 rawDT = m_Time.GetRawDT();
 		if (rawDT < fpsDT) {
 			float64 timeToSleep = fpsDT - rawDT;
 			m_Time.SmartSleep(timeToSleep);
 		}
-
-
-		//PROFILER_START("time", "Timer Update");
-		m_Time.Update();
-		//PROFILER_END("time"); 
-
-		// GCLE_INFO << "FPS : " << m_Time.GetFramePerSecond() << ENDL;
-		// PROFILER_END("Update");
-		// system("CLS");
 	}
 	timeEndPeriod(1);
 	m_IsRunning = false;
@@ -180,7 +171,7 @@ void GameManager::Close()
 
 	PROFILER_CLEAR();
 
-	delete mp_Window; 
+	delete mp_Window;
 }
 
 Clock* GameManager::GetTime()
@@ -307,10 +298,10 @@ void GameManager::UpdateUISystem()
 				m_UIsToDestroy.push_back(ui);
 				it = m_UIs[i].erase(it);
 			}
-			else if (ui->GetLayer() != i)        
+			else if (ui->GetLayer() != i)
 			{
-				m_UIsToCreate.push_back(ui);     
-				it = m_UIs[i].erase(it);         
+				m_UIsToCreate.push_back(ui);
+				it = m_UIs[i].erase(it);
 			}
 			else
 			{
@@ -357,8 +348,8 @@ void GameManager::DestroyEverything()
 	m_Camera.clear();
 }
 
-void GameManager::AddEntity(Entity* pEntity) { 
-	m_EntitiesToCreate.push_back(pEntity); 
+void GameManager::AddEntity(Entity* pEntity) {
+	m_EntitiesToCreate.push_back(pEntity);
 }
 
 void GameManager::AddUI(UI* ui)
@@ -366,7 +357,7 @@ void GameManager::AddUI(UI* ui)
 	m_UIsToCreate.push_back(ui);
 }
 
-Window* GameManager::GetWindow() { 
-	return mp_Window; 
+Window* GameManager::GetWindow() {
+	return mp_Window;
 }
 

@@ -87,6 +87,7 @@ private:
 	AABB UnionAABB(const AABB& a, const AABB& b);
 	AABB ComputePredictedAABB(Collider* pCollider, const AABB& currentAABB, float32 dt);
 	bool TestAxis(float32 startAxis, float32 deltaAxis, float32 minAxis, float32 maxAxis, Vector2f negativeNormal, Vector2f positiveNormal);
+	void ApplyDynamicVelocityResponse(Collider* pColA, Collider* pColB, const Vector2f& normal);
 
 public:
 	void SetActivateQuadTree(bool activate);
@@ -146,7 +147,7 @@ private:
 	std::vector<std::pair<Collider*, Collider*>> m_Pairs;
 	std::vector<Collider*> m_QueryResult;
 
-private: 
+private:
 	float32 m_EntryTime = 0.0f;
 	float32 m_ExitTime = 1.0f;
 	Vector2f m_EntryNormal{ 0.0f, 0.0f };
@@ -154,7 +155,7 @@ private:
 private:
 	static PhysicsManager* s_Instance;
 
-public : 
+public:
 	~PhysicsManager();
 
 	Collider* mp_CurrentColliderA = nullptr;
