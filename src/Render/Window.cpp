@@ -235,7 +235,7 @@ bool Window::IsFullscreen() const
 	return m_IsFullscreen;
 }
 
-void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
+void Window::DrawDebug(gcle::Shape* pShape, Vector2f camPos, float32 zoom)
 {
 	std::vector<SDL_FPoint*> pointsPtr;
 
@@ -261,11 +261,15 @@ void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
 		break;
 	}
 
+	Vector2f screenMiddle{ RENDER_TARGET_WIDTH * 0.5f, RENDER_TARGET_HEIGHT * 0.5f };
+
 	std::vector<SDL_FPoint> points;
 	points.reserve(pointsPtr.size());
 	for (SDL_FPoint* p : pointsPtr)
 	{
-		points.push_back(SDL_FPoint{ p->x + offset.x, p->y + offset.y });
+		Vector2f world{ p->x, p->y };
+		Vector2f screen = (world - camPos) * zoom + screenMiddle;
+		points.push_back(SDL_FPoint{ screen.x, screen.y });
 	}
 
 	SDL_RenderLines(mp_Renderer, points.data(), static_cast<int32>(points.size()));

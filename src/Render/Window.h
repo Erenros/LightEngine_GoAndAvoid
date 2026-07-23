@@ -64,7 +64,7 @@ public:
 	void DrawOnRenderer(SDL_Texture* pTexture, SDL_FRect* pSrcrect, SDL_FRect* pDstrect);
 	void Draw(gcle::Shape* pShape);
 
-	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f });
+	void DrawDebug(gcle::Shape* pShape, Vector2f offset = { 0.f, 0.f }, float32 zoom = 1.0f);
 
 	void SetWindowSize(int32 width, int32 height);
 	Vector2u GetSize();

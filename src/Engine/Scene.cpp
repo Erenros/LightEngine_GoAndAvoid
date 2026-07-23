@@ -229,8 +229,8 @@ void Scene::DestroyDebugInfoText(Text* pText)
 
 void Scene::DrawDebug(Window* pWindow)
 {
-	constexpr Vector2f screenMiddle({ RENDER_TARGET_WIDTH / 2.0f, RENDER_TARGET_HEIGHT / 2.0f });
-	Vector2f camOffset = mp_ActiveCamera != nullptr ? (screenMiddle - mp_ActiveCamera->GetPosition()) : Vector2f{ 0.f, 0.f };
+	Vector2f camPos = mp_ActiveCamera != nullptr ? mp_ActiveCamera->GetPosition() : Vector2f{ 0.f, 0.f };
+	float32 zoom = mp_ActiveCamera != nullptr ? mp_ActiveCamera->GetZoom() : 1.0f;
 
 	if (m_IsVisualDebugActive)
 	{
@@ -246,7 +246,7 @@ void Scene::DrawDebug(Window* pWindow)
 					if (col->IsActive())
 					{
 						GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-						GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
+						GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camPos, zoom);
 					}
 				}
 			}
@@ -256,12 +256,12 @@ void Scene::DrawDebug(Window* pWindow)
 	if (mp_SelectedEntity != nullptr && m_DebugPerf && mp_SelectedEntity->IsActiveIn(m_Tag))
 	{
 		GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
-		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetRenderShape());
+		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetRenderShape(), camPos, zoom);
 
 		for (auto& col : mp_SelectedEntity->GetColliders())
 		{
 			GameManager::GetInstance().GetWindow()->ClearWindowWithColor(0, 255, 0, 255);
-			GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camOffset);
+			GameManager::GetInstance().GetWindow()->DrawDebug(col->GetShape(), camPos, zoom);
 		}
 	}
 
