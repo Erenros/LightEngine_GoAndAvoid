@@ -12,9 +12,6 @@
 #include "Engine/Entity.h"
 #include "Engine/GameManager.h"
 
-constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
-constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
-
 Window::Window(const char* pName, int32 width, int32 height, uint32 windowFlags, uint32 rendererFlags, int32 x, int32 y)
 {
 	Create(pName, width, height, windowFlags, rendererFlags, x, y);
@@ -134,7 +131,7 @@ void Window::Present()
 	int32 windowW, windowH;
 	SDL_GetWindowSize(mp_Window, &windowW, &windowH);
 
-	constexpr float32 ASPECT = 1920.f / 1080.f;
+	constexpr float32 ASPECT = RENDER_TARGET_WIDTH / RENDER_TARGET_HEIGHT;
 
 	if (static_cast<float32>(windowW) / windowH > ASPECT)
 	{
@@ -272,6 +269,35 @@ void Window::DrawDebug(gcle::Shape* pShape, Vector2f offset)
 	}
 
 	SDL_RenderLines(mp_Renderer, points.data(), static_cast<int32>(points.size()));
+}
+
+void Window::SetWindowSize(int32 width, int32 height)
+{
+	if (mp_Window == nullptr)
+		return;
+	 
+	if (m_IsFullscreen)
+		SetFullscreen(false);
+
+	SDL_RestoreWindow(mp_Window);
+
+	if (!SDL_SetWindowSize(mp_Window, width, height))
+	{
+		GCLE_WARN << "SDL_SetWindowSize failed : " << SDL_GetError() << ENDL;
+		return;
+	}
+	 
+	SDL_SyncWindow(mp_Window);
+	 
+	SDL_SetWindowPosition(mp_Window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+	m_Width = width;
+	m_Height = height;
+}
+
+Vector2u Window::GetSize()
+{
+	return { static_cast<int32>(m_Width), static_cast<int32>(m_Height) };
 }
 
 Vector2u Window::GetMousePosition()

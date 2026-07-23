@@ -229,7 +229,7 @@ void Scene::DestroyDebugInfoText(Text* pText)
 
 void Scene::DrawDebug(Window* pWindow)
 {
-	constexpr Vector2f screenMiddle({ 1920.0f / 2.0f, 1080.0f / 2.0f });
+	constexpr Vector2f screenMiddle({ RENDER_TARGET_WIDTH / 2.0f, RENDER_TARGET_HEIGHT / 2.0f });
 	Vector2f camOffset = mp_ActiveCamera != nullptr ? (screenMiddle - mp_ActiveCamera->GetPosition()) : Vector2f{ 0.f, 0.f };
 
 	if (m_IsVisualDebugActive)
@@ -555,6 +555,7 @@ Toggle* Scene::CreateToggle(gcle::Shapes shape, const std::string& checkImage, c
 	Toggle* pToggle = CreateUI<Toggle>(shape);
 	pToggle->SetOnCheckedTexture(checkImage);
 	pToggle->SetOnUncheckedTexture(unCheckImage);
+	pToggle->SetOn(false, true);
 	return pToggle;
 }
 

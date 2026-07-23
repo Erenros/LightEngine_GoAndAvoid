@@ -28,6 +28,8 @@ void InputManager::Update()
 	{
 		m_Controllers[i]->state = GetGamepadState(i);
 	}
+
+	ResetScroll();
 } 
 
 
@@ -45,11 +47,18 @@ Vector2<int32> InputManager::GetMouseWorldPosition()
 	return Vector2<int32>();
 }
 
+void InputManager::ResetScroll()
+{
+	m_ScrollDeltaX = 0;
+	m_ScrollDeltaY = 0;
+}
 
-
-
-
-
+void InputManager::OnMouseWheel(int32 deltaX, int32 deltaY)
+{
+	m_ScrollDeltaX += deltaX;
+	m_ScrollDeltaY += deltaY;
+}
+ 
 bool InputManager::IsDown(int16 key)
 {
 	return m_Current[key] && !m_Previous[key];

@@ -1,13 +1,12 @@
 #pragma once
-#include "include.h"
+#include "Core/include.h"
 
-namespace Demo {
-
-	enum Tag : int32
-	{
-		Player,
-		Enemy,
-		Ground,
-		Trigger
-	};
-}
+enum Tag : int32
+{
+	Player,
+	Enemy,
+	Ground,
+	Trigger,
+	Obstacle,
+	Decor,
+};

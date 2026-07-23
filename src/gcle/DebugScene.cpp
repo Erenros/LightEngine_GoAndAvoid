@@ -16,38 +16,30 @@ void DebugScene::OnInitialize()
 
 	Collider* setUpCollider = nullptr;
 
-	//creation d'un player classique
+	//basic creation of an entity
 	Entity* entity1 = CreateEntity<DebugPlayer>(gcle::Shapes::Rectangle);
 	{
 		entity1->SetPosition(50, -200);
 		entity1->SetRotation(0);
 
-		//tag du player
-		entity1->SetTag(Demo::Tag::Player);
+		//player tag
+		entity1->SetTag(Tag::Player);
 
 		entity1->SetRigidBody(true);
 		entity1->GetRigidBody()->SetGravity(10, true);
 		entity1->GetRigidBody()->SetMaxSpeed(100);
 
-		// appeler Brake() quand vous le souhaitez pour qu'il fasse effet (au contacte du sol en generale)
+		// call Brake() when you want it to work
 		entity1->GetRigidBody()->SetBrakeDeceleration(100);
 
-		//si l'entity est un static elle ne peut pas bouger et coupe la velocité quand un objet 
-		//entre en contacte avec (dans la direction de la normal entre eux)
+		//if an entity is static she can't move and get her velocity set to 0
 		entity1->SetStatic(false);
 
-		//permet a l'objet de ne pas clip a travers les autres entité 
-		//(mais est assez couteux donc a ne mettre que sur un player)
+		//an entity can't clip through another one
+		//but take a high cost 
 		entity1->GetRigidBody()->SetCollisionOnContinuous();
 
-		//creation d'un collider parametres : (
-		// forme, 
-		// si il est actif, 
-		// position relatif a l'entité, 
-		// rotation relative a l'entité, 
-		// scale relatif a l'entité
-		// )
-		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity1->CreateCollider(gcle::Shapes::Rectangle, true, {{ 0, 0 }, 0, { 1, 1 }});
 	}
 
 	//creation d'un trigger
@@ -56,10 +48,10 @@ void DebugScene::OnInitialize()
 		entity2->SetPosition(200, -100);
 		entity2->SetScale({ 1, 5 });
 		entity2->SetRotation(0);
-		entity2->SetTag(Demo::Tag::Trigger);
+		entity2->SetTag(Tag::Trigger);
 		entity2->SetRigidBody(false);
 		entity2->SetStatic(true);
-		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity2->CreateCollider(gcle::Shapes::Rectangle, true, { { 0, 0 }, 0, { 1, 1 } });
 	}
 
 	//creation d'un sol
@@ -67,11 +59,11 @@ void DebugScene::OnInitialize()
 	{
 		entity3->SetPosition(0, 300);
 		entity3->SetScale({ 10, 1 });
-		entity3->SetTag(Demo::Tag::Ground);
+		entity3->SetTag(Tag::Ground);
 		entity3->SetRotation(0);
 		entity3->SetRigidBody(true);
 		entity3->SetStatic(true);
-		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1, 1 });
+		setUpCollider = entity3->CreateCollider(gcle::Shapes::Rectangle, true, {{ 0, 0 }, 0, { 1, 1 }});
 	}
 
 	Button* ui = CreateButton(gcle::Shapes::Rectangle, "hey");

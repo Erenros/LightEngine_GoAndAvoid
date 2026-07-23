@@ -8,7 +8,7 @@
 #include "Core/Timer.h"
 
 #include "Tuto-GCLE/Projectile.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 #include "Tuto-GCLE/InteractableHeart.h"
 
 namespace Demo
@@ -157,9 +157,9 @@ namespace Demo
 
 	void GCEnemy::OnInitialize()
 	{
-		SetTag(GameTag::Enemy);
+		SetTag(Tag::Enemy);
 
-		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
+		CreateCollider(gcle::Shapes::Rectangle, true, { { -3.0f, 0.0f }, 0, { 0.3f, 0.45f } });
 
 		SetRigidBody(true);
 		GetRigidBody()->SetGravity(false);

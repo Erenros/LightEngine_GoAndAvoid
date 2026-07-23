@@ -18,7 +18,7 @@ void Camera::Init(Window* pWindow)
 
 	mp_Window = pWindow;
 
-	m_ScreenMiddle = { 1920.f / 2.f, 1080.f / 2.f };
+	m_ScreenMiddle = { RENDER_TARGET_WIDTH / 2.f, RENDER_TARGET_HEIGHT / 2.f };
 
 	m_Id = sId++;
 }
@@ -48,7 +48,7 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 	if (mp_FollowingEntity != nullptr)
 		m_Transform.SetPosition(mp_FollowingEntity->GetPosition());
 
-	m_ScreenMiddle = Vector2f{ 1920.0f, 1080.0f } * 0.5f;
+	m_ScreenMiddle = Vector2f{ RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT } * 0.5f;
 	
 	for (auto& layer : entities)
 	{
@@ -88,10 +88,7 @@ Vector2f Camera::GetScreenMousePosition()
 }
 
 Vector2f Camera::GetMouseScreenToWorldPosition()
-{ 
-	constexpr float32 RENDER_TARGET_WIDTH = 1920.f;
-	constexpr float32 RENDER_TARGET_HEIGHT = 1080.f;
-
+{  
 	Vector2f mousePosOnTarget = mp_Window->GetMousePositionOnRenderTarget();
 	Vector2f screenCenter = Vector2f{ RENDER_TARGET_WIDTH, RENDER_TARGET_HEIGHT } *0.5f;
 

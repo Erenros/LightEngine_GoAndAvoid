@@ -55,7 +55,7 @@ void SampleScene::OnInitialize()
 			entity->SetPosition(0.0f + i * 100, 0.0f + y * 100);
 			entity->SetRigidBody(true);
 			entity->GetRigidBody()->SetGravity(false); 
-			entity->CreateCollider(gcle::Shapes::Rectangle, true, { 0, 0 }, 0, { 1.0f, 1.0f });
+			entity->CreateCollider(gcle::Shapes::Rectangle, true, { { 0, 0 }, 0, { 1.0f, 1.0f } });
 			entity->SetStatic(true);
 		}
 	}

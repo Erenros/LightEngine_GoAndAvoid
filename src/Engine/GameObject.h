@@ -20,7 +20,7 @@ public:
     void SetPosition(float32 x, float32 y);
     void SetRenderPosition(Vector2f position, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
     void SetRenderPosition(float32 x, float32 y, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
-    void SetRenderSize(int32 shapeType, const std::vector<float32>& points);
+    void SetRenderSize(gcle::Shapes shape, const std::vector<float32>& points);
 
     void SetScale(Vector2f scale);
     void SetScale(float32 scale);

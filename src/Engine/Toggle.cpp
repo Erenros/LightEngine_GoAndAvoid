@@ -5,7 +5,18 @@ void Toggle::SetOn(bool isOn, bool notify)
 {
     m_IsOn = isOn;
     if (!m_CheckedTexId.empty() && !m_UncheckedTexId.empty())
-        SetTexture(m_IsOn ? m_CheckedTexId : m_UncheckedTexId);
+    {
+        std::string tex = m_IsOn ? m_CheckedTexId : m_UncheckedTexId;
+
+        if (strcmp(tex.c_str(), "0") == 0)
+        {
+            GCLE_WARN << "One of the texture was'nt defined: " << ENDL;
+            GCLE_WARN << "Check texture: " << m_CheckedTexId << ENDL;
+            GCLE_WARN << "Uncheck texture: " << m_UncheckedTexId << ENDL;
+        }
+
+        SetTexture(tex);
+    }
 
     if (notify && m_OnValueChanged)
         m_OnValueChanged(m_IsOn);

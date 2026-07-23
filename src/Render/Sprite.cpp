@@ -60,8 +60,7 @@ void Sprite::PlayAnimation(const std::string& id, AnimationMode mode, AnimationI
 	if (!CanInterruptCurrentAnimation(interrupt))
 		return;
 
-	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) &&
-		m_currentAnimationId == id)
+	if (HasFlag(mode, AnimationMode::IgnoreIfAlreadyPlaying) && m_currentAnimationId == id)
 	{
 		return;
 	}

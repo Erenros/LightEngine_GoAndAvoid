@@ -18,7 +18,7 @@ protected:
 
 private:
     bool m_IsOn = false;
-    std::string m_CheckedTexId;
-    std::string m_UncheckedTexId;
+    std::string m_CheckedTexId = "0";
+    std::string m_UncheckedTexId = "0";
     std::function<void(bool)> m_OnValueChanged;
 };

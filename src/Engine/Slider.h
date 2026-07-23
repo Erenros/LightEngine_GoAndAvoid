@@ -10,12 +10,20 @@ enum class SliderOrientation
     Vertical
 };
  
+
+// Note: 
+// Fill mode : value can only be changed by SetValue()
+// Handle mode : value can be changed by both the mouse and SetValue()
 enum class SliderVisualMode
 {
     Handle,
     Fill
 };
  
+// Note: 
+// Start Slider visual go down from right to left 
+// Center Slider visual go from left and right to middle
+// End Slider visual go down from left to right 
 enum class SliderFillAnchor
 {
     Start,
@@ -46,7 +54,9 @@ public:
     void SetOnValueChanged(std::function<void(float32)> callback);
      
     void SetPosition(float32 x, float32 y);
-    void SetRenderSize(int32 shapeType, const std::vector<float32>& points);
+    void SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& points);
+
+    void SetActive(bool active) override;
 
 protected:
     void OnInitialize() override;

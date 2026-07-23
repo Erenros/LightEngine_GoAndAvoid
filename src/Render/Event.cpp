@@ -19,6 +19,10 @@ bool Event::WindowEvent()
 			pWindow->m_Width = static_cast<uint32>(pWindow->GetWindowSize().x);
 			pWindow->m_Height = static_cast<uint32>(pWindow->GetWindowSize().y);
 		}
+		if (event.type == SDL_EVENT_MOUSE_WHEEL)
+		{
+			InputManager::GetInstance().OnMouseWheel(event.wheel.x, event.wheel.y);
+		}
 	}
 	return false;
 }

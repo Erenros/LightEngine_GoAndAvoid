@@ -6,7 +6,7 @@
 #include "Core/Timer.h"
 
 #include "Tuto-GCLE/Projectile.h"
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 namespace Demo
 {
@@ -16,6 +16,9 @@ namespace Demo
 
 		InputManager& im = InputManager::GetInstance();
 		float32 dt = static_cast<float32>(::GameManager::GetInstance().GetTime()->GetDeltaTime());
+		RigidBody2D* rb = GetRigidBody();
+
+		constexpr float32 MOVE_FORCE = 1200.0f;
 
 		UpdateDodgeRoll(dt);
 
@@ -24,39 +27,39 @@ namespace Demo
 
 		if (im.IsHeld('Q') && m_CanMove)
 		{
-			GetRigidBody()->AddForce({ -1, 0 }, 1200, dt);
+			rb->AddForce({ -1, 0 }, MOVE_FORCE, dt);
 			SetTextureFlip(TextureFlipMode::FLIP_HORIZONTAL);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('D') && m_CanMove)
 		{
-			GetRigidBody()->AddForce({ 1, 0 }, 1200, dt); 
+			rb->AddForce({ 1, 0 }, MOVE_FORCE, dt);
 			SetTextureFlip(TextureFlipMode::FLIP_NONE);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('S') && m_CanMove)
 		{
-			GetRigidBody()->AddForce({ 0, 1 }, 1200, dt); 
+			rb->AddForce({ 0, 1 }, MOVE_FORCE, dt);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		if (im.IsHeld('Z') && m_CanMove)
 		{
-			GetRigidBody()->AddForce({ 0, -1 }, 1200, dt); 
+			rb->AddForce({ 0, -1 }, MOVE_FORCE, dt);
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 
-		
+
 
 		if (
-			GetRigidBody()->GetVelocity().x <= 0.05f && GetRigidBody()->GetVelocity().y <= 0.05f &&
-			GetRigidBody()->GetVelocity().x >= -0.05f && GetRigidBody()->GetVelocity().y >= -0.05f && 
+			rb->GetVelocity().x <= 0.05f && rb->GetVelocity().y <= 0.05f &&
+			rb->GetVelocity().x >= -0.05f && rb->GetVelocity().y >= -0.05f &&
 			m_CanMove
-		){
+			) {
 			PlayAnimation("Idle", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
 		else
 		{
-			m_LastMoveDirection = GetRigidBody()->GetVelocity();
+			m_LastMoveDirection = rb->GetVelocity();
 		}
 
 		if (im.IsDown(LeftButton))
@@ -69,16 +72,16 @@ namespace Demo
 			m_IsDodging = true;
 			m_DodgeTimer = m_DodgeDuration;
 			m_DodgeCooldownTimer = m_DodgeCooldown;
-			 
-			SetInvincible(true, m_DodgeDuration);
-			SetColor({ 255, 255, 255, 50 }); 
 
-			GetRigidBody()->Stop();
+			SetInvincible(true, m_DodgeDuration);
+			SetColor({ 255, 255, 255, 50 });
+
+			rb->Stop();
 
 			if (m_LastMoveDirection.x == 0 && m_LastMoveDirection.y == 0)
 				m_LastMoveDirection = { 1.0f, 0.0f };
 
-			GetRigidBody()->AddImpulse(m_LastMoveDirection, m_DodgeForce);
+			rb->AddImpulse(m_LastMoveDirection, m_DodgeForce);
 
 			PlayAnimation("Walk", AnimationMode::Loop | AnimationMode::IgnoreIfAlreadyPlaying);
 		}
@@ -86,6 +89,7 @@ namespace Demo
 		if (im.IsDown('F') && mp_InteractableObject.size() != 0)
 		{
 			mp_InteractableObject[0]->Interact(this);
+			mp_InteractableObject.erase(mp_InteractableObject.begin());
 		}
 		
 		if (im.IsDown('P'))
@@ -116,11 +120,11 @@ namespace Demo
 
 	void GCPlayer::OnInitialize()
 	{
-		SetTag(GameTag::Player);
+		SetTag(Tag::Player);
 
-		CreateCollider(gcle::Shapes::Rectangle, true, { -3.0f, 0.0f }, 0, { 0.3f, 0.45f });
+		CreateCollider(gcle::Shapes::Rectangle, true, { { -3.0f, 0.0f }, 0, { 0.3f, 0.5f } });
 
-		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { 0.0f, 0.0f }, 0, { 0.6f, 0.6f }, true);
+		mp_InteractableRange = CreateCollider(gcle::Shapes::Circle, true, { { 0.0f, 0.0f }, 0, { 0.6f, 0.6f } }, true);
 
 		
 
@@ -165,19 +169,32 @@ namespace Demo
 
 
 		SetMaxLife(50);
-		SetCurrentLife(50);
-
-
-
-
-
-
-
+		SetCurrentLife(50); 
 	}
 
 	void GCPlayer::OnCollision(Entity* collidedWith) {}
 	void GCPlayer::OnCollisionExit(Entity* collidedWith) {}
 	void GCPlayer::OnCollisionEnter(Entity* collidedWith) {}
+
+	void GCPlayer::OnTriggerEnter(Entity* collidedWith)
+	{
+		if (collidedWith->IsTag(Tag::Decor))
+		{
+			Object* pObj = static_cast<Object*>(collidedWith);
+
+			bool alreadyIn = false;
+			for (auto& obj : mp_InteractableObject)
+			{
+				if (collidedWith->GetId() == obj->GetId())
+					alreadyIn = true;
+			}
+
+			if (!alreadyIn && pObj->CanBeInteractWith())
+			{
+				mp_InteractableObject.push_back(pObj); 
+			}
+		}
+	}
 
 	void GCPlayer::OnTrigger(Entity* collidedWith)
 	{
@@ -201,27 +218,7 @@ namespace Demo
 
 		}
 	}
-
-	void GCPlayer::OnTriggerEnter(Entity* collidedWith)
-	{
-		if (collidedWith->IsTag(GameTag::Decor))
-		{
-			Object* pObj = static_cast<Object*>(collidedWith);
-
-			bool alreadyIn = false;
-			for (auto& obj : mp_InteractableObject)
-			{
-				if (collidedWith->GetId() == obj->GetId())
-					alreadyIn = true;
-			}
-
-			if (!alreadyIn && pObj->CanBeInteractWith())
-			{
-				mp_InteractableObject.push_back(pObj); 
-			}
-		}
-	}
-
+	 
 	void GCPlayer::Death()
 	{
 		Character::Death(); 
@@ -237,7 +234,7 @@ namespace Demo
 		if (!m_CanShoot)
 			return;
 
-		::Scene* pScene = ::SceneManager::GetInstance().GetCurrentScene();
+		Scene* pScene = ::SceneManager::GetInstance().GetCurrentScene();
 
 		Vector2f posToGo = pScene->GetCurrentCamera()->GetMouseScreenToWorldPosition();
 

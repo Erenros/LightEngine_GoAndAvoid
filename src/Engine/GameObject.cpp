@@ -48,14 +48,14 @@ void GameObject::SetRenderPosition(float32 x, float32 y, float32 ratioX, float32
         mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void GameObject::SetRenderSize(int32 shapeType, const std::vector<float32>& points)
+void GameObject::SetRenderSize(gcle::Shapes shape, const std::vector<float32>& points)
 {
     if (mp_RenderShape == nullptr)
         return;
 
-    switch (shapeType)
+    switch (shape)
     {
-    case 0:
+    case gcle::Shapes::Rectangle:
         if (points.size() < 2)
             return;
 
@@ -63,14 +63,14 @@ void GameObject::SetRenderSize(int32 shapeType, const std::vector<float32>& poin
         mp_RenderShape->SetHeight(points[1]);
         break;
 
-    case 1:
+    case gcle::Shapes::Circle:
         if (points.empty())
             return;
 
         mp_RenderShape->SetRadius(points[0]);
         break;
 
-    case 2:
+    case gcle::Shapes::Triangle:
         if (points.size() < 6)
             return;
 
@@ -128,7 +128,15 @@ void GameObject::SetTexture(const std::string& id)
         for (const std::string& sceneId : m_ActiveScenes)
             SceneManager::GetInstance().GetSceneWithTag(sceneId)->AddDrawnTexture(id);
 
-        if (resourceManager.GetSurface(id)->mp_surface == nullptr)
+        auto* surf = resourceManager.GetSurface(id);
+
+        if (surf == nullptr) 
+        {
+            GCLE_WARN << "Texture inconnue : " << id; 
+            return;
+        }
+
+        if (surf->mp_surface == nullptr)
         {
             const std::string path = "../../assets/textures/" + id + ".png";
             resourceManager.LoadSurface(GameManager::GetInstance().GetWindow(), path, id);

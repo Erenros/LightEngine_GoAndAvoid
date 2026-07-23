@@ -29,8 +29,8 @@ namespace Demo
 		 
 		Vector2f playerPosition = mp_FollowingEntity->GetPosition();
 		 
-		constexpr float32 SCREEN_WIDTH = 1920.0f;
-		constexpr float32 SCREEN_HEIGHT = 1080.0f;
+		constexpr float32 SCREEN_WIDTH = RENDER_TARGET_WIDTH;
+		constexpr float32 SCREEN_HEIGHT = RENDER_TARGET_HEIGHT;
 		 
 		Vector2f screenCenter =
 		{

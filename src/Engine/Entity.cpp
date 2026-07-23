@@ -249,31 +249,18 @@ const std::unordered_set<Collider*>& Entity::GetColliders() const
     return mp_Colliders;
 }
 
-Collider* Entity::CreateCollider(
-    gcle::Shapes shape,
-    bool isActive,
-    Vector2f relativePosition,
-    float32 relativeRotation,
-    Vector2f relativeScale,
-    bool isTrigger)
+Collider* Entity::CreateCollider( gcle::Shapes shape, bool isActive, gcle::ColliderDesc desc, bool isTrigger)
 {
     gcle::Shape* colliderShape = GetBaseShape(shape);
     if (colliderShape == nullptr)
         return nullptr;
 
     const Vector2f entityScale = m_Transform.GetScale();
-    colliderShape->SetScale({
-        relativeScale.x * entityScale.x,
-        relativeScale.y * entityScale.y
-        });
+    colliderShape->SetScale({ desc.RelativeScale.x * entityScale.x, desc.RelativeScale.y * entityScale.y });
 
     Collider* collider = GCLE_NEW Collider();
     collider->SetTrigger(isTrigger);
-    collider->Initialize(
-        colliderShape,
-        m_Transform.GetPosition() + relativePosition,
-        m_Transform.GetDegAngle() + relativeRotation,
-        this);
+    collider->Initialize( colliderShape, m_Transform.GetPosition() + desc.RelativePosition, m_Transform.GetDegAngle() + desc.RelativeRotation, this);
 
     AddCollider(collider);
     collider->SetActive(isActive);

@@ -42,7 +42,13 @@ void RessourceManager::ForcePutSurface(Surface* pText, std::string id)
 
 Font* RessourceManager::GetFont(const std::string& id)
 {
-	return m_FontMap[id];
+	auto it = m_FontMap.find(id);
+	if (it == m_FontMap.end())
+	{
+		GCLE_WARN << "Font '" << id << "' doesn't exist" << ENDL;
+		return nullptr;
+	}
+	return it->second;
 }
 
 SurfaceStruct* RessourceManager::GetSurface(const std::string& id)
@@ -131,8 +137,7 @@ void RessourceManager::InitTextureFolder(Window* pWindow)
 {
 	std::filesystem::path filename = "../../assets/textures";
 
-	GCLE_INFO << "CWD: " << std::filesystem::current_path().string() << ENDL;
-	GCLE_INFO << "Texture dir exists: " << std::filesystem::exists(filename) << ENDL;
+	GCLE_INFO << "CWD: " << std::filesystem::current_path().string() << ENDL; 
 
 	if (!std::filesystem::exists(filename) || !std::filesystem::is_directory(filename))
 	{

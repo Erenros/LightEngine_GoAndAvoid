@@ -42,7 +42,7 @@ void CreateDebugConsole()
 void CreateScenes()
 {
     SceneManager::GetInstance().CreateScene<DemoScene>("DebugScene");
-    SceneManager::GetInstance().CreateScene<DebugScene>("Sample");
+    //SceneManager::GetInstance().CreateScene<DebugScene>("Sample");
 }
 
 void Destroy()
@@ -61,7 +61,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     CreateDebugConsole();
 #endif 
 
-    //_CrtSetBreakAlloc(29302);
+    //_CrtSetBreakAlloc(157);
 
     GameManager& gm = GameManager::GetInstance();
 

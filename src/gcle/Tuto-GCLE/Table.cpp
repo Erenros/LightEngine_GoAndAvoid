@@ -1,13 +1,13 @@
 #include "Table.h"
 
-#include "Tuto-GCLE/Tag.h"
+#include "Tag.h"
 
 void Demo::Table::OnInitialize()
 {
-    SetTag(GameTag::Decor);
+    SetTag(Tag::Decor);
 
     ScaleBy({ 0.8f, 0.64f });
-    CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0, { 1.0f, 1.0f });
+    CreateCollider(gcle::Shapes::Rectangle, true, { { 0.0f, 0.0f }, 0, { 1.0f, 1.0f } });
 
     SetRigidBody(true);
     GetRigidBody()->SetGravity(false);
@@ -21,7 +21,7 @@ void Demo::Table::OnInteract(Entity* pEntity)
 {
     if (m_IsDown == false)
     {
-        SetTag(GameTag::Obstacle);
+        SetTag(Tag::Obstacle);
 
         SetStatic(false);
         GetRigidBody()->ActivateFriction(true);
