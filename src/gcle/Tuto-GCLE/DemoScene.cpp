@@ -73,14 +73,14 @@ void DemoScene::InitializeHUD()
 	constexpr float32 HEALTHBAR_HEIGHT = 32.0f;
 	 
 	mp_HealthBarBackground = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
-	mp_HealthBarBackground->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
+	mp_HealthBarBackground->SetSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBarBackground->SetPosition(215.0f, 40.0f);         
 	mp_HealthBarBackground->SetLayer(10);
 
 	mp_HealthBar = CreateSlider(gcle::Shapes::Rectangle); 
 	mp_HealthBar->SetVisualMode(SliderVisualMode::Fill);
 	mp_HealthBar->SetFillAnchor(SliderFillAnchor::Start); 
-	mp_HealthBar->SetRenderSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
+	mp_HealthBar->SetSize(gcle::Shapes::Rectangle, { HEALTHBAR_WIDTH, HEALTHBAR_HEIGHT });
 	mp_HealthBar->SetPosition(215.0f, 40.0f);
 	mp_HealthBar->SetColor(Color::Red);
 	mp_HealthBar->SetRange(0.0f, static_cast<float32>(mp_Player->GetMaxLife()));
@@ -95,7 +95,7 @@ void DemoScene::InitializeHUD()
 	mp_HealthBar->SetLayer(11);
 	 
 	mp_PlayerPortrait = CreateImage(gcle::Shapes::Rectangle, "player_portrait");
-	mp_PlayerPortrait->SetRenderSize(gcle::Shapes::Rectangle, { 64.0f, 64.0f });
+	mp_PlayerPortrait->SetSize(gcle::Shapes::Rectangle, { 64.0f, 64.0f });
 	mp_PlayerPortrait->SetPosition(40.0f, 40.0f);
 	mp_PlayerPortrait->SetLayer(10); 
 
@@ -113,7 +113,7 @@ void DemoScene::InitializePauseHUD()
 
 	// --- Background ---
 	mp_PauseMenu = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
-	mp_PauseMenu->SetRenderSize(gcle::Shapes::Rectangle, { (WIDTH_MULTIPLYER + 0.5f) * 100, 864.0f });
+	mp_PauseMenu->SetSize(gcle::Shapes::Rectangle, { (WIDTH_MULTIPLYER + 0.5f) * 100, 864.0f });
 	mp_PauseMenu->SetPosition(CENTER_X, CENTER_Y);
 	mp_PauseMenu->SetLayer(14);
 
@@ -166,7 +166,7 @@ void DemoScene::InitializeOptionsMenu()
 	m_CurrentResolutionIndex = 2;
 
 	mp_OptionsMenu = CreatePanel(gcle::Shapes::Rectangle, Color{ 30, 30, 30, 200 });
-	mp_OptionsMenu->SetRenderSize(gcle::Shapes::Rectangle, { 400.0f, 632.0f }); 
+	mp_OptionsMenu->SetSize(gcle::Shapes::Rectangle, { 400.0f, 632.0f }); 
 	mp_OptionsMenu->SetPosition(CENTER_X, CENTER_Y);
 	mp_OptionsMenu->SetLayer(14);
 
@@ -184,15 +184,14 @@ void DemoScene::InitializeOptionsMenu()
 			m_CurrentResolutionIndex = (m_CurrentResolutionIndex + 1) % static_cast<int32>(m_Resolutions.size());
 			Vector2u newRes = m_Resolutions[m_CurrentResolutionIndex];
 			GameManager::GetInstance().GetWindow()->SetWindowSize(newRes.x, newRes.y);
-			mp_ResolutionButton->GetText()->SetText(
-				std::to_string(newRes.x) + "x" + std::to_string(newRes.y));
+			mp_ResolutionButton->GetText()->SetText(std::to_string(newRes.x) + "x" + std::to_string(newRes.y));
 		});
 
 	// --- Volume ---
 	mp_VolumeSlider = CreateSlider(gcle::Shapes::Rectangle);
 	mp_VolumeSlider->SetVisualMode(SliderVisualMode::Handle);
 	mp_VolumeSlider->SetHandleSizeRatio(0.15f);
-	mp_VolumeSlider->SetRenderSize(gcle::Shapes::Rectangle, { 330.0f, 16.0f });
+	mp_VolumeSlider->SetSize(gcle::Shapes::Rectangle, { 330.0f, 16.0f });
 	mp_VolumeSlider->SetPosition(CENTER_X, 460.0f);
 	mp_VolumeSlider->SetColor(Color{ 80, 80, 80, 255 });
 	mp_VolumeSlider->SetRange(0.0f, 128.0f);
@@ -209,7 +208,7 @@ void DemoScene::InitializeOptionsMenu()
 
 	// --- Mute ---
 	mp_OptionsMuteToggle = CreateToggle(gcle::Shapes::Rectangle, "icon_mute", "icon_sound");
-	mp_OptionsMuteToggle->SetRenderSize(gcle::Shapes::Rectangle, { 48.0f, 48.0f });
+	mp_OptionsMuteToggle->SetSize(gcle::Shapes::Rectangle, { 48.0f, 48.0f });
 	mp_OptionsMuteToggle->SetPosition(CENTER_X, 540.0f);
 	mp_OptionsMuteToggle->SetLayer(15);
 	mp_OptionsMuteToggle->SetOnValueChanged([this](bool isMuted)

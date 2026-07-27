@@ -195,18 +195,18 @@ void Window::Draw(gcle::Shape* pShape)
 }
 
 bool Window::IsInsideWindow(GameObject* gm) {
-	if (gm->GetRenderShape() == nullptr)
+	if (gm->GetShape() == nullptr)
 		return false;
 	Vector2f camPos = SceneManager::GetInstance().GetCurrentScene()->GetCurrentCamera()->GetPosition();
 	float32 margin = 50.f;
 
 	AABB entityAABB;
-	if (static_cast<int32>(gm->GetRenderShape()->GetRotation()) % 180 != 0) {
-		entityAABB = GetRotatedAABB(gm->GetRenderPosition(), { gm->GetRenderShape()->GetWidth(), gm->GetRenderShape()->GetHeight() }, gm->GetRenderShape()->GetRotation() * DEG_TO_RAD);
+	if (static_cast<int32>(gm->GetShape()->GetRotation()) % 180 != 0) {
+		entityAABB = GetRotatedAABB(gm->GetRenderPosition(), { gm->GetShape()->GetWidth(), gm->GetShape()->GetHeight() }, gm->GetShape()->GetRotation() * DEG_TO_RAD);
 		entityAABB = { entityAABB.minX - margin, entityAABB.minY - margin, entityAABB.maxX + margin, entityAABB.maxY + margin };
 	}
 	else
-		entityAABB = { gm->GetRenderShape()->GetPosition(0.f, 0.f).x - margin , gm->GetRenderShape()->GetPosition(0.f, 0.f).y - margin , gm->GetRenderShape()->GetPosition(1.f, 1.f).x + margin, gm->GetRenderShape()->GetPosition(1.f, 1.f).y + margin };
+		entityAABB = { gm->GetShape()->GetPosition(0.f, 0.f).x - margin , gm->GetShape()->GetPosition(0.f, 0.f).y - margin , gm->GetShape()->GetPosition(1.f, 1.f).x + margin, gm->GetShape()->GetPosition(1.f, 1.f).y + margin };
 
 	AABB windowAABB = { -margin, -margin, margin + RENDER_TARGET_WIDTH , margin + RENDER_TARGET_HEIGHT };
 

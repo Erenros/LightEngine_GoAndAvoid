@@ -255,7 +255,7 @@ void Demo::TileMapLoader::CreateLayerEntities(Scene* pScene, const TilemapHeader
 				static_cast<float32>(y * header.cellSize[1]));
 
 			pEntity->SetTexture(textureName);
-			pEntity->GetRenderShape()->SetTextureRect(
+			pEntity->GetShape()->SetTextureRect(
 				tilePos[0], tilePos[1],
 				header.cellSize[0], header.cellSize[1],
 				header.rowCol[0] * header.cellSize[0],

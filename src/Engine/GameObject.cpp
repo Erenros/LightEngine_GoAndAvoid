@@ -48,7 +48,7 @@ void GameObject::SetRenderPosition(float32 x, float32 y, float32 ratioX, float32
         mp_RenderShape->SetPosition(x, y, ratioX, ratioY);
 }
 
-void GameObject::SetRenderSize(gcle::Shapes shape, const std::vector<float32>& points)
+void GameObject::SetSize(gcle::Shapes shape, const std::vector<float32>& points)
 {
     if (mp_RenderShape == nullptr)
         return;
@@ -89,6 +89,7 @@ void GameObject::SetRenderSize(gcle::Shapes shape, const std::vector<float32>& p
 void GameObject::SetScale(Vector2f scale)
 {
     m_Transform.SetScale(scale);
+    OnSetScale(scale.x, scale.y);
 }
 
 void GameObject::SetScale(float32 scale)
@@ -99,7 +100,9 @@ void GameObject::SetScale(float32 scale)
 void GameObject::ScaleBy(Vector2f factor)
 {
     const Vector2f currentScale = m_Transform.GetScale();
-    m_Transform.SetScale({ currentScale.x * factor.x, currentScale.y * factor.y });
+    Vector2f newScale = { currentScale.x * factor.x, currentScale.y * factor.y };
+    m_Transform.SetScale(newScale);
+    OnSetScale(newScale.x, newScale.y);
 }
 
 void GameObject::SetRotation(Degrees angle)
@@ -290,12 +293,12 @@ const Transform2D& GameObject::GetTransform2D() const
     return m_Transform;
 }
 
-gcle::Shape* GameObject::GetRenderShape()
+gcle::Shape* GameObject::GetShape()
 {
     return mp_RenderShape;
 }
 
-const gcle::Shape* GameObject::GetRenderShape() const
+const gcle::Shape* GameObject::GetShape() const
 {
     return mp_RenderShape;
 }

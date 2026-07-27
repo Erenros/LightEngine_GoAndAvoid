@@ -51,7 +51,7 @@ void Slider::SetVisualMode(SliderVisualMode mode)
         Scene* pScene = SceneManager::GetInstance().GetCurrentScene();
 
         mp_Handle = pScene->CreateUI<UI>(gcle::Shapes::Circle);
-        mp_Handle->SetRenderSize(gcle::Shapes::Circle, { 25.0f });
+        mp_Handle->SetSize(gcle::Shapes::Circle, { 25.0f });
     }
 
     UpdateVisual();
@@ -107,7 +107,7 @@ void Slider::SetPosition(float32 x, float32 y)
     UpdateVisual();
 }
 
-void Slider::SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& points)
+void Slider::SetSize(gcle::Shapes shapeType, const std::vector<float32>& points)
 {
     if (shapeType == gcle::Shapes::Rectangle && points.size() >= 2)
     {
@@ -115,7 +115,7 @@ void Slider::SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& p
         m_HasFullSize = true;
     }
 
-    GameObject::SetRenderSize(shapeType, points);
+    GameObject::SetSize(shapeType, points);
 
     UpdateVisual();
 }
@@ -162,8 +162,8 @@ void Slider::UpdateValueFromMouse()
 
     Vector2f mouse = GameManager::GetInstance().GetWindow()->GetMousePositionOnRenderTarget(); 
 
-    float32 width = GetRenderShape()->GetWidth();
-    float32 height = GetRenderShape()->GetHeight();
+    float32 width = GetShape()->GetWidth();
+    float32 height = GetShape()->GetHeight();
      
     Vector2f center = GetRenderPosition();
     Vector2f topLeft = { center.x - width * 0.5f, center.y - height * 0.5f };
@@ -196,13 +196,13 @@ void Slider::UpdateVisual()
 
 void Slider::UpdateVisualHandle()
 {
-    if (!mp_Handle || !GetRenderShape())
+    if (!mp_Handle || !GetShape())
         return;
 
     float32 t = (m_MaxValue > m_MinValue) ? (m_Value - m_MinValue) / (m_MaxValue - m_MinValue) : 0.f;
 
-    float32 width = GetRenderShape()->GetWidth();
-    float32 height = GetRenderShape()->GetHeight();
+    float32 width = GetShape()->GetWidth();
+    float32 height = GetShape()->GetHeight();
 
     Vector2f center = GetPosition(); 
     Vector2f topLeft = { center.x - width * 0.5f, center.y - height * 0.5f };
@@ -214,7 +214,7 @@ void Slider::UpdateVisualHandle()
         float32 newX = topLeft.x + x + handleWidth * 0.5f;
 
         mp_Handle->SetPosition(newX, center.y);
-        mp_Handle->SetRenderPosition(newX, center.y);
+        mp_Handle->SetAnchoredRenderPosition({ newX, center.y });
     }
     else
     {
@@ -224,7 +224,7 @@ void Slider::UpdateVisualHandle()
         float32 newY = topLeft.y + y + handleHeight * 0.5f;
 
         mp_Handle->SetPosition(center.x, newY);
-        mp_Handle->SetRenderPosition(center.x, newY);
+        mp_Handle->SetAnchoredRenderPosition({ center.x, newY });
     }
 }
 
@@ -241,7 +241,7 @@ float32 Slider::RatioForAnchor(SliderFillAnchor anchor)
 
 void Slider::UpdateVisualFill()
 {
-    if (!m_HasFullSize || GetRenderShape() == nullptr)
+    if (!m_HasFullSize || GetShape() == nullptr)
         return;
 
     float32 t = (m_MaxValue > m_MinValue) ? (m_Value - m_MinValue) / (m_MaxValue - m_MinValue) : 0.f;
@@ -255,7 +255,7 @@ void Slider::UpdateVisualFill()
 
         float32 fixedWorldX = (m_AnchorPosition.x - m_FullSize.x * 0.5f) + m_FullSize.x * fixedRatio;
 
-        GameObject::SetRenderSize(gcle::Shapes::Rectangle, { newWidth, m_FullSize.y });
+        GameObject::SetSize(gcle::Shapes::Rectangle, { newWidth, m_FullSize.y });
         SetRenderPosition({ fixedWorldX, m_AnchorPosition.y }, fixedRatio, 0.5f);
     }
     else
@@ -264,7 +264,7 @@ void Slider::UpdateVisualFill()
 
         float32 fixedWorldY = (m_AnchorPosition.y - m_FullSize.y * 0.5f) + m_FullSize.y * fixedRatio;
 
-        GameObject::SetRenderSize(gcle::Shapes::Rectangle, { m_FullSize.x, newHeight });
+        GameObject::SetSize(gcle::Shapes::Rectangle, { m_FullSize.x, newHeight });
         SetRenderPosition({ m_AnchorPosition.x, fixedWorldY }, 0.5f, fixedRatio);
     }
 }
