@@ -4,7 +4,7 @@
 #include "ScoreManager.h"
 #include <fstream>
 #include <iostream>
-//#include <unordered_map>
+#include <unordered_map>
 
 #ifdef _DEBUG
 #include "DebugPlayer.h"
@@ -120,138 +120,178 @@ void TestScene::LoadLevel(const std::string& filepath)
     auto levels = data["levels"];
     if (levels.empty()) return;
 
-    for (const auto& layer : levels[0]["layerInstances"])
+    const std::vector<std::string> targetOrder = { "Decor", "Platformes", "Entities" };
+
+    for (const auto& targetLayerName : targetOrder)
     {
-        std::string layerName = layer["__identifier"];
-        float gridSize = layer["__gridSize"];
-
-        float targetSize = gridSize * GLOBAL_SCALE;
-        float engineScale = targetSize / 100.0f;
-
-        if (layerName == "Platformes")
+        for (const auto& layer : levels[0]["layerInstances"])
         {
-            for (const auto& tile : layer["gridTiles"])
+            std::string layerName = layer["__identifier"];
+
+            if (layerName != targetLayerName)
             {
-                float posX = tile["px"][0] * GLOBAL_SCALE;
-                float posY = tile["px"][1] * GLOBAL_SCALE;
+                continue;
+            }
 
-                int16 srcX = tile["src"][0];
-                int16 srcY = tile["src"][1];
-                int tileId = tile["t"];
+            float gridSize = layer["__gridSize"];
+            float targetSize = gridSize * GLOBAL_SCALE;
+            float engineScale = targetSize / 100.0f;
 
-                std::string slopeType = "";
-                if (tileCustomData.find(tileId) != tileCustomData.end())
+            if (layerName == "Platformes")
+            {
+                for (const auto& tile : layer["gridTiles"])
                 {
-                    slopeType = tileCustomData[tileId];
-                }
+                    float posX = tile["px"][0] * GLOBAL_SCALE;
+                    float posY = tile["px"][1] * GLOBAL_SCALE;
 
-                Platform* p = CreateEntity<Platform>(gcle::Shapes::Rectangle);
-                p->SetPosition(posX, posY);
-                p->SetScale({ engineScale, engineScale });
-                p->SetTexture("Assets");
+                    int16 srcX = tile["src"][0];
+                    int16 srcY = tile["src"][1];
+                    int tileId = tile["t"];
 
-                p->SetTag(1);
-                p->SetRigidBody(true);
-                p->GetRigidBody()->SetGravity(false);
-                p->SetStatic(false);
+                    std::string slopeType = "";
+                    if (tileCustomData.find(tileId) != tileCustomData.end())
+                    {
+                        slopeType = tileCustomData[tileId];
+                    }
 
-                if (slopeType == "Spikes")
-                {
-                    p->SetType(PlatformType::Spikes);
-                }
+                    if (slopeType == "Water")
+                    {
+                        Decor* waterDecor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
+                        waterDecor->SetPosition(posX, posY);
+                        waterDecor->SetScale({ engineScale, engineScale });
+                        waterDecor->SetTexture("Assets");
 
-                p->BuildColliders(slopeType, engineScale);
+                        if (waterDecor->GetRenderShape() != nullptr)
+                        {
+                            waterDecor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                        }
 
-                if (p->GetRenderShape() != nullptr)
-                {
-                    p->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
-                }
+                        waterDecor->SetWater(true);
+
+                        continue;
+                    }
+
+                    Platform* p = CreateEntity<Platform>(gcle::Shapes::Rectangle);
+                    p->SetPosition(posX, posY);
+                    p->SetScale({ engineScale, engineScale });
+                    p->SetTexture("Assets");
+
+                    p->SetTag(1);
+                    p->SetRigidBody(true);
+                    p->GetRigidBody()->SetGravity(false);
+                    p->SetStatic(false);
+
+                    if (slopeType == "Spikes")
+                    {
+                        p->SetType(PlatformType::Spikes);
+                    }
+
+                    p->BuildColliders(slopeType, engineScale);
+
+                    if (p->GetRenderShape() != nullptr)
+                    {
+                        p->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                    }
 
 #ifdef _DEBUG
-                float yOffsetDbg = 25.0f;
+                    float yOffsetDbg = 25.0f;
 
-                if (slopeType == "SlopeRight")
-                {
-                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp->SetTarget(p, { 0.0f, 0.0f }, { -1.0f, 1.0f });
-                }
-                else if (slopeType == "SlopeLeft")
-                {
-                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-                }
-                else if (slopeType == "SlopeRight_Low")
-                {
-                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp->SetTarget(p, { 0.0f, yOffsetDbg }, { -1.0f, 0.5f });
-                }
-                else if (slopeType == "SlopeLeft_Low")
-                {
-                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                }
-                else if (slopeType == "SlopeRight_High")
-                {
-                    auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                    dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                    auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { -1.0f, 0.5f });
-                }
-                else if (slopeType == "SlopeLeft_High")
-                {
-                    auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                    dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                    auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                    dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { 1.0f, 0.5f });
-                }
-                else
-                {
-                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                    dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-                }
+                    if (slopeType == "SlopeRight")
+                    {
+                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp->SetTarget(p, { 0.0f, 0.0f }, { -1.0f, 1.0f });
+                    }
+                    else if (slopeType == "SlopeLeft")
+                    {
+                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+                    }
+                    else if (slopeType == "SlopeRight_Low")
+                    {
+                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp->SetTarget(p, { 0.0f, yOffsetDbg }, { -1.0f, 0.5f });
+                    }
+                    else if (slopeType == "SlopeLeft_Low")
+                    {
+                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                    }
+                    else if (slopeType == "SlopeRight_High")
+                    {
+                        auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                        dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                        auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { -1.0f, 0.5f });
+                    }
+                    else if (slopeType == "SlopeLeft_High")
+                    {
+                        auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                        dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                        auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                        dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { 1.0f, 0.5f });
+                    }
+                    else
+                    {
+                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                        dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+                    }
 #endif
-            }
-        }
-        else if (layerName == "Decor")
-        {
-            for (const auto& tile : layer["gridTiles"])
-            {
-                float posX = tile["px"][0] * GLOBAL_SCALE;
-                float posY = tile["px"][1] * GLOBAL_SCALE;
-
-                int16 srcX = tile["src"][0];
-                int16 srcY = tile["src"][1];
-
-                Decor* decor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
-                decor->SetPosition(posX, posY);
-                decor->SetScale({ engineScale, engineScale });
-                decor->SetTexture("Assets");
-
-                if (decor->GetRenderShape() != nullptr)
-                {
-                    decor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
                 }
             }
-        }
-        else if (layerName == "Entities")
-        {
-            for (const auto& entityInstance : layer["entityInstances"])
+            else if (layerName == "Decor")
             {
-                std::string entityIdentifier = entityInstance["__identifier"];
-
-                float posX = entityInstance["px"][0] * GLOBAL_SCALE;
-                float posY = entityInstance["px"][1] * GLOBAL_SCALE;
-
-                if (entityIdentifier == "Slime")
+                for (const auto& tile : layer["gridTiles"])
                 {
-                    Slime* slime = CreateEntity<Slime>(gcle::Shapes::Rectangle);
-                    slime->SetPosition(posX, posY);
-                    slime->SetScale({ GLOBAL_SCALE / 5.0f, GLOBAL_SCALE / 5.0f });
+                    float posX = tile["px"][0] * GLOBAL_SCALE;
+                    float posY = tile["px"][1] * GLOBAL_SCALE;
+
+                    int16 srcX = tile["src"][0];
+                    int16 srcY = tile["src"][1];
+
+                    int tileId = tile["t"];
+
+                    Decor* decor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
+                    decor->SetPosition(posX, posY);
+                    decor->SetScale({ engineScale, engineScale });
+                    decor->SetTexture("Assets");
+
+                    if (decor->GetRenderShape() != nullptr)
+                    {
+                        decor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                    }
+
+                    std::string customType = "";
+                    if (tileCustomData.find(tileId) != tileCustomData.end())
+                    {
+                        customType = tileCustomData[tileId];
+                    }
+
+                    if (customType == "Water")
+                    {
+                        decor->SetWater(true);
+                    }
+                }
+            }
+            else if (layerName == "Entities")
+            {
+                for (const auto& entityInstance : layer["entityInstances"])
+                {
+                    std::string entityIdentifier = entityInstance["__identifier"];
+
+                    float posX = entityInstance["px"][0] * GLOBAL_SCALE;
+                    float posY = entityInstance["px"][1] * GLOBAL_SCALE;
+
+                    if (entityIdentifier == "Slime")
+                    {
+                        Slime* slime = CreateEntity<Slime>(gcle::Shapes::Rectangle);
+                        slime->SetPosition(posX, posY);
+                        slime->SetScale({ GLOBAL_SCALE / 5.0f, GLOBAL_SCALE / 5.0f });
 
 #ifdef _DEBUG
-                    DebugKillableEntity* debugEnemy = CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
-                    debugEnemy->SetTarget(slime);
+                        DebugKillableEntity* debugEnemy = CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
+                        debugEnemy->SetTarget(slime);
 #endif
+                    }
                 }
             }
         }
