@@ -25,4 +25,7 @@ private:
 
     Text* m_pScoreText = nullptr;
     Text* m_pDistanceText = nullptr;
+
+    Decor* m_pBackground1[2] = { nullptr, nullptr };
+    Decor* m_pBackground2[2] = { nullptr, nullptr };
 };

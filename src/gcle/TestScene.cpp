@@ -4,7 +4,7 @@
 #include "ScoreManager.h"
 #include <fstream>
 #include <iostream>
-#include <unordered_map>
+//#include <unordered_map>
 
 #ifdef _DEBUG
 #include "DebugPlayer.h"
@@ -23,6 +23,8 @@ namespace
     constexpr float ENEMY_SCALE = 0.6f;
     constexpr int16 TEXTURE_WIDTH = 400;
     constexpr int16 TEXTURE_HEIGHT = 400;
+
+    constexpr float BG_WIDTH = 4800.0f;
 }
 
 void TestScene::OnInitialize()
@@ -34,9 +36,23 @@ void TestScene::OnInitialize()
     m_pCamera = CreateCamera();
     SwitchCamera(m_pCamera);
 
-    LoadLevel("../../assets/LDTK/Lv1.ldtk");
+    AddDrawnTexture("Background_2");
+    AddDrawnTexture("Background_1");
     AddDrawnTexture("Assets");
     AddDrawnTexture("slime");
+
+    for (int i = 0; i < 2; ++i)
+    {
+        m_pBackground2[i] = CreateEntity<Decor>(gcle::Shapes::Rectangle);
+        m_pBackground2[i]->SetTexture("Background_2");
+        m_pBackground2[i]->SetScale({ 48.0f, 27.0f });
+
+        m_pBackground1[i] = CreateEntity<Decor>(gcle::Shapes::Rectangle);
+        m_pBackground1[i]->SetTexture("Background_1");
+        m_pBackground1[i]->SetScale({ 48.0f, 27.0f });
+    }
+
+    LoadLevel("../../assets/LDTK/Lv1.ldtk");
 
     m_pPlayer = CreateEntity<Player>(gcle::Shapes::Rectangle);
     m_pPlayer->SetPosition(0.0f, 800.0f);
@@ -133,11 +149,6 @@ void TestScene::LoadLevel(const std::string& filepath)
                 p->SetPosition(posX, posY);
                 p->SetScale({ engineScale, engineScale });
                 p->SetTexture("Assets");
-
-                p->SetTag(1);
-                p->SetRigidBody(true);
-                p->GetRigidBody()->SetGravity(false);
-                p->SetStatic(false);
 
                 p->SetTag(1);
                 p->SetRigidBody(true);
@@ -281,6 +292,29 @@ void TestScene::OnUpdate(Clock& time)
             float newY = currentPos.y + (targetPos.y - currentPos.y) * 10.0f * dt;
 
             m_pCamera->SetPosition({ newX, newY });
+
+            Vector2f camPos = m_pCamera->GetPosition();
+
+            float parallax1 = 0.7f;
+            float parallax2 = 0.9f;
+
+            float offset1 = std::fmod(camPos.x * (1.0f - parallax1), BG_WIDTH);
+            if (offset1 < 0) offset1 += BG_WIDTH;
+
+            float offset2 = std::fmod(camPos.x * (1.0f - parallax2), BG_WIDTH);
+            if (offset2 < 0) offset2 += BG_WIDTH;
+
+            for (int i = 0; i < 2; ++i)
+            {
+                if (m_pBackground1[i] != nullptr)
+                {
+                    m_pBackground1[i]->SetPosition(camPos.x - offset1 + (i * BG_WIDTH), camPos.y * parallax1);
+                }
+                if (m_pBackground2[i] != nullptr)
+                {
+                    m_pBackground2[i]->SetPosition(camPos.x - offset2 + (i * BG_WIDTH), camPos.y * parallax2);
+                }
+            }
         }
 
         if (m_pPlayerDebugText != nullptr && m_pPlayerDebugText->GetText() != nullptr)
