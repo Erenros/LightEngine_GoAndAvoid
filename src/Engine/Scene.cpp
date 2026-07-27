@@ -3,8 +3,7 @@
 #include "PhysicsManager.h"
 
 #include <sstream>
-#include <iomanip>
-#include "WorldText.h"
+#include <iomanip> 
 #include "RessourceManager.h"
 #include "InputManager.h"
 
@@ -588,19 +587,19 @@ Image* Scene::CreateImage(gcle::Shapes shape, const std::string& textureId)
 	return pImage;
 }
 
-Entity* Scene::CreateWorldText( const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a)
+WorldText* Scene::CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId, byte r, byte g, byte b, byte a)
 {
-	WorldText* worldText = CreateEntity<WorldText>();
 	Font* font = RessourceManager::GetInstance().GetFont(fontId);
 	if (font == nullptr)
 	{
-		GCLE_WARN << "Couldn't find the font " << fontId <<  ENDL;
-		return nullptr;
+		GCLE_WARN << "Couldn't find the font " << fontId << ENDL;
+		return nullptr; 
 	}
 
-	Text* textObject = GCLE_NEW Text(font, text, worldText->GetPosition(), fontSize, r, g, b, a);
-	worldText->m_Text = textObject;
-	Entity* entity = worldText;
+	WorldText* worldText = CreateEntity<WorldText>();
 
-	return entity;
+	Text* textObject = GCLE_NEW Text(font, text, worldText->GetPosition(), fontSize, r, g, b, a);
+	worldText->SetTextObject(textObject);
+
+	return worldText;
 }

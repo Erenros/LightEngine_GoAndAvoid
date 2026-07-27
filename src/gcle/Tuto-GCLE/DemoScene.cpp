@@ -40,6 +40,14 @@ void DemoScene::OnInitialize()
 	mp_Enemy->SetAttackRange(400.0f);
 	mp_Enemy->SetPosition(100.0f, 100.0f);
 
+	WorldText* label = CreateWorldText("Score : 0", 25);
+	if (label != nullptr)
+	{
+		label->SetTextColor(255, 200, 0);
+		label->SetFontSize(30);
+		label->SetText("Score : 100");
+	}
+
 	Demo::Wall* pWall = CreateEntity<Demo::Wall>(gcle::Shapes::Rectangle);
 	pWall->SetPosition(0, -400);
 	pWall->SetScale({ 8.0f, 1.0f });
