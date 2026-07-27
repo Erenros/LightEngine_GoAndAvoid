@@ -17,13 +17,13 @@ class GameManager
 {
 public:
 	int16 m_fps = 120;
+	float64 fixedUpdateDT = 1.f / FixedUpdateExecution; 
+	float32 accDt = 0.f;
+	float64 fpsDT = 1.f / m_fps; 
 
 	static GameManager& GetInstance();
 	static void DestroyInstance();
 
-	float64 fixedUpdateDT = 1.f / FixedUpdateExecution; 
-	float32 accDt = 0.f;
-	float64 fpsDT = 1.f / m_fps; 
 
 	GameManager() = default;
 	~GameManager();

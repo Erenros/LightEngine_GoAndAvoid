@@ -10,14 +10,14 @@
 #include "Scrollbar.h"
 #include "Panel.h"
 #include "Image.h"
+#include "WorldText.h"
 
 //class Entity;
 class Font;
 class Text;
 class Camera;
 class GameManager;
-class Window;
-class WorldText;
+class Window; 
 
 class Scene
 { 
@@ -45,7 +45,7 @@ public:
 	Panel* CreatePanel(gcle::Shapes shape, Color color = Color::White);
 	Image* CreateImage(gcle::Shapes shape, const std::string& textureId);
 
-	Entity* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	WorldText* CreateWorldText(const std::string& text, int32 fontSize, const std::string& fontId = "Hack-Regular", byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	 
 	Camera* CreateCamera();
 	 
