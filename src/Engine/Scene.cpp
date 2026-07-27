@@ -16,19 +16,19 @@ void Scene::Draw(Window* pWindow)
 			if (e->IsActive() == false)
 				continue;
 
-			if (pWindow->IsInsideWindow(e) && e->GetRenderShape() != nullptr && m_FrustrumCulling) 
+			if (pWindow->IsInsideWindow(e) && e->GetShape() != nullptr && m_FrustrumCulling) 
 			{
 				if (e->IsActiveIn(m_Tag)) 
 				{
-					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					GameManager::GetInstance().GetWindow()->Draw(e->GetShape());
 					m_NumberOfDraw++;
 				}
 			}
-			else if (e->GetRenderShape() != nullptr && m_FrustrumCulling == false)
+			else if (e->GetShape() != nullptr && m_FrustrumCulling == false)
 			{
 				if (e->IsActiveIn(m_Tag))
 				{
-					GameManager::GetInstance().GetWindow()->Draw(e->GetRenderShape());
+					GameManager::GetInstance().GetWindow()->Draw(e->GetShape());
 					m_NumberOfDraw++;
 				}
 			}
@@ -50,19 +50,19 @@ void Scene::Draw(Window* pWindow)
 			if (ui->IsActive() == false)
 				continue;
 
-			if (pWindow->IsInsideWindow(ui) && ui->GetRenderShape() != nullptr && m_FrustrumCulling)
+			if (pWindow->IsInsideWindow(ui) && ui->GetShape() != nullptr && m_FrustrumCulling)
 			{
 				if (ui->IsActiveIn(m_Tag))
 				{
-					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetShape());
 					m_NumberOfDraw++;
 				}
 			}
-			else if (ui->GetRenderShape() != nullptr)
+			else if (ui->GetShape() != nullptr)
 			{
 				if (ui->IsActiveIn(m_Tag))
 				{
-					GameManager::GetInstance().GetWindow()->Draw(ui->GetRenderShape());
+					GameManager::GetInstance().GetWindow()->Draw(ui->GetShape());
 					m_NumberOfDraw++;
 				}
 			}
@@ -255,7 +255,7 @@ void Scene::DrawDebug(Window* pWindow)
 	if (mp_SelectedEntity != nullptr && m_DebugPerf && mp_SelectedEntity->IsActiveIn(m_Tag))
 	{
 		GameManager::GetInstance().GetWindow()->ClearWindowWithColor(255, 255, 0, 255);
-		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetRenderShape(), camPos, zoom);
+		GameManager::GetInstance().GetWindow()->DrawDebug(mp_SelectedEntity->GetShape(), camPos, zoom);
 
 		for (auto& col : mp_SelectedEntity->GetColliders())
 		{
@@ -545,7 +545,7 @@ Button* Scene::CreateButton(gcle::Shapes shape, std::string text, const std::str
 	Button* button = CreateUI<Button>(shape);  
 	button->SetTexture(background);
 
-	button->SetTextObject(CreateText(text, button->GetRenderShape()->GetPosition(), 25));
+	button->SetTextObject(CreateText(text, button->GetShape()->GetPosition(), 25));
 	return button;
 }
 

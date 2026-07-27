@@ -88,3 +88,9 @@ Vector2f WorldText::GetTextSizes() const
 {
 	return m_Text != nullptr ? m_Text->GetSizes() : Vector2f{ 0.f, 0.f };
 }
+
+void WorldText::SetActive(bool active)
+{
+	GameObject::SetActive(active);
+	m_Text->SetActive(active);
+}

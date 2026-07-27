@@ -54,7 +54,7 @@ public:
     void SetOnValueChanged(std::function<void(float32)> callback);
      
     void SetPosition(float32 x, float32 y);
-    void SetRenderSize(gcle::Shapes shapeType, const std::vector<float32>& points);
+    void SetSize(gcle::Shapes shapeType, const std::vector<float32>& points);
 
     void SetActive(bool active) override;
 

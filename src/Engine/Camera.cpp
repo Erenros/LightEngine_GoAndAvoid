@@ -55,13 +55,13 @@ void Camera::Update(Clock& time, std::vector<std::vector<Entity*>>& entities)
 		for (Entity* entity : layer)
 		{
 			if (entity->IsActiveIn(SceneManager::GetInstance().GetCurrentSceneTag())) {
-				if (entity->GetRenderShape() != nullptr) {
+				if (entity->GetShape() != nullptr) {
 					Vector2f offset = (entity->GetPosition() - GetPosition()) * GetZoom();
 					entity->SetRenderPosition(offset + m_ScreenMiddle);
 
 					Vector2f realScale = entity->GetScale();
-					entity->GetRenderShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
-					entity->GetRenderShape()->SetRotation(entity->GetRotation());
+					entity->GetShape()->SetScale({ realScale.x * static_cast<float32>(GetZoom()), realScale.y * static_cast<float32>(GetZoom()) });
+					entity->GetShape()->SetRotation(entity->GetRotation());
 				}
 				else if (entity->IsWorldText()) {
 					WorldText* text = static_cast<WorldText*>(entity);

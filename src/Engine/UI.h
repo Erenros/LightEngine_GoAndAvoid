@@ -19,9 +19,12 @@ private:
     void Initialize(gcle::Shapes shape) override;
     void Initialize();
     void OnSetPosition(float32 x, float32 y) override;
+    void OnSetScale(float32 x, float32 y) override;
 public: 
     void SetText(const std::string& text);
     void SetTextObject(Text* pText) { mp_Text = pText; }
+
+    void SetAnchoredRenderPosition(Vector2f position, float32 ratioX = 0.5f, float32 ratioY = 0.5f);
 
     void SetActive(bool active) override;
 

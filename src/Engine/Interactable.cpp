@@ -9,7 +9,7 @@ void Interactable::SetInteractable(bool enabled)
 
 bool Interactable::IsInteractable() const
 {
-    return !m_IsDisabled;
+    return !m_IsDisabled && m_IsActive;
 }
 
 bool Interactable::IsHovered() const
@@ -25,6 +25,9 @@ bool Interactable::IsPressed() const
 void Interactable::Update(float32 dt)
 {
     UI::Update(dt);
+
+    if (!m_IsActive)
+        return;
 
     if (m_IsDisabled)
     {

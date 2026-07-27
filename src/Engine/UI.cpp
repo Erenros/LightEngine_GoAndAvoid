@@ -49,9 +49,20 @@ void UI::OnSetPosition(float32 x, float32 y)
     }
 }
 
+void UI::OnSetScale(float32 x, float32 y)
+{ 
+    if (mp_RenderShape != nullptr)
+        mp_RenderShape->SetScale({ x, y });
+}
+
 void UI::SetText(const std::string& text)
 {
     mp_Text->SetText(text);
+}
+
+void UI::SetAnchoredRenderPosition(Vector2f position, float32 ratioX, float32 ratioY)
+{
+    SetRenderPosition(position, ratioX, ratioY);
 }
 
 void UI::SetActive(bool active)
