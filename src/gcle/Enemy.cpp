@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "ScoreManager.h"
 
 void Enemy::OnCollisionEnter(Entity* other)
 {
@@ -7,4 +8,10 @@ void Enemy::OnCollisionEnter(Entity* other)
     {
         victim->TakeDamage(1);
     }
+}
+
+void Enemy::OnDeath()
+{
+    ScoreManager::GetInstance().AddScore(m_scoreReward);
+    KillableEntity::OnDeath();
 }

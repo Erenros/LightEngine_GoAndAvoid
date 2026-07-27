@@ -12,6 +12,7 @@
 #include "Profiler.h"
 
 #include "TestScene.h"
+#include "MainMenu.h"
 
 #include "Tuto-GCLE/DemoScene.h"
 
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
 
     gm.Init(1920, 1180, 120);
 
+    SceneManager::GetInstance().CreateScene<MainMenu>("MainMenu");
     SceneManager::GetInstance().CreateScene<TestScene>("TestScene");
     //SceneManager::GetInstance().CreateScene<DebugScene>("Sample");
 

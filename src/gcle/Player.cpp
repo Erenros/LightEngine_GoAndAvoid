@@ -1,6 +1,20 @@
 #include "Player.h"
 #include "GameManager.h"
 #include "Hitbox.h"
+#include "ScoreManager.h"
+#include "SceneManager.h"
+#include "Collider.h"
+#include "Platform.h"
+#include <algorithm>
+
+#undef min
+#undef max
+
+namespace
+{
+    constexpr int32 PLATFORM_TAG = 1;
+    constexpr const char* MAIN_MENU_SCENE_TAG = "MainMenu";
+}
 
 void Player::OnInitialize()
 {
@@ -113,27 +127,29 @@ void Player::OnUpdate()
         m_attackCooldownTimer -= dt;
     }
 
-    bool locked = (m_actionTimer > 0.0f);
+    m_velX = 400.0f;
 
-    if (locked)
+    if (m_actionTimer > 0.0f)
     {
         m_actionTimer -= dt;
-        m_velX = 0.0f;
     }
-    else
-    {
-        m_velX = 400.0f;
 
-        if (!m_groundContacts.empty() && m_currentInputs.jump)
+    if (!m_groundContacts.empty() && m_currentInputs.jump)
+    {
+        m_velY = -m_jumpSpeed;
+        m_groundContacts.clear();
+
+        if (m_actionTimer <= 0.0f)
         {
-            m_velY = -m_jumpSpeed;
-            m_groundContacts.clear();
             m_state = State::Jump;
         }
-        else if (m_currentInputs.skill0 && m_attackCooldownTimer <= 0.0f)
+    }
+    else if (m_actionTimer <= 0.0f)
+    {
+        if (m_currentInputs.skill0 && m_attackCooldownTimer <= 0.0f)
         {
             StartAction("Attack", 3, State::Attack, AnimationMode::Lock);
-            m_velX = 0.0f;
+
             if (m_attackHitbox != nullptr)
             {
                 m_attackHitbox->Activate({ 50.0f, 0.0f }, { 1.0f, 1.0f }, m_dmg, 0.2f);
@@ -156,6 +172,8 @@ void Player::OnUpdate()
     KillableEntity::OnUpdate();
     UpdateAnimation();
 
+    ScoreManager::GetInstance().UpdateDistanceFromPosition(GetPosition());
+
     if (m_sprite != nullptr && GetRenderShape() != nullptr)
     {
         m_sprite->UpdateAnimation(dt, GetRenderShape());
@@ -164,12 +182,23 @@ void Player::OnUpdate()
 
 void Player::OnDeath()
 {
+    if (m_state == State::Dead)
+    {
+        return;
+    }
+
+    m_state = State::Dead;
+
+    ScoreManager::GetInstance().RegisterRunEnd();
+
     if (m_sprite != nullptr)
     {
         delete m_sprite;
         m_sprite = nullptr;
     }
     KillableEntity::OnDeath();
+
+    SceneManager::GetInstance().SetCurrentSceneWithTag(MAIN_MENU_SCENE_TAG, false);
 }
 
 std::string Player::GetStateAsString() const
@@ -182,5 +211,65 @@ std::string Player::GetStateAsString() const
     case State::Attack: return "Attack";
     case State::Dead: return "Dead";
     default: return "Unknown";
+    }
+}
+
+bool Player::HasCollidedOnRightSide(Entity* other)
+{
+    bool hitOnRight = false;
+
+    for (Collider* collider : GetColliders())
+    {
+        if (collider == nullptr)
+        {
+            continue;
+        }
+
+        if (collider->GetCollisionDirection().isCollidingOnRight)
+        {
+            hitOnRight = true;
+        }
+
+        collider->StoppedColliding();
+    }
+
+    if (!hitOnRight || other == nullptr)
+    {
+        return false;
+    }
+
+    gcle::Shape* pSelfShape = GetRenderShape();
+    gcle::Shape* pOtherShape = other->GetRenderShape();
+
+    if (pSelfShape == nullptr || pOtherShape == nullptr)
+    {
+        return hitOnRight;
+    }
+
+    float32 tolerance = pSelfShape->GetHeight() * 0.25f;
+
+    float32 selfBottom = GetPosition().y + pSelfShape->GetHeight() * 0.5f;
+    float32 otherTop = other->GetPosition().y - pOtherShape->GetHeight() * 0.5f;
+
+    return selfBottom > otherTop + tolerance;
+}
+
+void Player::OnCollisionEnter(Entity* other)
+{
+    KillableEntity::OnCollisionEnter(other);
+
+    if (other == nullptr || m_state == State::Dead || !other->IsTag(PLATFORM_TAG))
+    {
+        return;
+    }
+
+    bool hitOnRight = HasCollidedOnRightSide(other);
+
+    Platform* platform = dynamic_cast<Platform*>(other);
+    bool isSpikes = (platform != nullptr && platform->IsSpikes());
+
+    if (isSpikes || hitOnRight)
+    {
+        TakeDamage(m_hp);
     }
 }

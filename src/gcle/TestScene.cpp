@@ -1,8 +1,10 @@
 #include "TestScene.h"
 #include "Engine/SceneManager.h"
 #include "Hitbox.h"
+#include "ScoreManager.h"
 #include <fstream>
 #include <iostream>
+#include <unordered_map>
 
 #ifdef _DEBUG
 #include "DebugPlayer.h"
@@ -27,6 +29,8 @@ void TestScene::OnInitialize()
 {
     Scene::OnInitialize();
 
+    ScoreManager::GetInstance().Reset();
+
     m_pCamera = CreateCamera();
     SwitchCamera(m_pCamera);
 
@@ -45,7 +49,7 @@ void TestScene::OnInitialize()
     {
         prb->SetFriction({ 0.0f, 0.0f });
         prb->SetActive(true);
-        prb->SetGravity(false);
+        prb->SetGravity(true);
         prb->SetCollisionOnContinuous();
     }
 
@@ -66,6 +70,9 @@ void TestScene::OnInitialize()
 
     Entity* textEntity = CreateWorldText("Init...", 20, "Hack-Regular", 255, 255, 0, 255);
     m_pPlayerDebugText = static_cast<WorldText*>(textEntity);
+
+    m_pScoreText = CreateText("Score: 0", { 20.0f, 900.0f }, 28, 255, 255, 0);
+    m_pDistanceText = CreateText("Distance: 0m", { 20.0f, 935.0f }, 28, 255, 255, 0);
 }
 
 void TestScene::LoadLevel(const std::string& filepath)
@@ -78,6 +85,21 @@ void TestScene::LoadLevel(const std::string& filepath)
 
     json data;
     file >> data;
+
+    std::unordered_map<int, std::string> tileCustomData;
+    if (data.contains("defs") && data["defs"].contains("tilesets"))
+    {
+        for (const auto& tileset : data["defs"]["tilesets"])
+        {
+            if (tileset.contains("customData"))
+            {
+                for (const auto& customData : tileset["customData"])
+                {
+                    tileCustomData[customData["tileId"].get<int>()] = customData["data"].get<std::string>();
+                }
+            }
+        }
+    }
 
     auto levels = data["levels"];
     if (levels.empty()) return;
@@ -99,6 +121,13 @@ void TestScene::LoadLevel(const std::string& filepath)
 
                 int16 srcX = tile["src"][0];
                 int16 srcY = tile["src"][1];
+                int tileId = tile["t"];
+
+                std::string slopeType = "";
+                if (tileCustomData.find(tileId) != tileCustomData.end())
+                {
+                    slopeType = tileCustomData[tileId];
+                }
 
                 Platform* p = CreateEntity<Platform>(gcle::Shapes::Rectangle);
                 p->SetPosition(posX, posY);
@@ -110,7 +139,17 @@ void TestScene::LoadLevel(const std::string& filepath)
                 p->GetRigidBody()->SetGravity(false);
                 p->SetStatic(false);
 
-                p->CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f });
+                p->SetTag(1);
+                p->SetRigidBody(true);
+                p->GetRigidBody()->SetGravity(false);
+                p->SetStatic(false);
+
+                if (slopeType == "Spikes")
+                {
+                    p->SetType(PlatformType::Spikes);
+                }
+
+                p->BuildColliders(slopeType, engineScale);
 
                 if (p->GetRenderShape() != nullptr)
                 {
@@ -118,8 +157,47 @@ void TestScene::LoadLevel(const std::string& filepath)
                 }
 
 #ifdef _DEBUG
-                DebugPlatform* debugPlat = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                debugPlat->SetTarget(p);
+                float yOffsetDbg = 25.0f;
+
+                if (slopeType == "SlopeRight")
+                {
+                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp->SetTarget(p, { 0.0f, 0.0f }, { -1.0f, 1.0f });
+                }
+                else if (slopeType == "SlopeLeft")
+                {
+                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+                }
+                else if (slopeType == "SlopeRight_Low")
+                {
+                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp->SetTarget(p, { 0.0f, yOffsetDbg }, { -1.0f, 0.5f });
+                }
+                else if (slopeType == "SlopeLeft_Low")
+                {
+                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                }
+                else if (slopeType == "SlopeRight_High")
+                {
+                    auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                    dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                    auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { -1.0f, 0.5f });
+                }
+                else if (slopeType == "SlopeLeft_High")
+                {
+                    auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                    dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
+                    auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
+                    dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { 1.0f, 0.5f });
+                }
+                else
+                {
+                    auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
+                    dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+                }
 #endif
             }
         }
@@ -157,7 +235,7 @@ void TestScene::LoadLevel(const std::string& filepath)
                 {
                     Slime* slime = CreateEntity<Slime>(gcle::Shapes::Rectangle);
                     slime->SetPosition(posX, posY);
-                    slime->SetScale({ GLOBAL_SCALE / 5, GLOBAL_SCALE / 5 });
+                    slime->SetScale({ GLOBAL_SCALE / 5.0f, GLOBAL_SCALE / 5.0f });
 
 #ifdef _DEBUG
                     DebugKillableEntity* debugEnemy = CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
@@ -172,6 +250,16 @@ void TestScene::LoadLevel(const std::string& filepath)
 void TestScene::OnUpdate(Clock& time)
 {
     Scene::OnUpdate(time);
+
+    if (m_pScoreText != nullptr)
+    {
+        m_pScoreText->SetText("Score: " + std::to_string(ScoreManager::GetInstance().GetScore()));
+    }
+
+    if (m_pDistanceText != nullptr)
+    {
+        m_pDistanceText->SetText("Distance: " + std::to_string(ScoreManager::GetInstance().GetDistance()) + "m");
+    }
 
     if (m_pPlayer != nullptr)
     {
@@ -188,7 +276,7 @@ void TestScene::OnUpdate(Clock& time)
             Vector2f currentPos = m_pCamera->GetPosition();
             Vector2f targetPos = { playerPos.x + 250.0f, playerPos.y - 150.0f };
             float dt = static_cast<float>(time.GetDeltaTime());
-            
+
             float newX = currentPos.x + (targetPos.x - currentPos.x) * 10.0f * dt;
             float newY = currentPos.y + (targetPos.y - currentPos.y) * 10.0f * dt;
 

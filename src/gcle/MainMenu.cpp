@@ -1,0 +1,302 @@
+#include "MainMenu.h"
+#include "Engine/SceneManager.h"
+#include "ScoreManager.h"
+#include <algorithm>
+#include <cstdlib>
+
+namespace
+{
+    constexpr const char* TEST_SCENE_TAG = "TestScene";
+    constexpr const char* BUTTON_TEXTURE_ID = "Button";
+    constexpr const char* BUTTON_PRESSED_TEXTURE_ID = "PressedButton";
+    constexpr float32 SCREEN_WIDTH = 1920.0f;
+    constexpr float32 SCREEN_HEIGHT = 1080.0f;
+    constexpr float32 OFF_SCREEN_POSITION = -6000.0f;
+    constexpr int32 MENU_BUTTON_FONT_SIZE = 28;
+}
+
+void MainMenu::OnInitialize()
+{
+    Scene::OnInitialize();
+
+    m_pCamera = CreateCamera();
+    SwitchCamera(m_pCamera);
+
+    CreateMenuButtons();
+    CreateScorePanel();
+}
+
+void MainMenu::OnUpdate(Clock& time)
+{
+    Scene::OnUpdate(time);
+
+    if (m_pCamera == nullptr)
+        return;
+
+    Vector2f mousePosition = m_pCamera->GetScreenMousePosition();
+
+    if (m_ShowScorePanel)
+    {
+        if (InputManager::GetInstance().IsDown(Escape))
+            CloseScorePanel();
+
+        return;
+    }
+
+    float32 dt = static_cast<float32>(time.GetDeltaTime());
+
+    UpdateButtonHoverScale(m_pPlayButton, m_PlayHovered, mousePosition, dt);
+    UpdateButtonHoverScale(m_pScoreButton, m_ScoreHovered, mousePosition, dt);
+    UpdateButtonHoverScale(m_pExitButton, m_ExitHovered, mousePosition, dt);
+
+    UpdateButtonPressState(mousePosition);
+}
+
+Button* MainMenu::CreateMenuButton(const std::string& label, Vector2f position, Vector2f scale)
+{
+    Button* pButton = CreateUI<Button>(gcle::Shapes::Rectangle);
+
+    pButton->SetTexture(BUTTON_TEXTURE_ID);
+    pButton->SetTextObject(CreateText(label, position, MENU_BUTTON_FONT_SIZE, 255, 255, 255));
+
+    pButton->SetScale(scale);
+    pButton->SetPosition(position.x, position.y);
+
+    return pButton;
+}
+
+void MainMenu::CreateMenuButtons()
+{
+    constexpr float32 BUTTON_WIDTH = 320.0f;
+    constexpr float32 BUTTON_HEIGHT = 100.0f;
+    constexpr float32 BUTTON_SPACING = 50.0f;
+
+    m_ButtonBaseScale = { BUTTON_WIDTH / 100.0f, BUTTON_HEIGHT / 100.0f };
+
+    m_PlayButtonPosition = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f - (BUTTON_HEIGHT + BUTTON_SPACING) };
+    m_ScoreButtonPosition = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f };
+    m_ExitButtonPosition = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f + (BUTTON_HEIGHT + BUTTON_SPACING) };
+
+    m_pPlayButton = CreateMenuButton("JOUER", m_PlayButtonPosition, m_ButtonBaseScale);
+    m_pScoreButton = CreateMenuButton("SCORES", m_ScoreButtonPosition, m_ButtonBaseScale);
+    m_pExitButton = CreateMenuButton("QUITTER", m_ExitButtonPosition, m_ButtonBaseScale);
+
+    m_pPlayButton->AddFunction([this]() { OnPlayClicked(); });
+    m_pScoreButton->AddFunction([this]() { OnScoreClicked(); });
+    m_pExitButton->AddFunction([this]() { OnExitClicked(); });
+}
+
+void MainMenu::CreateScorePanel()
+{
+    constexpr float32 PANEL_WIDTH = 760.0f;
+    constexpr float32 PANEL_HEIGHT = 640.0f;
+    constexpr float32 LINE_HEIGHT = 46.0f;
+    constexpr int32 FONT_SIZE = 26;
+
+    m_ScorePanelBackgroundOnPosition = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f };
+
+    m_pScorePanelBackground = CreateUI<UI>(gcle::Shapes::Rectangle);
+    m_pScorePanelBackground->SetScale({ PANEL_WIDTH / 100.0f, PANEL_HEIGHT / 100.0f });
+    m_pScorePanelBackground->SetColor({ 15, 15, 25, 235 });
+    m_pScorePanelBackground->SetPosition(m_ScorePanelBackgroundOnPosition.x, m_ScorePanelBackgroundOnPosition.y);
+
+    float32 textX = SCREEN_WIDTH * 0.5f - PANEL_WIDTH * 0.5f + 40.0f;
+    float32 currentY = SCREEN_HEIGHT * 0.5f - PANEL_HEIGHT * 0.5f + 40.0f;
+
+    auto addLine = [&](const std::string& initialText) -> Text*
+        {
+            Vector2f onScreenPos = { textX, currentY };
+            Text* pText = CreateText(initialText, onScreenPos, FONT_SIZE, 255, 255, 255);
+            m_ScorePanelLines.push_back({ pText, onScreenPos });
+            currentY += LINE_HEIGHT;
+            return pText;
+        };
+
+    m_pScoreTitleText = addLine("MEILLEURS SCORES");
+    currentY += LINE_HEIGHT * 0.5f;
+
+    m_pBestScoreText = addLine("Meilleur score : 0");
+    m_pBestDistanceText = addLine("Meilleure distance : 0m");
+    currentY += LINE_HEIGHT * 0.5f;
+
+    m_HistoryTexts.resize(MAX_HISTORY_DISPLAY);
+    for (int32 i = 0; i < MAX_HISTORY_DISPLAY; i++)
+        m_HistoryTexts[i] = addLine("");
+
+    currentY += LINE_HEIGHT * 0.5f;
+    addLine("Appuyez sur ECHAP pour revenir");
+
+    SetScorePanelVisible(false);
+}
+
+void MainMenu::UpdateButtonHoverScale(Button* pButton, bool& isHovered, Vector2f mousePosition, float32 dt)
+{
+    if (pButton == nullptr)
+        return;
+
+    isHovered = pButton->IsInside(mousePosition);
+
+    Vector2f targetScale = isHovered
+        ? Vector2f{ m_ButtonBaseScale.x * HOVER_SCALE_MULTIPLIER, m_ButtonBaseScale.y * HOVER_SCALE_MULTIPLIER }
+    : m_ButtonBaseScale;
+
+    Vector2f currentScale = pButton->GetScale();
+    float32 t = std::clamp(HOVER_LERP_SPEED * dt, 0.0f, 1.0f);
+
+    Vector2f newScale
+    {
+        currentScale.x + (targetScale.x - currentScale.x) * t,
+        currentScale.y + (targetScale.y - currentScale.y) * t
+    };
+
+    pButton->SetScale(newScale);
+}
+
+void MainMenu::UpdateButtonPressState(Vector2f mousePosition)
+{
+    InputManager& input = InputManager::GetInstance();
+    bool isLeftButtonHeld = input.IsHeld(LeftButton);
+
+    if (m_pPressedButton == nullptr)
+    {
+        if (isLeftButtonHeld && !m_WasLeftButtonHeld)
+        {
+            m_pPressedButton = GetButtonUnderMouse(mousePosition);
+            if (m_pPressedButton != nullptr)
+                m_pPressedButton->SetTexture(BUTTON_PRESSED_TEXTURE_ID);
+        }
+    }
+    else
+    {
+        if (!isLeftButtonHeld)
+        {
+            bool validated = m_pPressedButton->IsInside(mousePosition);
+            m_pPressedButton->SetTexture(BUTTON_TEXTURE_ID);
+
+            if (validated)
+                m_pPressedButton->Click();
+
+            m_pPressedButton = nullptr;
+        }
+    }
+
+    m_WasLeftButtonHeld = isLeftButtonHeld;
+}
+
+Button* MainMenu::GetButtonUnderMouse(Vector2f mousePosition) const
+{
+    if (m_pPlayButton != nullptr && m_pPlayButton->IsInside(mousePosition))
+        return m_pPlayButton;
+
+    if (m_pScoreButton != nullptr && m_pScoreButton->IsInside(mousePosition))
+        return m_pScoreButton;
+
+    if (m_pExitButton != nullptr && m_pExitButton->IsInside(mousePosition))
+        return m_pExitButton;
+
+    return nullptr;
+}
+
+void MainMenu::OnPlayClicked()
+{
+    SceneManager::GetInstance().SetCurrentSceneWithTag(TEST_SCENE_TAG, true);
+}
+
+void MainMenu::OnScoreClicked()
+{
+    if (m_ShowScorePanel)
+        CloseScorePanel();
+    else
+        OpenScorePanel();
+}
+
+void MainMenu::OnExitClicked()
+{
+    std::exit(0);
+}
+
+void MainMenu::OpenScorePanel()
+{
+    RefreshScorePanel();
+    SetScorePanelVisible(true);
+    SetMenuButtonsVisible(false);
+    m_ShowScorePanel = true;
+}
+
+void MainMenu::CloseScorePanel()
+{
+    SetScorePanelVisible(false);
+    SetMenuButtonsVisible(true);
+    m_ShowScorePanel = false;
+}
+
+void MainMenu::RefreshScorePanel()
+{
+    ScoreManager& scoreManager = ScoreManager::GetInstance();
+
+    if (m_pBestScoreText != nullptr)
+        m_pBestScoreText->SetText("Meilleur score : " + std::to_string(scoreManager.GetBestScore()));
+
+    if (m_pBestDistanceText != nullptr)
+        m_pBestDistanceText->SetText("Meilleure distance : " + std::to_string(scoreManager.GetBestDistance()) + "m");
+
+    const std::vector<RunResult>& history = scoreManager.GetRunHistory();
+    int32 runCount = static_cast<int32>(history.size());
+
+    for (int32 i = 0; i < static_cast<int32>(m_HistoryTexts.size()); i++)
+    {
+        if (m_HistoryTexts[i] == nullptr)
+            continue;
+
+        int32 runIndex = runCount - 1 - i;
+
+        if (runIndex >= 0)
+        {
+            const RunResult& run = history[runIndex];
+            m_HistoryTexts[i]->SetText("Partie " + std::to_string(runIndex + 1) + " : Score " + std::to_string(run.score) + " - Distance " + std::to_string(run.distance) + "m");
+        }
+        else
+        {
+            m_HistoryTexts[i]->SetText("");
+        }
+    }
+}
+
+void MainMenu::SetScorePanelVisible(bool visible)
+{
+    if (m_pScorePanelBackground != nullptr)
+    {
+        Vector2f pos = visible ? m_ScorePanelBackgroundOnPosition : Vector2f{ OFF_SCREEN_POSITION, OFF_SCREEN_POSITION };
+        m_pScorePanelBackground->SetPosition(pos.x, pos.y);
+    }
+
+    for (ScorePanelLine& line : m_ScorePanelLines)
+    {
+        if (line.pText == nullptr)
+            continue;
+
+        Vector2f pos = visible ? line.onScreenPosition : Vector2f{ OFF_SCREEN_POSITION, OFF_SCREEN_POSITION };
+        line.pText->SetPosition(static_cast<int32>(pos.x), static_cast<int32>(pos.y));
+    }
+}
+
+void MainMenu::SetMenuButtonsVisible(bool visible)
+{
+    if (m_pPlayButton != nullptr)
+    {
+        Vector2f pos = visible ? m_PlayButtonPosition : Vector2f{ OFF_SCREEN_POSITION, OFF_SCREEN_POSITION };
+        m_pPlayButton->SetPosition(pos.x, pos.y);
+    }
+
+    if (m_pScoreButton != nullptr)
+    {
+        Vector2f pos = visible ? m_ScoreButtonPosition : Vector2f{ OFF_SCREEN_POSITION, OFF_SCREEN_POSITION };
+        m_pScoreButton->SetPosition(pos.x, pos.y);
+    }
+
+    if (m_pExitButton != nullptr)
+    {
+        Vector2f pos = visible ? m_ExitButtonPosition : Vector2f{ OFF_SCREEN_POSITION, OFF_SCREEN_POSITION };
+        m_pExitButton->SetPosition(pos.x, pos.y);
+    }
+}

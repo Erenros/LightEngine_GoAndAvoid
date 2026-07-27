@@ -38,7 +38,7 @@ FrameInputs CharacterInput::ReadKeyboard()
     in.left = im.IsHeld(static_cast<char>(m_keyLeft));
     in.right = im.IsHeld(static_cast<char>(m_keyRight));
     in.crouch = im.IsHeld(static_cast<char>(m_keyCrouch));
-    in.jump = im.IsDown(m_keyJump) || im.IsDown(VK_UP);
+    in.jump = im.IsHeld(static_cast<char>(m_keyJump)) || im.IsHeld(static_cast<char>(VK_UP));
     in.skill0 = im.IsDown(m_keySkill0);
     in.skill1 = im.IsDown(m_keySkill1);
 
@@ -70,7 +70,8 @@ FrameInputs CharacterInput::ReadController()
     if (im.IsControllerDown(m_padIndex, XBOX_B) || im.IsControllerDown(m_padIndex, XBOX_RB)) now |= 4;
 
     int16 pressed = RisingEdges(now);
-    in.jump = (pressed & 1) != 0;
+
+    in.jump = (now & 1) != 0;
     in.skill0 = (pressed & 2) != 0;
     in.skill1 = (pressed & 4) != 0;
 
@@ -102,7 +103,8 @@ FrameInputs CharacterInput::ReadJoystick()
     if (im.IsControllerDown(m_padIndex, XBOX_Y)) now |= 4;
 
     int16 pressed = RisingEdges(now);
-    in.jump = (pressed & 1) != 0;
+
+    in.jump = (now & 1) != 0;
     in.skill0 = (pressed & 2) != 0;
     in.skill1 = (pressed & 4) != 0;
 

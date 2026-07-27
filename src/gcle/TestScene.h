@@ -22,4 +22,7 @@ private:
     Player* m_pPlayer = nullptr;
     Enemy* m_pEnemy = nullptr;
     WorldText* m_pPlayerDebugText = nullptr;
+
+    Text* m_pScoreText = nullptr;
+    Text* m_pDistanceText = nullptr;
 };
