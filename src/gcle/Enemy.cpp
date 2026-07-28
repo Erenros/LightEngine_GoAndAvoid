@@ -3,6 +3,11 @@
 
 void Enemy::OnCollisionEnter(Entity* other)
 {
+    if (other == nullptr || dynamic_cast<Enemy*>(other) != nullptr)
+    {
+        return;
+    }
+
     KillableEntity* victim = dynamic_cast<KillableEntity*>(other);
     if (victim != nullptr)
     {

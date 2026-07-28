@@ -2,8 +2,12 @@
 #include "Engine/SceneManager.h"
 #include "Hitbox.h"
 #include "ScoreManager.h"
+#include "PlatformEntry.h"
+#include "DecorEntry.h"
+#include "SlimeEntry.h"
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <unordered_map>
 
 #ifdef _DEBUG
@@ -19,12 +23,15 @@ using json = nlohmann::json;
 namespace
 {
     constexpr float GLOBAL_SCALE = 4.0f;
-    constexpr float PLAYER_SCALE = 0.6f;
+    constexpr float PLAYER_SCALE = 0.8f;
     constexpr float ENEMY_SCALE = 0.6f;
     constexpr int16 TEXTURE_WIDTH = 400;
     constexpr int16 TEXTURE_HEIGHT = 400;
 
     constexpr float BG_WIDTH = 4800.0f;
+
+    constexpr float STREAM_LOAD_DISTANCE = 2200.0f;
+    constexpr float STREAM_UNLOAD_DISTANCE = 2600.0f;
 }
 
 void TestScene::OnInitialize()
@@ -51,6 +58,8 @@ void TestScene::OnInitialize()
         m_pBackground1[i]->SetTexture("Background_1");
         m_pBackground1[i]->SetScale({ 48.0f, 27.0f });
     }
+
+    m_LevelStreamer.Initialize(this, STREAM_LOAD_DISTANCE, STREAM_UNLOAD_DISTANCE);
 
     LoadLevel("../../assets/LDTK/Lv1.ldtk");
 
@@ -89,6 +98,8 @@ void TestScene::OnInitialize()
 
     m_pScoreText = CreateText("Score: 0", { 20.0f, 900.0f }, 28, 255, 255, 0);
     m_pDistanceText = CreateText("Distance: 0m", { 20.0f, 935.0f }, 28, 255, 255, 0);
+
+    m_LevelStreamer.Update(m_pPlayer->GetPosition().x);
 }
 
 void TestScene::LoadLevel(const std::string& filepath)
@@ -154,88 +165,19 @@ void TestScene::LoadLevel(const std::string& filepath)
                         slopeType = tileCustomData[tileId];
                     }
 
+                    Vector2f position{ posX, posY };
+                    Vector2f scale{ engineScale, engineScale };
+                    int16 gridSize16 = static_cast<int16>(gridSize);
+
                     if (slopeType == "Water")
                     {
-                        Decor* waterDecor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
-                        waterDecor->SetPosition(posX, posY);
-                        waterDecor->SetScale({ engineScale, engineScale });
-                        waterDecor->SetTexture("Assets");
-
-                        if (waterDecor->GetRenderShape() != nullptr)
-                        {
-                            waterDecor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
-                        }
-
-                        waterDecor->SetWater(true);
-
+                        m_LevelStreamer.AddEntry(std::make_unique<DecorEntry>(
+                            position, scale, srcX, srcY, gridSize16, TEXTURE_WIDTH, TEXTURE_HEIGHT, true));
                         continue;
                     }
 
-                    Platform* p = CreateEntity<Platform>(gcle::Shapes::Rectangle);
-                    p->SetPosition(posX, posY);
-                    p->SetScale({ engineScale, engineScale });
-                    p->SetTexture("Assets");
-
-                    p->SetTag(1);
-                    p->SetRigidBody(true);
-                    p->GetRigidBody()->SetGravity(false);
-                    p->SetStatic(false);
-
-                    if (slopeType == "Spikes")
-                    {
-                        p->SetType(PlatformType::Spikes);
-                    }
-
-                    p->BuildColliders(slopeType, engineScale);
-
-                    if (p->GetRenderShape() != nullptr)
-                    {
-                        p->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
-                    }
-
-#ifdef _DEBUG
-                    float yOffsetDbg = 25.0f;
-
-                    if (slopeType == "SlopeRight")
-                    {
-                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp->SetTarget(p, { 0.0f, 0.0f }, { -1.0f, 1.0f });
-                    }
-                    else if (slopeType == "SlopeLeft")
-                    {
-                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-                    }
-                    else if (slopeType == "SlopeRight_Low")
-                    {
-                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp->SetTarget(p, { 0.0f, yOffsetDbg }, { -1.0f, 0.5f });
-                    }
-                    else if (slopeType == "SlopeLeft_Low")
-                    {
-                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                    }
-                    else if (slopeType == "SlopeRight_High")
-                    {
-                        auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                        dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                        auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { -1.0f, 0.5f });
-                    }
-                    else if (slopeType == "SlopeLeft_High")
-                    {
-                        auto dp1 = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                        dp1->SetTarget(p, { 0.0f, yOffsetDbg }, { 1.0f, 0.5f });
-                        auto dp2 = CreateEntity<DebugPlatform>(gcle::Shapes::Triangle);
-                        dp2->SetTarget(p, { 0.0f, -yOffsetDbg }, { 1.0f, 0.5f });
-                    }
-                    else
-                    {
-                        auto dp = CreateEntity<DebugPlatform>(gcle::Shapes::Rectangle);
-                        dp->SetTarget(p, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-                    }
-#endif
+                    m_LevelStreamer.AddEntry(std::make_unique<PlatformEntry>(
+                        position, scale, srcX, srcY, gridSize16, TEXTURE_WIDTH, TEXTURE_HEIGHT, engineScale, slopeType));
                 }
             }
             else if (layerName == "Decor")
@@ -250,26 +192,18 @@ void TestScene::LoadLevel(const std::string& filepath)
 
                     int tileId = tile["t"];
 
-                    Decor* decor = CreateEntity<Decor>(gcle::Shapes::Rectangle);
-                    decor->SetPosition(posX, posY);
-                    decor->SetScale({ engineScale, engineScale });
-                    decor->SetTexture("Assets");
-
-                    if (decor->GetRenderShape() != nullptr)
-                    {
-                        decor->GetRenderShape()->SetTextureRect(srcX, srcY, static_cast<int16>(gridSize), static_cast<int16>(gridSize), TEXTURE_WIDTH, TEXTURE_HEIGHT);
-                    }
-
                     std::string customType = "";
                     if (tileCustomData.find(tileId) != tileCustomData.end())
                     {
                         customType = tileCustomData[tileId];
                     }
 
-                    if (customType == "Water")
-                    {
-                        decor->SetWater(true);
-                    }
+                    Vector2f position{ posX, posY };
+                    Vector2f scale{ engineScale, engineScale };
+                    int16 gridSize16 = static_cast<int16>(gridSize);
+
+                    m_LevelStreamer.AddEntry(std::make_unique<DecorEntry>(
+                        position, scale, srcX, srcY, gridSize16, TEXTURE_WIDTH, TEXTURE_HEIGHT, customType == "Water"));
                 }
             }
             else if (layerName == "Entities")
@@ -283,19 +217,17 @@ void TestScene::LoadLevel(const std::string& filepath)
 
                     if (entityIdentifier == "Slime")
                     {
-                        Slime* slime = CreateEntity<Slime>(gcle::Shapes::Rectangle);
-                        slime->SetPosition(posX, posY);
-                        slime->SetScale({ GLOBAL_SCALE / 5.0f, GLOBAL_SCALE / 5.0f });
+                        Vector2f position{ posX, posY };
+                        Vector2f scale{ GLOBAL_SCALE / 5.0f, GLOBAL_SCALE / 5.0f };
 
-#ifdef _DEBUG
-                        DebugKillableEntity* debugEnemy = CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
-                        debugEnemy->SetTarget(slime);
-#endif
+                        m_LevelStreamer.AddEntry(std::make_unique<SlimeEntry>(position, scale));
                     }
                 }
             }
         }
     }
+
+    m_LevelStreamer.FinalizeLoading();
 }
 
 void TestScene::OnUpdate(Clock& time)
@@ -321,6 +253,8 @@ void TestScene::OnUpdate(Clock& time)
         }
 
         Vector2f playerPos = m_pPlayer->GetPosition();
+
+        m_LevelStreamer.Update(playerPos.x);
 
         if (m_pCamera != nullptr)
         {
@@ -366,4 +300,10 @@ void TestScene::OnUpdate(Clock& time)
             m_pPlayerDebugText->GetText()->SetText(debugStr);
         }
     }
+}
+
+void TestScene::OnExit()
+{
+    m_LevelStreamer.Shutdown();
+    Scene::OnExit();
 }

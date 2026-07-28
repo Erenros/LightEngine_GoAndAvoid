@@ -1,11 +1,17 @@
 #include "Platform.h"
 
+namespace
+{
+    constexpr int32 PLATFORM_LAYER = 1;
+}
+
 void Platform::OnInitialize()
 {
     SetTag(1);
     SetRigidBody(true);
     GetRigidBody()->SetGravity(false);
     SetStatic(false);
+    SetLayer(PLATFORM_LAYER);
 }
 
 void Platform::SetType(PlatformType type)
@@ -21,6 +27,11 @@ void Platform::SetStatic(bool isStatic)
 void Platform::BuildColliders(const std::string& slopeType, float engineScale)
 {
     float yOffset = 25.0f;
+
+    if (slopeType == "Spike")
+    {
+        m_type = PlatformType::Spikes;
+    }
 
     if (slopeType == "SlopeRight")
     {

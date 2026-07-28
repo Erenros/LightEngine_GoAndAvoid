@@ -134,10 +134,13 @@ void Player::OnUpdate()
         m_actionTimer -= dt;
     }
 
-    if (!m_groundContacts.empty() && m_currentInputs.jump)
+    bool grounded = IsGrounded();
+
+    if (grounded && m_currentInputs.jump)
     {
         m_velY = -m_jumpSpeed;
         m_groundContacts.clear();
+        grounded = false;
 
         if (m_actionTimer <= 0.0f)
         {
@@ -155,15 +158,15 @@ void Player::OnUpdate()
                 m_attackHitbox->Activate({ 50.0f, 0.0f }, { 1.0f, 1.0f }, m_dmg, 0.2f);
             }
         }
-        else if (m_groundContacts.empty() && m_velY < 0.0f)
+        else if (!grounded && m_velY < 0.0f)
         {
             m_state = State::Jump;
         }
-        else if (m_groundContacts.empty() && m_velY > 0.0f)
+        else if (!grounded && m_velY > 0.0f)
         {
             m_state = State::Fall;
         }
-        else if (!m_groundContacts.empty())
+        else if (grounded)
         {
             m_state = State::Run;
         }
@@ -263,12 +266,14 @@ void Player::OnCollisionEnter(Entity* other)
         return;
     }
 
-    bool hitOnRight = HasCollidedOnRightSide(other);
+    Platform* platform = static_cast<Platform*>(other);
+    if (platform->IsSpikes())
+    {
+        TakeDamage(m_hp);
+        return;
+    }
 
-    Platform* platform = dynamic_cast<Platform*>(other);
-    bool isSpikes = (platform != nullptr && platform->IsSpikes());
-
-    if (isSpikes || hitOnRight)
+    if (HasCollidedOnRightSide(other))
     {
         TakeDamage(m_hp);
     }

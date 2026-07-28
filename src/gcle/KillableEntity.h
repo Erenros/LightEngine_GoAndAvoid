@@ -21,6 +21,8 @@ protected:
     void OnCollision(Entity* other) override;
     void OnCollisionExit(Entity* other) override;
 
+    bool IsGrounded();
+
 public:
     int GetHp() const { return m_hp; }
     int GetMaxHp() const { return m_maxHp; }

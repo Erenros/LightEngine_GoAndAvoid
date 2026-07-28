@@ -18,6 +18,7 @@ public:
     {
         SetRigidBody(false);
         SetColor(Color{ 255, 0, 0, 120 });
+        SetLayer(3);
     }
 
     void OnUpdate() override

@@ -7,6 +7,7 @@
 #include "WorldText.h"
 #include "Render/Text.h"
 #include "Slime.h"
+#include "LevelStreamer.h"
 #include <string>
 
 class TestScene : public Scene
@@ -14,6 +15,7 @@ class TestScene : public Scene
 public:
     void OnInitialize() override;
     void OnUpdate(Clock& time) override;
+    void OnExit() override;
 
 private:
     void LoadLevel(const std::string& filepath);
@@ -28,4 +30,6 @@ private:
 
     Decor* m_pBackground1[2] = { nullptr, nullptr };
     Decor* m_pBackground2[2] = { nullptr, nullptr };
+
+    LevelStreamer m_LevelStreamer;
 };

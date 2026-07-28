@@ -1,6 +1,11 @@
 #include "KillableEntity.h"
 #include "GameManager.h"
 
+namespace
+{
+    constexpr int32 KILLABLE_LAYER = 2;
+}
+
 void KillableEntity::TakeDamage(int dmg)
 {
     m_hp -= dmg;
@@ -11,6 +16,7 @@ void KillableEntity::OnInitialize()
 {
     SetStatic(true);
     SetRigidBody(true);
+    SetLayer(KILLABLE_LAYER);
 
     RigidBody2D* rb = GetRigidBody();
     if (rb != nullptr)
@@ -19,6 +25,23 @@ void KillableEntity::OnInitialize()
         rb->SetGravity(false);
         rb->SetCollisionOnContinuous();
     }
+}
+
+bool KillableEntity::IsGrounded()
+{
+    for (auto it = m_groundContacts.begin(); it != m_groundContacts.end(); )
+    {
+        if (*it == nullptr || (*it)->ToDestroy())
+        {
+            it = m_groundContacts.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return !m_groundContacts.empty();
 }
 
 void KillableEntity::OnUpdate()
@@ -31,7 +54,7 @@ void KillableEntity::OnUpdate()
         return;
     }
 
-    m_grounded = (!m_groundContacts.empty());
+    m_grounded = IsGrounded();
 
     if (m_grounded && m_velY >= 0.0f)
     {
