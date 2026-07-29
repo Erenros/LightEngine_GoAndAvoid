@@ -13,6 +13,7 @@
 
 #include "TestScene.h"
 #include "MainMenu.h"
+#include "PauseScene.h"
 
 #include "Tuto-GCLE/DemoScene.h"
 
@@ -20,7 +21,7 @@
 
 
 int main(int argc, char** argv)
-{ 
+{
     //_CrtSetBreakAlloc(135);
 
     GameManager& gm = GameManager::GetInstance();
@@ -29,11 +30,12 @@ int main(int argc, char** argv)
 
     SceneManager::GetInstance().CreateScene<MainMenu>("MainMenu");
     SceneManager::GetInstance().CreateScene<TestScene>("TestScene");
+    SceneManager::GetInstance().CreateScene<PauseScene>("PauseScene");
     //SceneManager::GetInstance().CreateScene<DebugScene>("Sample");
 
     //SceneManager::GetInstance().SetCurrentSceneWithTag("DebugScene");
 
-    
+
     gm.Loop();
 
     SceneManager::GetInstance().DeleteAllScenes();

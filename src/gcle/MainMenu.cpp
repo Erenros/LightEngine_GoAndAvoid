@@ -22,6 +22,13 @@ void MainMenu::OnInitialize()
     m_pCamera = CreateCamera();
     SwitchCamera(m_pCamera);
 
+    AddDrawnTexture("MenuBg");
+
+    m_pBackground = CreateUI<UI>(gcle::Shapes::Rectangle);
+    m_pBackground->SetTexture("MenuBg");
+    m_pBackground->SetScale({ 19.2f, 10.8f });
+    m_pBackground->SetPosition(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
+
     CreateMenuButtons();
     CreateScorePanel();
 }
@@ -57,7 +64,12 @@ Button* MainMenu::CreateMenuButton(const std::string& label, Vector2f position, 
     Button* pButton = CreateUI<Button>(gcle::Shapes::Rectangle);
 
     pButton->SetTexture(BUTTON_TEXTURE_ID);
-    pButton->SetTextObject(CreateText(label, position, MENU_BUTTON_FONT_SIZE, 255, 255, 255));
+
+    Text* pButtonText = CreateText(label, { 0.0f, 0.0f }, MENU_BUTTON_FONT_SIZE, 255, 255, 255);
+    pButtonText->SetFont("street-fighter");
+    pButtonText->SetText(label); // Forcer le calcul des dimensions réelles de la police
+
+    pButton->SetTextObject(pButtonText);
 
     pButton->SetScale(scale);
     pButton->SetPosition(position.x, position.y);
@@ -107,6 +119,7 @@ void MainMenu::CreateScorePanel()
         {
             Vector2f onScreenPos = { textX, currentY };
             Text* pText = CreateText(initialText, onScreenPos, FONT_SIZE, 255, 255, 255);
+            pText->SetFont("street-fighter");
             m_ScorePanelLines.push_back({ pText, onScreenPos });
             currentY += LINE_HEIGHT;
             return pText;
@@ -124,7 +137,7 @@ void MainMenu::CreateScorePanel()
         m_HistoryTexts[i] = addLine("");
 
     currentY += LINE_HEIGHT * 0.5f;
-    addLine("Appuyez sur ECHAP pour revenir");
+    addLine("ECHAP TO RETURN");
 
     SetScorePanelVisible(false);
 }
@@ -138,7 +151,7 @@ void MainMenu::UpdateButtonHoverScale(Button* pButton, bool& isHovered, Vector2f
 
     Vector2f targetScale = isHovered
         ? Vector2f{ m_ButtonBaseScale.x * HOVER_SCALE_MULTIPLIER, m_ButtonBaseScale.y * HOVER_SCALE_MULTIPLIER }
-    : m_ButtonBaseScale;
+        : m_ButtonBaseScale;
 
     Vector2f currentScale = pButton->GetScale();
     float32 t = std::clamp(HOVER_LERP_SPEED * dt, 0.0f, 1.0f);

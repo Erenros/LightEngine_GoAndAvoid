@@ -33,6 +33,9 @@ namespace
 
     constexpr float STREAM_LOAD_DISTANCE = 2200.0f;
     constexpr float STREAM_UNLOAD_DISTANCE = 2600.0f;
+
+    constexpr const char* PAUSE_SCENE_TAG = "PauseScene";
+    constexpr const char* MAIN_MENU_SCENE_TAG = "MainMenu";
 }
 
 void TestScene::OnInitialize()
@@ -94,11 +97,13 @@ void TestScene::OnInitialize()
     debugPlayer->SetTarget(m_pPlayer);
 #endif
 
-    Entity* textEntity = CreateWorldText("Init...", 20, "Hack-Regular", 255, 255, 0, 255);
+    Entity* textEntity = CreateWorldText("Init...", 20, "street-fighter", 255, 255, 0, 255);
     m_pPlayerDebugText = static_cast<WorldText*>(textEntity);
 
     m_pScoreText = CreateText("Score: 0", { 20.0f, 900.0f }, 28, 255, 255, 0);
+    m_pScoreText->SetFont("street-fighter");
     m_pDistanceText = CreateText("Distance: 0m", { 20.0f, 935.0f }, 28, 255, 255, 0);
+    m_pDistanceText->SetFont("street-fighter");
 
     m_LevelStreamer.Update(m_pPlayer->GetPosition().x);
 }
@@ -234,6 +239,20 @@ void TestScene::LoadLevel(const std::string& filepath)
 void TestScene::OnUpdate(Clock& time)
 {
     Scene::OnUpdate(time);
+
+    InputManager& input = InputManager::GetInstance();
+
+    if (input.IsDown('P'))
+    {
+        SceneManager::GetInstance().SetCurrentSceneWithTag(PAUSE_SCENE_TAG, true);
+        return;
+    }
+
+    if (input.IsDown(Escape) || input.IsDown(Backspace) || input.IsDown('M'))
+    {
+        SceneManager::GetInstance().SetCurrentSceneWithTag(MAIN_MENU_SCENE_TAG, false);
+        return;
+    }
 
     if (m_pScoreText != nullptr)
     {

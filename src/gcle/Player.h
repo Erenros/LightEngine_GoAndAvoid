@@ -1,6 +1,7 @@
 #pragma once
 #include "KillableEntity.h"
 #include "CharacterInput.h"
+#include "FootstepDustEmitter.h"
 #include <string>
 
 class Hitbox;
@@ -25,6 +26,8 @@ private:
     std::string m_currentAnim;
     Hitbox* m_attackHitbox = nullptr;
 
+    FootstepDustEmitter m_DustEmitter;
+
     float32 m_actionTimer = 0.0f;
     float32 m_animDt = 0.1f;
     float32 m_jumpSpeed = 850.0f;
@@ -35,6 +38,7 @@ private:
     void StartAction(const std::string& anim, int32 nbFrames, State state, AnimationMode animMode = AnimationMode::None);
     void ReleasePendingAttack();
     bool HasCollidedOnRightSide(Entity* other);
+    void UpdateFootstepDust(float32 dt, bool isGrounded);
 
 public:
     void OnInitialize() override;

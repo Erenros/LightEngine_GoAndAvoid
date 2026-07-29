@@ -89,7 +89,7 @@ void Player::StartAction(const std::string& anim, int32 nbFrames, State state, A
 void Player::ReleasePendingAttack()
 {
     m_actionTimer = 0.0f;
-    m_attackCooldownTimer = 0.2f;
+    m_attackCooldownTimer = 0.1f;
     m_state = State::Run;
 }
 
@@ -114,6 +114,22 @@ void Player::UpdateAnimation()
     case State::Attack:
         break;
     }
+}
+
+void Player::UpdateFootstepDust(float32 dt, bool isGrounded)
+{
+    gcle::Shape* pShape = GetRenderShape();
+
+    Vector2f feetPosition = GetPosition();
+    if (pShape != nullptr)
+    {
+        feetPosition.y += pShape->GetHeight() * 0.5f;
+    }
+
+    bool facingRight = GetScale().x >= 0.0f;
+    bool canEmit = isGrounded && m_state != State::Dead;
+
+    m_DustEmitter.Update(dt, feetPosition, canEmit, facingRight);
 }
 
 void Player::OnUpdate()
@@ -155,7 +171,7 @@ void Player::OnUpdate()
 
             if (m_attackHitbox != nullptr)
             {
-                m_attackHitbox->Activate({ 50.0f, 0.0f }, { 1.0f, 1.0f }, m_dmg, 0.2f);
+                m_attackHitbox->Activate({ 50.0f, 16.66f }, { 1.0f, 1.33f }, m_dmg, 0.2f);
             }
         }
         else if (!grounded && m_velY < 0.0f)
@@ -174,6 +190,7 @@ void Player::OnUpdate()
 
     KillableEntity::OnUpdate();
     UpdateAnimation();
+    UpdateFootstepDust(dt, grounded);
 
     ScoreManager::GetInstance().UpdateDistanceFromPosition(GetPosition());
 

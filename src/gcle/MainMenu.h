@@ -38,15 +38,16 @@ private:
 
 private:
     Camera* m_pCamera = nullptr;
+    UI* m_pBackground = nullptr;
 
     Button* m_pPlayButton = nullptr;
     Button* m_pScoreButton = nullptr;
     Button* m_pExitButton = nullptr;
     Button* m_pPressedButton = nullptr;
 
-    Vector2f m_PlayButtonPosition = { 0.0f, 0.0f };
-    Vector2f m_ScoreButtonPosition = { 0.0f, 0.0f };
-    Vector2f m_ExitButtonPosition = { 0.0f, 0.0f };
+    Vector2f m_PlayButtonPosition = { -1000.0f, 0.0f };
+    Vector2f m_ScoreButtonPosition = { -1000.0f, 0.0f };
+    Vector2f m_ExitButtonPosition = { -1000.0f, 0.0f };
     Vector2f m_ButtonBaseScale = { 1.0f, 1.0f };
 
     bool m_PlayHovered = false;
