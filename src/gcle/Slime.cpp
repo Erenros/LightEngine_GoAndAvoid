@@ -22,10 +22,8 @@ void Slime::OnInitialize()
     CreateCollider(gcle::Shapes::Rectangle, true, { 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, false);
 }
 
-void Slime::OnUpdate()
+void Slime::OnAliveUpdate()
 {
-    Enemy::OnUpdate();
-
     m_StateFrames--;
 
     if (m_StateFrames <= 0)

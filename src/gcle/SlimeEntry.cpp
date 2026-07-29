@@ -23,6 +23,19 @@ void SlimeEntry::Spawn(Scene* pScene)
 
     mp_Entity = pSlime;
 
+    pSlime->SetOnDestroyedCallback([this]()
+        {
+            mp_Entity = nullptr;
+
+#ifdef _DEBUG
+            if (mp_DebugEntity != nullptr)
+            {
+                mp_DebugEntity->Destroy();
+                mp_DebugEntity = nullptr;
+            }
+#endif
+        });
+
 #ifdef _DEBUG
     DebugKillableEntity* pDebug = pScene->CreateEntity<DebugKillableEntity>(gcle::Shapes::Rectangle);
     pDebug->SetTarget(pSlime);

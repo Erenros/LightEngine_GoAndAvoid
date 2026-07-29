@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <unordered_map>
+#include <cmath>
 
 #ifdef _DEBUG
 #include "DebugPlayer.h"
@@ -28,7 +29,7 @@ namespace
     constexpr int16 TEXTURE_WIDTH = 400;
     constexpr int16 TEXTURE_HEIGHT = 400;
 
-    constexpr float BG_WIDTH = 4800.0f;
+    constexpr double BG_WIDTH = 1920.0;
 
     constexpr float STREAM_LOAD_DISTANCE = 2200.0f;
     constexpr float STREAM_UNLOAD_DISTANCE = 2600.0f;
@@ -52,11 +53,11 @@ void TestScene::OnInitialize()
     {
         m_pBackground2[i] = CreateEntity<Decor>(gcle::Shapes::Rectangle);
         m_pBackground2[i]->SetTexture("Background_2");
-        m_pBackground2[i]->SetScale({ 48.0f, 27.0f });
+        m_pBackground2[i]->SetScale({ 19.2f, 10.8f });
 
         m_pBackground1[i] = CreateEntity<Decor>(gcle::Shapes::Rectangle);
         m_pBackground1[i]->SetTexture("Background_1");
-        m_pBackground1[i]->SetScale({ 48.0f, 27.0f });
+        m_pBackground1[i]->SetScale({ 19.2f, 10.8f });
     }
 
     m_LevelStreamer.Initialize(this, STREAM_LOAD_DISTANCE, STREAM_UNLOAD_DISTANCE);
@@ -269,24 +270,25 @@ void TestScene::OnUpdate(Clock& time)
 
             Vector2f camPos = m_pCamera->GetPosition();
 
-            float parallax1 = 0.7f;
-            float parallax2 = 0.9f;
+            double camX = static_cast<double>(camPos.x);
+            double parallax1 = 0.7;
+            double parallax2 = 0.9;
 
-            float offset1 = std::fmod(camPos.x * (1.0f - parallax1), BG_WIDTH);
-            if (offset1 < 0) offset1 += BG_WIDTH;
+            double offset1 = std::fmod(camX * (1.0 - parallax1), BG_WIDTH);
+            if (offset1 < 0.0) offset1 += BG_WIDTH;
 
-            float offset2 = std::fmod(camPos.x * (1.0f - parallax2), BG_WIDTH);
-            if (offset2 < 0) offset2 += BG_WIDTH;
+            double offset2 = std::fmod(camX * (1.0 - parallax2), BG_WIDTH);
+            if (offset2 < 0.0) offset2 += BG_WIDTH;
 
             for (int i = 0; i < 2; ++i)
             {
                 if (m_pBackground1[i] != nullptr)
                 {
-                    m_pBackground1[i]->SetPosition(camPos.x - offset1 + (i * BG_WIDTH), camPos.y * parallax1);
+                    m_pBackground1[i]->SetPosition(static_cast<float>(camX - offset1 + (i * BG_WIDTH)), camPos.y);
                 }
                 if (m_pBackground2[i] != nullptr)
                 {
-                    m_pBackground2[i]->SetPosition(camPos.x - offset2 + (i * BG_WIDTH), camPos.y * parallax2);
+                    m_pBackground2[i]->SetPosition(static_cast<float>(camX - offset2 + (i * BG_WIDTH)), camPos.y);
                 }
             }
         }

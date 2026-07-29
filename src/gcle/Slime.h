@@ -12,7 +12,7 @@ public:
     void OnCollisionEnter(Entity* other) override;
 
 protected:
-    void OnUpdate() override;
+    void OnAliveUpdate() override;
 
 private:
     int m_StateFrames;
