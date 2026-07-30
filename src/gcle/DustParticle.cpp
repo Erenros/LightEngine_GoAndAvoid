@@ -16,10 +16,22 @@ void DustParticle::OnInitialize()
 {
     SetStatic(true);
     GetRigidBody()->SetActive(false);
+
+    if (!m_ActiveScenes.empty())
+    {
+        m_SceneTag = m_ActiveScenes.front();
+        RemoveActiveScene(m_SceneTag);
+    }
 }
 
 void DustParticle::Init(Vector2f position, Vector2f velocity, float32 lifetime, float32 startScale, Color color)
 {
+    if (!m_Active)
+    {
+        AddActiveScene(m_SceneTag);
+        m_Active = true;
+    }
+
     SetPosition(position.x, position.y);
     SetScale({ startScale, startScale });
     SetColor(color);
@@ -38,7 +50,7 @@ void DustParticle::OnUpdate()
     m_Life -= dt;
     if (m_Life <= 0.0f)
     {
-        Destroy();
+        Deactivate();
         return;
     }
 
@@ -54,4 +66,15 @@ void DustParticle::OnUpdate()
 
     byte alpha = static_cast<byte>(static_cast<float32>(m_BaseColor.a) * (1.0f - t));
     SetColor({ m_BaseColor.r, m_BaseColor.g, m_BaseColor.b, alpha });
+}
+
+void DustParticle::Deactivate()
+{
+    if (!m_Active)
+    {
+        return;
+    }
+
+    m_Active = false;
+    RemoveActiveScene(m_SceneTag);
 }

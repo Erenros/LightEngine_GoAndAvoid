@@ -68,6 +68,9 @@ Text::Text(Font* pFont, const std::string& text, Vector2f pos, int32 fontSize, b
 	m_FontSize(fontSize)
 {
 	mp_Color = GCLE_NEW SDL_Color(r, g, b, a);
+	mp_Rect = GCLE_NEW SDL_FRect(pos.x, pos.y, 0.0f, 0.0f);
+
+	UpdateRectSize();
 
 	int32 width = 0;
 	int32 height = 0;
@@ -107,12 +110,16 @@ void Text::SetFont(const std::string& id)
 
 	mp_Font = font;
 	m_NeedToChange = true;
+
+	UpdateRectSize();
 }
 
 void Text::SetText(const std::string& text)
 {
 	m_Text = text;
 	m_NeedToChange = true;
+
+	UpdateRectSize();
 }
 
 void Text::SetPosition(int32 x, int32 y)
@@ -140,4 +147,22 @@ Vector2f Text::GetSizes() {
 
 Font* Text::GetFont() {
 	return mp_Font;
+}
+
+void Text::UpdateRectSize()
+{
+	if (mp_Font == nullptr)
+	{
+		return;
+	}
+
+	int32 width = 0;
+	int32 height = 0;
+
+	mp_Font->GetTextSize(m_Text, width, height);
+
+	float32 factor = static_cast<float32>(m_FontSize) / static_cast<float32>(mp_Font->GetFontSize());
+
+	mp_Rect->w = width * factor;
+	mp_Rect->h = height * factor;
 }

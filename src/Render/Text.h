@@ -24,6 +24,8 @@ private:
 
 	bool m_NeedToChange = false;
 	int32 m_FontSize = 24;
+
+	void UpdateRectSize();
 public:
 
 	SDL_Texture* GetTexture(Window* pWindow);

@@ -295,3 +295,8 @@ void Player::OnCollisionEnter(Entity* other)
         TakeDamage(m_hp);
     }
 }
+
+void Player::OnDestroy()
+{
+    m_DustEmitter.Shutdown();
+}

@@ -61,10 +61,15 @@ void FootstepDustEmitter::Spawn(Vector2f feetPosition, bool facingRight)
         float32 scaleVariance = (static_cast<float32>(GenerateRandomNumber(0, 100)) / 100.0f) * DUST_SCALE_VARIANCE;
         float32 scale = DUST_BASE_SCALE + scaleVariance;
 
-        DustParticle* pParticle = pScene->CreateEntity<DustParticle>(gcle::Shapes::Rectangle);
+        DustParticle* pParticle = m_Pool.Acquire(pScene);
         if (pParticle != nullptr)
         {
             pParticle->Init(spawnPos, velocity, DUST_LIFETIME, scale, DUST_COLOR);
         }
     }
+}
+
+void FootstepDustEmitter::Shutdown()
+{
+    m_Pool.Shutdown();
 }

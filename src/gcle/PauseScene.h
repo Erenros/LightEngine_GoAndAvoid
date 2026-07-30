@@ -15,4 +15,6 @@ private:
     Camera* m_pCamera = nullptr;
     Text* m_pPauseText = nullptr;
     Text* m_pHintText = nullptr;
+
+    UI* m_pBackground = nullptr;
 };

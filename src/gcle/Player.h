@@ -45,6 +45,7 @@ public:
     void OnUpdate() override;
     void OnDeath() override;
     void OnCollisionEnter(Entity* other) override;
+    void OnDestroy() override;
 
     void SetupPlayer(InputMapping mapping, int8 padIndex);
     void SetCustomKeys(int16 left, int16 right, int16 crouch, int16 jump, int16 skill0, int16 skill1);

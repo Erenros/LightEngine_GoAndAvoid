@@ -28,7 +28,7 @@ void PauseScene::OnInitialize()
 
     m_pPauseText = CreateText("PAUSE", { 0.0f, 0.0f }, PAUSE_FONT_SIZE, 255, 255, 255);
     m_pPauseText->SetFont("street-fighter");
-    m_pPauseText->SetText("PAUSE"); // Forcer le calcul des dimensions réelles de la police
+    m_pPauseText->SetText("PAUSE");
 
     Vector2f pauseSize = m_pPauseText->GetSizes();
     m_pPauseText->SetPosition(
