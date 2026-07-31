@@ -19,6 +19,7 @@ protected:
     void OnInitialize() override;
     void OnUpdate() override;
     void OnCollision(Entity* other) override;
+    void OnCollisionEnter(Entity* other) override;
     void OnCollisionExit(Entity* other) override;
 
     bool IsGrounded();
