@@ -23,6 +23,8 @@ public:
 
 	void Clear();
 
+	void ForgetCollider(Collider* pEntry);
+
 	std::vector<Collider*>& Query(Collider* pEntry);
 	friend class PhysicsManager;
 };

@@ -52,11 +52,14 @@ void MainMenu::OnUpdate(Clock& time)
 
     float32 dt = static_cast<float32>(time.GetDeltaTime());
 
-    UpdateButtonHoverScale(m_pPlayButton, m_PlayHovered, mousePosition, dt);
-    UpdateButtonHoverScale(m_pScoreButton, m_ScoreHovered, mousePosition, dt);
-    UpdateButtonHoverScale(m_pExitButton, m_ExitHovered, mousePosition, dt);
+    UpdateMenuNavigation(mousePosition);
+
+    UpdateButtonHoverScale(m_pPlayButton, m_SelectedMenuIndex == 0, dt);
+    UpdateButtonHoverScale(m_pScoreButton, m_SelectedMenuIndex == 1, dt);
+    UpdateButtonHoverScale(m_pExitButton, m_SelectedMenuIndex == 2, dt);
 
     UpdateButtonPressState(mousePosition);
+    UpdateSelectionConfirm();
 }
 
 Button* MainMenu::CreateMenuButton(const std::string& label, Vector2f position, Vector2f scale)
@@ -67,7 +70,7 @@ Button* MainMenu::CreateMenuButton(const std::string& label, Vector2f position, 
 
     Text* pButtonText = CreateText(label, { 0.0f, 0.0f }, MENU_BUTTON_FONT_SIZE, 255, 255, 255);
     pButtonText->SetFont("street-fighter");
-    pButtonText->SetText(label); // Forcer le calcul des dimensions réelles de la police
+    pButtonText->SetText(label);
 
     pButton->SetTextObject(pButtonText);
 
@@ -142,16 +145,34 @@ void MainMenu::CreateScorePanel()
     SetScorePanelVisible(false);
 }
 
-void MainMenu::UpdateButtonHoverScale(Button* pButton, bool& isHovered, Vector2f mousePosition, float32 dt)
+void MainMenu::UpdateMenuNavigation(Vector2f mousePosition)
+{
+    InputManager& input = InputManager::GetInstance();
+
+    Button* pButtonUnderMouse = GetButtonUnderMouse(mousePosition);
+    if (pButtonUnderMouse != nullptr)
+    {
+        m_SelectedMenuIndex = GetMenuButtonIndex(pButtonUnderMouse);
+    }
+
+    if (input.IsDown(UpArrow))
+    {
+        m_SelectedMenuIndex = (m_SelectedMenuIndex + MENU_BUTTON_COUNT - 1) % MENU_BUTTON_COUNT;
+    }
+    else if (input.IsDown(DownArrow))
+    {
+        m_SelectedMenuIndex = (m_SelectedMenuIndex + 1) % MENU_BUTTON_COUNT;
+    }
+}
+
+void MainMenu::UpdateButtonHoverScale(Button* pButton, bool isSelected, float32 dt)
 {
     if (pButton == nullptr)
         return;
 
-    isHovered = pButton->IsInside(mousePosition);
-
-    Vector2f targetScale = isHovered
+    Vector2f targetScale = isSelected
         ? Vector2f{ m_ButtonBaseScale.x * HOVER_SCALE_MULTIPLIER, m_ButtonBaseScale.y * HOVER_SCALE_MULTIPLIER }
-        : m_ButtonBaseScale;
+    : m_ButtonBaseScale;
 
     Vector2f currentScale = pButton->GetScale();
     float32 t = std::clamp(HOVER_LERP_SPEED * dt, 0.0f, 1.0f);
@@ -196,6 +217,24 @@ void MainMenu::UpdateButtonPressState(Vector2f mousePosition)
     m_WasLeftButtonHeld = isLeftButtonHeld;
 }
 
+void MainMenu::UpdateSelectionConfirm()
+{
+    InputManager& input = InputManager::GetInstance();
+
+    bool keyboardConfirmPressed = input.IsDown(Space);
+
+    bool isControllerConfirmHeld = input.IsControllerDown(0, XBOX_A);
+    bool controllerConfirmPressed = isControllerConfirmHeld && !m_WasControllerConfirmHeld;
+    m_WasControllerConfirmHeld = isControllerConfirmHeld;
+
+    if (!keyboardConfirmPressed && !controllerConfirmPressed)
+        return;
+
+    Button* pSelectedButton = GetSelectedButton();
+    if (pSelectedButton != nullptr)
+        pSelectedButton->Click();
+}
+
 Button* MainMenu::GetButtonUnderMouse(Vector2f mousePosition) const
 {
     if (m_pPlayButton != nullptr && m_pPlayButton->IsInside(mousePosition))
@@ -208,6 +247,30 @@ Button* MainMenu::GetButtonUnderMouse(Vector2f mousePosition) const
         return m_pExitButton;
 
     return nullptr;
+}
+
+Button* MainMenu::GetMenuButtonAt(int32 index) const
+{
+    switch (index)
+    {
+    case 0: return m_pPlayButton;
+    case 1: return m_pScoreButton;
+    case 2: return m_pExitButton;
+    default: return nullptr;
+    }
+}
+
+int32 MainMenu::GetMenuButtonIndex(Button* pButton) const
+{
+    if (pButton == m_pPlayButton) return 0;
+    if (pButton == m_pScoreButton) return 1;
+    if (pButton == m_pExitButton) return 2;
+    return -1;
+}
+
+Button* MainMenu::GetSelectedButton() const
+{
+    return GetMenuButtonAt(m_SelectedMenuIndex);
 }
 
 void MainMenu::OnPlayClicked()

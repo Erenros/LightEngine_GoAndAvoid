@@ -22,9 +22,14 @@ private:
 
     Button* CreateMenuButton(const std::string& label, Vector2f position, Vector2f scale);
 
-    void UpdateButtonHoverScale(Button* pButton, bool& isHovered, Vector2f mousePosition, float32 dt);
+    void UpdateMenuNavigation(Vector2f mousePosition);
+    void UpdateButtonHoverScale(Button* pButton, bool isSelected, float32 dt);
     void UpdateButtonPressState(Vector2f mousePosition);
+    void UpdateSelectionConfirm();
     Button* GetButtonUnderMouse(Vector2f mousePosition) const;
+    Button* GetMenuButtonAt(int32 index) const;
+    int32 GetMenuButtonIndex(Button* pButton) const;
+    Button* GetSelectedButton() const;
 
     void OnPlayClicked();
     void OnScoreClicked();
@@ -50,12 +55,11 @@ private:
     Vector2f m_ExitButtonPosition = { -1000.0f, 0.0f };
     Vector2f m_ButtonBaseScale = { 1.0f, 1.0f };
 
-    bool m_PlayHovered = false;
-    bool m_ScoreHovered = false;
-    bool m_ExitHovered = false;
+    int32 m_SelectedMenuIndex = 0;
 
     bool m_ShowScorePanel = false;
     bool m_WasLeftButtonHeld = false;
+    bool m_WasControllerConfirmHeld = false;
 
     UI* m_pScorePanelBackground = nullptr;
     Vector2f m_ScorePanelBackgroundOnPosition = { 0.0f, 0.0f };
@@ -67,6 +71,7 @@ private:
     std::vector<ScorePanelLine> m_ScorePanelLines;
 
     static constexpr int32 MAX_HISTORY_DISPLAY = 5;
+    static constexpr int32 MENU_BUTTON_COUNT = 3;
     static constexpr float32 HOVER_SCALE_MULTIPLIER = 1.15f;
     static constexpr float32 HOVER_LERP_SPEED = 12.0f;
 };

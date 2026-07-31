@@ -105,6 +105,10 @@ void TestScene::OnInitialize()
     m_pDistanceText = CreateText("Distance: 0m", { 20.0f, 935.0f }, 28, 255, 255, 0);
     m_pDistanceText->SetFont("street-fighter");
 
+    m_LastDisplayedScore = 0;
+    m_LastDisplayedDistance = 0;
+    m_DebugTextRefreshCounter = 0;
+
     m_LevelStreamer.Update(m_pPlayer->GetPosition().x);
 }
 
@@ -236,11 +240,95 @@ void TestScene::LoadLevel(const std::string& filepath)
     m_LevelStreamer.FinalizeLoading();
 }
 
+void TestScene::UpdateScoreDisplay()
+{
+    int32 currentScore = ScoreManager::GetInstance().GetScore();
+    if (m_pScoreText != nullptr && currentScore != m_LastDisplayedScore)
+    {
+        m_pScoreText->SetText("Score: " + std::to_string(currentScore));
+        m_LastDisplayedScore = currentScore;
+    }
+
+    int32 currentDistance = ScoreManager::GetInstance().GetDistance();
+    if (m_pDistanceText != nullptr && currentDistance != m_LastDisplayedDistance)
+    {
+        m_pDistanceText->SetText("Distance: " + std::to_string(currentDistance) + "m");
+        m_LastDisplayedDistance = currentDistance;
+    }
+}
+
+void TestScene::UpdatePlayerDebugText(Vector2f playerPosition)
+{
+    if (m_pPlayerDebugText == nullptr || m_pPlayerDebugText->GetText() == nullptr)
+    {
+        return;
+    }
+
+    m_pPlayerDebugText->SetRenderPosition({ playerPosition.x, playerPosition.y - 60.0f });
+
+    ++m_DebugTextRefreshCounter;
+    if (m_DebugTextRefreshCounter < DEBUG_TEXT_REFRESH_INTERVAL)
+    {
+        return;
+    }
+    m_DebugTextRefreshCounter = 0;
+
+    std::string debugStr = "HP: " + std::to_string(m_pPlayer->GetHp()) +
+        " | X: " + std::to_string(static_cast<int32>(playerPosition.x)) +
+        " | Y: " + std::to_string(static_cast<int32>(playerPosition.y));
+    m_pPlayerDebugText->GetText()->SetText(debugStr);
+}
+
+void TestScene::UpdateParallaxBackground(Clock& time, Vector2f playerPosition)
+{
+    if (m_pCamera == nullptr)
+    {
+        return;
+    }
+
+    Vector2f currentPos = m_pCamera->GetPosition();
+    Vector2f targetPos = { playerPosition.x + 250.0f, playerPosition.y - 150.0f };
+    float dt = static_cast<float>(time.GetDeltaTime());
+
+    float newX = currentPos.x + (targetPos.x - currentPos.x) * 10.0f * dt;
+    float newY = currentPos.y + (targetPos.y - currentPos.y) * 10.0f * dt;
+
+    m_pCamera->SetPosition({ newX, newY });
+
+    Vector2f camPos = m_pCamera->GetPosition();
+
+    double camX = static_cast<double>(camPos.x);
+    double parallax1 = 0.7;
+    double parallax2 = 0.9;
+
+    double offset1 = std::fmod(camX * (1.0 - parallax1), BG_WIDTH);
+    if (offset1 < 0.0) offset1 += BG_WIDTH;
+
+    double offset2 = std::fmod(camX * (1.0 - parallax2), BG_WIDTH);
+    if (offset2 < 0.0) offset2 += BG_WIDTH;
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (m_pBackground1[i] != nullptr)
+        {
+            m_pBackground1[i]->SetPosition(static_cast<float>(camX - offset1 + (i * BG_WIDTH)), camPos.y);
+        }
+        if (m_pBackground2[i] != nullptr)
+        {
+            m_pBackground2[i]->SetPosition(static_cast<float>(camX - offset2 + (i * BG_WIDTH)), camPos.y);
+        }
+    }
+}
+
 void TestScene::OnUpdate(Clock& time)
 {
     Scene::OnUpdate(time);
 
     InputManager& input = InputManager::GetInstance();
+
+    bool isControllerBackHeld = input.IsControllerDown(0, XBOX_BACK);
+    bool controllerBackPressed = isControllerBackHeld && !m_WasControllerBackHeld;
+    m_WasControllerBackHeld = isControllerBackHeld;
 
     if (input.IsDown('P'))
     {
@@ -248,21 +336,13 @@ void TestScene::OnUpdate(Clock& time)
         return;
     }
 
-    if (input.IsDown(Escape) || input.IsDown(Backspace) || input.IsDown('M'))
+    if (input.IsDown(Escape) || input.IsDown(Backspace) || input.IsDown('M') || controllerBackPressed)
     {
         SceneManager::GetInstance().SetCurrentSceneWithTag(MAIN_MENU_SCENE_TAG, false);
         return;
     }
 
-    if (m_pScoreText != nullptr)
-    {
-        m_pScoreText->SetText("Score: " + std::to_string(ScoreManager::GetInstance().GetScore()));
-    }
-
-    if (m_pDistanceText != nullptr)
-    {
-        m_pDistanceText->SetText("Distance: " + std::to_string(ScoreManager::GetInstance().GetDistance()) + "m");
-    }
+    UpdateScoreDisplay();
 
     if (m_pPlayer != nullptr)
     {
@@ -276,50 +356,8 @@ void TestScene::OnUpdate(Clock& time)
 
         m_LevelStreamer.Update(playerPos.x);
 
-        if (m_pCamera != nullptr)
-        {
-            Vector2f currentPos = m_pCamera->GetPosition();
-            Vector2f targetPos = { playerPos.x + 250.0f, playerPos.y - 150.0f };
-            float dt = static_cast<float>(time.GetDeltaTime());
-
-            float newX = currentPos.x + (targetPos.x - currentPos.x) * 10.0f * dt;
-            float newY = currentPos.y + (targetPos.y - currentPos.y) * 10.0f * dt;
-
-            m_pCamera->SetPosition({ newX, newY });
-
-            Vector2f camPos = m_pCamera->GetPosition();
-
-            double camX = static_cast<double>(camPos.x);
-            double parallax1 = 0.7;
-            double parallax2 = 0.9;
-
-            double offset1 = std::fmod(camX * (1.0 - parallax1), BG_WIDTH);
-            if (offset1 < 0.0) offset1 += BG_WIDTH;
-
-            double offset2 = std::fmod(camX * (1.0 - parallax2), BG_WIDTH);
-            if (offset2 < 0.0) offset2 += BG_WIDTH;
-
-            for (int i = 0; i < 2; ++i)
-            {
-                if (m_pBackground1[i] != nullptr)
-                {
-                    m_pBackground1[i]->SetPosition(static_cast<float>(camX - offset1 + (i * BG_WIDTH)), camPos.y);
-                }
-                if (m_pBackground2[i] != nullptr)
-                {
-                    m_pBackground2[i]->SetPosition(static_cast<float>(camX - offset2 + (i * BG_WIDTH)), camPos.y);
-                }
-            }
-        }
-
-        if (m_pPlayerDebugText != nullptr && m_pPlayerDebugText->GetText() != nullptr)
-        {
-            m_pPlayerDebugText->SetRenderPosition({ playerPos.x, playerPos.y - 60.0f });
-            std::string debugStr = "HP: " + std::to_string(m_pPlayer->GetHp()) +
-                " | X: " + std::to_string(static_cast<int32>(playerPos.x)) +
-                " | Y: " + std::to_string(static_cast<int32>(playerPos.y));
-            m_pPlayerDebugText->GetText()->SetText(debugStr);
-        }
+        UpdateParallaxBackground(time, playerPos);
+        UpdatePlayerDebugText(playerPos);
     }
 }
 

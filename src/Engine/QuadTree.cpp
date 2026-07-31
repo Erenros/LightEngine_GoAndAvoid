@@ -37,3 +37,12 @@ void QuadTree::Clear(){
 	m_Pool.Reset();
 	m_Root.Clear();
 }
+
+void QuadTree::ForgetCollider(Collider* pCollider)
+{
+	if (pCollider == nullptr)
+		return;
+
+	std::erase(m_SeenEntities, pCollider);
+	std::erase(m_QueryResult, pCollider);
+}

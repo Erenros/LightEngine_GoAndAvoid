@@ -7,20 +7,31 @@ void CharacterInput::SetMapping(InputMapping mapping, int8 padIndex)
     m_padIndex = padIndex;
     m_padPrev = 0;
 
-    if (mapping == InputMapping::Controller || mapping == InputMapping::Joystick)
+    if (!m_ControllerAdded)
     {
         InputManager::GetInstance().AddController(new Controller());
+        m_ControllerAdded = true;
     }
 }
 
 FrameInputs CharacterInput::Read()
 {
-    switch (m_mapping)
-    {
-    case InputMapping::Controller: return ReadController();
-    case InputMapping::Joystick:   return ReadJoystick();
-    default:                       return ReadKeyboard();
-    }
+    FrameInputs keyboardInputs = ReadKeyboard();
+    FrameInputs padInputs = (m_mapping == InputMapping::Joystick) ? ReadJoystick() : ReadController();
+
+    return Merge(keyboardInputs, padInputs);
+}
+
+FrameInputs CharacterInput::Merge(const FrameInputs& keyboard, const FrameInputs& pad) const
+{
+    FrameInputs merged;
+    merged.left = keyboard.left || pad.left;
+    merged.right = keyboard.right || pad.right;
+    merged.crouch = keyboard.crouch || pad.crouch;
+    merged.jump = keyboard.jump || pad.jump;
+    merged.skill0 = keyboard.skill0 || pad.skill0;
+    merged.skill1 = keyboard.skill1 || pad.skill1;
+    return merged;
 }
 
 int16 CharacterInput::RisingEdges(int16 now)
@@ -66,8 +77,8 @@ FrameInputs CharacterInput::ReadController()
 
     int16 now = 0;
     if (im.IsControllerDown(m_padIndex, XBOX_A)) now |= 1;
-    if (im.IsControllerDown(m_padIndex, XBOX_X)) now |= 2;
-    if (im.IsControllerDown(m_padIndex, XBOX_B) || im.IsControllerDown(m_padIndex, XBOX_RB)) now |= 4;
+    if (im.IsControllerDown(m_padIndex, XBOX_B)) now |= 2;
+    if (im.IsControllerDown(m_padIndex, XBOX_X) || im.IsControllerDown(m_padIndex, XBOX_RB)) now |= 4;
 
     int16 pressed = RisingEdges(now);
 
@@ -99,8 +110,8 @@ FrameInputs CharacterInput::ReadJoystick()
 
     int16 now = 0;
     if (im.IsControllerDown(m_padIndex, XBOX_A)) now |= 1;
-    if (im.IsControllerDown(m_padIndex, XBOX_X)) now |= 2;
-    if (im.IsControllerDown(m_padIndex, XBOX_Y)) now |= 4;
+    if (im.IsControllerDown(m_padIndex, XBOX_B)) now |= 2;
+    if (im.IsControllerDown(m_padIndex, XBOX_X) || im.IsControllerDown(m_padIndex, XBOX_Y)) now |= 4;
 
     int16 pressed = RisingEdges(now);
 

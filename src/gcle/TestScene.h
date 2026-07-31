@@ -19,6 +19,9 @@ public:
 
 private:
     void LoadLevel(const std::string& filepath);
+    void UpdateScoreDisplay();
+    void UpdatePlayerDebugText(Vector2f playerPosition);
+    void UpdateParallaxBackground(Clock& time, Vector2f playerPosition);
 
     Camera* m_pCamera = nullptr;
     Player* m_pPlayer = nullptr;
@@ -32,4 +35,12 @@ private:
     Decor* m_pBackground2[2] = { nullptr, nullptr };
 
     LevelStreamer m_LevelStreamer;
+
+    bool m_WasControllerBackHeld = false;
+
+    int32 m_LastDisplayedScore = -1;
+    int32 m_LastDisplayedDistance = -1;
+    int32 m_DebugTextRefreshCounter = 0;
+
+    static constexpr int32 DEBUG_TEXT_REFRESH_INTERVAL = 6;
 };

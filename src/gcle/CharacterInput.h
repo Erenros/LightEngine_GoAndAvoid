@@ -37,10 +37,12 @@ private:
     FrameInputs ReadKeyboard();
     FrameInputs ReadController();
     FrameInputs ReadJoystick();
+    FrameInputs Merge(const FrameInputs& keyboard, const FrameInputs& pad) const;
 
     int16 RisingEdges(int16 now);
 
     InputMapping m_mapping = InputMapping::Keyboard;
     int8 m_padIndex = 0;
     int16 m_padPrev = 0;
+    bool m_ControllerAdded = false;
 };

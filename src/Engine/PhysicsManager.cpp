@@ -138,8 +138,11 @@ void PhysicsManager::AddEntity(Entity* pEntity)
 {
 	for (auto& info : m_EntitiesToUpdate)
 	{
+		if (info.toRemove)
+			continue;
+
 		if (info.entity->GetId() == pEntity->GetId())
-			return; 
+			return;
 	}
 	m_EntitiesToUpdate.push_back({ pEntity, false });
 }
@@ -148,11 +151,15 @@ void PhysicsManager::RemoveEntity(Entity* pEntity)
 {
 	for (auto& info : m_EntitiesToUpdate)
 	{
-		if (info.toRemove) continue; 
+		if (info.toRemove) continue;
 		if (info.entity->GetId() == pEntity->GetId())
 		{
 			info.toRemove = true;
 			m_ForceQuadTreeRegen = true;
+
+			for (Collider* collider : pEntity->GetColliders())
+				mp_QuadTree->ForgetCollider(collider);
+
 			return;
 		}
 	}

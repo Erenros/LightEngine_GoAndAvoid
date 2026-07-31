@@ -23,16 +23,15 @@ namespace gcle
 
 	Shape::~Shape()
 	{
+		delete mp_Texture;
+		mp_Texture = nullptr;
+
 		for (SDL_Vertex* vertex : m_Verticies)
-		{
 			delete vertex;
-		}
 		m_Verticies.clear();
 
 		for (SDL_FPoint* point : m_HollowPoints)
-		{
 			delete point;
-		}
 		m_HollowPoints.clear();
 
 		m_DebugContour.clear();
